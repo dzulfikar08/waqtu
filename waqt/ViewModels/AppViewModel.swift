@@ -37,6 +37,13 @@ final class AppViewModel {
                 self?.calculatePrayers()
             }
             .store(in: &cancellables)
+
+        // Listen for manual location changes from settings
+        NotificationCenter.default.publisher(for: .locationSettingsChanged)
+            .sink { [weak self] _ in
+                self?.calculatePrayers()
+            }
+            .store(in: &cancellables)
     }
 
     func calculatePrayers() {
