@@ -349,21 +349,21 @@ export default function Home() {
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {[
                 {
-                  title: "Next prayer & countdown",
+                  title: "Never wonder when the next prayer is",
                   description:
-                    "Always visible in the menu bar. Tap to see all five daily times and a clear countdown to the next prayer.",
+                    "A quick glance at your menu bar tells you. No checking apps, no guessing.",
                   icon: "○",
                 },
                 {
-                  title: "Full-screen reminder",
+                  title: "Calm, not alarming",
                   description:
-                    "When it's time, a calm overlay appears. Dismiss when you're ready to pray, with a short block so you're not interrupted.",
+                    "A peaceful overlay appears when it's time. Dismiss when you're ready to pray.",
                   icon: "◇",
                 },
                 {
-                  title: "Calendar protection",
+                  title: "Your faith on your calendar",
                   description:
-                    "Optional: Waqtu creates busy blocks in your calendar (Exchange, iCloud, or default) so Outlook and Teams show you as busy during prayer.",
+                    "Waqtu create busy blocks in your calendar—Exchange, iCloud, or default. Outlook & Teams show you as busy.",
                   icon: "▷",
                 },
               ].map((item, i) => (
