@@ -164,6 +164,28 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Problem Agitation Section */}
+        <section className="relative z-10 section-tint-1 px-6 py-16 sm:px-10 md:px-14 md:py-24">
+          <div className="mx-auto max-w-2xl">
+            <h2 className="font-display mb-6 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
+              We know what it's like.
+            </h2>
+            <div className="space-y-4 text-[var(--waqtu-muted)] leading-relaxed">
+              <p>
+                You're in back-to-back meetings. The prayer time comes and goes.
+                You make a mental note to "make it up later" <em className="text-[var(--waqtu-gold)]">(again)</em>.
+                Or you step away and come back to "Where were you?" messages.
+              </p>
+              <p>
+                Your calendar doesn't know about your prayers. Your colleagues don't either.
+              </p>
+              <p className="text-[var(--waqtu-text)] font-medium">
+                It's not that work is more important. It's just... louder.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Quote strip */}
         <section className="relative z-10 section-tint-1 border-y border-[var(--waqtu-border)] px-6 py-10 sm:px-10 md:px-14">
           <blockquote
