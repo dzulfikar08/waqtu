@@ -389,8 +389,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Testimonials Section */}
-        <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-16 sm:px-10 md:px-14 md:py-24">
+        {/* Testimonials Section - Hidden until we have real feedback */}
+        {/* <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-16 sm:px-10 md:px-14 md:py-24">
           <div className="mx-auto max-w-4xl">
             <h2 className="font-display mb-4 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
               Join Muslims who've made prayer part of their work day
@@ -435,7 +435,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Pricing Section */}
         <section
