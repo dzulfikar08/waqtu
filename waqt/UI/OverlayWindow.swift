@@ -3,6 +3,7 @@ import SwiftUI
 
 final class OverlayWindow: NSWindow {
     private var overlayTimer: Timer?
+    private var onDismissCallback: (() -> Void)?
 
     init(prayerName: PrayerName, durationMinutes: Int, onDismiss: @escaping () -> Void) {
         super.init(
@@ -11,10 +12,11 @@ final class OverlayWindow: NSWindow {
             backing: .buffered,
             defer: false
         )
-        setupWindow(prayerName: prayerName, durationMinutes: durationMinutes, onDismiss: onDismiss)
+        self.onDismissCallback = onDismiss
+        setupWindow(prayerName: prayerName, durationMinutes: durationMinutes)
     }
 
-    private func setupWindow(prayerName: PrayerName, durationMinutes: Int, onDismiss: @escaping () -> Void) {
+    private func setupWindow(prayerName: PrayerName, durationMinutes: Int) {
         level = .screenSaver
         if let screen = NSScreen.main {
             setFrame(screen.visibleFrame, display: true)
@@ -22,21 +24,30 @@ final class OverlayWindow: NSWindow {
         isMovable = false
         styleMask = [.borderless, .fullSizeContentView]
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        contentView = NSHostingView(rootView: OverlayView(
+
+        let hostingView = NSHostingView(rootView: OverlayView(
             prayerName: prayerName,
             durationMinutes: durationMinutes,
             onDismiss: { [weak self] in
-                self?.close()
-                onDismiss()
+                self?.dismissOverlay()
             }
         ))
+        contentView = hostingView
+
         overlayTimer = Timer.scheduledTimer(
             withTimeInterval: TimeInterval(durationMinutes * 60),
             repeats: false
         ) { [weak self] _ in
-            self?.close()
-            onDismiss()
+            self?.dismissOverlay()
         }
+    }
+
+    private func dismissOverlay() {
+        onDismissCallback?()
+        onDismissCallback = nil
+        overlayTimer?.invalidate()
+        overlayTimer = nil
+        super.close()
     }
 
     override var canBecomeKey: Bool { true }
@@ -44,5 +55,7 @@ final class OverlayWindow: NSWindow {
 
     deinit {
         overlayTimer?.invalidate()
+        overlayTimer = nil
+        onDismissCallback = nil
     }
 }

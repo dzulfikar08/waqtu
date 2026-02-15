@@ -39,7 +39,7 @@ final class AppViewModel {
             .store(in: &cancellables)
 
         // Listen for manual location changes from settings
-        NotificationCenter.default.publisher(for: .locationSettingsChanged)
+        NotificationCenter.default.publisher(for: Notification.Name("locationChanged"))
             .sink { [weak self] _ in
                 self?.calculatePrayers()
             }
@@ -120,17 +120,41 @@ final class AppViewModel {
     }
 
     private func showOverlay(for prayer: PrayerTime) {
-        overlayWindow = OverlayWindow(
+        // Close any existing overlay first
+        if let existing = overlayWindow {
+            overlayWindow = nil  // Clear reference BEFORE closing
+            existing.close()      // Then close
+        }
+
+        let newWindow = OverlayWindow(
             prayerName: prayer.name,
             durationMinutes: settings.overlayDuration
         ) { [weak self] in
             self?.overlayWindow = nil
         }
-        overlayWindow?.makeKeyAndOrderFront(nil)
+        overlayWindow = newWindow
+        newWindow.makeKeyAndOrderFront(nil)
     }
 
     func resetShownPrayers() {
         shownPrayers.removeAll()
+    }
+
+    func showTestOverlay() {
+        // Close any existing overlay first and clear the reference
+        if let existing = overlayWindow {
+            overlayWindow = nil  // Clear reference BEFORE closing
+            existing.close()      // Then close
+        }
+
+        let testWindow = OverlayWindow(
+            prayerName: .maghrib,
+            durationMinutes: settings.overlayDuration
+        ) { [weak self] in
+            self?.overlayWindow = nil
+        }
+        overlayWindow = testWindow
+        testWindow.makeKeyAndOrderFront(nil)
     }
 
     deinit {
