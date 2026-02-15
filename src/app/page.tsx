@@ -106,7 +106,9 @@ export default function Home() {
             >
               You check your calendar,
               <br />
-              <span className="text-[var(--waqtu-light)]">see a meeting at 1:15 PM.</span>
+              <span className="text-[var(--waqtu-light)]">
+                see a meeting at 1:15 PM.
+              </span>
               <br />
               But Dhuhr is at 1:00 PM.
             </h1>
@@ -114,9 +116,10 @@ export default function Home() {
               className="animate-fade-up mt-8 max-w-xl text-lg leading-relaxed text-[var(--waqtu-muted)]"
               style={{ animationDelay: "160ms", opacity: 0 }}
             >
-              Time for prayer, without the awkward calendar conflicts.
-              Waqtu sits in your menu bar and blocks your calendar during prayer
-              times—so Outlook and Teams show you as busy before you even step away.
+              Time for prayer, without the awkward calendar conflicts. Waqtu
+              sits in your menu bar and blocks your calendar during prayer
+              times—so Outlook and Teams show you as busy before you even step
+              away.
             </p>
             <div
               className="animate-fade-up mt-12 flex flex-wrap items-center justify-center gap-4"
@@ -173,62 +176,17 @@ export default function Home() {
             <div className="space-y-4 text-[var(--waqtu-muted)] leading-relaxed">
               <p>
                 You're in back-to-back meetings. The prayer time comes and goes.
-                You make a mental note to "make it up later" <em className="text-[var(--waqtu-gold)]">(again)</em>.
-                Or you step away and come back to "Where were you?" messages.
+                You make a mental note to "make it up later"{" "}
+                <em className="text-[var(--waqtu-gold)]">(again)</em>. Or you
+                step away and come back to "Where were you?" messages.
               </p>
               <p>
-                Your calendar doesn't know about your prayers. Your colleagues don't either.
+                Your calendar doesn't know about your prayers. Your colleagues
+                don't either.
               </p>
               <p className="text-[var(--waqtu-text)] font-medium">
                 It's not that work is more important. It's just... louder.
               </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Solution Section */}
-        <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-16 sm:px-10 md:px-14 md:py-24">
-          <div className="mx-auto max-w-4xl">
-            <h2 className="font-display mb-4 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
-              What if your calendar respected your prayers?
-            </h2>
-            <p className="mx-auto mb-12 max-w-2xl text-center text-[var(--waqtu-muted)]">
-              Waqtu is a small app that lives in your Mac's menu bar. It knows when it's time
-              for each of the five daily prayers—and it gently protects that time.
-            </p>
-            <div className="grid gap-6 sm:grid-cols-3">
-              {[
-                {
-                  title: "Always there",
-                  description: "Next prayer & countdown in your menu bar",
-                  icon: "○",
-                },
-                {
-                  title: "Calm reminders",
-                  description: "Full-screen overlay appears when it's time to pray",
-                  icon: "◇",
-                },
-                {
-                  title: "Calendar protection",
-                  description: "Shows you \"busy\" in Outlook & Teams during prayer times",
-                  icon: "▷",
-                },
-              ].map((item, i) => (
-                <article
-                  key={item.title}
-                  className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-6 text-center backdrop-blur-sm"
-                >
-                  <span className="mb-3 block text-2xl text-[var(--waqtu-gold)] opacity-80">
-                    {item.icon}
-                  </span>
-                  <h3 className="font-display mb-2 font-semibold text-[var(--waqtu-text)]">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm text-[var(--waqtu-muted)]">
-                    {item.description}
-                  </p>
-                </article>
-              ))}
             </div>
           </div>
         </section>
@@ -254,9 +212,12 @@ export default function Home() {
                     <span className="text-xs text-[var(--waqtu-gold)]">🌙</span>
                   </div>
                   <div className="flex-1 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-6 backdrop-blur-sm">
-                    <h3 className="font-display font-semibold text-[var(--waqtu-gold)]">Morning · Fajr</h3>
+                    <h3 className="font-display font-semibold text-[var(--waqtu-gold)]">
+                      Morning · Fajr
+                    </h3>
                     <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
-                      A gentle wake-up reminder. Your calendar is still yours—no blocks needed while you sleep.
+                      A gentle wake-up reminder. Your calendar is still yours—no
+                      blocks needed while you sleep.
                     </p>
                   </div>
                 </div>
@@ -264,12 +225,17 @@ export default function Home() {
                 {/* Work begins */}
                 <div className="relative flex gap-4 sm:gap-6">
                   <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--waqtu-bg)] border-2 border-[var(--waqtu-muted)] sm:h-10 sm:w-10">
-                    <span className="text-xs text-[var(--waqtu-muted)]">💻</span>
+                    <span className="text-xs text-[var(--waqtu-muted)]">
+                      💻
+                    </span>
                   </div>
                   <div className="flex-1 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-6 backdrop-blur-sm">
-                    <h3 className="font-display font-semibold text-[var(--waqtu-text)]">Mid-morning · Work begins</h3>
+                    <h3 className="font-display font-semibold text-[var(--waqtu-text)]">
+                      Mid-morning · Work begins
+                    </h3>
                     <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
-                      Waqtu sits quietly in your menu bar, showing a countdown to Dhuhr. No interruptions.
+                      Waqtu sits quietly in your menu bar, showing a countdown
+                      to Dhuhr. No interruptions.
                     </p>
                   </div>
                 </div>
@@ -277,15 +243,25 @@ export default function Home() {
                 {/* Dhuhr */}
                 <div className="relative flex gap-4 sm:gap-6">
                   <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--waqtu-bg)] border-2 border-[var(--waqtu-primary)] sm:h-10 sm:w-10">
-                    <span className="text-xs text-[var(--waqtu-primary)]">🕌</span>
+                    <span className="text-xs text-[var(--waqtu-primary)]">
+                      🕌
+                    </span>
                   </div>
                   <div className="flex-1 rounded-2xl border border-[var(--waqtu-primary)]/30 bg-[var(--waqtu-card)]/80 p-6 backdrop-blur-sm">
-                    <h3 className="font-display font-semibold text-[var(--waqtu-primary)]">1:00 PM · Dhuhr arrives</h3>
+                    <h3 className="font-display font-semibold text-[var(--waqtu-primary)]">
+                      1:00 PM · Dhuhr arrives
+                    </h3>
                     <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
-                      A calm full-screen reminder appears. You dismiss it when ready—and your calendar now shows you <span className="text-[var(--waqtu-primary)]">"busy"</span> until 1:20 PM.
+                      A calm full-screen reminder appears. You dismiss it when
+                      ready—and your calendar now shows you{" "}
+                      <span className="text-[var(--waqtu-primary)]">
+                        "busy"
+                      </span>{" "}
+                      until 1:20 PM.
                     </p>
                     <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
-                      Your colleagues see "Busy" in Teams. No awkward "where were you?" messages.
+                      Your colleagues see "Busy" in Teams. No awkward "where
+                      were you?" messages.
                     </p>
                   </div>
                 </div>
@@ -293,12 +269,17 @@ export default function Home() {
                 {/* Asr & Maghrib */}
                 <div className="relative flex gap-4 sm:gap-6">
                   <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--waqtu-bg)] border-2 border-[var(--waqtu-primary)] sm:h-10 sm:w-10">
-                    <span className="text-xs text-[var(--waqtu-primary)]">🕌</span>
+                    <span className="text-xs text-[var(--waqtu-primary)]">
+                      🕌
+                    </span>
                   </div>
                   <div className="flex-1 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-6 backdrop-blur-sm">
-                    <h3 className="font-display font-semibold text-[var(--waqtu-text)]">Afternoon · Asr & Maghrib</h3>
+                    <h3 className="font-display font-semibold text-[var(--waqtu-text)]">
+                      Afternoon · Asr & Maghrib
+                    </h3>
                     <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
-                      Same peaceful rhythm. You step away, your calendar protects you, you return.
+                      Same peaceful rhythm. You step away, your calendar
+                      protects you, you return.
                     </p>
                   </div>
                 </div>
@@ -309,9 +290,12 @@ export default function Home() {
                     <span className="text-xs text-[var(--waqtu-gold)]">🌙</span>
                   </div>
                   <div className="flex-1 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-6 backdrop-blur-sm">
-                    <h3 className="font-display font-semibold text-[var(--waqtu-gold)]">Evening · Isha</h3>
+                    <h3 className="font-display font-semibold text-[var(--waqtu-gold)]">
+                      Evening · Isha
+                    </h3>
                     <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
-                      Final prayer of the day, final block on your calendar. Tomorrow, Waqtu is there again.
+                      Final prayer of the day, final block on your calendar.
+                      Tomorrow, Waqtu is there again.
                     </p>
                   </div>
                 </div>
@@ -396,7 +380,8 @@ export default function Home() {
               See Waqtu in action
             </h2>
             <p className="mx-auto mb-12 max-w-2xl text-center text-[var(--waqtu-muted)]">
-              A calm reminder when it's time to pray. Your calendar protected during prayer times.
+              A calm reminder when it's time to pray. Your calendar protected
+              during prayer times.
             </p>
 
             <div className="grid gap-8 md:grid-cols-2">
@@ -407,7 +392,8 @@ export default function Home() {
                     Full-screen prayer reminder
                   </h3>
                   <p className="mt-1 text-sm text-[var(--waqtu-muted)]">
-                    A peaceful overlay appears at prayer time. Dismiss when you're ready.
+                    A peaceful overlay appears at prayer time. Dismiss when
+                    you're ready.
                   </p>
                 </div>
                 <video
@@ -428,7 +414,8 @@ export default function Home() {
                     Your calendar respects your prayers
                   </h3>
                   <p className="mt-1 text-sm text-[var(--waqtu-muted)]">
-                    Waqtu blocks your calendar during prayer times. Teams shows you as "Busy".
+                    Waqtu blocks your calendar during prayer times. Teams shows
+                    you as "Busy".
                   </p>
                 </div>
                 <img
@@ -582,7 +569,14 @@ export default function Home() {
                       : plan.cta}
                   </button>
                   <p className="mt-3 text-center text-sm text-[var(--waqtu-muted)]">
-                    Not sure? <a href="#download" className="text-[var(--waqtu-primary)] hover:underline">Try free first</a>. No credit card required.
+                    Not sure?{" "}
+                    <a
+                      href="#download"
+                      className="text-[var(--waqtu-primary)] hover:underline"
+                    >
+                      Try free first
+                    </a>
+                    . No credit card required.
                   </p>
                   <ul className="mt-8 space-y-3">
                     {plan.features.map((feature) => (
@@ -711,7 +705,8 @@ export default function Home() {
               Ready to protect your prayer times?
             </h2>
             <p className="mt-4 text-[var(--waqtu-muted)]">
-              Download Waqtu for macOS. No account required. Free to try, $9.99 if you love it.
+              Download Waqtu for macOS. No account required. Free to try, $9.99
+              if you love it.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <a
@@ -766,7 +761,7 @@ export default function Home() {
               </p>
             </div>
             <div className="mt-8 text-center text-sm text-[var(--waqtu-muted)]">
-              <p>© 2025 Waqtu. Made with intention.</p>
+              <p>© 2026 Waqtu. Made with intention.</p>
             </div>
           </div>
         </footer>
