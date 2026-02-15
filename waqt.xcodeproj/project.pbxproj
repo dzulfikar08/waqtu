@@ -23,10 +23,17 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXBuildFile section */
+		32D0237D9FD6219D7400D6FE /* Adhan in Frameworks */ = {
+			isa = PBXBuildFile;
+			productRef = E43528A876F357103BE64098 /* Adhan */;
+		};
+/* End PBXBuildFile section */
 /* Begin PBXFileReference section */
 		AA40DE862F4174E2006EDD6D /* waqt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = waqt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA40DE932F4174E3006EDD6D /* waqtTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = waqtTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA40DE9D2F4174E3006EDD6D /* waqtUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = waqtUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2717EA0AE00B545057492781 /* Adhan */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Adhan; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				32D0237D9FD6219D7400D6FE /* Adhan in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +120,7 @@
 			);
 			name = waqt;
 			packageProductDependencies = (
+				1333C6AA761E8AC4FC22AEC1 /* Adhan */,
 			);
 			productName = waqt;
 			productReference = AA40DE862F4174E2006EDD6D /* waqt.app */;
@@ -199,6 +208,9 @@
 			productRefGroup = AA40DE872F4174E2006EDD6D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
+			packageReferences = (
+				2717EA0AE00B545057492781 /* XCRemoteSwiftPackageReference "Adhan-Swift" */,
+			);
 			targets = (
 				AA40DE852F4174E2006EDD6D /* waqt */,
 				AA40DE922F4174E3006EDD6D /* waqtTests */,
@@ -206,6 +218,24 @@
 			);
 		};
 /* End PBXProject section */
+/* Begin XCRemoteSwiftPackageReference section */
+		2717EA0AE00B545057492781 /* XCRemoteSwiftPackageReference "Adhan-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/batoulapps/Adhan-Swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.4.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1333C6AA761E8AC4FC22AEC1 /* Adhan */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2717EA0AE00B545057492781 /* XCRemoteSwiftPackageReference "Adhan-Swift" */;
+			productName = Adhan;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin PBXResourcesBuildPhase section */
 		AA40DE842F4174E2006EDD6D /* Resources */ = {
