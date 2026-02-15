@@ -656,29 +656,22 @@ export default function Home() {
         >
           <div className="mx-auto max-w-2xl rounded-3xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/80 p-12 text-center backdrop-blur-sm md:p-16">
             <h2 className="font-display text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
-              Ready to add Waqtu to your day?
+              Ready to protect your prayer times?
             </h2>
             <p className="mt-4 text-[var(--waqtu-muted)]">
-              Download for macOS. No account, no subscription required to get
-              started.
+              Download Waqtu for macOS. No account required. Free to try, $9.99 if you love it.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <a
-                href="#"
+                href="#pricing"
                 className="inline-flex items-center gap-2 rounded-full bg-[var(--waqtu-primary)] px-8 py-4 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_32px_rgba(74,139,111,0.45)]"
               >
-                Download for Mac
+                Get Waqtu for $9.99
                 <span>→</span>
-              </a>
-              <a
-                href="#features"
-                className="inline-flex items-center gap-2 text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
-              >
-                Learn more
               </a>
             </div>
             <p className="mt-6 text-sm text-[var(--waqtu-muted)]">
-              Requires macOS 12 or later • Free to try
+              Your prayers deserve a place on your calendar.
             </p>
           </div>
         </section>
