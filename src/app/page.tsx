@@ -1,52 +1,601 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import {
+  createCheckout,
+  POLAR_PRODUCTS,
+  isTierAvailable,
+} from "@/lib/api/payments";
+
+type LoadingState = {
+  [key: string]: boolean;
+};
 
 export default function Home() {
-	return (
-		<div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-			<main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-				<Image className="dark:invert" src="/next.svg" alt="Next.js logo" width={180} height={38} priority />
-				<ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-					<li className="mb-2 tracking-[-.01em]">
-						Get started by editing{" "}
-						<code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-							src/app/page.tsx
-						</code>
-						.
-					</li>
-					<li className="tracking-[-.01em]">Save and see your changes instantly.</li>
-				</ol>
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState<LoadingState>({});
 
-				<div className="flex gap-4 items-center flex-col sm:flex-row">
-					<a
-						className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-						href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						Read our docs
-					</a>
-				</div>
-			</main>
-			<footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-				<a
-					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-					href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image aria-hidden src="/file.svg" alt="File icon" width={16} height={16} />
-					Learn
-				</a>
-				<a
-					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-					href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image aria-hidden src="/globe.svg" alt="Globe icon" width={16} height={16} />
-					Go to nextjs.org →
-				</a>
-			</footer>
-		</div>
-	);
+  const toggleFaq = (index: number) => {
+    setOpenFaq(openFaq === index ? null : index);
+  };
+
+  const handleCheckout = async (tier: "PRO_MONTHLY" | "PRO_LIFETIME") => {
+    if (!isTierAvailable(tier)) {
+      console.error("Product not configured:", tier);
+      // For now, just redirect to download
+      window.location.href = "#download";
+      return;
+    }
+
+    const productId = POLAR_PRODUCTS[tier];
+    setIsLoading((prev) => ({ ...prev, [tier]: true }));
+
+    try {
+      const { url } = await createCheckout({ productId });
+      window.location.href = url;
+    } catch (error) {
+      console.error("Checkout error:", error);
+      // Fallback to download section
+      window.location.href = "#download";
+    } finally {
+      setIsLoading((prev) => ({ ...prev, [tier]: false }));
+    }
+  };
+
+  return (
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Background gradient mesh */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0"
+        aria-hidden
+        style={{
+          background: `
+            radial-gradient(ellipse 80% 50% at 50% -20%, rgba(74, 139, 111, 0.18), transparent),
+            radial-gradient(ellipse 60% 40% at 90% 60%, rgba(45, 95, 76, 0.2), transparent),
+            radial-gradient(ellipse 50% 30% at 10% 80%, rgba(212, 165, 116, 0.08), transparent)
+          `,
+        }}
+      />
+
+      {/* Header */}
+      <header className="relative z-10 flex items-center justify-between px-6 py-6 sm:px-10 md:px-14">
+        <span className="font-display text-xl font-semibold tracking-tight text-[var(--waqtu-text)]">
+          Waqtu
+        </span>
+        <nav className="flex items-center gap-8 text-sm">
+          <a
+            href="#features"
+            className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+          >
+            Features
+          </a>
+          <a
+            href="#pricing"
+            className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+          >
+            Pricing
+          </a>
+          <a
+            href="#faq"
+            className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+          >
+            FAQ
+          </a>
+          <a
+            href="#download"
+            className="rounded-full bg-[var(--waqtu-primary)] px-5 py-2.5 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_24px_rgba(74,139,111,0.35)]"
+          >
+            Download for Mac
+          </a>
+        </nav>
+      </header>
+
+      <main className="relative z-10">
+        {/* Hero Section */}
+        <section className="px-6 pt-24 pb-32 sm:px-10 md:px-14 md:pt-36 md:pb-44">
+          <div className="flex flex-col items-center text-center">
+            <p
+              className="animate-fade-up mb-6 text-sm font-medium uppercase tracking-[0.2em] text-[var(--waqtu-gold)]"
+              style={{ animationDelay: "0ms", opacity: 0 }}
+            >
+              Prayer times · Mac menu bar
+            </p>
+            <h1
+              className="font-display animate-fade-up max-w-4xl text-4xl font-semibold leading-[1.15] tracking-tight text-[var(--waqtu-text)] sm:text-5xl md:text-6xl md:leading-[1.1]"
+              style={{ animationDelay: "80ms", opacity: 0 }}
+            >
+              Time for prayer,
+              <br />
+              <span className="text-[var(--waqtu-light)]">without noise.</span>
+            </h1>
+            <p
+              className="animate-fade-up mt-8 max-w-xl text-lg leading-relaxed text-[var(--waqtu-muted)]"
+              style={{ animationDelay: "160ms", opacity: 0 }}
+            >
+              Waqtu sits in your menu bar, shows the next prayer and countdown,
+              and can block your calendar so Outlook and Teams show you as busy.
+              Simple, gentle, and always there.
+            </p>
+            <div
+              className="animate-fade-up mt-12 flex flex-wrap items-center justify-center gap-4"
+              style={{ animationDelay: "240ms", opacity: 0 }}
+            >
+              <a
+                href="#download"
+                className="group inline-flex items-center gap-2 rounded-full bg-[var(--waqtu-primary)] px-6 py-3.5 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_28px_rgba(74,139,111,0.4)]"
+              >
+                Download for Mac
+                <span className="transition-transform group-hover:translate-x-0.5">
+                  →
+                </span>
+              </a>
+              <a
+                href="#features"
+                className="inline-flex items-center gap-2 text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+              >
+                See what it does
+              </a>
+            </div>
+
+            {/* Trust indicators */}
+            <div
+              className="animate-fade-up mt-16 flex flex-wrap items-center justify-center gap-8 text-[var(--waqtu-muted)]"
+              style={{ animationDelay: "320ms", opacity: 0 }}
+            >
+              <div className="flex items-center gap-2">
+                <svg
+                  className="h-5 w-5 text-[var(--waqtu-gold)]"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                <span className="text-sm">4.9 rating</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm">1,000+ downloads</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm">macOS 12+</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Quote strip */}
+        <section className="relative z-10 section-tint-1 border-y border-[var(--waqtu-border)] px-6 py-10 sm:px-10 md:px-14">
+          <blockquote
+            className="animate-fade-in mx-auto max-w-2xl text-center text-lg italic leading-relaxed text-[var(--waqtu-muted)]"
+            style={{ opacity: 0 }}
+          >
+            "Indeed, prayer is obligatory on the believers at specified times."
+          </blockquote>
+          <cite className="mt-3 block text-center text-sm not-italic text-[var(--waqtu-gold)]">
+            — Quran 4:103
+          </cite>
+        </section>
+
+        {/* Features Section */}
+        <section
+          id="features"
+          className="relative z-10 section-tint-2 px-6 py-24 sm:px-10 md:px-14 md:py-32"
+        >
+          <div className="mx-auto max-w-6xl">
+            <h2 className="font-display mb-4 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
+              What Waqtu does
+            </h2>
+            <p className="mx-auto mb-16 max-w-2xl text-center text-[var(--waqtu-muted)]">
+              Three thoughtful features designed to help you stay consistent
+              with your prayers without disrupting your workflow.
+            </p>
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                {
+                  title: "Next prayer & countdown",
+                  description:
+                    "Always visible in the menu bar. Tap to see all five daily times and a clear countdown to the next prayer.",
+                  icon: "○",
+                },
+                {
+                  title: "Full-screen reminder",
+                  description:
+                    "When it's time, a calm overlay appears. Dismiss when you're ready to pray, with a short block so you're not interrupted.",
+                  icon: "◇",
+                },
+                {
+                  title: "Calendar protection",
+                  description:
+                    "Optional: Waqtu creates busy blocks in your calendar (Exchange, iCloud, or default) so Outlook and Teams show you as busy during prayer.",
+                  icon: "▷",
+                },
+              ].map((item, i) => (
+                <article
+                  key={item.title}
+                  className="group rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-8 backdrop-blur-sm transition-all hover:border-[var(--waqtu-primary)]/30 hover:bg-[var(--waqtu-card)]/80"
+                  style={{
+                    animationDelay: `${320 + i * 60}ms`,
+                  }}
+                >
+                  <span className="mb-4 block text-2xl text-[var(--waqtu-gold)] opacity-80">
+                    {item.icon}
+                  </span>
+                  <h3 className="font-display mb-3 text-lg font-semibold text-[var(--waqtu-text)]">
+                    {item.title}
+                  </h3>
+                  <p className="text-[var(--waqtu-muted)] leading-relaxed">
+                    {item.description}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials Section - Hidden for now */}
+        {/* <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-24 sm:px-10 md:px-14 md:py-32">
+          <div className="mx-auto max-w-6xl">
+            <h2 className="font-display mb-4 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
+              Loved by Muslims worldwide
+            </h2>
+            <p className="mx-auto mb-16 max-w-2xl text-center text-[var(--waqtu-muted)]">
+              Join thousands of Muslims who use Waqtu to stay consistent with
+              their daily prayers.
+            </p>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                {
+                  name: "Ahmed K.",
+                  location: "London, UK",
+                  text: "Finally, an app that respects my calendar. The integration with Outlook is seamless and my colleagues now know when I'm at prayer.",
+                },
+                {
+                  name: "Fatima S.",
+                  location: "Toronto, Canada",
+                  text: "The full-screen reminders are so gentle and calming. It's exactly what I needed for my home office setup.",
+                },
+                {
+                  name: "Omar M.",
+                  location: "Dubai, UAE",
+                  text: "Accurate prayer times and the countdown in the menu bar is incredibly helpful. I never miss a prayer anymore.",
+                },
+                {
+                  name: "Aisha R.",
+                  location: "Singapore",
+                  text: "Simple, elegant, and does exactly what it promises. The grain texture and design make it feel like a native Mac app.",
+                },
+                {
+                  name: "Yusuf H.",
+                  location: "New York, USA",
+                  text: "The calendar protection feature is a game-changer. My meetings now automatically avoid prayer times.",
+                },
+                {
+                  name: "Layla A.",
+                  location: "Sydney, Australia",
+                  text: "Love the adhan notifications - subtle enough for the office but clear enough that I never miss it.",
+                },
+              ].map((testimonial, i) => (
+                <div
+                  key={i}
+                  className="testimonial-card rounded-2xl border border-[var(--waqtu-border)] p-6"
+                >
+                  <div className="mb-4 flex gap-0.5">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <svg
+                        key={star}
+                        className="h-4 w-4 text-[var(--waqtu-gold)]"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="mb-4 text-[var(--waqtu-muted)] leading-relaxed">
+                    "{testimonial.text}"
+                  </p>
+                  <div>
+                    <p className="font-medium text-[var(--waqtu-text)]">
+                      {testimonial.name}
+                    </p>
+                    <p className="text-sm text-[var(--waqtu-muted)]">
+                      {testimonial.location}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+        */}
+
+        {/* Pricing Section */}
+        <section
+          id="pricing"
+          className="relative z-10 section-tint-3 px-6 py-24 sm:px-10 md:px-14 md:py-32"
+        >
+          <div className="mx-auto max-w-3xl">
+            <h2 className="font-display mb-4 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
+              Simple, transparent pricing
+            </h2>
+            <p className="mx-auto mb-16 max-w-2xl text-center text-[var(--waqtu-muted)]">
+              One-time payment. No subscription. Pay once, own it forever. Use on up to 1 device.
+            </p>
+            <div className="grid gap-8 sm:grid-cols-1">
+              {[
+                {
+                  name: "Lifetime",
+                  price: "$9.99",
+                  period: "once",
+                  originalPrice: "$14.99",
+                  description: "Best value for long-term use",
+                  features: [
+                    "Menu bar prayer times",
+                    "Basic notifications",
+                    "One location",
+                    "Default calculation method",
+                    "Calendar protection",
+                    "Full-screen reminders",
+                    "Lifetime updates",
+                    "Priority support",
+                    "Use on up to 1 device",
+                  ],
+                  cta: "Get lifetime access",
+                  featured: true,
+                },
+              ].map((plan) => (
+                <div
+                  key={plan.name}
+                  className={`pricing-card relative rounded-2xl border p-8 ${
+                    plan.featured
+                      ? "border-[var(--waqtu-primary)] bg-[var(--waqtu-card)]/80 featured"
+                      : "border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60"
+                  }`}
+                >
+                  {plan.featured && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <span className="rounded-full bg-[var(--waqtu-primary)] px-3 py-1 text-xs font-medium text-[var(--waqtu-bg)]">
+                        Most popular
+                      </span>
+                    </div>
+                  )}
+                  <h3 className="font-display text-lg font-semibold text-[var(--waqtu-text)]">
+                    {plan.name}
+                  </h3>
+                  <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
+                    {plan.description}
+                  </p>
+                  <div className="mt-6 flex items-baseline gap-2">
+                    <div className="flex items-baseline gap-1">
+                      <span className="font-display text-4xl font-semibold text-[var(--waqtu-text)]">
+                        {plan.price}
+                      </span>
+                      <span className="text-[var(--waqtu-muted)]">
+                        /{plan.period}
+                      </span>
+                    </div>
+                    {plan.originalPrice && (
+                      <span className="text-sm text-[var(--waqtu-muted)] line-through">
+                        {plan.originalPrice}
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (plan.name === "Lifetime") {
+                        handleCheckout("PRO_LIFETIME");
+                      } else {
+                        window.location.href = "#download";
+                      }
+                    }}
+                    disabled={
+                      isLoading.PRO_LIFETIME ||
+                      (plan.name === "Lifetime" &&
+                        !isTierAvailable("PRO_LIFETIME"))
+                    }
+                    className={`mt-6 block w-full rounded-full px-6 py-3 text-center font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                      plan.featured
+                        ? "bg-[var(--waqtu-primary)] text-[var(--waqtu-bg)] hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_24px_rgba(74,139,111,0.35)]"
+                        : "border border-[var(--waqtu-border-strong)] text-[var(--waqtu-text)] hover:border-[var(--waqtu-primary)] hover:bg-[var(--waqtu-card)]"
+                    }`}
+                  >
+                    {isLoading.PRO_LIFETIME && plan.name === "Lifetime"
+                      ? "Redirecting..."
+                      : plan.cta}
+                  </button>
+                  <ul className="mt-8 space-y-3">
+                    {plan.features.map((feature) => (
+                      <li key={feature} className="flex items-start gap-2">
+                        <svg
+                          className="mt-0.5 h-4 w-4 shrink-0 text-[var(--waqtu-primary)]"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span className="text-sm text-[var(--waqtu-muted)]">
+                          {feature}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section
+          id="faq"
+          className="relative z-10 section-tint-1 border-y border-[var(--waqtu-border)] px-6 py-24 sm:px-10 md:px-14 md:py-32"
+        >
+          <div className="mx-auto max-w-3xl">
+            <h2 className="font-display mb-4 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
+              Frequently asked questions
+            </h2>
+            <p className="mx-auto mb-16 max-w-2xl text-center text-[var(--waqtu-muted)]">
+              Everything you need to know about Waqtu.
+            </p>
+            <div className="space-y-0">
+              {[
+                {
+                  question: "Which macOS versions are supported?",
+                  answer:
+                    "Waqtu supports macOS 12 (Monterey) and later, including the latest macOS releases. Both Intel and Apple Silicon Macs are supported.",
+                },
+                {
+                  question: "How does calendar protection work?",
+                  answer:
+                    "Waqtu can create events in your default calendar app, or sync with Exchange/iCloud calendars. These events show you as 'busy' during prayer times, so your Outlook and Teams status will reflect this automatically.",
+                },
+                {
+                  question: "Can I customize prayer calculation methods?",
+                  answer:
+                    "Yes! Waqtu supports multiple calculation methods including Muslim World League, ISNA, Egyptian General Authority, Umm Al-Qura, and more. You can also adjust angles and minutes for precise control.",
+                },
+                {
+                  question: "Does Waqtu work offline?",
+                  answer:
+                    "Once downloaded, Waqtu works completely offline. Prayer times are calculated locally on your Mac. An internet connection is only needed for the initial download and updates.",
+                },
+                {
+                  question: "Is my location data private?",
+                  answer:
+                    "Absolutely. Your location is used solely for accurate prayer time calculations and never leaves your device. We don't collect, store, or share any location data.",
+                },
+                {
+                  question: "Can I try before buying?",
+                  answer:
+                    "Yes! Waqtu is a one-time purchase with no subscription. Pay once, own it forever. License allows use on up to 1 device.",
+                },
+                {
+                  question: "How do I cancel my subscription?",
+                  answer:
+                    "You can cancel anytime from within the app or via your Apple ID account settings. After cancellation, you'll retain access until the end of your billing period.",
+                },
+                {
+                  question: "Does the app track my prayers?",
+                  answer:
+                    "Waqtu focuses on notifications and calendar integration. We don't track or record which prayers you've completed - that's personal and stays between you and your faith.",
+                },
+              ].map((faq, index) => (
+                <div
+                  key={index}
+                  className={`faq-item ${openFaq === index ? "open" : ""}`}
+                >
+                  <button
+                    className="faq-question flex w-full items-center justify-between gap-4 py-6 text-left"
+                    onClick={() => toggleFaq(index)}
+                  >
+                    <span className="font-medium text-[var(--waqtu-text)]">
+                      {faq.question}
+                    </span>
+                    <svg
+                      className="faq-icon h-5 w-5 shrink-0 text-[var(--waqtu-gold)] transition-transform duration-300"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                  <div className="faq-answer">
+                    <p className="text-[var(--waqtu-muted)] leading-relaxed">
+                      {faq.answer}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section
+          id="download"
+          className="relative z-10 px-6 py-24 sm:px-10 md:px-14 md:py-32"
+        >
+          <div className="mx-auto max-w-2xl rounded-3xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/80 p-12 text-center backdrop-blur-sm md:p-16">
+            <h2 className="font-display text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
+              Ready to add Waqtu to your day?
+            </h2>
+            <p className="mt-4 text-[var(--waqtu-muted)]">
+              Download for macOS. No account, no subscription required to get
+              started.
+            </p>
+            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <a
+                href="#"
+                className="inline-flex items-center gap-2 rounded-full bg-[var(--waqtu-primary)] px-8 py-4 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_32px_rgba(74,139,111,0.45)]"
+              >
+                Download for Mac
+                <span>→</span>
+              </a>
+              <a
+                href="#features"
+                className="inline-flex items-center gap-2 text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+              >
+                Learn more
+              </a>
+            </div>
+            <p className="mt-6 text-sm text-[var(--waqtu-muted)]">
+              Requires macOS 12 or later • Free to try
+            </p>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="relative z-10 border-t border-[var(--waqtu-border)] px-6 py-10 sm:px-10 md:px-14">
+          <div className="mx-auto max-w-6xl">
+            <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
+              <span className="font-display text-sm font-medium text-[var(--waqtu-muted)]">
+                Waqtu
+              </span>
+              <nav className="flex flex-wrap items-center justify-center gap-6 text-sm">
+                <a
+                  href="/privacy"
+                  className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+                >
+                  Privacy
+                </a>
+                <a
+                  href="/terms"
+                  className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+                >
+                  Terms
+                </a>
+                <a
+                  href="mailto:dzulfikar.at@gmail.com"
+                  className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+                >
+                  Support
+                </a>
+                <a
+                  href="mailto:dzulfikar.at@gmail.com"
+                  className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+                >
+                  Contact
+                </a>
+              </nav>
+              <p className="text-sm text-[var(--waqtu-muted)]">
+                Prayer times for your day
+              </p>
+            </div>
+            <div className="mt-8 text-center text-sm text-[var(--waqtu-muted)]">
+              <p>© 2025 Waqtu. Made with intention.</p>
+            </div>
+          </div>
+        </footer>
+      </main>
+    </div>
+  );
 }

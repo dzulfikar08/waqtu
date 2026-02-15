@@ -1,26 +1,179 @@
 @import "tailwindcss";
 
 :root {
-	--background: #ffffff;
-	--foreground: #171717;
+  --waqtu-bg: #0f1914;
+  --waqtu-surface: #1a2e25;
+  --waqtu-card: #1f352b;
+  --waqtu-primary: #4a8b6f;
+  --waqtu-primary-soft: #3d7560;
+  --waqtu-light: #6ba888;
+  --waqtu-gold: #d4a574;
+  --waqtu-gold-dim: #b8926a;
+  --waqtu-text: #e8f0ed;
+  --waqtu-muted: #8fa89c;
+  --waqtu-border: rgba(107, 168, 136, 0.15);
+  --waqtu-border-strong: rgba(107, 168, 136, 0.25);
+
+  /* Section background tints */
+  --waqtu-bg-tint-1: rgba(74, 139, 111, 0.03);
+  --waqtu-bg-tint-2: rgba(212, 165, 116, 0.03);
+  --waqtu-bg-tint-3: rgba(45, 95, 76, 0.03);
 }
 
 @theme inline {
-	--color-background: var(--background);
-	--color-foreground: var(--foreground);
-	--font-sans: var(--font-geist-sans);
-	--font-mono: var(--font-geist-mono);
+  --color-background: var(--waqtu-bg);
+  --color-foreground: var(--waqtu-text);
+  --font-sans: var(--font-sans), system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-	:root {
-		--background: #0a0a0a;
-		--foreground: #ededed;
-	}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-2%, -2%); }
+  20% { transform: translate(2%, 2%); }
+  30% { transform: translate(-1%, 1%); }
+  40% { transform: translate(1%, -1%); }
+  50% { transform: translate(-2%, 2%); }
+  60% { transform: translate(2%, -2%); }
+  70% { transform: translate(-1%, -1%); }
+  80% { transform: translate(1%, 1%); }
+  90% { transform: translate(-2%, 0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 1s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
 body {
-	background: var(--background);
-	color: var(--foreground);
-	font-family: Arial, Helvetica, sans-serif;
+  background: var(--waqtu-bg);
+  color: var(--waqtu-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+/* Subtle noise overlay for depth */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* FAQ Accordion */
+.faq-item {
+  border-bottom: 1px solid var(--waqtu-border);
+}
+
+.faq-question {
+  cursor: pointer;
+  user-select: none;
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+}
+
+.faq-item.open .faq-answer {
+  max-height: 500px;
+  padding-bottom: 1rem;
+}
+
+.faq-item.open .faq-icon {
+  transform: rotate(180deg);
+}
+
+/* Pricing Card */
+.pricing-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pricing-card:hover {
+  transform: translateY(-4px);
+}
+
+.pricing-card.featured {
+  border-color: var(--waqtu-primary);
+  box-shadow: 0 0 40px rgba(74, 139, 111, 0.15);
+}
+
+/* Testimonial Card */
+.testimonial-card {
+  background: linear-gradient(135deg, var(--waqtu-card) 0%, var(--waqtu-surface) 100%);
+}
+
+/* Section background tints */
+.section-tint-1 {
+  background: var(--waqtu-bg-tint-1);
+}
+
+.section-tint-2 {
+  background: var(--waqtu-bg-tint-2);
+}
+
+.section-tint-3 {
+  background: var(--waqtu-bg-tint-3);
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--waqtu-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--waqtu-primary-soft);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--waqtu-primary);
 }
