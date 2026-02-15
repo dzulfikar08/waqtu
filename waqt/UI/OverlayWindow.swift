@@ -4,17 +4,17 @@ import SwiftUI
 final class OverlayWindow: NSWindow {
     private var overlayTimer: Timer?
 
-    init(durationMinutes: Int, onDismiss: @escaping () -> Void) {
+    init(prayerName: PrayerName, durationMinutes: Int, onDismiss: @escaping () -> Void) {
         super.init(
             contentRect: NSScreen.main?.frame ?? .zero,
             styleMask: [.borderless, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
-        setupWindow(durationMinutes: durationMinutes, onDismiss: onDismiss)
+        setupWindow(prayerName: prayerName, durationMinutes: durationMinutes, onDismiss: onDismiss)
     }
 
-    private func setupWindow(durationMinutes: Int, onDismiss: @escaping () -> Void) {
+    private func setupWindow(prayerName: PrayerName, durationMinutes: Int, onDismiss: @escaping () -> Void) {
         level = .screenSaver
         if let screen = NSScreen.main {
             setFrame(screen.visibleFrame, display: true)
@@ -23,6 +23,7 @@ final class OverlayWindow: NSWindow {
         styleMask = [.borderless, .fullSizeContentView]
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         contentView = NSHostingView(rootView: OverlayView(
+            prayerName: prayerName,
             durationMinutes: durationMinutes,
             onDismiss: { [weak self] in
                 self?.close()

@@ -50,6 +50,25 @@ final class AppViewModel {
             self?.updateCountdown()
             self?.checkPrayerTime()
         }
+        setupMidnightTimer()
+    }
+
+    private func setupMidnightTimer() {
+        let calendar = Calendar.current
+        let now = Date()
+
+        guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) else {
+            return
+        }
+        let midnight = calendar.startOfDay(for: tomorrow)
+
+        let timeUntilMidnight = midnight.timeIntervalSince(now)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + timeUntilMidnight) { [weak self] in
+            self?.resetShownPrayers()
+            self?.calculatePrayers()
+            self?.setupMidnightTimer()
+        }
     }
 
     private func updateCountdown() {
@@ -94,7 +113,10 @@ final class AppViewModel {
     }
 
     private func showOverlay(for prayer: PrayerTime) {
-        overlayWindow = OverlayWindow(durationMinutes: settings.overlayDuration) { [weak self] in
+        overlayWindow = OverlayWindow(
+            prayerName: prayer.name,
+            durationMinutes: settings.overlayDuration
+        ) { [weak self] in
             self?.overlayWindow = nil
         }
         overlayWindow?.makeKeyAndOrderFront(nil)
@@ -102,5 +124,10 @@ final class AppViewModel {
 
     func resetShownPrayers() {
         shownPrayers.removeAll()
+    }
+
+    deinit {
+        timer?.invalidate()
+        cancellables.forEach { $0.cancel() }
     }
 }

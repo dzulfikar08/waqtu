@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct OverlayView: View {
+    let prayerName: PrayerName
     let durationMinutes: Int
     let onDismiss: () -> Void
 
@@ -9,7 +10,8 @@ struct OverlayView: View {
 
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    init(durationMinutes: Int, onDismiss: @escaping () -> Void) {
+    init(prayerName: PrayerName, durationMinutes: Int, onDismiss: @escaping () -> Void) {
+        self.prayerName = prayerName
         self.durationMinutes = durationMinutes
         self.onDismiss = onDismiss
         self._countdown = State(initialValue: durationMinutes * 60)
@@ -20,7 +22,7 @@ struct OverlayView: View {
             Color(red: 0.1, green: 0.1, blue: 0.1).ignoresSafeArea()
             VStack(spacing: 40) {
                 Spacer()
-                Text("Maghrib")
+                Text(prayerName.displayName)
                     .font(.system(size: 72, weight: .bold))
                     .foregroundStyle(.white)
                 Text(currentTime)
