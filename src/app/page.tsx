@@ -11,9 +11,12 @@ type LoadingState = {
   [key: string]: boolean;
 };
 
+type MediaType = "video" | "image";
+
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<LoadingState>({});
+  const [expandedMedia, setExpandedMedia] = useState<MediaType | null>(null);
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
@@ -58,7 +61,7 @@ export default function Home() {
       />
 
       {/* Header */}
-      <header className="relative z-10 flex items-center justify-between px-6 py-6 sm:px-10 md:px-14">
+      <header className="sticky top-0 z-50 flex items-center justify-between px-6 py-6 sm:px-10 md:px-14 backdrop-blur-md bg-[var(--waqtu-bg)]/80 border-b border-[var(--waqtu-border)]">
         <span className="font-display text-xl font-semibold tracking-tight text-[var(--waqtu-text)]">
           Waqtu
         </span>
@@ -386,14 +389,17 @@ export default function Home() {
 
             <div className="grid gap-8 md:grid-cols-2">
               {/* Video - Full screen reminder */}
-              <div className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm">
+              <div 
+                className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all"
+                onClick={() => setExpandedMedia("video")}
+              >
                 <div className="mb-3">
                   <h3 className="font-display text-lg font-semibold text-[var(--waqtu-text)]">
                     Full-screen prayer reminder
                   </h3>
                   <p className="mt-1 text-sm text-[var(--waqtu-muted)]">
                     A peaceful overlay appears at prayer time. Dismiss when
-                    you're ready.
+                    you're ready. Click to expand.
                   </p>
                 </div>
                 <video
@@ -408,14 +414,17 @@ export default function Home() {
               </div>
 
               {/* Image - Teams calendar */}
-              <div className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm">
+              <div 
+                className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all"
+                onClick={() => setExpandedMedia("image")}
+              >
                 <div className="mb-3">
                   <h3 className="font-display text-lg font-semibold text-[var(--waqtu-text)]">
                     Your calendar respects your prayers
                   </h3>
                   <p className="mt-1 text-sm text-[var(--waqtu-muted)]">
                     Waqtu blocks your calendar during prayer times. Teams shows
-                    you as "Busy".
+                    you as "Busy". Click to expand.
                   </p>
                 </div>
                 <img
@@ -766,6 +775,48 @@ export default function Home() {
           </div>
         </footer>
       </main>
+
+      {/* Fullscreen Media Viewer */}
+      {expandedMedia && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+          onClick={() => setExpandedMedia(null)}
+        >
+          <button 
+            className="absolute top-6 right-6 text-white/80 hover:text-white transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              setExpandedMedia(null);
+            }}
+          >
+            <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <div 
+            className="max-w-6xl max-h-[90vh] w-full px-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {expandedMedia === "video" ? (
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full rounded-lg shadow-2xl"
+              >
+                <source src="/waqtu.mp4" type="video/mp4" />
+              </video>
+            ) : (
+              <img
+                src="/waqtu.webp"
+                alt="Teams calendar showing prayer time blocked as busy"
+                className="w-full rounded-lg shadow-2xl"
+              />
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
