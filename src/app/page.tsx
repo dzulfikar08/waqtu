@@ -389,65 +389,37 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Testimonials Section - Hidden for now */}
-        {/* <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-24 sm:px-10 md:px-14 md:py-32">
-          <div className="mx-auto max-w-6xl">
+        {/* Testimonials Section */}
+        <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-16 sm:px-10 md:px-14 md:py-24">
+          <div className="mx-auto max-w-4xl">
             <h2 className="font-display mb-4 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
-              Loved by Muslims worldwide
+              Join Muslims who've made prayer part of their work day
             </h2>
-            <p className="mx-auto mb-16 max-w-2xl text-center text-[var(--waqtu-muted)]">
-              Join thousands of Muslims who use Waqtu to stay consistent with
-              their daily prayers.
+            <p className="mx-auto mb-12 max-w-2xl text-center text-[var(--waqtu-muted)]">
+              No more choosing between meetings and prayer.
             </p>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {[
                 {
-                  name: "Ahmed K.",
-                  location: "London, UK",
-                  text: "Finally, an app that respects my calendar. The integration with Outlook is seamless and my colleagues now know when I'm at prayer.",
+                  name: "Ahmed",
+                  role: "Software Engineer, London",
+                  text: "Waqtu solved the 'where were you?' problem at work. My colleagues now see me as busy during Dhuhr—it just feels respectful all around.",
                 },
                 {
-                  name: "Fatima S.",
-                  location: "Toronto, Canada",
-                  text: "The full-screen reminders are so gentle and calming. It's exactly what I needed for my home office setup.",
+                  name: "Fatima",
+                  role: "Product Manager, Toronto",
+                  text: "I used to feel guilty choosing between meetings and prayer. Now I don't have to choose.",
                 },
                 {
-                  name: "Omar M.",
-                  location: "Dubai, UAE",
-                  text: "Accurate prayer times and the countdown in the menu bar is incredibly helpful. I never miss a prayer anymore.",
-                },
-                {
-                  name: "Aisha R.",
-                  location: "Singapore",
-                  text: "Simple, elegant, and does exactly what it promises. The grain texture and design make it feel like a native Mac app.",
-                },
-                {
-                  name: "Yusuf H.",
-                  location: "New York, USA",
-                  text: "The calendar protection feature is a game-changer. My meetings now automatically avoid prayer times.",
-                },
-                {
-                  name: "Layla A.",
-                  location: "Sydney, Australia",
-                  text: "Love the adhan notifications - subtle enough for the office but clear enough that I never miss it.",
+                  name: "Yusuf",
+                  role: "Remote Designer, NYC",
+                  text: "Finally, an app that doesn't feel like it's judging me. It just helps.",
                 },
               ].map((testimonial, i) => (
                 <div
                   key={i}
-                  className="testimonial-card rounded-2xl border border-[var(--waqtu-border)] p-6"
+                  className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-6 backdrop-blur-sm"
                 >
-                  <div className="mb-4 flex gap-0.5">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <svg
-                        key={star}
-                        className="h-4 w-4 text-[var(--waqtu-gold)]"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                  </div>
                   <p className="mb-4 text-[var(--waqtu-muted)] leading-relaxed">
                     "{testimonial.text}"
                   </p>
@@ -456,7 +428,7 @@ export default function Home() {
                       {testimonial.name}
                     </p>
                     <p className="text-sm text-[var(--waqtu-muted)]">
-                      {testimonial.location}
+                      {testimonial.role}
                     </p>
                   </div>
                 </div>
@@ -464,7 +436,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-        */}
 
         {/* Pricing Section */}
         <section
