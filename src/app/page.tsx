@@ -363,7 +363,7 @@ export default function Home() {
                 {
                   title: "Your faith on your calendar",
                   description:
-                    "Waqtu create busy blocks in your calendar—Exchange, iCloud, or default. Outlook & Teams show you as busy.",
+                    "Waqtu creates busy blocks in your calendar—Exchange, iCloud, or default. Outlook & Teams show you as busy.",
                   icon: "▷",
                 },
               ].map((item, i) => (
