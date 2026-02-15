@@ -186,6 +186,53 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Solution Section */}
+        <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-16 sm:px-10 md:px-14 md:py-24">
+          <div className="mx-auto max-w-4xl">
+            <h2 className="font-display mb-4 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
+              What if your calendar respected your prayers?
+            </h2>
+            <p className="mx-auto mb-12 max-w-2xl text-center text-[var(--waqtu-muted)]">
+              Waqtu is a small app that lives in your Mac's menu bar. It knows when it's time
+              for each of the five daily prayers—and it gently protects that time.
+            </p>
+            <div className="grid gap-6 sm:grid-cols-3">
+              {[
+                {
+                  title: "Always there",
+                  description: "Next prayer & countdown in your menu bar",
+                  icon: "○",
+                },
+                {
+                  title: "Calm reminders",
+                  description: "Full-screen overlay appears when it's time to pray",
+                  icon: "◇",
+                },
+                {
+                  title: "Calendar protection",
+                  description: "Shows you \"busy\" in Outlook & Teams during prayer times",
+                  icon: "▷",
+                },
+              ].map((item, i) => (
+                <article
+                  key={item.title}
+                  className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-6 text-center backdrop-blur-sm"
+                >
+                  <span className="mb-3 block text-2xl text-[var(--waqtu-gold)] opacity-80">
+                    {item.icon}
+                  </span>
+                  <h3 className="font-display mb-2 font-semibold text-[var(--waqtu-text)]">
+                    {item.title}
+                  </h3>
+                  <p className="text-sm text-[var(--waqtu-muted)]">
+                    {item.description}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Quote strip */}
         <section className="relative z-10 section-tint-1 border-y border-[var(--waqtu-border)] px-6 py-10 sm:px-10 md:px-14">
           <blockquote
