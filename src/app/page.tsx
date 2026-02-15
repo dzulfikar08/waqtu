@@ -447,7 +447,7 @@ export default function Home() {
               Simple, transparent pricing
             </h2>
             <p className="mx-auto mb-16 max-w-2xl text-center text-[var(--waqtu-muted)]">
-              One-time payment. No subscription. Pay once, own it forever. Use on up to 1 device.
+              Everything you need to protect your prayer times. Forever.
             </p>
             <div className="grid gap-8 sm:grid-cols-1">
               {[
@@ -458,15 +458,13 @@ export default function Home() {
                   originalPrice: "$14.99",
                   description: "Best value for long-term use",
                   features: [
-                    "Menu bar prayer times",
-                    "Basic notifications",
-                    "One location",
-                    "Default calculation method",
-                    "Calendar protection",
-                    "Full-screen reminders",
-                    "Lifetime updates",
-                    "Priority support",
-                    "Use on up to 1 device",
+                    "Menu bar prayer times & countdown",
+                    "Full-screen reminders (calm, not alarming)",
+                    "Calendar protection (Exchange, iCloud, or default)",
+                    "Works offline—your location never leaves your Mac",
+                    "Lifetime updates & support",
+                    "Use on 1 Mac",
+                    "30-day money-back guarantee",
                   ],
                   cta: "Get lifetime access",
                   featured: true,
@@ -531,6 +529,9 @@ export default function Home() {
                       ? "Redirecting..."
                       : plan.cta}
                   </button>
+                  <p className="mt-3 text-center text-sm text-[var(--waqtu-muted)]">
+                    Not sure? <a href="#download" className="text-[var(--waqtu-primary)] hover:underline">Try free first</a>. No credit card required.
+                  </p>
                   <ul className="mt-8 space-y-3">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-2">
