@@ -82,10 +82,10 @@ export default function Home() {
             FAQ
           </a>
           <a
-            href="#download"
+            href="#pricing"
             className="rounded-full bg-[var(--waqtu-primary)] px-5 py-2.5 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_24px_rgba(74,139,111,0.35)]"
           >
-            Download for Mac
+            Get Waqtu
           </a>
         </nav>
       </header>
