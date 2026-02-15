@@ -598,14 +598,14 @@ export default function Home() {
                     "Absolutely. Your location is used solely for accurate prayer time calculations and never leaves your device. We don't collect, store, or share any location data.",
                 },
                 {
-                  question: "Can I try before buying?",
+                  question: "Is there a free trial?",
                   answer:
-                    "Yes! Waqtu is a one-time purchase with no subscription. Pay once, own it forever. License allows use on up to 1 device.",
+                    "Yes. Download Waqtu and try it free. When you're ready, purchase the lifetime license for $9.99. No subscriptions, no recurring fees.",
                 },
                 {
-                  question: "How do I cancel my subscription?",
+                  question: "How do refunds work?",
                   answer:
-                    "You can cancel anytime from within the app or via your Apple ID account settings. After cancellation, you'll retain access until the end of your billing period.",
+                    "If you're not satisfied with Waqtu, contact us within 30 days of purchase for a full refund. No questions asked.",
                 },
                 {
                   question: "Does the app track my prayers?",
