@@ -8,10 +8,13 @@
 import SwiftUI
 
 @main
-struct waqtApp: App {
+struct WaqtApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @State private var viewModel = AppViewModel()
+
     var body: some Scene {
-        WindowGroup {
-            ContentView()
+        MenuBarExtra("Waqt", systemImage: "moon.fill") {
+            MenuBarView(viewModel: viewModel)
         }
     }
 }
