@@ -98,33 +98,35 @@ export default function Home() {
               className="animate-fade-up mb-6 text-sm font-medium uppercase tracking-[0.2em] text-[var(--waqtu-gold)]"
               style={{ animationDelay: "0ms", opacity: 0 }}
             >
-              Prayer times · Mac menu bar
+              Prayer times · Calendar protection · Mac menu bar
             </p>
             <h1
               className="font-display animate-fade-up max-w-4xl text-4xl font-semibold leading-[1.15] tracking-tight text-[var(--waqtu-text)] sm:text-5xl md:text-6xl md:leading-[1.1]"
               style={{ animationDelay: "80ms", opacity: 0 }}
             >
-              Time for prayer,
+              You check your calendar,
               <br />
-              <span className="text-[var(--waqtu-light)]">without noise.</span>
+              <span className="text-[var(--waqtu-light)]">see a meeting at 1:15 PM.</span>
+              <br />
+              But Dhuhr is at 1:00 PM.
             </h1>
             <p
               className="animate-fade-up mt-8 max-w-xl text-lg leading-relaxed text-[var(--waqtu-muted)]"
               style={{ animationDelay: "160ms", opacity: 0 }}
             >
-              Waqtu sits in your menu bar, shows the next prayer and countdown,
-              and can block your calendar so Outlook and Teams show you as busy.
-              Simple, gentle, and always there.
+              Time for prayer, without the awkward calendar conflicts.
+              Waqtu sits in your menu bar and blocks your calendar during prayer
+              times—so Outlook and Teams show you as busy before you even step away.
             </p>
             <div
               className="animate-fade-up mt-12 flex flex-wrap items-center justify-center gap-4"
               style={{ animationDelay: "240ms", opacity: 0 }}
             >
               <a
-                href="#download"
+                href="#pricing"
                 className="group inline-flex items-center gap-2 rounded-full bg-[var(--waqtu-primary)] px-6 py-3.5 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_28px_rgba(74,139,111,0.4)]"
               >
-                Download for Mac
+                Get Waqtu for Mac
                 <span className="transition-transform group-hover:translate-x-0.5">
                   →
                 </span>
@@ -133,7 +135,7 @@ export default function Home() {
                 href="#features"
                 className="inline-flex items-center gap-2 text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
               >
-                See what it does
+                See how it works
               </a>
             </div>
 
@@ -150,10 +152,10 @@ export default function Home() {
                 >
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
-                <span className="text-sm">4.9 rating</span>
+                <span className="text-sm">30-day money-back guarantee</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm">1,000+ downloads</span>
+                <span className="text-sm">Free to try</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm">macOS 12+</span>
