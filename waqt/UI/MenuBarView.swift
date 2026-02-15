@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import EventKit
 
 // MARK: - Mutabaah-inspired Colors
 extension Color {
@@ -14,7 +15,6 @@ extension Color {
 
 struct MenuBarView: View {
     @Bindable var viewModel: AppViewModel
-    @State private var showingSettings = false
 
     init(viewModel: AppViewModel) {
         self.viewModel = viewModel
@@ -47,15 +47,10 @@ struct MenuBarView: View {
             Divider()
 
             // Bottom buttons
-            BottomButtons(
-                onSettings: { showingSettings = true }
-            )
+            BottomButtons()
         }
-        .frame(width: 280)
+        .frame(width: 320)
         .background(Color.waqtBackground)
-        .sheet(isPresented: $showingSettings) {
-            SettingsView(settings: viewModel.settings)
-        }
     }
 }
 
@@ -67,51 +62,31 @@ struct NextPrayerHeader: View {
     var body: some View {
         Group {
             if let next = nextPrayer {
-                HStack {
-                    Image(systemName: next.name.iconName)
-                        .foregroundColor(.waqtGold)
-                        .font(.system(size: 14))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Next Prayer")
+                        .font(.system(size: 11))
+                        .foregroundColor(.waqtMuted)
 
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(next.name.displayName.uppercased())
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundColor(.waqtMuted)
-
-                        Text(next.time, style: .time)
-                            .font(.system(size: 13, weight: .medium))
+                    HStack {
+                        Text(next.name.displayName)
+                            .font(.system(size: 16, weight: .bold))
                             .foregroundColor(.waqtText)
+
+                        Spacer()
+
+                        Text(countdownText)
+                            .font(.system(size: 14, weight: .semibold))
+                            .monospacedDigit()
+                            .foregroundColor(.waqtGold)
                     }
-
-                    Spacer()
-
-                    CountdownView(countdown: countdown)
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .background(Color.waqtDark.opacity(0.5))
+                .padding(12)
             } else {
                 Text("Loading...")
                     .font(.system(size: 13))
                     .foregroundColor(.waqtMuted)
                     .padding()
             }
-        }
-    }
-}
-
-// MARK: - Countdown View
-struct CountdownView: View {
-    let countdown: Int
-
-    var body: some View {
-        VStack(alignment: .trailing, spacing: 2) {
-            Text("in")
-                .font(.system(size: 9))
-                .foregroundColor(.waqtMuted)
-
-            Text(countdownText)
-                .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                .foregroundColor(.waqtPrimary)
         }
     }
 
@@ -131,14 +106,13 @@ struct PrayerTimesList: View {
     let nextPrayerId: UUID?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(spacing: 4) {
             ForEach(prayers) { prayer in
                 PrayerRow(prayer: prayer, isNext: prayer.id == nextPrayerId)
-                if prayer.id != prayers.last?.id {
-                    Divider().padding(.leading, 36)
-                }
             }
         }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
     }
 }
 
@@ -146,32 +120,37 @@ struct PrayerTimesList: View {
 struct PrayerRow: View {
     let prayer: PrayerTime
     let isNext: Bool
+    @State private var isHovering = false
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(systemName: prayer.hasPassed ? "circle" : "circle.fill")
-                .foregroundColor(prayer.hasPassed ? .waqtMuted : .waqtPrimary)
-                .font(.system(size: 10))
+            Image(systemName: prayer.name.iconName)
+                .font(.system(size: 14))
+                .foregroundColor(isNext ? .waqtGold : .waqtMuted)
+                .frame(width: 18)
 
             Text(prayer.name.displayName)
-                .font(.system(size: 13))
-                .foregroundColor(prayer.hasPassed ? .waqtMuted.opacity(0.7) : .waqtText)
+                .font(.system(size: 13, weight: isNext ? .semibold : .regular))
+                .foregroundColor(prayer.hasPassed ? .waqtMuted.opacity(0.4) : .waqtText)
+                .lineLimit(1)
 
-            Spacer()
+            Spacer(minLength: 8)
 
-            Text(prayer.time, style: .time)
-                .font(.system(size: 12))
-                .foregroundColor(prayer.hasPassed ? .waqtMuted.opacity(0.7) : .waqtText)
-
-            if isNext {
-                Image(systemName: "circle.fill")
-                    .font(.system(size: 4))
-                    .foregroundColor(.waqtGold)
-            }
+            Text(prayer.time.formatted(date: .omitted, time: .shortened))
+                .font(.system(size: 13, weight: .semibold))
+                .monospacedDigit()
+                .foregroundColor(prayer.hasPassed ? .waqtMuted.opacity(0.4) : (isNext ? .waqtGold : .waqtText))
         }
-        .padding(.horizontal, 12)
         .padding(.vertical, 6)
-        .background(isNext ? Color.waqtPrimary.opacity(0.1) : Color.clear)
+        .padding(.horizontal, 8)
+        .background(
+            isNext ? Color.waqtPrimary.opacity(0.12) : (isHovering ? Color.waqtPrimary.opacity(0.06) : Color.clear)
+        )
+        .cornerRadius(8)
+        .contentShape(Rectangle())
+        .onHover { hovering in
+            isHovering = hovering
+        }
     }
 }
 
@@ -182,22 +161,24 @@ struct ControlsSection: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Overlay toggle
-            HStack {
-                Image(systemName: "bell")
-                    .foregroundColor(.waqtGold)
-                    .font(.system(size: 12))
-                Text("Enable Overlay")
-                    .font(.system(size: 13))
-                    .foregroundColor(.waqtText)
-                Spacer()
-                Toggle("", isOn: $overlayEnabled)
+            // Overlay toggle - bell, text, and switch on one line
+            HStack(spacing: 0) {
+                HStack(spacing: 10) {
+                    Image(systemName: "bell")
+                        .foregroundColor(.waqtGold)
+                        .font(.system(size: 12))
+                        .frame(width: 18, alignment: .center)
+                    Text("Enable Overlay")
+                        .font(.system(size: 13))
+                        .foregroundColor(.waqtText)
+                }
+                Spacer(minLength: 8)
+                Toggle(isOn: $overlayEnabled) { EmptyView() }
                     .toggleStyle(.switch)
+                    .labelsHidden()
             }
             .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-
-            Divider()
+            .padding(.vertical, 10)
 
             // Test overlay button
             Button(action: onTestOverlay) {
@@ -213,32 +194,45 @@ struct ControlsSection: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(Color.waqtPrimary.opacity(0.1))
-            .buttonStyle(.plain)
+            .buttonStyle(ControlRowButtonStyle())
         }
+    }
+}
+
+// MARK: - Control Row Button Style
+struct ControlRowButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .background(
+                configuration.isPressed
+                    ? Color.waqtPrimary.opacity(0.12)
+                    : Color.clear
+            )
     }
 }
 
 // MARK: - Bottom Buttons
 struct BottomButtons: View {
-    let onSettings: () -> Void
+    @Environment(\.openSettings) private var openSettings
 
     var body: some View {
         VStack(spacing: 0) {
-            Button(action: onSettings) {
+            Button(action: {
+                NSApp.activate(ignoringOtherApps: true)
+                openSettings()
+            }) {
                 HStack {
                     Text("Settings")
                         .font(.system(size: 13))
                         .foregroundColor(.waqtText)
                     Spacer()
                 }
+                .frame(maxWidth: .infinity, minHeight: 28)
+                .contentShape(Rectangle())
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(Color.waqtPrimary.opacity(0.1))
-            .buttonStyle(.plain)
-
-            Divider()
+            .buttonStyle(ControlRowButtonStyle())
 
             Button {
                 NSApplication.shared.terminate(nil)
@@ -249,10 +243,12 @@ struct BottomButtons: View {
                         .foregroundColor(.waqtMuted)
                     Spacer()
                 }
+                .frame(maxWidth: .infinity, minHeight: 28)
+                .contentShape(Rectangle())
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .buttonStyle(.plain)
+            .buttonStyle(ControlRowButtonStyle())
         }
     }
 }
@@ -260,93 +256,129 @@ struct BottomButtons: View {
 // MARK: - Settings View
 struct SettingsView: View {
     @Bindable var settings: AppSettings
-    @Environment(\.dismiss) private var dismiss
+    var viewModel: AppViewModel?
+
+    init(settings: AppSettings, viewModel: AppViewModel? = nil) {
+        self.settings = settings
+        self.viewModel = viewModel
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            // Header
-            HStack {
-                Image(systemName: "gearshape")
-                    .foregroundColor(.waqtGold)
-                    .font(.system(size: 20))
-                Text("Settings")
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundColor(.waqtText)
-                Spacer()
-            }
-            .padding(.bottom, 8)
-
-            // Overlay settings
-            SettingsSection(title: "OVERLAY", icon: "bell") {
-                Toggle("Enable Overlay", isOn: $settings.overlayEnabled)
-                    .font(.system(size: 14))
-                    .foregroundColor(.waqtText)
-                    .toggleStyle(.switch)
-
-                Button("Test Overlay") {
-                    showTestOverlay()
+        TabView {
+            GeneralSettingsTab(settings: settings, viewModel: viewModel)
+                .tabItem {
+                    Label("General", systemImage: "gearshape.fill")
                 }
-                .buttonStyle(.bordered)
-                .tint(.waqtPrimary)
 
-                DurationSlider(settings: settings)
-            }
-
-            Divider()
-
-            // Location settings
-            SettingsSection(title: "LOCATION", icon: "location") {
-                Toggle("Auto-detect", isOn: $settings.autoDetectLocation)
-                    .font(.system(size: 14))
-                    .foregroundColor(.waqtText)
-                    .toggleStyle(.switch)
-
-                if !settings.autoDetectLocation {
-                    LocationInputs(settings: settings)
+            LocationSettingsTab(settings: settings)
+                .tabItem {
+                    Label("Location", systemImage: "location.fill")
                 }
-            }
 
-            Divider()
-
-            // Launch at login
-            HStack {
-                Image(systemName: "power")
-                    .foregroundColor(.waqtGold)
-                    .font(.system(size: 14))
-                Toggle("Launch at Login", isOn: $settings.launchAtLogin)
-                    .font(.system(size: 14))
-                    .foregroundColor(.waqtText)
-                    .toggleStyle(.switch)
-            }
-
-            Divider()
-
-            // Quranic quote
-            QuoteSection()
-
-            Spacer()
-
-            // Done button
-            HStack {
-                Spacer()
-                Button("Done") { dismiss() }
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 32)
-                    .padding(.vertical, 12)
-                    .background(
-                        LinearGradient(
-                            colors: [.waqtPrimary, .waqtLight],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .cornerRadius(8)
+            AboutSettingsTab()
+                .tabItem {
+                    Label("About", systemImage: "info.circle.fill")
+                }
+        }
+        .frame(width: 440, height: 520)
+        .background(Color.waqtBackground)
+        .onAppear {
+            NSApp.activate(ignoringOtherApps: true)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                NSApp.keyWindow?.makeKeyAndOrderFront(nil)
             }
         }
-        .padding(24)
-        .frame(width: 400, height: 520)
+    }
+}
+
+// MARK: - General Settings Tab
+struct GeneralSettingsTab: View {
+    @Bindable var settings: AppSettings
+    var viewModel: AppViewModel?
+    @State private var showCalendarExplanation = false
+    @State private var showRemoveWaqtEventsAlert = false
+    @State private var calendarManager = CalendarManager()
+    @State private var calendarsGroupedBySource: [(source: EKSource, calendars: [EKCalendar])] = []
+
+    var body: some View {
+        Form {
+            Section {
+                Toggle("Enable Overlay", isOn: $settings.overlayEnabled)
+                Text("Show a full-screen notification when it's time for prayer.")
+                    .font(.caption)
+                    .foregroundColor(.waqtMuted)
+
+                if settings.overlayEnabled {
+                    HStack {
+                        Text("Duration")
+                        Spacer()
+                        Text("\(settings.overlayDuration) min")
+                            .foregroundColor(.waqtPrimary)
+                            .monospacedDigit()
+                        Slider(value: Binding(
+                            get: { Double(settings.overlayDuration) },
+                            set: { settings.overlayDuration = Int($0) }
+                        ), in: 5...15, step: 1)
+                        .frame(width: 120)
+                        .tint(.waqtPrimary)
+                    }
+                    Text("How long the overlay stays visible (5–15 minutes).")
+                        .font(.caption)
+                        .foregroundColor(.waqtMuted)
+
+                    Button("Test Overlay") { showTestOverlay() }
+                        .buttonStyle(.bordered)
+                        .tint(.waqtPrimary)
+                }
+            } header: {
+                Text("Prayer Reminders")
+            }
+
+            CalendarProtectionSection(
+                settings: settings,
+                calendarsGroupedBySource: calendarsGroupedBySource,
+                onEnableFirstTime: {
+                    if !settings.hasSeenCalendarProtectionExplanation {
+                        showCalendarExplanation = true
+                    }
+                    viewModel?.requestCalendarAccessAndRegenerate()
+                },
+                onRemoveAllWaqtEvents: {
+                    showRemoveWaqtEventsAlert = true
+                }
+            )
+
+            Section {
+                Toggle("Launch at Login", isOn: $settings.launchAtLogin)
+                Text("Start Waqt automatically when you log in.")
+                    .font(.caption)
+                    .foregroundColor(.waqtMuted)
+            } header: {
+                Text("Startup")
+            }
+        }
+        .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
         .background(Color.waqtBackground)
+        .padding()
+        .onAppear {
+            calendarsGroupedBySource = calendarManager.calendarsGroupedBySource()
+        }
+        .alert("Calendar Protection", isPresented: $showCalendarExplanation) {
+            Button("OK") {
+                settings.hasSeenCalendarProtectionExplanation = true
+            }
+        } message: {
+            Text("Waqt will create daily prayer blocks in your calendar so you appear busy during prayer times. Events are recreated every day to match changing prayer times.")
+        }
+        .alert("Remove All Waqt Events?", isPresented: $showRemoveWaqtEventsAlert) {
+            Button("Cancel", role: .cancel) {}
+            Button("Remove All", role: .destructive) {
+                viewModel?.removeAllWaqtEvents()
+            }
+        } message: {
+            Text("This will delete all prayer block events created by Waqt from your calendar. Your other events are not affected.")
+        }
     }
 
     private func showTestOverlay() {
@@ -358,127 +390,184 @@ struct SettingsView: View {
     }
 }
 
-// MARK: - Settings Components
-struct SettingsSection<Content: View>: View {
-    let title: String
-    let icon: String
-    let content: Content
+// MARK: - Calendar Protection Section
+struct CalendarProtectionSection: View {
+    @Bindable var settings: AppSettings
+    let calendarsGroupedBySource: [(source: EKSource, calendars: [EKCalendar])]
+    let onEnableFirstTime: () -> Void
+    let onRemoveAllWaqtEvents: () -> Void
 
-    init(title: String, icon: String, @ViewBuilder content: () -> Content) {
-        self.title = title
-        self.icon = icon
-        self.content = content()
+    private var selectedCalendarTitle: String {
+        if settings.calendarProtectionCalendarId.isEmpty { return "Default" }
+        let allCalendars = calendarsGroupedBySource.flatMap(\.calendars)
+        return allCalendars.first(where: { $0.calendarIdentifier == settings.calendarProtectionCalendarId })?.title ?? "Default"
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Image(systemName: icon)
-                    .foregroundColor(.waqtGold)
-                    .font(.system(size: 14))
-                Text(title)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.waqtMuted)
-                    .tracking(1)
-            }
+        Section {
+            Toggle("Block calendar during prayer", isOn: Binding(
+                get: { settings.calendarProtectionEnabled },
+                set: { newValue in
+                    settings.calendarProtectionEnabled = newValue
+                    if newValue { onEnableFirstTime() }
+                }
+            ))
+            Text("Create daily busy blocks for each prayer so Outlook and Teams show you as busy. Events are recreated every day.")
+                .font(.caption)
+                .foregroundColor(.waqtMuted)
 
-            content
+            if settings.calendarProtectionEnabled {
+                HStack {
+                    Text("Block duration")
+                    Spacer()
+                    Text("\(settings.calendarBlockDuration) min")
+                        .foregroundColor(.waqtPrimary)
+                        .monospacedDigit()
+                    Slider(value: Binding(
+                        get: { Double(settings.calendarBlockDuration) },
+                        set: { settings.calendarBlockDuration = Int($0) }
+                    ), in: 10...20, step: 1)
+                    .frame(width: 120)
+                    .tint(.waqtPrimary)
+                }
+                .onChange(of: settings.calendarBlockDuration) { _, _ in
+                    NotificationCenter.default.post(name: Notification.Name("calendarProtectionSettingsChanged"), object: nil)
+                }
+                Text("Length of each prayer block (10–20 minutes).")
+                    .font(.caption)
+                    .foregroundColor(.waqtMuted)
+
+                Toggle("Add 5 min reminder", isOn: $settings.calendarProtectionReminder)
+                    .onChange(of: settings.calendarProtectionReminder) { _, _ in
+                        NotificationCenter.default.post(name: Notification.Name("calendarProtectionSettingsChanged"), object: nil)
+                    }
+                Text("Alert 5 minutes before each prayer block.")
+                    .font(.caption)
+                    .foregroundColor(.waqtMuted)
+
+                Menu {
+                    Button("Default") {
+                        settings.calendarProtectionCalendarId = ""
+                        NotificationCenter.default.post(name: Notification.Name("calendarProtectionSettingsChanged"), object: nil)
+                    }
+                    ForEach(calendarsGroupedBySource, id: \.source.sourceIdentifier) { group in
+                        Section(header: Text(group.source.title)) {
+                            ForEach(group.calendars, id: \.calendarIdentifier) { cal in
+                                Button(cal.title) {
+                                    settings.calendarProtectionCalendarId = cal.calendarIdentifier
+                                    NotificationCenter.default.post(name: Notification.Name("calendarProtectionSettingsChanged"), object: nil)
+                                }
+                            }
+                        }
+                    }
+                } label: {
+                    HStack {
+                        Text("Calendar")
+                        Spacer()
+                        Text(selectedCalendarTitle)
+                            .foregroundColor(.waqtMuted)
+                    }
+                }
+                .onChange(of: settings.calendarProtectionCalendarId) { _, _ in
+                    NotificationCenter.default.post(name: Notification.Name("calendarProtectionSettingsChanged"), object: nil)
+                }
+
+                Button("Remove all Waqt events from calendar", role: .destructive) {
+                    onRemoveAllWaqtEvents()
+                }
+                .font(.caption)
+            }
+        } header: {
+            Text("Calendar Protection")
         }
     }
 }
 
-struct DurationSlider: View {
+// MARK: - Location Settings Tab
+struct LocationSettingsTab: View {
     @Bindable var settings: AppSettings
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Duration")
-                    .font(.system(size: 13))
-                    .foregroundColor(.waqtText)
-                Spacer()
-                Text("\(settings.overlayDuration) min")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.waqtPrimary)
+        Form {
+            Section {
+                Toggle("Auto-detect Location", isOn: $settings.autoDetectLocation)
+                Text("Use your Mac's location for accurate prayer times.")
+                    .font(.caption)
+                    .foregroundColor(.waqtMuted)
+            } header: {
+                Text("Location Source")
             }
 
-            Slider(value: Binding(
-                get: { Double(settings.overlayDuration) },
-                set: { settings.overlayDuration = Int($0) }
-            ), in: 5...15, step: 1)
-            .tint(.waqtPrimary)
-
-            HStack {
-                Text("5")
-                    .font(.system(size: 11))
-                    .foregroundColor(.waqtMuted)
-                Spacer()
-                Text("15")
-                    .font(.system(size: 11))
-                    .foregroundColor(.waqtMuted)
+            if !settings.autoDetectLocation {
+                Section {
+                    HStack {
+                        Text("Latitude")
+                            .frame(width: 80, alignment: .leading)
+                        TextField("", value: $settings.manualLatitude, format: .number)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: 120)
+                    }
+                    HStack {
+                        Text("Longitude")
+                            .frame(width: 80, alignment: .leading)
+                        TextField("", value: $settings.manualLongitude, format: .number)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: 120)
+                    }
+                    Button("Apply Location") {
+                        NotificationCenter.default.post(name: Notification.Name("locationChanged"), object: nil)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.waqtPrimary)
+                } header: {
+                    Text("Manual Coordinates")
+                } footer: {
+                    Text("Enter coordinates if auto-detect is unavailable. Example: Mecca 21.4225, 39.8262")
+                }
             }
         }
-        .padding(.leading, 24)
+        .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
+        .background(Color.waqtBackground)
+        .padding()
     }
 }
 
-struct LocationInputs: View {
-    @Bindable var settings: AppSettings
-
+// MARK: - About Settings Tab
+struct AboutSettingsTab: View {
     var body: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Text("Latitude")
-                    .font(.system(size: 12))
-                    .foregroundColor(.waqtMuted)
-                    .frame(width: 60, alignment: .leading)
-                TextField("", value: $settings.manualLatitude, format: .number)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(width: 100)
-            }
-
-            HStack {
-                Text("Longitude")
-                    .font(.system(size: 12))
-                    .foregroundColor(.waqtMuted)
-                    .frame(width: 60, alignment: .leading)
-                TextField("", value: $settings.manualLongitude, format: .number)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(width: 100)
-            }
-
-            Button("Apply Location") {
-                NotificationCenter.default.post(name: Notification.Name("locationChanged"), object: nil)
-            }
-            .buttonStyle(.bordered)
-            .tint(.waqtPrimary)
-        }
-    }
-}
-
-struct QuoteSection: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: "quote.opening")
-                    .foregroundColor(.waqtGold)
-                    .font(.system(size: 12))
-                Text("DAILY REMINDER")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.waqtMuted)
-                    .tracking(1)
-            }
-
-            Text(AppSettings.quranicQuote)
-                .font(.system(size: 14, weight: .medium))
+        VStack(spacing: 24) {
+            Spacer()
+            Image("AppLogo")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 80, height: 80)
+            Text("Waqt")
+                .font(.system(size: 24, weight: .bold))
                 .foregroundColor(.waqtText)
-                .padding(.leading, 20)
+            Text("Prayer times for your day")
+                .font(.system(size: 14))
+                .foregroundColor(.waqtMuted)
 
-            Text(AppSettings.quranicReference)
-                .font(.system(size: 12))
-                .foregroundColor(.waqtGold)
-                .padding(.leading, 20)
+            VStack(alignment: .leading, spacing: 12) {
+                Text(AppSettings.quranicQuote)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.waqtText)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+                Text(AppSettings.quranicReference)
+                    .font(.system(size: 13))
+                    .foregroundColor(.waqtGold)
+                    .frame(maxWidth: .infinity)
+            }
+            .padding(20)
+            .background(Color.waqtDark.opacity(0.4))
+            .cornerRadius(12)
+
+            Spacer()
         }
+        .frame(maxWidth: .infinity)
+        .background(Color.waqtBackground)
     }
 }
 

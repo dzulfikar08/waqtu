@@ -4,6 +4,7 @@ import SwiftUI
 final class OverlayWindow: NSWindow {
     private var overlayTimer: Timer?
     private var onDismissCallback: (() -> Void)?
+    private var isDismissing = false
 
     init(prayerName: PrayerName, durationMinutes: Int, onDismiss: @escaping () -> Void) {
         super.init(
@@ -12,6 +13,7 @@ final class OverlayWindow: NSWindow {
             backing: .buffered,
             defer: false
         )
+        self.isReleasedWhenClosed = false
         self.onDismissCallback = onDismiss
         setupWindow(prayerName: prayerName, durationMinutes: durationMinutes)
     }
@@ -29,7 +31,8 @@ final class OverlayWindow: NSWindow {
             prayerName: prayerName,
             durationMinutes: durationMinutes,
             onDismiss: { [weak self] in
-                self?.dismissOverlay()
+                guard let self = self, !self.isDismissing else { return }
+                self.dismissOverlay()
             }
         ))
         contentView = hostingView
@@ -43,11 +46,27 @@ final class OverlayWindow: NSWindow {
     }
 
     private func dismissOverlay() {
-        onDismissCallback?()
-        onDismissCallback = nil
+        guard !isDismissing else { return }
+        isDismissing = true
+
         overlayTimer?.invalidate()
         overlayTimer = nil
-        super.close()
+
+        let callback = onDismissCallback
+        onDismissCallback = nil
+
+        // Defer teardown to let the button's action handler and SwiftUI fully complete.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+            guard let self = self else {
+                callback?()
+                return
+            }
+            // Clear SwiftUI content first to release NSHostingView and stop any timers/observers
+            self.contentView = nil
+            self.orderOut(nil)
+            self.close()
+            callback?()
+        }
     }
 
     override var canBecomeKey: Bool { true }

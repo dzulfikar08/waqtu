@@ -411,6 +411,7 @@
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqt creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqt needs your location to calculate accurate prayer times.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -434,6 +435,7 @@
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqt creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqt needs your location to calculate accurate prayer times.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

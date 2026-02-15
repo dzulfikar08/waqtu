@@ -36,6 +36,39 @@ final class AppSettings {
         set { UserDefaults.standard.set(newValue, forKey: "launchAtLogin") }
     }
 
+    // Calendar Protection (prayer blocks in calendar)
+    var calendarProtectionEnabled: Bool {
+        get { UserDefaults.standard.bool(forKey: "calendarProtectionEnabled") }
+        set { UserDefaults.standard.set(newValue, forKey: "calendarProtectionEnabled") }
+    }
+
+    /// Duration of each prayer block (10–20 minutes).
+    var calendarBlockDuration: Int {
+        get {
+            let v = UserDefaults.standard.integer(forKey: "calendarBlockDuration")
+            return v >= 10 && v <= 20 ? v : 10
+        }
+        set { UserDefaults.standard.set(newValue, forKey: "calendarBlockDuration") }
+    }
+
+    /// Add 5-minute-before reminder to prayer events.
+    var calendarProtectionReminder: Bool {
+        get { UserDefaults.standard.bool(forKey: "calendarProtectionReminder") }
+        set { UserDefaults.standard.set(newValue, forKey: "calendarProtectionReminder") }
+    }
+
+    /// Calendar identifier for prayer events. Empty = default calendar.
+    var calendarProtectionCalendarId: String {
+        get { UserDefaults.standard.string(forKey: "calendarProtectionCalendarId") ?? "" }
+        set { UserDefaults.standard.set(newValue, forKey: "calendarProtectionCalendarId") }
+    }
+
+    /// Whether we've shown the "Waqt will create daily prayer blocks" explanation once.
+    var hasSeenCalendarProtectionExplanation: Bool {
+        get { UserDefaults.standard.bool(forKey: "hasSeenCalendarProtectionExplanation") }
+        set { UserDefaults.standard.set(newValue, forKey: "hasSeenCalendarProtectionExplanation") }
+    }
+
     // Quranic quote
     static let quranicQuote = "Indeed, prayer is obligatory on the believers at the specified time."
     static let quranicReference = "— Quran 4:103"

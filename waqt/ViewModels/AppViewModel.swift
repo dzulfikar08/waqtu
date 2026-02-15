@@ -7,6 +7,7 @@ final class AppViewModel {
     var settings: AppSettings
     let calculator: PrayerTimeCalculator
     let locationManager: LocationManager
+    let calendarManager: CalendarManager
 
     private var timer: Timer?
     private var shownPrayers: Set<String> = []
@@ -23,6 +24,7 @@ final class AppViewModel {
         self.settings = settings
         self.calculator = PrayerTimeCalculator(settings: settings)
         self.locationManager = LocationManager()
+        self.calendarManager = CalendarManager()
         setupLocationUpdates()
         calculatePrayers()
         setupTimer()
@@ -42,6 +44,13 @@ final class AppViewModel {
         NotificationCenter.default.publisher(for: Notification.Name("locationChanged"))
             .sink { [weak self] _ in
                 self?.calculatePrayers()
+            }
+            .store(in: &cancellables)
+
+        // Regenerate calendar events when user changes calendar protection settings
+        NotificationCenter.default.publisher(for: Notification.Name("calendarProtectionSettingsChanged"))
+            .sink { [weak self] _ in
+                self?.regenerateCalendarEventsIfEnabled()
             }
             .store(in: &cancellables)
     }
@@ -74,6 +83,7 @@ final class AppViewModel {
         DispatchQueue.main.asyncAfter(deadline: .now() + timeUntilMidnight) { [weak self] in
             self?.resetShownPrayers()
             self?.calculatePrayers()
+            self?.regenerateCalendarEventsIfEnabled()
             self?.setupMidnightTimer()
         }
     }
@@ -138,6 +148,52 @@ final class AppViewModel {
 
     func resetShownPrayers() {
         shownPrayers.removeAll()
+    }
+
+    // MARK: - Calendar Protection
+
+    /// Request calendar access and regenerate today's prayer events. Call when user enables the feature or at midnight.
+    func requestCalendarAccessAndRegenerate() {
+        guard settings.calendarProtectionEnabled else { return }
+        Task { @MainActor in
+            do {
+                try await calendarManager.requestAccess()
+                regenerateCalendarEventsIfEnabled()
+            } catch {
+                // Permission denied or error — keep setting as-is; user can retry from Settings
+            }
+        }
+    }
+
+    /// Regenerate prayer events for today if calendar protection is enabled and we have access.
+    func regenerateCalendarEventsIfEnabled() {
+        guard settings.calendarProtectionEnabled,
+              calendarManager.hasAccess,
+              let cal = calendarManager.targetCalendar(identifier: settings.calendarProtectionCalendarId.isEmpty ? nil : settings.calendarProtectionCalendarId)
+        else { return }
+        let prayers = calculator.calculatePrayerTimes(for: Date())
+        let duration = settings.calendarBlockDuration
+        let reminder = settings.calendarProtectionReminder
+        do {
+            try calendarManager.regeneratePrayerEvents(
+                for: Date(),
+                prayers: prayers,
+                durationMinutes: duration,
+                calendar: cal,
+                addReminder: reminder
+            )
+        } catch {
+            // Log or surface error if needed
+        }
+    }
+
+    /// Remove all Waqt-created events from the calendar. Call when user disables feature or taps "Remove all Waqt events".
+    func removeAllWaqtEvents() {
+        do {
+            try calendarManager.deleteAllWaqtEvents()
+        } catch {
+            // Surface if needed
+        }
     }
 
     func showTestOverlay() {

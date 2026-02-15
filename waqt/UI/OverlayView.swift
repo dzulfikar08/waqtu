@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 struct OverlayView: View {
     let prayerName: PrayerName
@@ -7,6 +8,8 @@ struct OverlayView: View {
 
     @State private var countdown: Int
     @State private var currentTime: String = ""
+    @State private var isDismissing = false
+    @State private var timerCancellable: AnyCancellable?
 
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -87,7 +90,14 @@ struct OverlayView: View {
                 .padding(.bottom, 40)
 
                 // Dismiss button with Mutabaah style
-                Button(action: onDismiss) {
+                Button(action: {
+                    guard !isDismissing else { return }
+                    isDismissing = true
+                    // Stop timer immediately before triggering close to prevent use-after-free
+                    timerCancellable?.cancel()
+                    timerCancellable = nil
+                    onDismiss()
+                }) {
                     HStack(spacing: 8) {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 20))
@@ -110,12 +120,17 @@ struct OverlayView: View {
                 .padding(.bottom, 60)
             }
         }
-        .onReceive(timer) { _ in
-            updateCurrentTime()
-            updateCountdown()
-        }
         .onAppear {
             updateCurrentTime()
+            timerCancellable = timer.sink(receiveValue: { _ in
+                guard !isDismissing else { return }
+                updateCurrentTime()
+                updateCountdown()
+            })
+        }
+        .onDisappear {
+            timerCancellable?.cancel()
+            timerCancellable = nil
         }
     }
 
