@@ -485,13 +485,13 @@ export default function Home() {
                       </span>
                     </div>
                   )}
-                  <h3 className="font-display text-lg font-semibold text-[var(--waqtu-text)]">
+                  <h3 className="font-display text-center text-lg font-semibold text-[var(--waqtu-text)]">
                     {plan.name}
                   </h3>
-                  <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
+                  <p className="mt-2 text-center text-sm text-[var(--waqtu-muted)]">
                     {plan.description}
                   </p>
-                  <div className="mt-6 flex items-baseline gap-2">
+                  <div className="mt-6 flex items-baseline justify-center gap-2">
                     <div className="flex items-baseline gap-1">
                       <span className="font-display text-4xl font-semibold text-[var(--waqtu-text)]">
                         {plan.price}
