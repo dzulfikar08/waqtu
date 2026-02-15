@@ -389,6 +389,58 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Visual Showcase Section */}
+        <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-16 sm:px-10 md:px-14 md:py-24">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="font-display mb-4 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
+              See Waqtu in action
+            </h2>
+            <p className="mx-auto mb-12 max-w-2xl text-center text-[var(--waqtu-muted)]">
+              A calm reminder when it's time to pray. Your calendar protected during prayer times.
+            </p>
+
+            <div className="grid gap-8 md:grid-cols-2">
+              {/* Video - Full screen reminder */}
+              <div className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm">
+                <div className="mb-3">
+                  <h3 className="font-display text-lg font-semibold text-[var(--waqtu-text)]">
+                    Full-screen prayer reminder
+                  </h3>
+                  <p className="mt-1 text-sm text-[var(--waqtu-muted)]">
+                    A peaceful overlay appears at prayer time. Dismiss when you're ready.
+                  </p>
+                </div>
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full rounded-xl border border-[var(--waqtu-border)]"
+                >
+                  <source src="/waqtu.mp4" type="video/mp4" />
+                </video>
+              </div>
+
+              {/* Image - Teams calendar */}
+              <div className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm">
+                <div className="mb-3">
+                  <h3 className="font-display text-lg font-semibold text-[var(--waqtu-text)]">
+                    Your calendar respects your prayers
+                  </h3>
+                  <p className="mt-1 text-sm text-[var(--waqtu-muted)]">
+                    Waqtu blocks your calendar during prayer times. Teams shows you as "Busy".
+                  </p>
+                </div>
+                <img
+                  src="/waqtu.webp"
+                  alt="Teams calendar showing prayer time blocked as busy"
+                  className="w-full rounded-xl border border-[var(--waqtu-border)]"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Testimonials Section - Hidden until we have real feedback */}
         {/* <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-16 sm:px-10 md:px-14 md:py-24">
           <div className="mx-auto max-w-4xl">
