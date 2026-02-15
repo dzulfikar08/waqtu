@@ -233,6 +233,93 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Your Day with Waqtu - Timeline */}
+        <section className="relative z-10 section-tint-2 px-6 py-16 sm:px-10 md:px-14 md:py-24">
+          <div className="mx-auto max-w-3xl">
+            <h2 className="font-display mb-4 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
+              Your day with Waqtu
+            </h2>
+            <p className="mx-auto mb-12 max-w-2xl text-center text-[var(--waqtu-muted)]">
+              See how Waqtu fits into your daily rhythm.
+            </p>
+
+            <div className="relative">
+              {/* Timeline line */}
+              <div className="absolute left-4 top-0 h-full w-0.5 bg-[var(--waqtu-border)] sm:left-6" />
+
+              <div className="space-y-8">
+                {/* Fajr */}
+                <div className="relative flex gap-4 sm:gap-6">
+                  <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--waqtu-bg)] border-2 border-[var(--waqtu-gold)] sm:h-10 sm:w-10">
+                    <span className="text-xs text-[var(--waqtu-gold)]">🌙</span>
+                  </div>
+                  <div className="flex-1 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-6 backdrop-blur-sm">
+                    <h3 className="font-display font-semibold text-[var(--waqtu-gold)]">Morning · Fajr</h3>
+                    <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
+                      A gentle wake-up reminder. Your calendar is still yours—no blocks needed while you sleep.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Work begins */}
+                <div className="relative flex gap-4 sm:gap-6">
+                  <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--waqtu-bg)] border-2 border-[var(--waqtu-muted)] sm:h-10 sm:w-10">
+                    <span className="text-xs text-[var(--waqtu-muted)]">💻</span>
+                  </div>
+                  <div className="flex-1 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-6 backdrop-blur-sm">
+                    <h3 className="font-display font-semibold text-[var(--waqtu-text)]">Mid-morning · Work begins</h3>
+                    <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
+                      Waqtu sits quietly in your menu bar, showing a countdown to Dhuhr. No interruptions.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Dhuhr */}
+                <div className="relative flex gap-4 sm:gap-6">
+                  <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--waqtu-bg)] border-2 border-[var(--waqtu-primary)] sm:h-10 sm:w-10">
+                    <span className="text-xs text-[var(--waqtu-primary)]">🕌</span>
+                  </div>
+                  <div className="flex-1 rounded-2xl border border-[var(--waqtu-primary)]/30 bg-[var(--waqtu-card)]/80 p-6 backdrop-blur-sm">
+                    <h3 className="font-display font-semibold text-[var(--waqtu-primary)]">1:00 PM · Dhuhr arrives</h3>
+                    <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
+                      A calm full-screen reminder appears. You dismiss it when ready—and your calendar now shows you <span className="text-[var(--waqtu-primary)]">"busy"</span> until 1:20 PM.
+                    </p>
+                    <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
+                      Your colleagues see "Busy" in Teams. No awkward "where were you?" messages.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Asr & Maghrib */}
+                <div className="relative flex gap-4 sm:gap-6">
+                  <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--waqtu-bg)] border-2 border-[var(--waqtu-primary)] sm:h-10 sm:w-10">
+                    <span className="text-xs text-[var(--waqtu-primary)]">🕌</span>
+                  </div>
+                  <div className="flex-1 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-6 backdrop-blur-sm">
+                    <h3 className="font-display font-semibold text-[var(--waqtu-text)]">Afternoon · Asr & Maghrib</h3>
+                    <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
+                      Same peaceful rhythm. You step away, your calendar protects you, you return.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Isha */}
+                <div className="relative flex gap-4 sm:gap-6">
+                  <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--waqtu-bg)] border-2 border-[var(--waqtu-gold)] sm:h-10 sm:w-10">
+                    <span className="text-xs text-[var(--waqtu-gold)]">🌙</span>
+                  </div>
+                  <div className="flex-1 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-6 backdrop-blur-sm">
+                    <h3 className="font-display font-semibold text-[var(--waqtu-gold)]">Evening · Isha</h3>
+                    <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
+                      Final prayer of the day, final block on your calendar. Tomorrow, Waqtu is there again.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Quote strip */}
         <section className="relative z-10 section-tint-1 border-y border-[var(--waqtu-border)] px-6 py-10 sm:px-10 md:px-14">
           <blockquote
