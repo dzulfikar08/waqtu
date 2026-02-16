@@ -44,9 +44,19 @@ final class PrayerTimeCalculator {
         return times
     }
 
+    /// Returns the next upcoming prayer. If past today's Isha, returns tomorrow's Fajr.
     func getNextPrayer() -> PrayerTime? {
-        let prayers = calculatePrayerTimes()
-        return prayers.first { !$0.hasPassed }
+        let todayPrayers = calculatePrayerTimes()
+        if let next = todayPrayers.first(where: { !$0.hasPassed }) {
+            return next
+        }
+        // Past last prayer today — next prayer is tomorrow's Fajr
+        let calendar = Calendar(identifier: .gregorian)
+        guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: Date()) else {
+            return nil
+        }
+        let tomorrowPrayers = calculatePrayerTimes(for: tomorrow)
+        return tomorrowPrayers.first
     }
 
     private func getCoordinates() -> Coordinates {
