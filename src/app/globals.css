@@ -160,6 +160,19 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Better touch targets for mobile */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Mobile menu link hit areas */
+a[href] {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

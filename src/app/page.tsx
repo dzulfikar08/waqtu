@@ -144,7 +144,7 @@ export default function Home() {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="sm:hidden relative z-50 p-2 -mr-2 text-[var(--waqtu-text)]"
+          className="sm:hidden relative z-50 p-2 -mr-2 text-[var(--waqtu-text)] touch-manipulation"
           aria-label="Toggle menu"
           aria-expanded={mobileMenuOpen}
         >
@@ -158,77 +158,96 @@ export default function Home() {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 d="M6 18L18 6M6 6l12 12"
               />
             ) : (
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 d="M4 6h16M4 12h16M4 18h16"
               />
             )}
           </svg>
         </button>
 
-        {/* Mobile Menu Overlay */}
+        {/* Mobile Menu - Combined overlay and content */}
         <div
           className={`
-            fixed inset-0 bg-[var(--waqtu-bg)]/98 backdrop-blur-xl
-            transition-opacity duration-300 ease-out
-            sm:hidden
+            fixed inset-0 sm:hidden
+            flex flex-col
+            transition-all duration-300 ease-out
             ${mobileMenuOpen
               ? "opacity-100 pointer-events-auto"
               : "opacity-0 pointer-events-none"
             }
           `}
-          aria-hidden="true"
-        />
-
-        {/* Mobile Menu Content */}
-        <nav
-          className={`
-            fixed top-0 left-0 right-0 bottom-0
-            flex flex-col items-center justify-center gap-8
-            transition-all duration-300 ease-out
-            sm:hidden
-            ${mobileMenuOpen
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 -translate-y-4 pointer-events-none"
-            }
-          `}
-          style={{ zIndex: 45 }}
+          style={{ zIndex: 40 }}
+          onClick={() => setMobileMenuOpen(false)}
         >
-          <a
-            href="#features"
-            onClick={handleNavClick}
-            className="text-2xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors"
+          {/* Background */}
+          <div className="absolute inset-0 bg-[var(--waqtu-bg)]/99 backdrop-blur-2xl" />
+
+          {/* Close button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setMobileMenuOpen(false);
+            }}
+            className="absolute top-6 right-4 p-2 text-[var(--waqtu-text)] touch-manipulation"
+            aria-label="Close menu"
           >
-            Features
-          </a>
-          <a
-            href="#pricing"
-            onClick={handleNavClick}
-            className="text-2xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors"
+            <svg
+              className="h-8 w-8"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2.5}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+
+          {/* Menu content */}
+          <nav
+            className="relative flex-1 flex flex-col items-center justify-center gap-10 px-6"
+            onClick={(e) => e.stopPropagation()}
           >
-            Pricing
-          </a>
-          <a
-            href="#faq"
-            onClick={handleNavClick}
-            className="text-2xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors"
-          >
-            FAQ
-          </a>
-          <a
-            href="#pricing"
-            onClick={handleNavClick}
-            className="rounded-full bg-[var(--waqtu-primary)] px-8 py-3 text-lg font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_24px_rgba(74,139,111,0.35)]"
-          >
-            Get Waqtu
-          </a>
-        </nav>
+            <a
+              href="#features"
+              onClick={handleNavClick}
+              className="text-3xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors py-2"
+            >
+              Features
+            </a>
+            <a
+              href="#pricing"
+              onClick={handleNavClick}
+              className="text-3xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors py-2"
+            >
+              Pricing
+            </a>
+            <a
+              href="#faq"
+              onClick={handleNavClick}
+              className="text-3xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors py-2"
+            >
+              FAQ
+            </a>
+            <a
+              href="#pricing"
+              onClick={handleNavClick}
+              className="mt-4 rounded-full bg-[var(--waqtu-primary)] px-10 py-4 text-xl font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_24px_rgba(74,139,111,0.35)]"
+            >
+              Get Waqtu
+            </a>
+          </nav>
+        </div>
       </header>
 
       <main className="relative z-10">
