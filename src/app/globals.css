@@ -177,3 +177,22 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--waqtu-primary);
 }
+
+/* Sticky header support */
+@supports (backdrop-filter: blur(10px)) {
+  .backdrop-blur-xl {
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+}
+
+/* Ensure proper stacking for fixed header */
+header {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Smooth scroll snapping prevention */
+html {
+  scroll-padding-top: 80px;
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   createCheckout,
   POLAR_PRODUCTS,
@@ -17,10 +17,38 @@ export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<LoadingState>({});
   const [expandedMedia, setExpandedMedia] = useState<MediaType | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
   };
+
+  // Track scroll for header state
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Close mobile menu when clicking a link
+  const handleNavClick = () => {
+    setMobileMenuOpen(false);
+  };
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
 
   const handleCheckout = async (tier: "PRO_MONTHLY" | "PRO_LIFETIME") => {
     if (!isTierAvailable(tier)) {
@@ -61,32 +89,142 @@ export default function Home() {
       />
 
       {/* Header */}
-      <header className="sticky top-0 z-50 flex items-center justify-between px-6 py-6 sm:px-10 md:px-14 backdrop-blur-md bg-[var(--waqtu-bg)]/80 border-b border-[var(--waqtu-border)]">
-        <span className="font-display text-xl font-semibold tracking-tight text-[var(--waqtu-text)]">
+      <header
+        className={`
+          fixed top-0 left-0 right-0 z-50
+          flex items-center justify-between px-4 sm:px-6 md:px-14
+          transition-all duration-300 ease-out
+          ${isScrolled
+            ? "py-3 bg-[var(--waqtu-bg)]/95 backdrop-blur-xl border-b border-[var(--waqtu-border)] shadow-sm"
+            : "py-5 bg-transparent border-b border-transparent"
+          }
+        `}
+      >
+        {/* Logo */}
+        <a
+          href="#"
+          onClick={handleNavClick}
+          className="font-display text-xl font-semibold tracking-tight text-[var(--waqtu-text)] relative z-50"
+        >
           Waqtu
-        </span>
-        <nav className="flex items-center gap-8 text-sm">
+        </a>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden sm:flex items-center gap-8 text-sm">
           <a
             href="#features"
+            onClick={handleNavClick}
             className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
           >
             Features
           </a>
           <a
             href="#pricing"
+            onClick={handleNavClick}
             className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
           >
             Pricing
           </a>
           <a
             href="#faq"
+            onClick={handleNavClick}
             className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
           >
             FAQ
           </a>
           <a
             href="#pricing"
+            onClick={handleNavClick}
             className="rounded-full bg-[var(--waqtu-primary)] px-5 py-2.5 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_24px_rgba(74,139,111,0.35)]"
+          >
+            Get Waqtu
+          </a>
+        </nav>
+
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="sm:hidden relative z-50 p-2 -mr-2 text-[var(--waqtu-text)]"
+          aria-label="Toggle menu"
+          aria-expanded={mobileMenuOpen}
+        >
+          <svg
+            className={`h-6 w-6 transition-transform duration-300 ${mobileMenuOpen ? "rotate-90" : ""}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            {mobileMenuOpen ? (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            ) : (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            )}
+          </svg>
+        </button>
+
+        {/* Mobile Menu Overlay */}
+        <div
+          className={`
+            fixed inset-0 bg-[var(--waqtu-bg)]/98 backdrop-blur-xl
+            transition-opacity duration-300 ease-out
+            sm:hidden
+            ${mobileMenuOpen
+              ? "opacity-100 pointer-events-auto"
+              : "opacity-0 pointer-events-none"
+            }
+          `}
+          aria-hidden="true"
+        />
+
+        {/* Mobile Menu Content */}
+        <nav
+          className={`
+            fixed top-0 left-0 right-0 bottom-0
+            flex flex-col items-center justify-center gap-8
+            transition-all duration-300 ease-out
+            sm:hidden
+            ${mobileMenuOpen
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 -translate-y-4 pointer-events-none"
+            }
+          `}
+          style={{ zIndex: 45 }}
+        >
+          <a
+            href="#features"
+            onClick={handleNavClick}
+            className="text-2xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors"
+          >
+            Features
+          </a>
+          <a
+            href="#pricing"
+            onClick={handleNavClick}
+            className="text-2xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors"
+          >
+            Pricing
+          </a>
+          <a
+            href="#faq"
+            onClick={handleNavClick}
+            className="text-2xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors"
+          >
+            FAQ
+          </a>
+          <a
+            href="#pricing"
+            onClick={handleNavClick}
+            className="rounded-full bg-[var(--waqtu-primary)] px-8 py-3 text-lg font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_24px_rgba(74,139,111,0.35)]"
           >
             Get Waqtu
           </a>
@@ -94,8 +232,11 @@ export default function Home() {
       </header>
 
       <main className="relative z-10">
+        {/* Spacer for fixed header */}
+        <div className="h-20 sm:h-24" />
+
         {/* Hero Section */}
-        <section className="px-6 pt-24 pb-32 sm:px-10 md:px-14 md:pt-36 md:pb-44">
+        <section className="px-6 pb-32 sm:px-10 md:px-14 md:pb-44">
           <div className="flex flex-col items-center text-center">
             <p
               className="animate-fade-up mb-6 text-sm font-medium uppercase tracking-[0.2em] text-[var(--waqtu-gold)]"
