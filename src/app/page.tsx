@@ -568,7 +568,7 @@ export default function Home() {
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {/* Video - Full screen reminder */}
               <div
-                className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all"
+                className="flex flex-col rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all"
                 onClick={() => setExpandedMedia("video")}
               >
                 <div className="mb-3">
@@ -585,7 +585,7 @@ export default function Home() {
                   loop
                   muted
                   playsInline
-                  className="w-full rounded-xl border border-[var(--waqtu-border)]"
+                  className="w-full flex-1 rounded-xl border border-[var(--waqtu-border)] object-cover aspect-video"
                 >
                   <source src="/waqtu.mp4" type="video/mp4" />
                 </video>
@@ -593,7 +593,7 @@ export default function Home() {
 
               {/* Video 2 - Full screen reminder */}
               <div
-                className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all"
+                className="flex flex-col rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all"
                 onClick={() => setExpandedMedia("video2")}
               >
                 <div className="mb-3">
@@ -609,7 +609,7 @@ export default function Home() {
                   loop
                   muted
                   playsInline
-                  className="w-full rounded-xl border border-[var(--waqtu-border)]"
+                  className="w-full flex-1 rounded-xl border border-[var(--waqtu-border)] object-cover aspect-video"
                 >
                   <source src="/waqtu-2.mp4" type="video/mp4" />
                 </video>
@@ -617,7 +617,7 @@ export default function Home() {
 
               {/* Image - Teams calendar */}
               <div
-                className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all md:col-span-2 lg:col-span-1"
+                className="flex flex-col rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all"
                 onClick={() => setExpandedMedia("image")}
               >
                 <div className="mb-3">
@@ -632,7 +632,7 @@ export default function Home() {
                 <img
                   src="/waqtu.webp"
                   alt="Teams calendar showing prayer time blocked as busy"
-                  className="w-full rounded-xl border border-[var(--waqtu-border)]"
+                  className="w-full flex-1 rounded-xl border border-[var(--waqtu-border)] object-cover aspect-video"
                 />
               </div>
             </div>
