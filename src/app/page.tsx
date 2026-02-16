@@ -183,11 +183,9 @@ export default function Home() {
               : "opacity-0 pointer-events-none"
             }
           `}
-          style={{ zIndex: 40 }}
+          style={{ zIndex: 40, backgroundColor: 'var(--waqtu-bg, #0f1914)' }}
           onClick={() => setMobileMenuOpen(false)}
         >
-          {/* Background */}
-          <div className="absolute inset-0 bg-[var(--waqtu-bg)]" />
 
           {/* Close button */}
           <button
