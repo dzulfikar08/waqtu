@@ -17,16 +17,14 @@ function verifyPolarSignature(
 	secret: string,
 ): boolean {
 	if (!secret || !webhookId || !webhookSignature || !webhookTimestamp) {
-		console.log("Missing required data for signature verification");
 		return false;
 	}
 
 	try {
-		// Check timestamp - reject if older than 5 minutes (Standard Webhooks best practice)
+		// Check timestamp - reject if older than 5 minutes
 		const timestamp = parseInt(webhookTimestamp, 10);
 		const now = Math.floor(Date.now() / 1000);
 		if (Math.abs(now - timestamp) > 300) {
-			console.log("Webhook timestamp too old:", { timestamp, now, diff: now - timestamp });
 			return false;
 		}
 
@@ -35,27 +33,21 @@ function verifyPolarSignature(
 
 		// Create the signed content: webhook-id.timestamp.body
 		const signedContent = `${webhookId}.${webhookTimestamp}.${body}`;
-		console.log("Signed content preview:", signedContent.substring(0, 100) + "...");
 
 		// Generate HMAC signature
 		const expectedSignature = createHmac("sha256", base64Secret)
 			.update(signedContent)
 			.digest("base64");
 
-		console.log("Expected signature:", expectedSignature.substring(0, 30) + "...");
-		console.log("Received signatures:", webhookSignature.split(" ").map(s => s.substring(0, 30) + "..."));
-
 		// Polar sends multiple signatures separated by space
 		// Check if any of them match
 		const signatures = webhookSignature.split(" ");
 		for (const sig of signatures) {
 			if (sig === expectedSignature) {
-				console.log("Signature matched!");
 				return true;
 			}
 		}
 
-		console.log("No signature matched");
 		return false;
 	} catch (error) {
 		console.error("Error verifying webhook signature:", error);
@@ -79,17 +71,7 @@ export async function POST(request: NextRequest) {
 		const webhookSignature = request.headers.get("webhook-signature");
 		const webhookTimestamp = request.headers.get("webhook-timestamp");
 
-		// Debug logging
-		console.log("Webhook headers:", {
-			"webhook-id": webhookId?.substring(0, 20) + "...",
-			"webhook-signature": webhookSignature?.substring(0, 30) + "...",
-			"webhook-timestamp": webhookTimestamp,
-			"has-secret": !!POLAR_WEBHOOK_SECRET,
-		});
-
-		// TEMPORARILY DISABLED FOR DEBUGGING
-		// Uncomment to re-enable signature verification
-		/*
+		// Verify webhook signature - skip in development if needed
 		if (POLAR_WEBHOOK_SECRET) {
 			const isValid = verifyPolarSignature(
 				body,
@@ -98,7 +80,6 @@ export async function POST(request: NextRequest) {
 				webhookTimestamp,
 				POLAR_WEBHOOK_SECRET,
 			);
-			console.log("Signature valid:", isValid);
 			if (!isValid) {
 				console.error("Invalid webhook signature");
 				return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
@@ -108,7 +89,6 @@ export async function POST(request: NextRequest) {
 				"POLAR_WEBHOOK_SECRET not configured - webhook signature verification disabled",
 			);
 		}
-		*/
 
 		const event = JSON.parse(body) as {
 			type: string;
