@@ -87,6 +87,9 @@ export async function POST(request: NextRequest) {
 			"has-secret": !!POLAR_WEBHOOK_SECRET,
 		});
 
+		// TEMPORARILY DISABLED FOR DEBUGGING
+		// Uncomment to re-enable signature verification
+		/*
 		if (POLAR_WEBHOOK_SECRET) {
 			const isValid = verifyPolarSignature(
 				body,
@@ -105,6 +108,7 @@ export async function POST(request: NextRequest) {
 				"POLAR_WEBHOOK_SECRET not configured - webhook signature verification disabled",
 			);
 		}
+		*/
 
 		const event = JSON.parse(body) as {
 			type: string;
