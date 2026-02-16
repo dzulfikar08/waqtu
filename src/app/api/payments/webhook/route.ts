@@ -6,29 +6,42 @@ const POLAR_API_BASE = "https://api.polar.sh/v1";
 const POLAR_ACCESS_TOKEN = process.env.POLAR_ACCESS_TOKEN || "";
 const POLAR_WEBHOOK_SECRET = process.env.POLAR_WEBHOOK_SECRET || "";
 
-// Verify Polar webhook signature
+// Verify Polar webhook signature using Standard Webhooks format
+// Polar uses: webhook-id, webhook-signature, webhook-timestamp headers
+// Secret must be base64 encoded before signing
 function verifyPolarSignature(
 	body: string,
-	signature: string,
+	webhookId: string | null,
+	webhookSignature: string | null,
+	webhookTimestamp: string | null,
 	secret: string,
 ): boolean {
-	if (!secret || !signature) {
+	if (!secret || !webhookId || !webhookSignature || !webhookTimestamp) {
 		return false;
 	}
 
 	try {
-		const expectedSignature = createHmac("sha256", secret)
-			.update(body)
-			.digest("hex");
+		// Base64 encode the secret as per Polar's requirements
+		const base64Secret = Buffer.from(secret).toString("base64");
 
-		const expectedBuffer = Buffer.from(expectedSignature, "hex");
-		const receivedBuffer = Buffer.from(signature, "hex");
+		// Create the signed content: webhook-id.timestamp.body
+		const signedContent = `${webhookId}.${webhookTimestamp}.${body}`;
 
-		if (expectedBuffer.length !== receivedBuffer.length) {
-			return false;
+		// Generate HMAC signature
+		const expectedSignature = createHmac("sha256", base64Secret)
+			.update(signedContent)
+			.digest("base64");
+
+		// Polar sends multiple signatures separated by space
+		// Check if any of them match
+		const signatures = webhookSignature.split(" ");
+		for (const sig of signatures) {
+			if (sig === expectedSignature) {
+				return true;
+			}
 		}
 
-		return timingSafeEqual(expectedBuffer, receivedBuffer);
+		return false;
 	} catch (error) {
 		console.error("Error verifying webhook signature:", error);
 		return false;
@@ -46,10 +59,21 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		// Verify webhook signature
-		const signature = request.headers.get("x-polar-signature") || "";
+		// Verify webhook signature using Standard Webhooks format
+		const webhookId = request.headers.get("webhook-id");
+		const webhookSignature = request.headers.get("webhook-signature");
+		const webhookTimestamp = request.headers.get("webhook-timestamp");
+
 		if (POLAR_WEBHOOK_SECRET) {
-			if (!verifyPolarSignature(body, signature, POLAR_WEBHOOK_SECRET)) {
+			if (
+				!verifyPolarSignature(
+					body,
+					webhookId,
+					webhookSignature,
+					webhookTimestamp,
+					POLAR_WEBHOOK_SECRET,
+				)
+			) {
 				console.error("Invalid webhook signature");
 				return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
 			}

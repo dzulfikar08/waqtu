@@ -88,6 +88,8 @@ export async function POST(request: NextRequest) {
 			},
 			body: JSON.stringify({
 				products: [productId],
+				success_url: `${baseUrl}/?checkout=success`,
+				return_url: `${baseUrl}/?checkout=canceled`,
 			}),
 		});
 
