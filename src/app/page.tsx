@@ -94,8 +94,8 @@ export default function Home() {
           fixed top-0 left-0 right-0 z-50
           flex items-center justify-between px-4 sm:px-6 md:px-14
           transition-all duration-300 ease-out
-          ${isScrolled
-            ? "py-3 bg-[var(--waqtu-bg)]/95 backdrop-blur-xl border-b border-[var(--waqtu-border)] shadow-sm"
+          ${isScrolled || mobileMenuOpen
+            ? "py-3 bg-[var(--waqtu-bg)]/98 backdrop-blur-xl border-b border-[var(--waqtu-border)] shadow-sm"
             : "py-5 bg-transparent border-b border-transparent"
           }
         `}
@@ -187,7 +187,7 @@ export default function Home() {
           onClick={() => setMobileMenuOpen(false)}
         >
           {/* Background */}
-          <div className="absolute inset-0 bg-[var(--waqtu-bg)]/99 backdrop-blur-2xl" />
+          <div className="absolute inset-0 bg-[var(--waqtu-bg)]" />
 
           {/* Close button */}
           <button
