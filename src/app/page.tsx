@@ -19,6 +19,11 @@ export default function Home() {
   const [expandedMedia, setExpandedMedia] = useState<MediaType | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [email, setEmail] = useState("");
+  const [emailModalTier, setEmailModalTier] = useState<
+    "PRO_MONTHLY" | "PRO_LIFETIME" | null
+  >(null);
+  const [emailError, setEmailError] = useState("");
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
@@ -50,26 +55,41 @@ export default function Home() {
     };
   }, [mobileMenuOpen]);
 
-  const handleCheckout = async (tier: "PRO_MONTHLY" | "PRO_LIFETIME") => {
+  const handleCheckoutClick = (tier: "PRO_MONTHLY" | "PRO_LIFETIME") => {
     if (!isTierAvailable(tier)) {
       console.error("Product not configured:", tier);
-      // For now, just redirect to download
       window.location.href = "#download";
       return;
     }
+    // Open email modal
+    setEmailModalTier(tier);
+    setEmailError("");
+  };
 
-    const productId = POLAR_PRODUCTS[tier];
-    setIsLoading((prev) => ({ ...prev, [tier]: true }));
+  const handleCheckout = async () => {
+    if (!emailModalTier) return;
+
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+
+    const productId = POLAR_PRODUCTS[emailModalTier];
+    setIsLoading((prev) => ({ ...prev, [emailModalTier]: true }));
 
     try {
-      const { url } = await createCheckout({ productId });
+      const { url } = await createCheckout({ productId, email });
+      // Close modal and redirect
+      setEmailModalTier(null);
       window.location.href = url;
     } catch (error) {
       console.error("Checkout error:", error);
-      // Fallback to download section
-      window.location.href = "#download";
-    } finally {
-      setIsLoading((prev) => ({ ...prev, [tier]: false }));
+      setEmailError(
+        error instanceof Error ? error.message : "Failed to create checkout",
+      );
+      setIsLoading((prev) => ({ ...prev, [emailModalTier]: false }));
     }
   };
 
@@ -715,7 +735,7 @@ export default function Home() {
                   <button
                     onClick={() => {
                       if (plan.name === "Lifetime") {
-                        handleCheckout("PRO_LIFETIME");
+                        handleCheckoutClick("PRO_LIFETIME");
                       } else {
                         window.location.href = "#download";
                       }
@@ -972,6 +992,61 @@ export default function Home() {
                 className="w-full rounded-lg shadow-2xl"
               />
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Email modal for checkout */}
+      {emailModalTier && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => {
+            if (!isLoading[emailModalTier]) setEmailModalTier(null);
+          }}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl bg-[var(--waqtu-card)] p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-semibold text-[var(--waqtu-text)]">
+              Enter your email
+            </h3>
+            <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
+              We'll send your receipt and license key to this email address.
+            </p>
+            <input
+              type="email"
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setEmailError("");
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleCheckout();
+              }}
+              autoFocus
+              className="mt-4 w-full rounded-lg border border-[var(--waqtu-border)] bg-[var(--waqtu-bg)] px-4 py-3 text-[var(--waqtu-text)] placeholder:text-[var(--waqtu-dim)] focus:border-[var(--waqtu-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--waqtu-primary)]"
+            />
+            {emailError && (
+              <p className="mt-2 text-sm text-red-500">{emailError}</p>
+            )}
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => setEmailModalTier(null)}
+                disabled={isLoading[emailModalTier]}
+                className="flex-1 rounded-full border border-[var(--waqtu-border)] px-4 py-2.5 text-[var(--waqtu-text)] transition-colors hover:bg-[var(--waqtu-bg)] disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCheckout}
+                disabled={isLoading[emailModalTier] || !email}
+                className="flex-1 rounded-full bg-[var(--waqtu-primary)] px-4 py-2.5 font-medium text-[var(--waqtu-bg)] transition-colors hover:bg-[var(--waqtu-primary-soft)] disabled:opacity-50"
+              >
+                {isLoading[emailModalTier] ? "Creating..." : "Continue"}
+              </button>
+            </div>
           </div>
         </div>
       )}

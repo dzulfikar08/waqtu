@@ -4,15 +4,14 @@ import { NextRequest, NextResponse } from "next/server";
 // Polar API configuration
 const POLAR_API_BASE = "https://api.polar.sh/v1";
 const POLAR_ACCESS_TOKEN = process.env.POLAR_ACCESS_TOKEN || "";
-const CLIENT_URL = process.env.NEXT_PUBLIC_CLIENT_URL || process.env.VERCEL_URL
-	? `https://${process.env.VERCEL_URL}`
-	: process.env.NODE_ENV === "production"
-		? "https://your-domain.com"
-		: "http://localhost:3000";
+const CLIENT_URL =
+	process.env.NEXT_PUBLIC_CLIENT_URL ||
+	(process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
 // Validation schema for checkout request
 interface CheckoutRequest {
 	productId: string;
+	email?: string;
 }
 
 // Verify Polar webhook signature
@@ -47,11 +46,19 @@ function verifyPolarSignature(
 export async function POST(request: NextRequest) {
 	try {
 		const body = await request.json();
-		const { productId } = body as CheckoutRequest;
+		const { productId, email } = body as CheckoutRequest;
 
 		if (!productId) {
 			return NextResponse.json(
 				{ error: "Product ID is required" },
+				{ status: 400 },
+			);
+		}
+
+		// Email is now required - Polar validates email domains
+		if (!email) {
+			return NextResponse.json(
+				{ error: "Email is required" },
 				{ status: 400 },
 			);
 		}
@@ -64,26 +71,27 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		// Get user email from request (for now, using a query param or header)
-		// In a real app, this would come from the authenticated session
-		const email = (request.headers.get("x-user-email") ||
-			(body as CheckoutRequest & { email?: string }).email ||
-			"user@example.com") as string;
+		// Get origin from request headers for proper redirect URLs
+		const origin =
+			request.headers.get("origin") ||
+			request.headers.get("referer")?.split("/")[2] ||
+			CLIENT_URL.replace(/^https?:\/\//, "");
 
-		// Create checkout session using Polar API
-		const response = await fetch(`${POLAR_API_BASE}/checkouts`, {
+		const baseUrl = origin.startsWith("http") ? origin : `https://${origin}`;
+
+		// Create checkout session using Polar API v1
+		const response = await fetch(`${POLAR_API_BASE}/checkout/sessions`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
 				Authorization: `Bearer ${POLAR_ACCESS_TOKEN}`,
 			},
 			body: JSON.stringify({
-				product_id: productId,
+				products: [productId],
 				customer_email: email,
-				success_url: `${CLIENT_URL}/?checkout=success`,
-				cancel_url: `${CLIENT_URL}/?checkout=canceled`,
+				success_url: `${baseUrl}/?checkout=success`,
+				return_url: `${baseUrl}/?checkout=canceled`,
 				metadata: {
-					// Store any relevant metadata
 					source: "waqtu-web",
 				},
 			}),
