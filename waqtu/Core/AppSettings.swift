@@ -63,7 +63,7 @@ final class AppSettings {
         set { UserDefaults.standard.set(newValue, forKey: "calendarProtectionCalendarId") }
     }
 
-    /// Whether we've shown the "Waqt will create daily prayer blocks" explanation once.
+    /// Whether we've shown the "Waqtu will create daily prayer blocks" explanation once.
     var hasSeenCalendarProtectionExplanation: Bool {
         get { UserDefaults.standard.bool(forKey: "hasSeenCalendarProtectionExplanation") }
         set { UserDefaults.standard.set(newValue, forKey: "hasSeenCalendarProtectionExplanation") }

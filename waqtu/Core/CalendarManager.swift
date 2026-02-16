@@ -1,6 +1,6 @@
 //
 //  CalendarManager.swift
-//  waqt
+//  waqtu
 //
 //  Creates and manages daily prayer block events in the user's calendar.
 //  Events are regenerated at midnight (prayer times change daily).
@@ -9,8 +9,8 @@
 import Foundation
 import EventKit
 
-/// Tag used in event notes to identify events created by Waqt. Do not change.
-private let waqtEventTag = "Created by Waqt"
+/// Tag used in event notes to identify events created by Waqtu. Do not change.
+private let waqtuEventTag = "Created by Waqtu"
 
 final class CalendarManager {
     private let eventStore = EKEventStore()
@@ -87,7 +87,7 @@ final class CalendarManager {
         event.startDate = startDate
         event.endDate = startDate.addingTimeInterval(TimeInterval(durationMinutes * 60))
         event.calendar = calendar
-        event.notes = waqtEventTag
+        event.notes = waqtuEventTag
         event.isAllDay = false
         event.availability = .busy
 
@@ -99,10 +99,10 @@ final class CalendarManager {
         try eventStore.save(event, span: .thisEvent)
     }
 
-    // MARK: - Delete Waqt Events
+    // MARK: - Delete Waqtu Events
 
-    /// Deletes all Waqt-created events in the given day (calendar-agnostic).
-    func deleteWaqtEvents(for date: Date) throws {
+    /// Deletes all Waqtu-created events in the given day (calendar-agnostic).
+    func deleteWaqtuEvents(for date: Date) throws {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: date)
         guard let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) else { return }
@@ -110,19 +110,19 @@ final class CalendarManager {
         let predicate = eventStore.predicateForEvents(withStart: startOfDay, end: endOfDay, calendars: nil)
         let events = eventStore.events(matching: predicate)
 
-        for event in events where event.notes?.contains(waqtEventTag) == true {
+        for event in events where event.notes?.contains(waqtuEventTag) == true {
             try eventStore.remove(event, span: .thisEvent)
         }
     }
 
-    /// Deletes all Waqt-created events in the store (all time). Use when user disables feature.
-    func deleteAllWaqtEvents() throws {
+    /// Deletes all Waqtu-created events in the store (all time). Use when user disables feature.
+    func deleteAllWaqtuEvents() throws {
         let start = calendarDate(yearsAgo: 1)
         let end = calendarDate(yearsAhead: 2)
         let predicate = eventStore.predicateForEvents(withStart: start, end: end, calendars: nil)
         let events = eventStore.events(matching: predicate)
 
-        for event in events where event.notes?.contains(waqtEventTag) == true {
+        for event in events where event.notes?.contains(waqtuEventTag) == true {
             try eventStore.remove(event, span: .thisEvent)
         }
     }
@@ -137,7 +137,7 @@ final class CalendarManager {
 
     // MARK: - Regenerate Day
 
-    /// Deletes Waqt events for the given day and creates fresh ones from prayer times.
+    /// Deletes Waqtu events for the given day and creates fresh ones from prayer times.
     /// Call at midnight or when user enables the feature.
     func regeneratePrayerEvents(
         for date: Date,
@@ -146,7 +146,7 @@ final class CalendarManager {
         calendar: EKCalendar,
         addReminder: Bool
     ) throws {
-        try deleteWaqtEvents(for: date)
+        try deleteWaqtuEvents(for: date)
         for prayer in prayers {
             try createPrayerEvent(
                 prayerName: prayer.name.displayName,

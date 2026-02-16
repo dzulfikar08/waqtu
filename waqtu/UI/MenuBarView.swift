@@ -4,24 +4,38 @@ import EventKit
 
 // MARK: - Mutabaah-inspired Colors
 extension Color {
-    static let waqtPrimary = Color(hex: "#4A8B6F")
-    static let waqtLight = Color(hex: "#6BA888")
-    static let waqtDark = Color(hex: "#2D5F4C")
-    static let waqtBackground = Color(hex: "#1A2E25")
-    static let waqtGold = Color(hex: "#D4A574")
-    static let waqtText = Color(hex: "#E8F0ED")
-    static let waqtMuted = Color(hex: "#A8C9B8")
+    static let waqtuPrimary = Color(hex: "#4A8B6F")
+    static let waqtuLight = Color(hex: "#6BA888")
+    static let waqtuDark = Color(hex: "#2D5F4C")
+    static let waqtuBackground = Color(hex: "#1A2E25")
+    static let waqtuGold = Color(hex: "#D4A574")
+    static let waqtuText = Color(hex: "#E8F0ED")
+    static let waqtuMuted = Color(hex: "#A8C9B8")
 }
 
 struct MenuBarView: View {
     @Bindable var viewModel: AppViewModel
+    @State private var showTrialEndingSoonModal = false
 
     init(viewModel: AppViewModel) {
         self.viewModel = viewModel
     }
 
     var body: some View {
+        if viewModel.trialManager.hasAccess {
+            menuBarContent
+        } else {
+            TrialExpiredMenuView()
+        }
+    }
+
+    private var menuBarContent: some View {
         VStack(spacing: 0) {
+            // Day 1–5: subtle trial banner
+            if viewModel.trialManager.trialDaysRemaining >= 2 {
+                TrialBannerView(daysRemaining: viewModel.trialManager.trialDaysRemaining)
+            }
+
             // Next prayer header
             NextPrayerHeader(
                 nextPrayer: viewModel.nextPrayer,
@@ -50,7 +64,89 @@ struct MenuBarView: View {
             BottomButtons()
         }
         .frame(width: 320)
-        .background(Color.waqtBackground)
+        .background(Color.waqtuBackground)
+        .onAppear {
+            if viewModel.trialManager.shouldShowTrialEndingSoonModal {
+                showTrialEndingSoonModal = true
+            }
+        }
+        .sheet(isPresented: $showTrialEndingSoonModal) {
+            TrialEndingSoonModal(trialManager: viewModel.trialManager) {
+                viewModel.trialManager.recordTrialEndingSoonModalShown()
+                showTrialEndingSoonModal = false
+            }
+        }
+    }
+}
+
+// MARK: - Trial banner (Day 1–5: subtle)
+struct TrialBannerView: View {
+    let daysRemaining: Int
+
+    var body: some View {
+        Text("\(daysRemaining) day\(daysRemaining == 1 ? "" : "s") remaining")
+            .font(.system(size: 11))
+            .foregroundColor(.waqtuMuted)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 6)
+            .background(Color.waqtuDark.opacity(0.4))
+    }
+}
+
+// MARK: - Day 6: Trial ending soon modal
+struct TrialEndingSoonModal: View {
+    let trialManager: TrialManager
+    let onDismiss: () -> Void
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Trial ending soon")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(.waqtuText)
+            Text("Your trial ends tomorrow. Upgrade anytime to keep using Waqtu.")
+                .font(.system(size: 14))
+                .foregroundColor(.waqtuMuted)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            Button("Got it", action: onDismiss)
+                .buttonStyle(.borderedProminent)
+                .tint(.waqtuPrimary)
+        }
+        .frame(width: 320)
+        .padding(28)
+        .background(Color.waqtuBackground)
+    }
+}
+
+// MARK: - Day 7: Trial expired (menu bar → Upgrade)
+struct TrialExpiredMenuView: View {
+    var body: some View {
+        VStack(spacing: 14) {
+            Text("Upgrade to keep using Waqtu.")
+                .font(.system(size: 13))
+                .foregroundColor(.waqtuText)
+                .multilineTextAlignment(.center)
+            Button("Upgrade") {
+                openUpgradeWindow()
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.waqtuPrimary)
+            Button("Quit") {
+                NSApplication.shared.terminate(nil)
+            }
+            .font(.system(size: 12))
+            .foregroundColor(.waqtuMuted)
+        }
+        .frame(width: 260)
+        .padding(20)
+        .background(Color.waqtuBackground)
+    }
+
+    private func openUpgradeWindow() {
+        NSApp.activate(ignoringOtherApps: true)
+        if NSApp.responds(to: Selector(("showSettingsWindow:"))) {
+            NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        }
     }
 }
 
@@ -65,26 +161,26 @@ struct NextPrayerHeader: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Next Prayer")
                         .font(.system(size: 11))
-                        .foregroundColor(.waqtMuted)
+                        .foregroundColor(.waqtuMuted)
 
                     HStack {
                         Text(next.name.displayName)
                             .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.waqtText)
+                            .foregroundColor(.waqtuText)
 
                         Spacer()
 
                         Text(countdownText)
                             .font(.system(size: 14, weight: .semibold))
                             .monospacedDigit()
-                            .foregroundColor(.waqtGold)
+                            .foregroundColor(.waqtuGold)
                     }
                 }
                 .padding(12)
             } else {
                 Text("Loading...")
                     .font(.system(size: 13))
-                    .foregroundColor(.waqtMuted)
+                    .foregroundColor(.waqtuMuted)
                     .padding()
             }
         }
@@ -126,12 +222,12 @@ struct PrayerRow: View {
         HStack(spacing: 10) {
             Image(systemName: prayer.name.iconName)
                 .font(.system(size: 14))
-                .foregroundColor(isNext ? .waqtGold : .waqtMuted)
+                .foregroundColor(isNext ? .waqtuGold : .waqtuMuted)
                 .frame(width: 18)
 
             Text(prayer.name.displayName)
                 .font(.system(size: 13, weight: isNext ? .semibold : .regular))
-                .foregroundColor(prayer.hasPassed ? .waqtMuted.opacity(0.4) : .waqtText)
+                .foregroundColor(prayer.hasPassed ? .waqtuMuted.opacity(0.4) : .waqtuText)
                 .lineLimit(1)
 
             Spacer(minLength: 8)
@@ -139,12 +235,12 @@ struct PrayerRow: View {
             Text(prayer.time.formatted(date: .omitted, time: .shortened))
                 .font(.system(size: 13, weight: .semibold))
                 .monospacedDigit()
-                .foregroundColor(prayer.hasPassed ? .waqtMuted.opacity(0.4) : (isNext ? .waqtGold : .waqtText))
+                .foregroundColor(prayer.hasPassed ? .waqtuMuted.opacity(0.4) : (isNext ? .waqtuGold : .waqtuText))
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 8)
         .background(
-            isNext ? Color.waqtPrimary.opacity(0.12) : (isHovering ? Color.waqtPrimary.opacity(0.06) : Color.clear)
+            isNext ? Color.waqtuPrimary.opacity(0.12) : (isHovering ? Color.waqtuPrimary.opacity(0.06) : Color.clear)
         )
         .cornerRadius(8)
         .contentShape(Rectangle())
@@ -165,12 +261,12 @@ struct ControlsSection: View {
             HStack(spacing: 0) {
                 HStack(spacing: 10) {
                     Image(systemName: "bell")
-                        .foregroundColor(.waqtGold)
+                        .foregroundColor(.waqtuGold)
                         .font(.system(size: 12))
                         .frame(width: 18, alignment: .center)
                     Text("Enable Overlay")
                         .font(.system(size: 13))
-                        .foregroundColor(.waqtText)
+                        .foregroundColor(.waqtuText)
                 }
                 Spacer(minLength: 8)
                 Toggle(isOn: $overlayEnabled) { EmptyView() }
@@ -184,11 +280,11 @@ struct ControlsSection: View {
             Button(action: onTestOverlay) {
                 HStack {
                     Image(systemName: "play.circle")
-                        .foregroundColor(.waqtPrimary)
+                        .foregroundColor(.waqtuPrimary)
                         .font(.system(size: 12))
                     Text("Test Overlay")
                         .font(.system(size: 13))
-                        .foregroundColor(.waqtText)
+                        .foregroundColor(.waqtuText)
                     Spacer()
                 }
             }
@@ -205,7 +301,7 @@ struct ControlRowButtonStyle: ButtonStyle {
         configuration.label
             .background(
                 configuration.isPressed
-                    ? Color.waqtPrimary.opacity(0.12)
+                    ? Color.waqtuPrimary.opacity(0.12)
                     : Color.clear
             )
     }
@@ -224,7 +320,7 @@ struct BottomButtons: View {
                 HStack {
                     Text("Settings")
                         .font(.system(size: 13))
-                        .foregroundColor(.waqtText)
+                        .foregroundColor(.waqtuText)
                     Spacer()
                 }
                 .frame(maxWidth: .infinity, minHeight: 28)
@@ -240,7 +336,7 @@ struct BottomButtons: View {
                 HStack {
                     Text("Quit")
                         .font(.system(size: 13))
-                        .foregroundColor(.waqtMuted)
+                        .foregroundColor(.waqtuMuted)
                     Spacer()
                 }
                 .frame(maxWidth: .infinity, minHeight: 28)
@@ -264,30 +360,79 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        TabView {
-            GeneralSettingsTab(settings: settings, viewModel: viewModel)
-                .tabItem {
-                    Label("General", systemImage: "gearshape.fill")
-                }
-
-            LocationSettingsTab(settings: settings)
-                .tabItem {
-                    Label("Location", systemImage: "location.fill")
-                }
-
-            AboutSettingsTab()
-                .tabItem {
-                    Label("About", systemImage: "info.circle.fill")
-                }
+        Group {
+            if let vm = viewModel, !vm.trialManager.hasAccess {
+                UpgradeFullScreenView(trialManager: vm.trialManager)
+            } else {
+                settingsTabs
+            }
         }
         .frame(width: 440, height: 520)
-        .background(Color.waqtBackground)
+        .background(Color.waqtuBackground)
         .onAppear {
             NSApp.activate(ignoringOtherApps: true)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                 NSApp.keyWindow?.makeKeyAndOrderFront(nil)
             }
         }
+    }
+
+    private var settingsTabs: some View {
+        VStack(spacing: 0) {
+            if let vm = viewModel, vm.trialManager.trialDaysRemaining >= 2 {
+                TrialBannerView(daysRemaining: vm.trialManager.trialDaysRemaining)
+            }
+            TabView {
+                GeneralSettingsTab(settings: settings, viewModel: viewModel)
+                    .tabItem {
+                        Label("General", systemImage: "gearshape.fill")
+                    }
+
+                LocationSettingsTab(settings: settings)
+                    .tabItem {
+                        Label("Location", systemImage: "location.fill")
+                    }
+
+                AboutSettingsTab(trialManager: viewModel?.trialManager)
+                    .tabItem {
+                        Label("About", systemImage: "info.circle.fill")
+                    }
+            }
+        }
+    }
+}
+
+// MARK: - Day 7: Full-screen upgrade (Settings)
+struct UpgradeFullScreenView: View {
+    @Bindable var trialManager: TrialManager
+
+    var body: some View {
+        VStack(spacing: 28) {
+            Spacer()
+            Text("Upgrade")
+                .font(.system(size: 26, weight: .semibold))
+                .foregroundColor(.waqtuText)
+            Text("Your trial has ended. Upgrade to keep using Waqtu.")
+                .font(.system(size: 15))
+                .foregroundColor(.waqtuMuted)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+            Button("Upgrade") {
+                openStore()
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.waqtuPrimary)
+            .controlSize(.large)
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private func openStore() {
+        if let url = URL(string: "https://your-store.com/waqtu") {
+            NSWorkspace.shared.open(url)
+        }
+        // When purchase completes: trialManager.markTrialUsed()
     }
 }
 
@@ -296,7 +441,7 @@ struct GeneralSettingsTab: View {
     @Bindable var settings: AppSettings
     var viewModel: AppViewModel?
     @State private var showCalendarExplanation = false
-    @State private var showRemoveWaqtEventsAlert = false
+    @State private var showRemoveWaqtuEventsAlert = false
     @State private var calendarManager = CalendarManager()
     @State private var calendarsGroupedBySource: [(source: EKSource, calendars: [EKCalendar])] = []
 
@@ -306,29 +451,29 @@ struct GeneralSettingsTab: View {
                 Toggle("Enable Overlay", isOn: $settings.overlayEnabled)
                 Text("Show a full-screen notification when it's time for prayer.")
                     .font(.caption)
-                    .foregroundColor(.waqtMuted)
+                    .foregroundColor(.waqtuMuted)
 
                 if settings.overlayEnabled {
                     HStack {
                         Text("Duration")
                         Spacer()
                         Text("\(settings.overlayDuration) min")
-                            .foregroundColor(.waqtPrimary)
+                            .foregroundColor(.waqtuPrimary)
                             .monospacedDigit()
                         Slider(value: Binding(
                             get: { Double(settings.overlayDuration) },
                             set: { settings.overlayDuration = Int($0) }
                         ), in: 5...15, step: 1)
                         .frame(width: 120)
-                        .tint(.waqtPrimary)
+                        .tint(.waqtuPrimary)
                     }
                     Text("How long the overlay stays visible (5–15 minutes).")
                         .font(.caption)
-                        .foregroundColor(.waqtMuted)
+                        .foregroundColor(.waqtuMuted)
 
                     Button("Test Overlay") { showTestOverlay() }
                         .buttonStyle(.bordered)
-                        .tint(.waqtPrimary)
+                        .tint(.waqtuPrimary)
                 }
             } header: {
                 Text("Prayer Reminders")
@@ -343,23 +488,23 @@ struct GeneralSettingsTab: View {
                     }
                     viewModel?.requestCalendarAccessAndRegenerate()
                 },
-                onRemoveAllWaqtEvents: {
-                    showRemoveWaqtEventsAlert = true
+                onRemoveAllWaqtuEvents: {
+                    showRemoveWaqtuEventsAlert = true
                 }
             )
 
             Section {
                 Toggle("Launch at Login", isOn: $settings.launchAtLogin)
-                Text("Start Waqt automatically when you log in.")
+                Text("Start Waqtu automatically when you log in.")
                     .font(.caption)
-                    .foregroundColor(.waqtMuted)
+                    .foregroundColor(.waqtuMuted)
             } header: {
                 Text("Startup")
             }
         }
         .formStyle(.grouped)
         .scrollContentBackground(.hidden)
-        .background(Color.waqtBackground)
+        .background(Color.waqtuBackground)
         .padding()
         .onAppear {
             calendarsGroupedBySource = calendarManager.calendarsGroupedBySource()
@@ -369,15 +514,15 @@ struct GeneralSettingsTab: View {
                 settings.hasSeenCalendarProtectionExplanation = true
             }
         } message: {
-            Text("Waqt will create daily prayer blocks in your calendar so you appear busy during prayer times. Events are recreated every day to match changing prayer times.")
+            Text("Waqtu will create daily prayer blocks in your calendar so you appear busy during prayer times. Events are recreated every day to match changing prayer times.")
         }
-        .alert("Remove All Waqt Events?", isPresented: $showRemoveWaqtEventsAlert) {
+        .alert("Remove All Waqtu Events?", isPresented: $showRemoveWaqtuEventsAlert) {
             Button("Cancel", role: .cancel) {}
             Button("Remove All", role: .destructive) {
-                viewModel?.removeAllWaqtEvents()
+                viewModel?.removeAllWaqtuEvents()
             }
         } message: {
-            Text("This will delete all prayer block events created by Waqt from your calendar. Your other events are not affected.")
+            Text("This will delete all prayer block events created by Waqtu from your calendar. Your other events are not affected.")
         }
     }
 
@@ -395,7 +540,7 @@ struct CalendarProtectionSection: View {
     @Bindable var settings: AppSettings
     let calendarsGroupedBySource: [(source: EKSource, calendars: [EKCalendar])]
     let onEnableFirstTime: () -> Void
-    let onRemoveAllWaqtEvents: () -> Void
+    let onRemoveAllWaqtuEvents: () -> Void
 
     private var selectedCalendarTitle: String {
         if settings.calendarProtectionCalendarId.isEmpty { return "Default" }
@@ -414,28 +559,28 @@ struct CalendarProtectionSection: View {
             ))
             Text("Create daily busy blocks for each prayer so Outlook and Teams show you as busy. Events are recreated every day.")
                 .font(.caption)
-                .foregroundColor(.waqtMuted)
+                .foregroundColor(.waqtuMuted)
 
             if settings.calendarProtectionEnabled {
                 HStack {
                     Text("Block duration")
                     Spacer()
                     Text("\(settings.calendarBlockDuration) min")
-                        .foregroundColor(.waqtPrimary)
+                        .foregroundColor(.waqtuPrimary)
                         .monospacedDigit()
                     Slider(value: Binding(
                         get: { Double(settings.calendarBlockDuration) },
                         set: { settings.calendarBlockDuration = Int($0) }
                     ), in: 10...20, step: 1)
                     .frame(width: 120)
-                    .tint(.waqtPrimary)
+                    .tint(.waqtuPrimary)
                 }
                 .onChange(of: settings.calendarBlockDuration) { _, _ in
                     NotificationCenter.default.post(name: Notification.Name("calendarProtectionSettingsChanged"), object: nil)
                 }
                 Text("Length of each prayer block (10–20 minutes).")
                     .font(.caption)
-                    .foregroundColor(.waqtMuted)
+                    .foregroundColor(.waqtuMuted)
 
                 Toggle("Add 5 min reminder", isOn: $settings.calendarProtectionReminder)
                     .onChange(of: settings.calendarProtectionReminder) { _, _ in
@@ -443,7 +588,7 @@ struct CalendarProtectionSection: View {
                     }
                 Text("Alert 5 minutes before each prayer block.")
                     .font(.caption)
-                    .foregroundColor(.waqtMuted)
+                    .foregroundColor(.waqtuMuted)
 
                 Menu {
                     Button("Default") {
@@ -465,15 +610,15 @@ struct CalendarProtectionSection: View {
                         Text("Calendar")
                         Spacer()
                         Text(selectedCalendarTitle)
-                            .foregroundColor(.waqtMuted)
+                            .foregroundColor(.waqtuMuted)
                     }
                 }
                 .onChange(of: settings.calendarProtectionCalendarId) { _, _ in
                     NotificationCenter.default.post(name: Notification.Name("calendarProtectionSettingsChanged"), object: nil)
                 }
 
-                Button("Remove all Waqt events from calendar", role: .destructive) {
-                    onRemoveAllWaqtEvents()
+                Button("Remove all Waqtu events from calendar", role: .destructive) {
+                    onRemoveAllWaqtuEvents()
                 }
                 .font(.caption)
             }
@@ -493,7 +638,7 @@ struct LocationSettingsTab: View {
                 Toggle("Auto-detect Location", isOn: $settings.autoDetectLocation)
                 Text("Use your Mac's location for accurate prayer times.")
                     .font(.caption)
-                    .foregroundColor(.waqtMuted)
+                    .foregroundColor(.waqtuMuted)
             } header: {
                 Text("Location Source")
             }
@@ -518,7 +663,7 @@ struct LocationSettingsTab: View {
                         NotificationCenter.default.post(name: Notification.Name("locationChanged"), object: nil)
                     }
                     .buttonStyle(.bordered)
-                    .tint(.waqtPrimary)
+                    .tint(.waqtuPrimary)
                 } header: {
                     Text("Manual Coordinates")
                 } footer: {
@@ -528,13 +673,15 @@ struct LocationSettingsTab: View {
         }
         .formStyle(.grouped)
         .scrollContentBackground(.hidden)
-        .background(Color.waqtBackground)
+        .background(Color.waqtuBackground)
         .padding()
     }
 }
 
 // MARK: - About Settings Tab
 struct AboutSettingsTab: View {
+    var trialManager: TrialManager?
+
     var body: some View {
         VStack(spacing: 24) {
             Spacer()
@@ -542,32 +689,51 @@ struct AboutSettingsTab: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 80, height: 80)
-            Text("Waqt")
+            Text("Waqtu")
                 .font(.system(size: 24, weight: .bold))
-                .foregroundColor(.waqtText)
+                .foregroundColor(.waqtuText)
             Text("Prayer times for your day")
                 .font(.system(size: 14))
-                .foregroundColor(.waqtMuted)
+                .foregroundColor(.waqtuMuted)
+
+            if let trial = trialManager {
+                trialBadge(trial)
+            }
 
             VStack(alignment: .leading, spacing: 12) {
                 Text(AppSettings.quranicQuote)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.waqtText)
+                    .foregroundColor(.waqtuText)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
                 Text(AppSettings.quranicReference)
                     .font(.system(size: 13))
-                    .foregroundColor(.waqtGold)
+                    .foregroundColor(.waqtuGold)
                     .frame(maxWidth: .infinity)
             }
             .padding(20)
-            .background(Color.waqtDark.opacity(0.4))
+            .background(Color.waqtuDark.opacity(0.4))
             .cornerRadius(12)
 
             Spacer()
         }
         .frame(maxWidth: .infinity)
-        .background(Color.waqtBackground)
+        .background(Color.waqtuBackground)
+    }
+
+    @ViewBuilder
+    private func trialBadge(_ trial: TrialManager) -> some View {
+        if trial.hasAccess {
+            if trial.isTrialActive, trial.trialDaysRemaining > 0 {
+                Text("\(trial.trialDaysRemaining) day\(trial.trialDaysRemaining == 1 ? "" : "s") left in trial")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.waqtuGold)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.waqtuDark.opacity(0.6))
+                    .cornerRadius(8)
+            }
+        }
     }
 }
 

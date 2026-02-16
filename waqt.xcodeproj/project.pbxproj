@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		32D0237D9FD6219D7400D6FE /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		AA447E9D2F417E8200A6E861 /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = 1333C6AA761E8AC4FC22AEC1 /* Adhan */; };
+		AA50DE822F4174E2006EDD6E /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = AA50DE812F4174E2006EDD6E /* Sparkle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -17,37 +18,37 @@
 			containerPortal = AA40DE7E2F4174E2006EDD6D /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = AA40DE852F4174E2006EDD6D;
-			remoteInfo = waqt;
+			remoteInfo = waqtu;
 		};
 		AA40DE9E2F4174E3006EDD6D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AA40DE7E2F4174E2006EDD6D /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = AA40DE852F4174E2006EDD6D;
-			remoteInfo = waqt;
+			remoteInfo = waqtu;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		AA40DE862F4174E2006EDD6D /* waqt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = waqt.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AA40DE932F4174E3006EDD6D /* waqtTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = waqtTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		AA40DE9D2F4174E3006EDD6D /* waqtUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = waqtUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA40DE862F4174E2006EDD6D /* waqtu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = waqtu.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA40DE932F4174E3006EDD6D /* waqtuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = waqtuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA40DE9D2F4174E3006EDD6D /* waqtuUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = waqtuUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		AA40DE882F4174E2006EDD6D /* waqt */ = {
+		AA40DE882F4174E2006EDD6D /* waqtu */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = waqt;
+			path = waqtu;
 			sourceTree = "<group>";
 		};
-		AA40DE962F4174E3006EDD6D /* waqtTests */ = {
+		AA40DE962F4174E3006EDD6D /* waqtuTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = waqtTests;
+			path = waqtuTests;
 			sourceTree = "<group>";
 		};
-		AA40DEA02F4174E3006EDD6D /* waqtUITests */ = {
+		AA40DEA02F4174E3006EDD6D /* waqtuUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = waqtUITests;
+			path = waqtuUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -59,6 +60,7 @@
 			files = (
 				AA447E9D2F417E8200A6E861 /* Adhan in Frameworks */,
 				32D0237D9FD6219D7400D6FE /* (null) in Frameworks */,
+				AA50DE822F4174E2006EDD6E /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -82,9 +84,9 @@
 		AA40DE7D2F4174E2006EDD6D = {
 			isa = PBXGroup;
 			children = (
-				AA40DE882F4174E2006EDD6D /* waqt */,
-				AA40DE962F4174E3006EDD6D /* waqtTests */,
-				AA40DEA02F4174E3006EDD6D /* waqtUITests */,
+				AA40DE882F4174E2006EDD6D /* waqtu */,
+				AA40DE962F4174E3006EDD6D /* waqtuTests */,
+				AA40DEA02F4174E3006EDD6D /* waqtuUITests */,
 				AA40DE872F4174E2006EDD6D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -92,9 +94,9 @@
 		AA40DE872F4174E2006EDD6D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				AA40DE862F4174E2006EDD6D /* waqt.app */,
-				AA40DE932F4174E3006EDD6D /* waqtTests.xctest */,
-				AA40DE9D2F4174E3006EDD6D /* waqtUITests.xctest */,
+				AA40DE862F4174E2006EDD6D /* waqtu.app */,
+				AA40DE932F4174E3006EDD6D /* waqtuTests.xctest */,
+				AA40DE9D2F4174E3006EDD6D /* waqtuUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -102,9 +104,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		AA40DE852F4174E2006EDD6D /* waqt */ = {
+		AA40DE852F4174E2006EDD6D /* waqtu */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AA40DEA72F4174E3006EDD6D /* Build configuration list for PBXNativeTarget "waqt" */;
+			buildConfigurationList = AA40DEA72F4174E3006EDD6D /* Build configuration list for PBXNativeTarget "waqtu" */;
 			buildPhases = (
 				AA40DE822F4174E2006EDD6D /* Sources */,
 				AA40DE832F4174E2006EDD6D /* Frameworks */,
@@ -115,19 +117,20 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				AA40DE882F4174E2006EDD6D /* waqt */,
+				AA40DE882F4174E2006EDD6D /* waqtu */,
 			);
-			name = waqt;
+			name = waqtu;
 			packageProductDependencies = (
 				1333C6AA761E8AC4FC22AEC1 /* Adhan */,
+				AA50DE812F4174E2006EDD6E /* Sparkle */,
 			);
-			productName = waqt;
-			productReference = AA40DE862F4174E2006EDD6D /* waqt.app */;
+			productName = waqtu;
+			productReference = AA40DE862F4174E2006EDD6D /* waqtu.app */;
 			productType = "com.apple.product-type.application";
 		};
-		AA40DE922F4174E3006EDD6D /* waqtTests */ = {
+		AA40DE922F4174E3006EDD6D /* waqtuTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AA40DEAA2F4174E3006EDD6D /* Build configuration list for PBXNativeTarget "waqtTests" */;
+			buildConfigurationList = AA40DEAA2F4174E3006EDD6D /* Build configuration list for PBXNativeTarget "waqtuTests" */;
 			buildPhases = (
 				AA40DE8F2F4174E3006EDD6D /* Sources */,
 				AA40DE902F4174E3006EDD6D /* Frameworks */,
@@ -139,18 +142,18 @@
 				AA40DE952F4174E3006EDD6D /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				AA40DE962F4174E3006EDD6D /* waqtTests */,
+				AA40DE962F4174E3006EDD6D /* waqtuTests */,
 			);
-			name = waqtTests;
+			name = waqtuTests;
 			packageProductDependencies = (
 			);
-			productName = waqtTests;
-			productReference = AA40DE932F4174E3006EDD6D /* waqtTests.xctest */;
+			productName = waqtuTests;
+			productReference = AA40DE932F4174E3006EDD6D /* waqtuTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		AA40DE9C2F4174E3006EDD6D /* waqtUITests */ = {
+		AA40DE9C2F4174E3006EDD6D /* waqtuUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AA40DEAD2F4174E3006EDD6D /* Build configuration list for PBXNativeTarget "waqtUITests" */;
+			buildConfigurationList = AA40DEAD2F4174E3006EDD6D /* Build configuration list for PBXNativeTarget "waqtuUITests" */;
 			buildPhases = (
 				AA40DE992F4174E3006EDD6D /* Sources */,
 				AA40DE9A2F4174E3006EDD6D /* Frameworks */,
@@ -162,13 +165,13 @@
 				AA40DE9F2F4174E3006EDD6D /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				AA40DEA02F4174E3006EDD6D /* waqtUITests */,
+				AA40DEA02F4174E3006EDD6D /* waqtuUITests */,
 			);
-			name = waqtUITests;
+			name = waqtuUITests;
 			packageProductDependencies = (
 			);
-			productName = waqtUITests;
-			productReference = AA40DE9D2F4174E3006EDD6D /* waqtUITests.xctest */;
+			productName = waqtuUITests;
+			productReference = AA40DE9D2F4174E3006EDD6D /* waqtuUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -205,15 +208,16 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				2717EA0AE00B545057492781 /* XCRemoteSwiftPackageReference "Adhan-Swift" */,
+				AA50DE802F4174E2006EDD6E /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AA40DE872F4174E2006EDD6D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				AA40DE852F4174E2006EDD6D /* waqt */,
-				AA40DE922F4174E3006EDD6D /* waqtTests */,
-				AA40DE9C2F4174E3006EDD6D /* waqtUITests */,
+				AA40DE852F4174E2006EDD6D /* waqtu */,
+				AA40DE922F4174E3006EDD6D /* waqtuTests */,
+				AA40DE9C2F4174E3006EDD6D /* waqtuUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -269,12 +273,12 @@
 /* Begin PBXTargetDependency section */
 		AA40DE952F4174E3006EDD6D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = AA40DE852F4174E2006EDD6D /* waqt */;
+			target = AA40DE852F4174E2006EDD6D /* waqtu */;
 			targetProxy = AA40DE942F4174E3006EDD6D /* PBXContainerItemProxy */;
 		};
 		AA40DE9F2F4174E3006EDD6D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = AA40DE852F4174E2006EDD6D /* waqt */;
+			target = AA40DE852F4174E2006EDD6D /* waqtu */;
 			targetProxy = AA40DE9E2F4174E3006EDD6D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -411,14 +415,15 @@
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqt creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqt needs your location to calculate accurate prayer times.";
+				INFOPLIST_KEY_SUFeedURL = "https://your-domain.com/waqtu/appcast.xml";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dat.waqt;
+				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtu;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -435,14 +440,15 @@
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqt creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqt needs your location to calculate accurate prayer times.";
+				INFOPLIST_KEY_SUFeedURL = "https://your-domain.com/waqtu/appcast.xml";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dat.waqt;
+				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtu;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -459,11 +465,11 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtTests;
+				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtuTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/waqt.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/waqt";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/waqtu.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/waqt";
 			};
 			name = Debug;
 		};
@@ -477,11 +483,11 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtTests;
+				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtuTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/waqt.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/waqt";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/waqtu.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/waqt";
 			};
 			name = Release;
 		};
@@ -493,11 +499,11 @@
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtuUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = waqt;
+				TEST_TARGET_NAME = waqtu;
 			};
 			name = Debug;
 		};
@@ -509,11 +515,11 @@
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtuUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = waqt;
+				TEST_TARGET_NAME = waqtu;
 			};
 			name = Release;
 		};
@@ -529,7 +535,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AA40DEA72F4174E3006EDD6D /* Build configuration list for PBXNativeTarget "waqt" */ = {
+		AA40DEA72F4174E3006EDD6D /* Build configuration list for PBXNativeTarget "waqtu" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA40DEA82F4174E3006EDD6D /* Debug */,
@@ -538,7 +544,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AA40DEAA2F4174E3006EDD6D /* Build configuration list for PBXNativeTarget "waqtTests" */ = {
+		AA40DEAA2F4174E3006EDD6D /* Build configuration list for PBXNativeTarget "waqtuTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA40DEAB2F4174E3006EDD6D /* Debug */,
@@ -547,7 +553,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AA40DEAD2F4174E3006EDD6D /* Build configuration list for PBXNativeTarget "waqtUITests" */ = {
+		AA40DEAD2F4174E3006EDD6D /* Build configuration list for PBXNativeTarget "waqtuUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA40DEAE2F4174E3006EDD6D /* Debug */,
@@ -567,6 +573,14 @@
 				minimumVersion = 1.4.0;
 			};
 		};
+		AA50DE802F4174E2006EDD6E /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -574,6 +588,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2717EA0AE00B545057492781 /* XCRemoteSwiftPackageReference "Adhan-Swift" */;
 			productName = Adhan;
+		};
+		AA50DE812F4174E2006EDD6E /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA50DE802F4174E2006EDD6E /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

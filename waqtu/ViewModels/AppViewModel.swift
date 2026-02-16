@@ -8,6 +8,7 @@ final class AppViewModel {
     let calculator: PrayerTimeCalculator
     let locationManager: LocationManager
     let calendarManager: CalendarManager
+    let trialManager: TrialManager
 
     private var timer: Timer?
     private var shownPrayers: Set<String> = []
@@ -19,9 +20,10 @@ final class AppViewModel {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init() {
+    init(trialManager: TrialManager = TrialManager()) {
         let settings = AppSettings()
         self.settings = settings
+        self.trialManager = trialManager
         self.calculator = PrayerTimeCalculator(settings: settings)
         self.locationManager = LocationManager()
         self.calendarManager = CalendarManager()
@@ -187,10 +189,10 @@ final class AppViewModel {
         }
     }
 
-    /// Remove all Waqt-created events from the calendar. Call when user disables feature or taps "Remove all Waqt events".
-    func removeAllWaqtEvents() {
+    /// Remove all Waqtu-created events from the calendar. Call when user disables feature or taps "Remove all Waqtu events".
+    func removeAllWaqtuEvents() {
         do {
-            try calendarManager.deleteAllWaqtEvents()
+            try calendarManager.deleteAllWaqtuEvents()
         } catch {
             // Surface if needed
         }
