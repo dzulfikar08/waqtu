@@ -565,9 +565,9 @@ export default function Home() {
               during prayer times.
             </p>
 
-            <div className="grid gap-8 md:grid-cols-2">
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {/* Video - Full screen reminder */}
-              <div 
+              <div
                 className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all"
                 onClick={() => setExpandedMedia("video")}
               >
@@ -591,9 +591,33 @@ export default function Home() {
                 </video>
               </div>
 
-              {/* Image - Teams calendar */}
-              <div 
+              {/* Video 2 - Full screen reminder */}
+              <div
                 className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all"
+                onClick={() => setExpandedMedia("video2")}
+              >
+                <div className="mb-3">
+                  <h3 className="font-display text-lg font-semibold text-[var(--waqtu-text)]">
+                    The moment work stops, prayer begins
+                  </h3>
+                  <p className="mt-1 text-sm text-[var(--waqtu-muted)]">
+                    A gentle full-screen nudge that interrupts your flow for what matters. You choose when to dismiss—it waits respectfully until you do. Click to expand.
+                  </p>
+                </div>
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full rounded-xl border border-[var(--waqtu-border)]"
+                >
+                  <source src="/waqtu-2.mp4" type="video/mp4" />
+                </video>
+              </div>
+
+              {/* Image - Teams calendar */}
+              <div
+                className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all md:col-span-2 lg:col-span-1"
                 onClick={() => setExpandedMedia("image")}
               >
                 <div className="mb-3">
@@ -984,6 +1008,16 @@ export default function Home() {
                 className="w-full rounded-lg shadow-2xl"
               >
                 <source src="/waqtu.mp4" type="video/mp4" />
+              </video>
+            ) : expandedMedia === "video2" ? (
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full rounded-lg shadow-2xl"
+              >
+                <source src="/waqtu-2.mp4" type="video/mp4" />
               </video>
             ) : (
               <img
