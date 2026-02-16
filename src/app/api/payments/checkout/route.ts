@@ -2,7 +2,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 // Polar API configuration
-const POLAR_API_BASE = "https://api.polar.sh/v1";
+const POLAR_API_BASE = "https://api.polar.sh";
 const POLAR_ACCESS_TOKEN = process.env.POLAR_ACCESS_TOKEN || "";
 const CLIENT_URL =
 	process.env.NEXT_PUBLIC_CLIENT_URL ||
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
 		const baseUrl = origin.startsWith("http") ? origin : `https://${origin}`;
 
 		// Create checkout session using Polar API v1
-		const response = await fetch(`${POLAR_API_BASE}/checkout/sessions`, {
+		const response = await fetch(`${POLAR_API_BASE}/v1/checkouts/`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -88,12 +88,6 @@ export async function POST(request: NextRequest) {
 			},
 			body: JSON.stringify({
 				products: [productId],
-				customer_email: email,
-				success_url: `${baseUrl}/?checkout=success`,
-				return_url: `${baseUrl}/?checkout=canceled`,
-				metadata: {
-					source: "waqtu-web",
-				},
 			}),
 		});
 
