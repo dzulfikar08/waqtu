@@ -63,7 +63,11 @@ struct WaqtuApp: App {
 
         #if os(macOS)
         Settings {
-            SettingsView(settings: viewModel.settings, viewModel: viewModel)
+            SettingsView(
+                settings: viewModel.settings,
+                viewModel: viewModel,
+                onCheckForUpdates: { appDelegate.updaterController.updater.checkForUpdates() }
+            )
         }
         .windowResizability(.contentSize)
         .defaultSize(width: 460, height: 560)

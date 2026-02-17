@@ -448,6 +448,7 @@
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Waqtu;
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqt needs your location to calculate accurate prayer times.";
 				INFOPLIST_KEY_SUFeedURL = "https://waqt-updates.dzulfikar-at.workers.dev/appcast.xml";
@@ -476,6 +477,7 @@
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Waqtu;
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqt needs your location to calculate accurate prayer times.";
 				INFOPLIST_KEY_SUFeedURL = "https://waqt-updates.dzulfikar-at.workers.dev/appcast.xml";

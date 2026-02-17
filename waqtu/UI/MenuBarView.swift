@@ -31,8 +31,8 @@ struct MenuBarView: View {
 
     private var menuBarContent: some View {
         VStack(spacing: 0) {
-            // Day 1–5: subtle trial banner
-            if viewModel.trialManager.trialDaysRemaining >= 2 {
+            // Trial banner only when not licensed
+            if !viewModel.licenseManager.isLicensed, viewModel.trialManager.trialDaysRemaining >= 2 {
                 TrialBannerView(daysRemaining: viewModel.trialManager.trialDaysRemaining)
             }
 
@@ -353,10 +353,12 @@ struct BottomButtons: View {
 struct SettingsView: View {
     @Bindable var settings: AppSettings
     var viewModel: AppViewModel?
+    var onCheckForUpdates: (() -> Void)?
 
-    init(settings: AppSettings, viewModel: AppViewModel? = nil) {
+    init(settings: AppSettings, viewModel: AppViewModel? = nil, onCheckForUpdates: (() -> Void)? = nil) {
         self.settings = settings
         self.viewModel = viewModel
+        self.onCheckForUpdates = onCheckForUpdates
     }
 
     var body: some View {
@@ -393,10 +395,97 @@ struct SettingsView: View {
                         Label("Location", systemImage: "location.fill")
                     }
 
-                AboutSettingsTab(trialManager: viewModel?.trialManager)
+                if let vm = viewModel {
+                    UpgradeSettingsTab(trialManager: vm.trialManager, licenseManager: vm.licenseManager)
+                        .tabItem {
+                            Label("Upgrade", systemImage: "crown.fill")
+                        }
+                }
+
+                AboutSettingsTab(trialManager: viewModel?.trialManager, isLicensed: viewModel?.licenseManager.isLicensed ?? false, onCheckForUpdates: onCheckForUpdates)
                     .tabItem {
                         Label("About", systemImage: "info.circle.fill")
                     }
+            }
+        }
+    }
+}
+
+// MARK: - Upgrade tab in Settings (visible before and after trial)
+struct UpgradeSettingsTab: View {
+    @Bindable var trialManager: TrialManager
+    @Bindable var licenseManager: LicenseManager
+    @State private var licenseKeyInput = ""
+    @State private var isActivating = false
+    @State private var activationError: String?
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                if licenseManager.isLicensed {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.waqtuPrimary)
+                        Text("You have lifetime access on this Mac.")
+                            .font(.system(size: 14))
+                            .foregroundColor(.waqtuText)
+                    }
+                    .padding(.vertical, 8)
+                } else {
+                    if trialManager.isTrialActive, trialManager.trialDaysRemaining > 0 {
+                        Text("\(trialManager.trialDaysRemaining) day\(trialManager.trialDaysRemaining == 1 ? "" : "s") left in trial. Upgrade anytime to keep access.")
+                            .font(.system(size: 13))
+                            .foregroundColor(.waqtuMuted)
+                    }
+                    Text("Buy once at getwaqtu.com — you’ll get a license key by email. Enter it below to activate this Mac.")
+                        .font(.system(size: 13))
+                        .foregroundColor(.waqtuMuted)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("License key")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.waqtuMuted)
+                        TextField("Paste key from Polar email", text: $licenseKeyInput)
+                            .textFieldStyle(.roundedBorder)
+                            .onChange(of: licenseKeyInput) { _, _ in activationError = nil }
+                        if let err = activationError {
+                            Text(err)
+                                .font(.system(size: 11))
+                                .foregroundColor(.red)
+                        }
+                        Button(isActivating ? "Activating…" : "Activate this device") {
+                            activateLicense()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.waqtuPrimary)
+                        .disabled(isActivating || licenseKeyInput.trimmingCharacters(in: .whitespaces).isEmpty)
+                    }
+
+                    Button("Open getwaqtu.com to purchase") {
+                        if let url = URL(string: "https://getwaqtu.com") {
+                            NSWorkspace.shared.open(url)
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.waqtuPrimary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(24)
+        }
+    }
+
+    private func activateLicense() {
+        activationError = nil
+        isActivating = true
+        Task { @MainActor in
+            let result = await licenseManager.activate(key: licenseKeyInput)
+            isActivating = false
+            switch result {
+            case .success:
+                licenseKeyInput = ""
+            case .failure(.message(let msg)):
+                activationError = msg
             }
         }
     }
@@ -720,6 +809,14 @@ struct LocationSettingsTab: View {
 // MARK: - About Settings Tab
 struct AboutSettingsTab: View {
     var trialManager: TrialManager?
+    var isLicensed: Bool = false
+    var onCheckForUpdates: (() -> Void)?
+
+    private var versionString: String {
+        let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
+        return "Version \(short) (\(build))"
+    }
 
     var body: some View {
         VStack(spacing: 24) {
@@ -735,8 +832,16 @@ struct AboutSettingsTab: View {
                 .font(.system(size: 14))
                 .foregroundColor(.waqtuMuted)
 
-            if let trial = trialManager {
-                trialBadge(trial)
+            Text(versionString)
+                .font(.system(size: 12))
+                .foregroundColor(.waqtuMuted)
+
+            accessBadge
+
+            if let onCheck = onCheckForUpdates {
+                Button("Check for Updates…", action: onCheck)
+                    .buttonStyle(.bordered)
+                    .tint(.waqtuPrimary)
             }
 
             Button {
@@ -772,17 +877,28 @@ struct AboutSettingsTab: View {
     }
 
     @ViewBuilder
-    private func trialBadge(_ trial: TrialManager) -> some View {
-        if trial.hasAccess {
-            if trial.isTrialActive, trial.trialDaysRemaining > 0 {
-                Text("\(trial.trialDaysRemaining) day\(trial.trialDaysRemaining == 1 ? "" : "s") left in trial")
+    private var accessBadge: some View {
+        if isLicensed {
+            HStack(spacing: 6) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 12))
+                    .foregroundColor(.waqtuPrimary)
+                Text("Lifetime access")
                     .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(.waqtuGold)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color.waqtuDark.opacity(0.6))
-                    .cornerRadius(8)
+                    .foregroundColor(.waqtuText)
             }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Color.waqtuDark.opacity(0.6))
+            .cornerRadius(8)
+        } else if let trial = trialManager, trial.hasAccess, trial.isTrialActive, trial.trialDaysRemaining > 0 {
+            Text("\(trial.trialDaysRemaining) day\(trial.trialDaysRemaining == 1 ? "" : "s") left in trial")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(.waqtuGold)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Color.waqtuDark.opacity(0.6))
+                .cornerRadius(8)
         }
     }
 }
