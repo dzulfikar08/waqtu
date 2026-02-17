@@ -8,7 +8,7 @@ const POLAR_WEBHOOK_SECRET = process.env.POLAR_WEBHOOK_SECRET || "";
 
 // Verify Polar webhook signature using Standard Webhooks format
 // Polar uses: webhook-id, webhook-signature, webhook-timestamp headers
-// Secret must be base64 encoded before signing
+// The secret should be used as-is for HMAC (Standard Webhooks library base64 encodes internally)
 function verifyPolarSignature(
 	body: string,
 	webhookId: string | null,
@@ -30,16 +30,20 @@ function verifyPolarSignature(
 			return false;
 		}
 
-		// Base64 encode the secret as per Polar's requirements
-		const base64Secret = Buffer.from(secret).toString("base64");
+		// Standard Webhooks expects the secret to be base64 encoded as bytes for HMAC
+		// The secret from Polar is provided raw, so we encode it to base64 bytes
+		const secretBuffer = Buffer.from(secret, "utf-8");
+		const base64Secret = secretBuffer.toString("base64");
 		console.log("[WEBHOOK DEBUG] Base64 secret length:", base64Secret.length);
 
 		// Create the signed content: webhook-id.timestamp.body
 		const signedContent = `${webhookId}.${webhookTimestamp}.${body}`;
 		console.log("[WEBHOOK DEBUG] Signed content length:", signedContent.length);
 
-		// Generate HMAC signature
-		const expectedSignature = createHmac("sha256", base64Secret)
+		// Generate HMAC signature using the base64-encoded secret as a buffer
+		// The key for HMAC must be the base64-encoded secret decoded back to bytes
+		const hmacKey = Buffer.from(base64Secret, "base64");
+		const expectedSignature = createHmac("sha256", hmacKey)
 			.update(signedContent)
 			.digest("base64");
 		console.log("[WEBHOOK DEBUG] Expected sig:", expectedSignature.slice(0, 20));
