@@ -7,6 +7,11 @@ import {
   isTierAvailable,
 } from "@/lib/api/payments";
 
+// Latest DMG (worker redirects to R2); set NEXT_PUBLIC_DOWNLOAD_URL to override
+const DOWNLOAD_URL =
+  process.env.NEXT_PUBLIC_DOWNLOAD_URL ||
+  "https://waqt-updates.dzulfikar-at.workers.dev/latest";
+
 type LoadingState = {
   [key: string]: boolean;
 };
@@ -24,6 +29,18 @@ export default function Home() {
     "PRO_MONTHLY" | "PRO_LIFETIME" | null
   >(null);
   const [emailError, setEmailError] = useState("");
+  const [showCheckoutSuccess, setShowCheckoutSuccess] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const success = params.get("checkout") === "success";
+    setShowCheckoutSuccess(success);
+    if (success) {
+      const el = document.getElementById("download");
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, []);
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
@@ -114,9 +131,10 @@ export default function Home() {
           fixed top-0 left-0 right-0 z-50
           flex items-center justify-between px-4 sm:px-6 md:px-14
           transition-all duration-300 ease-out
-          ${isScrolled || mobileMenuOpen
-            ? "py-3 bg-[var(--waqtu-bg)]/98 backdrop-blur-xl border-b border-[var(--waqtu-border)] shadow-sm"
-            : "py-5 bg-transparent border-b border-transparent"
+          ${
+            isScrolled || mobileMenuOpen
+              ? "py-3 bg-[var(--waqtu-bg)]/98 backdrop-blur-xl border-b border-[var(--waqtu-border)] shadow-sm"
+              : "py-5 bg-transparent border-b border-transparent"
           }
         `}
       >
@@ -198,15 +216,15 @@ export default function Home() {
             fixed inset-0 sm:hidden
             flex flex-col
             transition-all duration-300 ease-out
-            ${mobileMenuOpen
-              ? "opacity-100 pointer-events-auto"
-              : "opacity-0 pointer-events-none"
+            ${
+              mobileMenuOpen
+                ? "opacity-100 pointer-events-auto"
+                : "opacity-0 pointer-events-none"
             }
           `}
-          style={{ zIndex: 40, backgroundColor: 'var(--waqtu-bg, #0f1914)' }}
+          style={{ zIndex: 40, backgroundColor: "var(--waqtu-bg, #0f1914)" }}
           onClick={() => setMobileMenuOpen(false)}
         >
-
           {/* Close button */}
           <button
             onClick={(e) => {
@@ -601,7 +619,9 @@ export default function Home() {
                     The moment work stops, prayer begins
                   </h3>
                   <p className="mt-1 text-sm text-[var(--waqtu-muted)]">
-                    A gentle full-screen nudge that interrupts your flow for what matters. You choose when to dismiss—it waits respectfully until you do. Click to expand.
+                    A gentle full-screen nudge that interrupts your flow for
+                    what matters. You choose when to dismiss—it waits
+                    respectfully until you do. Click to expand.
                   </p>
                 </div>
                 <video
@@ -611,7 +631,7 @@ export default function Home() {
                   playsInline
                   className="w-full flex-1 rounded-xl border border-[var(--waqtu-border)] object-cover aspect-video"
                 >
-                  <source src="/waqtu-2.mp4" type="video/mp4" />
+                  <source src="/waqtu-3.mp4" type="video/mp4" />
                 </video>
               </div>
 
@@ -815,6 +835,76 @@ export default function Home() {
           </div>
         </section>
 
+        {/* What happens next */}
+        <section className="relative z-10 px-6 py-16 sm:px-10 md:px-14 md:py-24">
+          <div className="mx-auto max-w-2xl">
+            <h2 className="font-display mb-3 text-center text-xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-2xl">
+              What happens next
+            </h2>
+            <p className="mx-auto mb-10 max-w-lg text-center text-[var(--waqtu-muted)]">
+              Three quick steps and you're done.
+            </p>
+
+            <div className="grid gap-6 sm:gap-8">
+              {/* Step 1 */}
+              <div className="group relative flex gap-4 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-5 backdrop-blur-sm transition-all hover:border-[var(--waqtu-primary)]/30 hover:bg-[var(--waqtu-card)]/80 sm:gap-6 sm:p-6">
+                <div className="flex shrink-0 items-center justify-center">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--waqtu-primary)] text-sm font-semibold text-[var(--waqtu-bg)]">
+                    1
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-display font-semibold text-[var(--waqtu-text)]">
+                    Check your email
+                  </h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-[var(--waqtu-muted)] sm:mt-2">
+                    Your license key arrives within a minute. If you don't see it, check spam or promotions.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div className="group relative flex gap-4 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-5 backdrop-blur-sm transition-all hover:border-[var(--waqtu-primary)]/30 hover:bg-[var(--waqtu-card)]/80 sm:gap-6 sm:p-6">
+                <div className="flex shrink-0 items-center justify-center">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--waqtu-primary)] text-sm font-semibold text-[var(--waqtu-bg)]">
+                    2
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-display font-semibold text-[var(--waqtu-text)]">
+                    Download & install
+                  </h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-[var(--waqtu-muted)] sm:mt-2">
+                    Grab the DMG from the section below. Drag Waqtu to your Applications folder and launch it.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className="group relative flex gap-4 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-5 backdrop-blur-sm transition-all hover:border-[var(--waqtu-primary)]/30 hover:bg-[var(--waqtu-card)]/80 sm:gap-6 sm:p-6">
+                <div className="flex shrink-0 items-center justify-center">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--waqtu-primary)] text-sm font-semibold text-[var(--waqtu-bg)]">
+                    3
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-display font-semibold text-[var(--waqtu-text)]">
+                    Activate your license
+                  </h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-[var(--waqtu-muted)] sm:mt-2">
+                    Open Waqtu, go to <span className="font-medium text-[var(--waqtu-text)]">Settings → Upgrade</span>, paste your key, and tap <span className="font-medium text-[var(--waqtu-text)]">Activate this device</span>.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Note */}
+            <p className="mt-8 text-center text-sm text-[var(--waqtu-dim)]">
+              One license, one Mac. Your key is tied to this device—sharing the app file won't unlock it for others.
+            </p>
+          </div>
+        </section>
+
         {/* FAQ Section */}
         <section
           id="faq"
@@ -911,25 +1001,43 @@ export default function Home() {
           id="download"
           className="relative z-10 px-6 py-24 sm:px-10 md:px-14 md:py-32"
         >
-          <div className="mx-auto max-w-2xl rounded-3xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/80 p-12 text-center backdrop-blur-sm md:p-16">
+          <div className="mx-auto max-w-2xl rounded-3xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/80 p-10 text-center backdrop-blur-sm sm:p-12 md:p-16">
+            {showCheckoutSuccess && (
+              <div className="mb-6 flex items-center justify-center gap-2 rounded-xl border border-[var(--waqtu-primary)]/40 bg-[var(--waqtu-primary)]/10 px-4 py-3 sm:mb-8">
+                <svg className="h-5 w-5 text-[var(--waqtu-primary)]" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <p className="text-sm font-medium text-[var(--waqtu-text)]">
+                  Purchase confirmed. Check your email for your license key, then download below.
+                </p>
+              </div>
+            )}
             <h2 className="font-display text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
-              Ready to protect your prayer times?
+              Begin today
             </h2>
-            <p className="mt-4 text-[var(--waqtu-muted)]">
-              Download Waqtu for macOS. No account required. Free to try, $9.99
-              if you love it.
+            <p className="mt-4 text-[var(--waqtu-muted)] sm:mt-5">
+              Free to try. No account needed. macOS 12 or later.
             </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4">
+              <a
+                href={DOWNLOAD_URL}
+                className="group inline-flex items-center gap-2 rounded-full bg-[var(--waqtu-primary)] px-8 py-4 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_32px_rgba(74,139,111,0.45)] sm:px-10"
+              >
+                Download Waqtu
+                <svg className="h-4 w-4 transition-transform group-hover:translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+              </a>
               <a
                 href="#pricing"
-                className="inline-flex items-center gap-2 rounded-full bg-[var(--waqtu-primary)] px-8 py-4 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_32px_rgba(74,139,111,0.45)]"
+                className="group inline-flex items-center gap-2 rounded-full border border-[var(--waqtu-border)] px-8 py-4 font-medium text-[var(--waqtu-text)] transition-colors hover:border-[var(--waqtu-primary)] hover:bg-[var(--waqtu-card)] sm:px-10"
               >
-                Get Waqtu for $9.99
-                <span>→</span>
+                <span className="text-[var(--waqtu-gold)]">·</span>
+                Lifetime access $9.99
               </a>
             </div>
-            <p className="mt-6 text-sm text-[var(--waqtu-muted)]">
-              Your prayers deserve a place on your calendar.
+            <p className="mt-6 text-sm text-[var(--waqtu-dim)] sm:mt-8">
+              One Mac. One lifetime.
             </p>
           </div>
         </section>
@@ -980,22 +1088,32 @@ export default function Home() {
 
       {/* Fullscreen Media Viewer */}
       {expandedMedia && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
           onClick={() => setExpandedMedia(null)}
         >
-          <button 
+          <button
             className="absolute top-6 right-6 text-white/80 hover:text-white transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               setExpandedMedia(null);
             }}
           >
-            <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="h-8 w-8"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
-          <div 
+          <div
             className="max-w-6xl max-h-[90vh] w-full px-4"
             onClick={(e) => e.stopPropagation()}
           >
