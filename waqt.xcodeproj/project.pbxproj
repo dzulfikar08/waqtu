@@ -30,6 +30,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AA2B768E2F440BAE005EC86C /* public_ed25519.pem */ = {isa = PBXFileReference; lastKnownFileType = text; name = public_ed25519.pem; path = waqtu/Resources/public_ed25519.pem; sourceTree = "<group>"; };
 		AA40DE862F4174E2006EDD6D /* waqtu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = waqtu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA40DE932F4174E3006EDD6D /* waqtuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = waqtuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA40DE9D2F4174E3006EDD6D /* waqtuUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = waqtuUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,12 +82,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AA2B76B92F44177E005EC86C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		AA40DE7D2F4174E2006EDD6D = {
 			isa = PBXGroup;
 			children = (
+				AA2B768E2F440BAE005EC86C /* public_ed25519.pem */,
 				AA40DE882F4174E2006EDD6D /* waqtu */,
 				AA40DE962F4174E3006EDD6D /* waqtuTests */,
 				AA40DEA02F4174E3006EDD6D /* waqtuUITests */,
+				AA2B76B92F44177E005EC86C /* Frameworks */,
 				AA40DE872F4174E2006EDD6D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -410,6 +420,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
@@ -417,7 +428,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqt needs your location to calculate accurate prayer times.";
-				INFOPLIST_KEY_SUFeedURL = "https://your-domain.com/waqtu/appcast.xml";
+				INFOPLIST_KEY_SUFeedURL = "https://waqt-updates.dzulfikar-at.workers.dev/appcast.xml";
+				INFOPLIST_KEY_SUPublicEDKey = "ST4I7E9UtjShTiPHebZWDNOPHIuOarKcjCVLCN1QyWc=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -435,6 +447,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
@@ -442,7 +455,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqt needs your location to calculate accurate prayer times.";
-				INFOPLIST_KEY_SUFeedURL = "https://your-domain.com/waqtu/appcast.xml";
+				INFOPLIST_KEY_SUFeedURL = "https://waqt-updates.dzulfikar-at.workers.dev/appcast.xml";
+				INFOPLIST_KEY_SUPublicEDKey = "ST4I7E9UtjShTiPHebZWDNOPHIuOarKcjCVLCN1QyWc=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -429,7 +429,7 @@ struct UpgradeFullScreenView: View {
     }
 
     private func openStore() {
-        if let url = URL(string: "https://your-store.com/waqtu") {
+        if let url = URL(string: "https://getwaqtu.com") {
             NSWorkspace.shared.open(url)
         }
         // When purchase completes: trialManager.markTrialUsed()
@@ -699,6 +699,17 @@ struct AboutSettingsTab: View {
             if let trial = trialManager {
                 trialBadge(trial)
             }
+
+            Button {
+                if let url = URL(string: "https://getwaqtu.com") {
+                    NSWorkspace.shared.open(url)
+                }
+            } label: {
+                Text("getwaqtu.com")
+                    .font(.system(size: 13))
+                    .foregroundColor(.waqtuPrimary)
+            }
+            .buttonStyle(.plain)
 
             VStack(alignment: .leading, spacing: 12) {
                 Text(AppSettings.quranicQuote)

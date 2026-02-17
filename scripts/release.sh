@@ -1,88 +1,88 @@
 #!/bin/bash
 set -e
 
-# Configuration
-VERSION="${1:-}"
-PRIVATE_KEY_LABEL="sparkle"  # Keychain item name created by generate_keys
+# Release: build DMG, sign with Sparkle, upload to R2, add row to D1.
+# Usage: ./scripts/release.sh SHORT_VERSION [DESCRIPTION]
+# Example: ./scripts/release.sh 1.0.0 "Initial release with prayer times and calendar protection."
+#
+# Prereqs:
+# - Xcode: MARKETING_VERSION and CURRENT_PROJECT_VERSION set (CURRENT_PROJECT_VERSION = Sparkle version integer)
+# - Sparkle: generate_keys run once, private key in keychain
+# - Cloudflare: D1 database waqt-releases-db created, schema applied, R2 bucket waqt-releases, wrangler.toml has database_id
+# - Env: R2_PUBLIC_BASE_URL (e.g. https://pub-xxx.r2.dev/waqt-releases) so downloads work
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+WORKER_DIR="$PROJECT_DIR/cloudflare-worker"
+BUILD_DIR="$PROJECT_DIR/build"
+SHORT_VERSION="${1:?Usage: ./scripts/release.sh SHORT_VERSION [DESCRIPTION]}"
+DESCRIPTION="${2:-Update with prayer times and calendar protection.}"
+
+DMG_NAME="Waqtu-${SHORT_VERSION}.dmg"
 R2_BUCKET="waqt-releases"
-WORKER_DIR="cloudflare-worker"
-BUILD_DIR="build"
-DMG_NAME="Waqt-$VERSION.dmg"
-SPARKLE_SIGN_TOOL="build/DerivedData/SourcePackages/checkouts/Sparkle/.build/artifacts/sparkle/Sparkle/bin/sign_update"
 
-if [ -z "$VERSION" ]; then
-  echo "Usage: ./scripts/release.sh VERSION"
-  echo "Example: ./scripts/release.sh 1.0.1"
+# Sparkle sign_update: when using SPM, artifacts are under DerivedData/SourcePackages/artifacts
+SPARKLE_BIN="$BUILD_DIR/DerivedData/SourcePackages/artifacts/sparkle/Sparkle/bin/sign_update"
+if [[ ! -f "$SPARKLE_BIN" ]]; then
+  SPARKLE_BIN="$PROJECT_DIR/build/DerivedData/SourcePackages/checkouts/Sparkle/bin/sign_update"
+fi
+if [[ ! -f "$SPARKLE_BIN" ]]; then
+  echo "Error: Sparkle sign_update not found. Build the app once in Xcode so SPM fetches Sparkle, or set SPARKLE_SIGN_UPDATE_PATH."
   exit 1
 fi
 
-echo "Releasing Waqt version $VERSION..."
+R2_PUBLIC_BASE_URL="${R2_PUBLIC_BASE_URL:-https://waqt-r2-release.dzulfikar.com}"
 
-# Check if sign_update tool exists
-if [ ! -f "$SPARKLE_SIGN_TOOL" ]; then
-  echo "Error: Sparkle sign_update tool not found at $SPARKLE_SIGN_TOOL"
-  echo "Make sure Sparkle is properly checked out and built."
+echo "=== Releasing Waqtu $SHORT_VERSION ==="
+
+# 1. Build DMG (uses same DerivedData so Sparkle is there)
+echo "[1/4] Building DMG..."
+"$SCRIPT_DIR/build-dmg.sh" "$SHORT_VERSION"
+
+DMG_PATH="$BUILD_DIR/$DMG_NAME"
+if [[ ! -f "$DMG_PATH" ]]; then
+  echo "Error: DMG not found at $DMG_PATH"
   exit 1
 fi
 
-# Step 1: Build the DMG
-echo "Building DMG..."
-if [ -f "./build-dmg" ]; then
-  ./build-dmg
-else
-  echo "Error: build-dmg script not found. Please build the DMG manually first."
+# 2. Sparkle version = CFBundleVersion from built app
+APP_PLIST="$BUILD_DIR/DerivedData/Build/Products/Release/waqtu.app/Contents/Info.plist"
+if [[ ! -f "$APP_PLIST" ]]; then
+  echo "Error: App Info.plist not found. Build may have failed."
   exit 1
 fi
+SPARKLE_VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" "$APP_PLIST")
+echo "    Sparkle version (build): $SPARKLE_VERSION"
 
-# Check if DMG was created
-if [ ! -f "$BUILD_DIR/$DMG_NAME" ]; then
-  echo "Error: DMG file not found at $BUILD_DIR/$DMG_NAME"
-  echo "The build-dmg script may have created it elsewhere. Please check and update BUILD_DIR."
-  exit 1
-fi
+# 3. Sign DMG
+echo "[2/4] Signing DMG with Sparkle..."
+SIGNATURE=$("$SPARKLE_BIN" "$DMG_PATH")
+echo "    Signature: ${SIGNATURE:0:40}..."
+FILE_LENGTH=$(stat -f%z "$DMG_PATH" 2>/dev/null || stat -c%s "$DMG_PATH")
 
-# Step 2: Sign the DMG with Sparkle
-echo "Signing DMG..."
-SIGNATURE=$("$SPARKLE_SIGN_TOOL" "$BUILD_DIR/$DMG_NAME")
+# 4. Upload to R2
+echo "[3/4] Uploading to R2..."
+cd "$WORKER_DIR"
+npx wrangler r2 object put "$R2_BUCKET/$DMG_NAME" --file="$DMG_PATH"
+cd "$PROJECT_DIR"
+echo "    Uploaded: $DMG_NAME"
 
-echo "Signature: $SIGNATURE"
+# 5. Insert into D1
+ENCLOSURE_URL="${R2_PUBLIC_BASE_URL%/}/$DMG_NAME"
+PUB_DATE=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
+TITLE="Waqtu $SHORT_VERSION"
+# Escape single quotes for SQL
+TITLE_ESC="${TITLE//\'/\'\'}"
+DESC_ESC="${DESCRIPTION//\'/\'\'}"
+SIG_ESC="${SIGNATURE//\'/\'\'}"
 
-# Step 3: Get DMG file size
-FILE_SIZE=$(stat -f%z "$BUILD_DIR/$DMG_NAME" 2>/dev/null || stat -c%s "$BUILD_DIR/$DMG_NAME")
-echo "DMG size: $FILE_SIZE bytes"
-
-# Step 4: Upload to R2
-echo "Uploading to R2..."
-npx wrangler r2 object put "$R2_BUCKET/$DMG_NAME" --file="$BUILD_DIR/$DMG_NAME"
-
-echo "✓ Uploaded to R2: $DMG_NAME"
-
-# Step 5: Print update info for Worker
-echo ""
-echo "========================================="
-echo "UPDATE THE FOLLOWING IN cloudflare-worker/worker.ts:"
-echo "========================================="
-echo "  enclosureUrl: \"https://YOUR_R2_BUCKET_URL/$DMG_NAME\""
-echo "  edSignature: \"$SIGNATURE\""
-echo "  length: $FILE_SIZE"
-echo "  version: \"$VERSION\""
-echo "========================================="
-echo ""
-echo "After updating worker.ts, run: cd $WORKER_DIR && npx wrangler deploy"
-echo ""
-
-# Step 6: Ask about git tag
-read -p "Create and push git tag v$VERSION? (y/n) " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-  git tag -a "v$VERSION" -m "Release version $VERSION"
-  git push origin "v$VERSION"
-  echo "✓ Tag v$VERSION created and pushed"
-fi
+echo "[4/4] Adding release to D1..."
+cd "$WORKER_DIR"
+npx wrangler d1 execute waqt-releases-db --remote --command "INSERT INTO releases (version, short_version_string, title, description, enclosure_url, ed_signature, length, pub_date) VALUES ($SPARKLE_VERSION, '$SHORT_VERSION', '$TITLE_ESC', '$DESC_ESC', '$ENCLOSURE_URL', '$SIG_ESC', $FILE_LENGTH, '$PUB_DATE');"
+cd "$PROJECT_DIR"
 
 echo ""
-echo "Release $VERSION preparation complete!"
-echo "Next steps:"
-echo "  1. Update cloudflare-worker/worker.ts with the info above"
-echo "  2. Deploy: cd $WORKER_DIR && npx wrangler deploy"
-echo "  3. Test the update in your app"
+echo "=== Done ==="
+echo "  Appcast: https://waqt-updates.dzulfikar-at.workers.dev/appcast.xml"
+echo "  Deploy worker if you haven't: cd $WORKER_DIR && npx wrangler deploy"
+echo "  Optional: git tag -a v$SHORT_VERSION -m 'Release $SHORT_VERSION' && git push origin v$SHORT_VERSION"
