@@ -16,7 +16,7 @@ type LoadingState = {
   [key: string]: boolean;
 };
 
-type MediaType = "video" | "video2" | "image";
+type MediaType = "video" | "video2" | "image" | "menuBar";
 
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
