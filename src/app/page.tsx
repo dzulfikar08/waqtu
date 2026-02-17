@@ -7,6 +7,15 @@ import {
   isTierAvailable,
 } from "@/lib/api/payments";
 
+// One Dollar Stats analytics helper
+declare global {
+  interface Window {
+    Stonks?: {
+      event: (name: string, properties?: Record<string, unknown>) => void;
+    };
+  }
+}
+
 // Latest DMG (worker redirects to R2); set NEXT_PUBLIC_DOWNLOAD_URL to override
 const DOWNLOAD_URL =
   process.env.NEXT_PUBLIC_DOWNLOAD_URL ||
@@ -37,6 +46,8 @@ export default function Home() {
     const success = params.get("checkout") === "success";
     setShowCheckoutSuccess(success);
     if (success) {
+      // Track successful purchase return
+      window.Stonks?.event("checkout_success_return");
       const el = document.getElementById("download");
       el?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -53,6 +64,40 @@ export default function Home() {
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Track scroll depth milestones
+  useEffect(() => {
+    let hasHit25 = false;
+    let hasHit50 = false;
+    let hasHit75 = false;
+    let hasHit100 = false;
+
+    const handleScrollDepth = () => {
+      const scrollPercent =
+        (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
+        100;
+
+      if (scrollPercent >= 25 && !hasHit25) {
+        hasHit25 = true;
+        window.Stonks?.event("scroll_depth", { percent: 25 });
+      }
+      if (scrollPercent >= 50 && !hasHit50) {
+        hasHit50 = true;
+        window.Stonks?.event("scroll_depth", { percent: 50 });
+      }
+      if (scrollPercent >= 75 && !hasHit75) {
+        hasHit75 = true;
+        window.Stonks?.event("scroll_depth", { percent: 75 });
+      }
+      if (scrollPercent >= 100 && !hasHit100) {
+        hasHit100 = true;
+        window.Stonks?.event("scroll_depth", { percent: 100 });
+      }
+    };
+
+    window.addEventListener("scroll", handleScrollDepth, { passive: true });
+    return () => window.removeEventListener("scroll", handleScrollDepth);
   }, []);
 
   // Close mobile menu when clicking a link
@@ -78,6 +123,8 @@ export default function Home() {
       window.location.href = "#download";
       return;
     }
+    // Track checkout start
+    window.Stonks?.event("checkout_start", { tier });
     // Open email modal
     setEmailModalTier(tier);
     setEmailError("");
@@ -98,11 +145,18 @@ export default function Home() {
 
     try {
       const { url } = await createCheckout({ productId, email });
+      // Track checkout redirect
+      window.Stonks?.event("checkout_redirect", { tier: emailModalTier, email });
       // Close modal and redirect
       setEmailModalTier(null);
       window.location.href = url;
     } catch (error) {
       console.error("Checkout error:", error);
+      // Track checkout error
+      window.Stonks?.event("checkout_error", {
+        tier: emailModalTier,
+        error: error instanceof Error ? error.message : "Failed to create checkout",
+      });
       setEmailError(
         error instanceof Error ? error.message : "Failed to create checkout",
       );
@@ -153,6 +207,8 @@ export default function Home() {
             href="#features"
             onClick={handleNavClick}
             className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+            data-s-event="nav_click"
+            data-s-event-props='{"destination":"features"}'
           >
             Features
           </a>
@@ -160,6 +216,8 @@ export default function Home() {
             href="#pricing"
             onClick={handleNavClick}
             className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+            data-s-event="nav_click"
+            data-s-event-props='{"destination":"pricing"}'
           >
             Pricing
           </a>
@@ -167,6 +225,8 @@ export default function Home() {
             href="#faq"
             onClick={handleNavClick}
             className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+            data-s-event="nav_click"
+            data-s-event-props='{"destination":"faq"}'
           >
             FAQ
           </a>
@@ -174,6 +234,8 @@ export default function Home() {
             href="#pricing"
             onClick={handleNavClick}
             className="rounded-full bg-[var(--waqtu-primary)] px-5 py-2.5 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_24px_rgba(74,139,111,0.35)]"
+            data-s-event="cta_click"
+            data-s-event-props='{"location":"header","text":"Get Waqtu"}'
           >
             Get Waqtu
           </a>
@@ -185,6 +247,8 @@ export default function Home() {
           className="sm:hidden relative z-50 p-2 -mr-2 text-[var(--waqtu-text)] touch-manipulation"
           aria-label="Toggle menu"
           aria-expanded={mobileMenuOpen}
+          data-s-event="mobile_menu_toggle"
+          data-s-event-props={`{"state":"${mobileMenuOpen ? "close" : "open"}"}`}
         >
           <svg
             className={`h-6 w-6 transition-transform duration-300 ${mobileMenuOpen ? "rotate-90" : ""}`}
@@ -258,6 +322,8 @@ export default function Home() {
               href="#features"
               onClick={handleNavClick}
               className="text-3xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors py-2"
+              data-s-event="nav_click"
+              data-s-event-props='{"destination":"features","location":"mobile_menu"}'
             >
               Features
             </a>
@@ -265,6 +331,8 @@ export default function Home() {
               href="#pricing"
               onClick={handleNavClick}
               className="text-3xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors py-2"
+              data-s-event="nav_click"
+              data-s-event-props='{"destination":"pricing","location":"mobile_menu"}'
             >
               Pricing
             </a>
@@ -272,6 +340,8 @@ export default function Home() {
               href="#faq"
               onClick={handleNavClick}
               className="text-3xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors py-2"
+              data-s-event="nav_click"
+              data-s-event-props='{"destination":"faq","location":"mobile_menu"}'
             >
               FAQ
             </a>
@@ -279,6 +349,8 @@ export default function Home() {
               href="#pricing"
               onClick={handleNavClick}
               className="mt-4 rounded-full bg-[var(--waqtu-primary)] px-10 py-4 text-xl font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_24px_rgba(74,139,111,0.35)]"
+              data-s-event="cta_click"
+              data-s-event-props='{"location":"mobile_menu","text":"Get Waqtu"}'
             >
               Get Waqtu
             </a>
@@ -327,6 +399,8 @@ export default function Home() {
               <a
                 href="#pricing"
                 className="group inline-flex items-center gap-2 rounded-full bg-[var(--waqtu-primary)] px-6 py-3.5 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_28px_rgba(74,139,111,0.4)]"
+                data-s-event="cta_click"
+                data-s-event-props='{"location":"hero","text":"Get Waqtu for Mac"}'
               >
                 Get Waqtu for Mac
                 <span className="transition-transform group-hover:translate-x-0.5">
@@ -336,6 +410,8 @@ export default function Home() {
               <a
                 href="#features"
                 className="inline-flex items-center gap-2 text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+                data-s-event="nav_click"
+                data-s-event-props='{"destination":"features","location":"hero"}'
               >
                 See how it works
               </a>
@@ -627,6 +703,8 @@ export default function Home() {
               <div
                 className="flex flex-col rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all"
                 onClick={() => setExpandedMedia("menuBar")}
+                data-s-event="media_expand"
+                data-s-event-props='{"type":"image","media":"menuBar"}'
               >
                 <div className="mb-3">
                   <h3 className="font-display text-lg font-semibold text-[var(--waqtu-text)]">
@@ -648,6 +726,8 @@ export default function Home() {
               <div
                 className="flex flex-col rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all"
                 onClick={() => setExpandedMedia("video2")}
+                data-s-event="media_expand"
+                data-s-event-props='{"type":"video","media":"fullscreen_reminder"}'
               >
                 <div className="mb-3">
                   <h3 className="font-display text-lg font-semibold text-[var(--waqtu-text)]">
@@ -674,6 +754,8 @@ export default function Home() {
               <div
                 className="flex flex-col rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all"
                 onClick={() => setExpandedMedia("image")}
+                data-s-event="media_expand"
+                data-s-event-props='{"type":"image","media":"teams_calendar"}'
               >
                 <div className="mb-3">
                   <h3 className="font-display text-lg font-semibold text-[var(--waqtu-text)]">
@@ -829,6 +911,8 @@ export default function Home() {
                         ? "bg-[var(--waqtu-primary)] text-[var(--waqtu-bg)] hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_24px_rgba(74,139,111,0.35)]"
                         : "border border-[var(--waqtu-border-strong)] text-[var(--waqtu-text)] hover:border-[var(--waqtu-primary)] hover:bg-[var(--waqtu-card)]"
                     }`}
+                    data-s-event="cta_click"
+                    data-s-event-props='{"location":"pricing","text":"Get lifetime access","tier":"lifetime"}'
                   >
                     {isLoading.PRO_LIFETIME && plan.name === "Lifetime"
                       ? "Redirecting..."
@@ -1013,6 +1097,8 @@ export default function Home() {
                   <button
                     className="faq-question flex w-full items-center justify-between gap-4 py-6 text-left"
                     onClick={() => toggleFaq(index)}
+                    data-s-event="faq_toggle"
+                    data-s-event-props={`{"question":"${faq.question.replace(/"/g, '\\"')}","index":${index}}`}
                   >
                     <span className="font-medium text-[var(--waqtu-text)]">
                       {faq.question}
@@ -1077,6 +1163,8 @@ export default function Home() {
               <a
                 href={DOWNLOAD_URL}
                 className="group inline-flex items-center gap-2 rounded-full bg-[var(--waqtu-primary)] px-8 py-4 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_32px_rgba(74,139,111,0.45)] sm:px-10"
+                data-s-event="download_click"
+                data-s-event-props='{"location":"download_cta","text":"Download Waqtu"}'
               >
                 Download Waqtu
                 <svg
@@ -1096,6 +1184,8 @@ export default function Home() {
               <a
                 href="#pricing"
                 className="group inline-flex items-center gap-2 rounded-full border border-[var(--waqtu-border)] px-8 py-4 font-medium text-[var(--waqtu-text)] transition-colors hover:border-[var(--waqtu-primary)] hover:bg-[var(--waqtu-card)] sm:px-10"
+                data-s-event="cta_click"
+                data-s-event-props='{"location":"download_cta","text":"Lifetime access $9.99"}'
               >
                 <span className="text-[var(--waqtu-gold)]">·</span>
                 Lifetime access $9.99
@@ -1118,24 +1208,32 @@ export default function Home() {
                 <a
                   href="/privacy"
                   className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+                  data-s-event="footer_link_click"
+                  data-s-event-props='{"link":"privacy"}'
                 >
                   Privacy
                 </a>
                 <a
                   href="/terms"
                   className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+                  data-s-event="footer_link_click"
+                  data-s-event-props='{"link":"terms"}'
                 >
                   Terms
                 </a>
                 <a
                   href="mailto:dzulfikar.at@gmail.com"
                   className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+                  data-s-event="footer_link_click"
+                  data-s-event-props='{"link":"support"}'
                 >
                   Support
                 </a>
                 <a
                   href="mailto:dzulfikar.at@gmail.com"
                   className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+                  data-s-event="footer_link_click"
+                  data-s-event-props='{"link":"contact"}'
                 >
                   Contact
                 </a>
@@ -1224,7 +1322,10 @@ export default function Home() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
           onClick={() => {
-            if (!isLoading[emailModalTier]) setEmailModalTier(null);
+            if (!isLoading[emailModalTier]) {
+              window.Stonks?.event("checkout_cancel", { tier: emailModalTier, step: "email_modal" });
+              setEmailModalTier(null);
+            }
           }}
         >
           <div
@@ -1256,7 +1357,10 @@ export default function Home() {
             )}
             <div className="mt-6 flex gap-3">
               <button
-                onClick={() => setEmailModalTier(null)}
+                onClick={() => {
+                  window.Stonks?.event("checkout_cancel", { tier: emailModalTier, step: "email_modal" });
+                  setEmailModalTier(null);
+                }}
                 disabled={isLoading[emailModalTier]}
                 className="flex-1 rounded-full border border-[var(--waqtu-border)] px-4 py-2.5 text-[var(--waqtu-text)] transition-colors hover:bg-[var(--waqtu-bg)] disabled:opacity-50"
               >

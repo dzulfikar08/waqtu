@@ -7,6 +7,7 @@
       "dependencies": {
         "@opennextjs/cloudflare": "^1.15.1",
         "next": "16.1.5",
+        "onedollarstats": "^0.0.12",
         "react": "19.1.5",
         "react-dom": "19.1.5",
       },
@@ -1110,6 +1111,8 @@
     "on-finished": ["on-finished@2.4.1", "", { "dependencies": { "ee-first": "1.1.1" } }, "sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg=="],
 
     "once": ["once@1.4.0", "", { "dependencies": { "wrappy": "1" } }, "sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w=="],
+
+    "onedollarstats": ["onedollarstats@0.0.12", "", {}, "sha512-YPGGUxVqAstQmMmWNi4ce/UPeogj2eIa4k/uwZaWIvgSwzp2E/wZ8z7ZFIgISKxvWM0zJOSOGYyL2ZxrcGE/Qw=="],
 
     "onetime": ["onetime@5.1.2", "", { "dependencies": { "mimic-fn": "^2.1.0" } }, "sha512-kbpaSSGJTWdAY5KPVeMOKXSrPtr8C8C7wodJbcsd51jRnmD+GZu8Y0VoU6Dm5Z4vWr0Ig/1NKuWRKf7j5aaYSg=="],
 
