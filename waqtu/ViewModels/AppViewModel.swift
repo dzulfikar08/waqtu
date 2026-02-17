@@ -81,11 +81,15 @@ final class AppViewModel {
     private func updateLocationDisplay() {
         let location: CLLocation
         if settings.autoDetectLocation {
-            guard let loc = locationManager.locationForGeocoding else {
-                locationDisplay = "Getting location..."
-                return
+            if let loc = locationManager.locationForGeocoding {
+                location = loc
+            } else {
+                // Use manual fallback (same as prayer calculator) so we show something instead of stuck "Getting location..."
+                location = CLLocation(
+                    latitude: settings.manualLatitude,
+                    longitude: settings.manualLongitude
+                )
             }
-            location = loc
         } else {
             location = CLLocation(
                 latitude: settings.manualLatitude,
