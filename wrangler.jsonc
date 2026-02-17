@@ -31,7 +31,7 @@
   ],
   "vars": {
     "NEXT_PUBLIC_POLAR_PRODUCT_PRO_LIFETIME": "a9414ce0-7d3d-4545-8619-61e225367154",
-    "NEXT_PUBLIC_CLIENT_URL": "https://waqtu.dzulfikar-at.workers.dev",
+    "NEXT_PUBLIC_CLIENT_URL": "https://getwaqtu.com",
   },
   "observability": {
     "enabled": true,
