@@ -46,12 +46,15 @@ function verifyPolarSignature(
 		console.log("[WEBHOOK DEBUG] Received sig:", webhookSignature.slice(0, 20));
 
 		// Polar sends multiple signatures separated by space
+		// Each signature has format: v1,{base64-signature}
 		// Check if any of them match
 		const signatures = webhookSignature.split(" ");
 		console.log("[WEBHOOK DEBUG] Number of signatures:", signatures.length);
 
 		for (const sig of signatures) {
-			if (sig === expectedSignature) {
+			// Strip the "v1," prefix to get the raw base64 signature
+			const rawSig = sig.startsWith("v1,") ? sig.slice(3) : sig;
+			if (rawSig === expectedSignature) {
 				console.log("[WEBHOOK DEBUG] Signature matched!");
 				return true;
 			}
