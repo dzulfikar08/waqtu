@@ -222,7 +222,7 @@ export default function Home() {
                 : "opacity-0 pointer-events-none"
             }
           `}
-          style={{ zIndex: 40, backgroundColor: "var(--waqtu-bg, #0f1914)" }}
+          style={{ zIndex: 40, backgroundColor: "rgb(15, 25, 20)" }}
           onClick={() => setMobileMenuOpen(false)}
         >
           {/* Close button */}
@@ -535,19 +535,58 @@ export default function Home() {
                   title: "Never wonder when the next prayer is",
                   description:
                     "A quick glance at your menu bar tells you. No checking apps, no guessing.",
-                  icon: "○",
+                  icon: (
+                    <svg
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 6v6l4 2" />
+                    </svg>
+                  ),
                 },
                 {
                   title: "Calm, not alarming",
                   description:
                     "A peaceful overlay appears when it's time. Dismiss when you're ready to pray.",
-                  icon: "◇",
+                  icon: (
+                    <svg
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
+                      />
+                    </svg>
+                  ),
                 },
                 {
                   title: "Your faith on your calendar",
                   description:
                     "Waqtu creates busy blocks in your calendar—Exchange, iCloud, or default. Outlook & Teams show you as busy.",
-                  icon: "▷",
+                  icon: (
+                    <svg
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z"
+                      />
+                    </svg>
+                  ),
                 },
               ].map((item, i) => (
                 <article
@@ -557,7 +596,7 @@ export default function Home() {
                     animationDelay: `${320 + i * 60}ms`,
                   }}
                 >
-                  <span className="mb-4 block text-2xl text-[var(--waqtu-gold)] opacity-80">
+                  <span className="mb-4 block text-[var(--waqtu-gold)] opacity-80">
                     {item.icon}
                   </span>
                   <h3 className="font-display mb-3 text-lg font-semibold text-[var(--waqtu-text)]">
@@ -584,29 +623,25 @@ export default function Home() {
             </p>
 
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {/* Video - Full screen reminder */}
+              {/* Image - Menu bar prayer times */}
               <div
                 className="flex flex-col rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all"
-                onClick={() => setExpandedMedia("video")}
+                onClick={() => setExpandedMedia("menuBar")}
               >
                 <div className="mb-3">
                   <h3 className="font-display text-lg font-semibold text-[var(--waqtu-text)]">
-                    Full-screen prayer reminder
+                    Prayer times in your menu bar
                   </h3>
                   <p className="mt-1 text-sm text-[var(--waqtu-muted)]">
-                    A peaceful overlay appears at prayer time. Dismiss when
-                    you're ready. Click to expand.
+                    A quick glance tells you when the next prayer is. No checking
+                    apps, no guessing. Click to expand.
                   </p>
                 </div>
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
+                <img
+                  src="/waqtu-4.webp"
+                  alt="Waqtu menu bar showing prayer time countdown"
                   className="w-full flex-1 rounded-xl border border-[var(--waqtu-border)] object-cover aspect-video"
-                >
-                  <source src="/waqtu.mp4" type="video/mp4" />
-                </video>
+                />
               </div>
 
               {/* Video 2 - Full screen reminder */}
@@ -712,7 +747,7 @@ export default function Home() {
           id="pricing"
           className="relative z-10 section-tint-3 px-6 py-24 sm:px-10 md:px-14 md:py-32"
         >
-          <div className="mx-auto max-w-3xl">
+          <div className="mx-auto max-w-xl">
             <h2 className="font-display mb-4 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
               Simple, transparent pricing
             </h2>
@@ -858,7 +893,8 @@ export default function Home() {
                     Check your email
                   </h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-[var(--waqtu-muted)] sm:mt-2">
-                    Your license key arrives within a minute. If you don't see it, check spam or promotions.
+                    Your license key arrives within a minute. If you don't see
+                    it, check spam or promotions.
                   </p>
                 </div>
               </div>
@@ -875,7 +911,8 @@ export default function Home() {
                     Download & install
                   </h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-[var(--waqtu-muted)] sm:mt-2">
-                    Grab the DMG from the section below. Drag Waqtu to your Applications folder and launch it.
+                    Grab the DMG from the section below. Drag Waqtu to your
+                    Applications folder and launch it.
                   </p>
                 </div>
               </div>
@@ -892,7 +929,15 @@ export default function Home() {
                     Activate your license
                   </h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-[var(--waqtu-muted)] sm:mt-2">
-                    Open Waqtu, go to <span className="font-medium text-[var(--waqtu-text)]">Settings → Upgrade</span>, paste your key, and tap <span className="font-medium text-[var(--waqtu-text)]">Activate this device</span>.
+                    Open Waqtu, go to{" "}
+                    <span className="font-medium text-[var(--waqtu-text)]">
+                      Settings → Upgrade
+                    </span>
+                    , paste your key, and tap{" "}
+                    <span className="font-medium text-[var(--waqtu-text)]">
+                      Activate this device
+                    </span>
+                    .
                   </p>
                 </div>
               </div>
@@ -900,7 +945,8 @@ export default function Home() {
 
             {/* Note */}
             <p className="mt-8 text-center text-sm text-[var(--waqtu-dim)]">
-              One license, one Mac. Your key is tied to this device—sharing the app file won't unlock it for others.
+              One license, one Mac. Your key is tied to this device—sharing the
+              app file won't unlock it for others.
             </p>
           </div>
         </section>
@@ -1004,11 +1050,20 @@ export default function Home() {
           <div className="mx-auto max-w-2xl rounded-3xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/80 p-10 text-center backdrop-blur-sm sm:p-12 md:p-16">
             {showCheckoutSuccess && (
               <div className="mb-6 flex items-center justify-center gap-2 rounded-xl border border-[var(--waqtu-primary)]/40 bg-[var(--waqtu-primary)]/10 px-4 py-3 sm:mb-8">
-                <svg className="h-5 w-5 text-[var(--waqtu-primary)]" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <svg
+                  className="h-5 w-5 text-[var(--waqtu-primary)]"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 <p className="text-sm font-medium text-[var(--waqtu-text)]">
-                  Purchase confirmed. Check your email for your license key, then download below.
+                  Purchase confirmed. Check your email for your license key,
+                  then download below.
                 </p>
               </div>
             )}
@@ -1024,8 +1079,18 @@ export default function Home() {
                 className="group inline-flex items-center gap-2 rounded-full bg-[var(--waqtu-primary)] px-8 py-4 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_32px_rgba(74,139,111,0.45)] sm:px-10"
               >
                 Download Waqtu
-                <svg className="h-4 w-4 transition-transform group-hover:translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                <svg
+                  className="h-4 w-4 transition-transform group-hover:translate-y-0.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                  />
                 </svg>
               </a>
               <a
@@ -1135,8 +1200,14 @@ export default function Home() {
                 playsInline
                 className="w-full rounded-lg shadow-2xl"
               >
-                <source src="/waqtu-2.mp4" type="video/mp4" />
+                <source src="/waqtu-3.mp4" type="video/mp4" />
               </video>
+            ) : expandedMedia === "menuBar" ? (
+              <img
+                src="/waqtu-4.webp"
+                alt="Waqtu menu bar showing prayer time countdown"
+                className="w-full rounded-lg shadow-2xl"
+              />
             ) : (
               <img
                 src="/waqtu.webp"
