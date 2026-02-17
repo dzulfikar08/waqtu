@@ -22,7 +22,7 @@ struct MenuBarView: View {
     }
 
     var body: some View {
-        if viewModel.trialManager.hasAccess {
+        if viewModel.hasAccess {
             menuBarContent
         } else {
             TrialExpiredMenuView()
@@ -361,8 +361,8 @@ struct SettingsView: View {
 
     var body: some View {
         Group {
-            if let vm = viewModel, !vm.trialManager.hasAccess {
-                UpgradeFullScreenView(trialManager: vm.trialManager)
+            if let vm = viewModel, !vm.hasAccess {
+                UpgradeFullScreenView(trialManager: vm.trialManager, licenseManager: vm.licenseManager)
             } else {
                 settingsTabs
             }
@@ -379,7 +379,7 @@ struct SettingsView: View {
 
     private var settingsTabs: some View {
         VStack(spacing: 0) {
-            if let vm = viewModel, vm.trialManager.trialDaysRemaining >= 2 {
+            if let vm = viewModel, !vm.licenseManager.isLicensed, vm.trialManager.trialDaysRemaining >= 2 {
                 TrialBannerView(daysRemaining: vm.trialManager.trialDaysRemaining)
             }
             TabView {
@@ -405,34 +405,73 @@ struct SettingsView: View {
 // MARK: - Day 7: Full-screen upgrade (Settings)
 struct UpgradeFullScreenView: View {
     @Bindable var trialManager: TrialManager
+    @Bindable var licenseManager: LicenseManager
+    @State private var licenseKeyInput = ""
+    @State private var isActivating = false
+    @State private var activationError: String?
 
     var body: some View {
-        VStack(spacing: 28) {
+        VStack(spacing: 24) {
             Spacer()
             Text("Upgrade")
                 .font(.system(size: 26, weight: .semibold))
                 .foregroundColor(.waqtuText)
-            Text("Your trial has ended. Upgrade to keep using Waqtu.")
-                .font(.system(size: 15))
+            Text("Your trial has ended. Buy lifetime access at getwaqtu.com — you’ll get a license key by email. Enter it below to activate this Mac.")
+                .font(.system(size: 14))
                 .foregroundColor(.waqtuMuted)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
-            Button("Upgrade") {
+                .padding(.horizontal, 32)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("License key")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.waqtuMuted)
+                TextField("Paste key from Polar email", text: $licenseKeyInput)
+                    .textFieldStyle(.roundedBorder)
+                    .onChange(of: licenseKeyInput) { _, _ in activationError = nil }
+                if let err = activationError {
+                    Text(err)
+                        .font(.system(size: 11))
+                        .foregroundColor(.red)
+                }
+                Button(isActivating ? "Activating…" : "Activate this device") {
+                    activateLicense()
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.waqtuPrimary)
+                .disabled(isActivating || licenseKeyInput.trimmingCharacters(in: .whitespaces).isEmpty)
+            }
+            .frame(width: 280)
+
+            Button("Open getwaqtu.com to purchase") {
                 openStore()
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.bordered)
             .tint(.waqtuPrimary)
-            .controlSize(.large)
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private func activateLicense() {
+        activationError = nil
+        isActivating = true
+        Task { @MainActor in
+            let result = await licenseManager.activate(key: licenseKeyInput)
+            isActivating = false
+            switch result {
+            case .success:
+                licenseKeyInput = ""
+            case .failure(.message(let msg)):
+                activationError = msg
+            }
+        }
     }
 
     private func openStore() {
         if let url = URL(string: "https://getwaqtu.com") {
             NSWorkspace.shared.open(url)
         }
-        // When purchase completes: trialManager.markTrialUsed()
     }
 }
 

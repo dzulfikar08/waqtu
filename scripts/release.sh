@@ -78,7 +78,7 @@ SIG_ESC="${SIGNATURE//\'/\'\'}"
 
 echo "[4/4] Adding release to D1..."
 cd "$WORKER_DIR"
-npx wrangler d1 execute waqt-releases-db --remote --command "INSERT INTO releases (version, short_version_string, title, description, enclosure_url, ed_signature, length, pub_date) VALUES ($SPARKLE_VERSION, '$SHORT_VERSION', '$TITLE_ESC', '$DESC_ESC', '$ENCLOSURE_URL', '$SIG_ESC', $FILE_LENGTH, '$PUB_DATE');"
+npx wrangler d1 execute waqt-releases-db --remote --command "INSERT OR REPLACE INTO releases (version, short_version_string, title, description, enclosure_url, ed_signature, length, pub_date) VALUES ($SPARKLE_VERSION, '$SHORT_VERSION', '$TITLE_ESC', '$DESC_ESC', '$ENCLOSURE_URL', '$SIG_ESC', $FILE_LENGTH, '$PUB_DATE');"
 cd "$PROJECT_DIR"
 
 echo ""

@@ -9,6 +9,7 @@ final class AppViewModel {
     let locationManager: LocationManager
     let calendarManager: CalendarManager
     let trialManager: TrialManager
+    let licenseManager: LicenseManager
 
     private var timer: Timer?
     private var shownPrayers: Set<String> = []
@@ -18,18 +19,27 @@ final class AppViewModel {
     var countdown: Int = 0
     var overlayWindow: NSWindow?
 
+    /// Full access: trial active, trial used (legacy), or valid license.
+    var hasAccess: Bool {
+        trialManager.hasAccess || licenseManager.isLicensed
+    }
+
     private var cancellables = Set<AnyCancellable>()
 
-    init(trialManager: TrialManager = TrialManager()) {
+    init(trialManager: TrialManager = TrialManager(), licenseManager: LicenseManager = LicenseManager()) {
         let settings = AppSettings()
         self.settings = settings
         self.trialManager = trialManager
+        self.licenseManager = licenseManager
         self.calculator = PrayerTimeCalculator(settings: settings)
         self.locationManager = LocationManager()
         self.calendarManager = CalendarManager()
         setupLocationUpdates()
         calculatePrayers()
         setupTimer()
+        Task { @MainActor in
+            await licenseManager.validate()
+        }
     }
 
     private func setupLocationUpdates() {

@@ -121,6 +121,7 @@
 				AA40DE822F4174E2006EDD6D /* Sources */,
 				AA40DE832F4174E2006EDD6D /* Frameworks */,
 				AA40DE842F4174E2006EDD6D /* Resources */,
+				AA50DE852F4174E2006EDD6E /* Embed Sparkle */,
 			);
 			buildRules = (
 			);
@@ -256,6 +257,27 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		AA50DE852F4174E2006EDD6E /* Embed Sparkle */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Sparkle";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "FRAMEWORKS_DIR=\"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Contents/Frameworks\"\nmkdir -p \"${FRAMEWORKS_DIR}\"\nSPARKLE=\"\"\n[ -d \"${BUILT_PRODUCTS_DIR}/Sparkle.framework\" ] && SPARKLE=\"${BUILT_PRODUCTS_DIR}/Sparkle.framework\"\n[ -z \"$SPARKLE\" ] && [ -d \"${BUILT_PRODUCTS_DIR}/PackageFrameworks/Sparkle.framework\" ] && SPARKLE=\"${BUILT_PRODUCTS_DIR}/PackageFrameworks/Sparkle.framework\"\nif [ -n \"$SPARKLE\" ]; then\n  cp -Rf \"$SPARKLE\" \"${FRAMEWORKS_DIR}/\"\n  codesign --force --sign \"${EXPANDED_CODE_SIGN_IDENTITY}\" --timestamp=none \"${FRAMEWORKS_DIR}/Sparkle.framework\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		AA40DE822F4174E2006EDD6D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -332,7 +354,7 @@
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -396,7 +418,7 @@
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -422,7 +444,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -432,6 +454,7 @@
 				INFOPLIST_KEY_SUPublicEDKey = "ST4I7E9UtjShTiPHebZWDNOPHIuOarKcjCVLCN1QyWc=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
+					"@executable_path/../Frameworks",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
@@ -449,7 +472,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -459,6 +482,7 @@
 				INFOPLIST_KEY_SUPublicEDKey = "ST4I7E9UtjShTiPHebZWDNOPHIuOarKcjCVLCN1QyWc=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
+					"@executable_path/../Frameworks",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
