@@ -1,11 +1,13 @@
 import Foundation
 import Combine
 import AppKit
+import CoreLocation
 
 @Observable
 final class AppViewModel {
     var settings: AppSettings
     let calculator: PrayerTimeCalculator
+    let reminderScheduler: PrayerReminderScheduler
     let locationManager: LocationManager
     let calendarManager: CalendarManager
     let trialManager: TrialManager
@@ -18,6 +20,9 @@ final class AppViewModel {
     var nextPrayer: PrayerTime?
     var countdown: Int = 0
     var overlayWindow: NSWindow?
+
+    /// Human-readable location used for prayer times (city, country or "Manual: Mecca").
+    var locationDisplay: String = "Getting location..."
 
     /// Full access: trial active, trial used (legacy), or valid license.
     var hasAccess: Bool {
@@ -32,6 +37,7 @@ final class AppViewModel {
         self.trialManager = trialManager
         self.licenseManager = licenseManager
         self.calculator = PrayerTimeCalculator(settings: settings)
+        self.reminderScheduler = PrayerReminderScheduler(settings: settings)
         self.locationManager = LocationManager()
         self.calendarManager = CalendarManager()
         setupLocationUpdates()
@@ -49,6 +55,7 @@ final class AppViewModel {
             .sink { [weak self] coordinates in
                 self?.calculator.setCurrentCoordinates(coordinates)
                 self?.calculatePrayers()
+                self?.updateLocationDisplay()
             }
             .store(in: &cancellables)
 
@@ -56,6 +63,7 @@ final class AppViewModel {
         NotificationCenter.default.publisher(for: Notification.Name("locationChanged"))
             .sink { [weak self] _ in
                 self?.calculatePrayers()
+                self?.updateLocationDisplay()
             }
             .store(in: &cancellables)
 
@@ -65,12 +73,65 @@ final class AppViewModel {
                 self?.regenerateCalendarEventsIfEnabled()
             }
             .store(in: &cancellables)
+
+        // Initial location display
+        updateLocationDisplay()
+    }
+
+    private func updateLocationDisplay() {
+        let location: CLLocation
+        if settings.autoDetectLocation {
+            guard let loc = locationManager.locationForGeocoding else {
+                locationDisplay = "Getting location..."
+                return
+            }
+            location = loc
+        } else {
+            location = CLLocation(
+                latitude: settings.manualLatitude,
+                longitude: settings.manualLongitude
+            )
+        }
+        let geocoder = CLGeocoder()
+
+        geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, _ in
+            guard let self else { return }
+            Task { @MainActor in
+                let lat = location.coordinate.latitude
+                let lon = location.coordinate.longitude
+                if let place = placemarks?.first {
+                    let city = place.locality ?? place.administrativeArea ?? place.subAdministrativeArea
+                    let country = place.country
+                    if let city, let country {
+                        self.locationDisplay = "\(city), \(country)"
+                    } else if let city {
+                        self.locationDisplay = city
+                    } else if let country {
+                        self.locationDisplay = country
+                    } else {
+                        self.locationDisplay = self.formatCoordinates(lat: lat, lon: lon)
+                    }
+                } else {
+                    self.locationDisplay = self.settings.autoDetectLocation
+                        ? "Location unavailable"
+                        : self.formatCoordinates(lat: lat, lon: lon)
+                }
+            }
+        }
+    }
+
+    private func formatCoordinates(lat: Double, lon: Double) -> String {
+        let latDir = lat >= 0 ? "N" : "S"
+        let lonDir = lon >= 0 ? "E" : "W"
+        return String(format: "%.2f°%@, %.2f°%@", abs(lat), latDir, abs(lon), lonDir)
     }
 
     func calculatePrayers() {
         todayPrayers = calculator.calculatePrayerTimes()
         nextPrayer = calculator.getNextPrayer()
         updateCountdown()
+        // Schedule \"Asr in 5 minutes\"-style notifications
+        reminderScheduler.scheduleReminders(for: todayPrayers)
     }
 
     private func setupTimer() {
@@ -150,7 +211,8 @@ final class AppViewModel {
 
         let newWindow = OverlayWindow(
             prayerName: prayer.name,
-            durationMinutes: settings.overlayDuration
+            durationMinutes: settings.overlayDuration,
+            playAdhanSound: settings.overlayPlayAdhanSound
         ) { [weak self] in
             self?.overlayWindow = nil
         }
@@ -160,6 +222,10 @@ final class AppViewModel {
 
     func resetShownPrayers() {
         shownPrayers.removeAll()
+    }
+
+    func rescheduleReminderNotifications() {
+        reminderScheduler.scheduleReminders(for: todayPrayers)
     }
 
     // MARK: - Calendar Protection
@@ -217,7 +283,8 @@ final class AppViewModel {
 
         let testWindow = OverlayWindow(
             prayerName: .maghrib,
-            durationMinutes: settings.overlayDuration
+            durationMinutes: settings.overlayDuration,
+            playAdhanSound: settings.overlayPlayAdhanSound
         ) { [weak self] in
             self?.overlayWindow = nil
         }

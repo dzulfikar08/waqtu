@@ -1,9 +1,11 @@
 import SwiftUI
 import Combine
+import AppKit
 
 struct OverlayView: View {
     let prayerName: PrayerName
     let durationMinutes: Int
+    let playAdhanSound: Bool
     let onDismiss: () -> Void
 
     @State private var countdown: Int
@@ -13,9 +15,10 @@ struct OverlayView: View {
 
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    init(prayerName: PrayerName, durationMinutes: Int, onDismiss: @escaping () -> Void) {
+    init(prayerName: PrayerName, durationMinutes: Int, playAdhanSound: Bool = false, onDismiss: @escaping () -> Void) {
         self.prayerName = prayerName
         self.durationMinutes = durationMinutes
+        self.playAdhanSound = playAdhanSound
         self.onDismiss = onDismiss
         self._countdown = State(initialValue: durationMinutes * 60)
     }
@@ -122,6 +125,9 @@ struct OverlayView: View {
         }
         .onAppear {
             updateCurrentTime()
+            if playAdhanSound, let url = Bundle.main.url(forResource: "adhan", withExtension: "mp3") {
+                NSSound(contentsOf: url, byReference: false)?.play()
+            }
             timerCancellable = timer.sink(receiveValue: { _ in
                 guard !isDismissing else { return }
                 updateCurrentTime()

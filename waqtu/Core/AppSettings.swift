@@ -14,6 +14,27 @@ final class AppSettings {
         set { UserDefaults.standard.set(newValue, forKey: "overlayDuration") }
     }
 
+    /// Play Adhan sound when the prayer overlay appears.
+    var overlayPlayAdhanSound: Bool {
+        get { UserDefaults.standard.bool(forKey: "overlayPlayAdhanSound") }
+        set { UserDefaults.standard.set(newValue, forKey: "overlayPlayAdhanSound") }
+    }
+
+    // Prayer reminder notifications ("Asr in 5 minutes")
+    var reminderNotificationEnabled: Bool {
+        get { UserDefaults.standard.bool(forKey: "reminderNotificationEnabled") }
+        set { UserDefaults.standard.set(newValue, forKey: "reminderNotificationEnabled") }
+    }
+
+    /// Minutes before prayer to show notification (5, 10, 15, or 30).
+    var reminderMinutesBefore: Int {
+        get {
+            let v = UserDefaults.standard.integer(forKey: "reminderMinutesBefore")
+            return [5, 10, 15, 30].contains(v) ? v : 5
+        }
+        set { UserDefaults.standard.set(newValue, forKey: "reminderMinutesBefore") }
+    }
+
     // Location settings
     var autoDetectLocation: Bool {
         get { UserDefaults.standard.bool(forKey: "autoDetectLocation") }
@@ -79,6 +100,9 @@ final class AppSettings {
             UserDefaults.standard.set(true, forKey: "settingsInitialized")
             UserDefaults.standard.set(true, forKey: "overlayEnabled")
             UserDefaults.standard.set(10, forKey: "overlayDuration") // 10 minutes
+            UserDefaults.standard.set(false, forKey: "overlayPlayAdhanSound")
+            UserDefaults.standard.set(true, forKey: "reminderNotificationEnabled")
+            UserDefaults.standard.set(5, forKey: "reminderMinutesBefore")
             UserDefaults.standard.set(true, forKey: "autoDetectLocation")
             // Default: Mecca coordinates
             UserDefaults.standard.set(21.4225, forKey: "manualLatitude")

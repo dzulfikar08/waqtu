@@ -6,7 +6,7 @@ final class OverlayWindow: NSWindow {
     private var onDismissCallback: (() -> Void)?
     private var isDismissing = false
 
-    init(prayerName: PrayerName, durationMinutes: Int, onDismiss: @escaping () -> Void) {
+    init(prayerName: PrayerName, durationMinutes: Int, playAdhanSound: Bool, onDismiss: @escaping () -> Void) {
         super.init(
             contentRect: NSScreen.main?.frame ?? .zero,
             styleMask: [.borderless, .fullSizeContentView],
@@ -15,10 +15,10 @@ final class OverlayWindow: NSWindow {
         )
         self.isReleasedWhenClosed = false
         self.onDismissCallback = onDismiss
-        setupWindow(prayerName: prayerName, durationMinutes: durationMinutes)
+        setupWindow(prayerName: prayerName, durationMinutes: durationMinutes, playAdhanSound: playAdhanSound)
     }
 
-    private func setupWindow(prayerName: PrayerName, durationMinutes: Int) {
+    private func setupWindow(prayerName: PrayerName, durationMinutes: Int, playAdhanSound: Bool) {
         level = .screenSaver
         if let screen = NSScreen.main {
             setFrame(screen.visibleFrame, display: true)
@@ -30,6 +30,7 @@ final class OverlayWindow: NSWindow {
         let hostingView = NSHostingView(rootView: OverlayView(
             prayerName: prayerName,
             durationMinutes: durationMinutes,
+            playAdhanSound: playAdhanSound,
             onDismiss: { [weak self] in
                 guard let self = self, !self.isDismissing else { return }
                 self.dismissOverlay()

@@ -42,6 +42,9 @@ struct MenuBarView: View {
                 countdown: viewModel.countdown
             )
 
+            // Location used for prayer times
+            LocationDisplayView(locationDisplay: viewModel.locationDisplay)
+
             Divider()
 
             // Prayer times list
@@ -193,6 +196,26 @@ struct NextPrayerHeader: View {
             return "\(hours)h \(minutes)m"
         }
         return "\(minutes)m"
+    }
+}
+
+// MARK: - Location Display
+struct LocationDisplayView: View {
+    let locationDisplay: String
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "location.fill")
+                .font(.system(size: 10))
+                .foregroundColor(.waqtuMuted)
+            Text(locationDisplay)
+                .font(.system(size: 11))
+                .foregroundColor(.waqtuMuted)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 12)
+        .padding(.bottom, 8)
     }
 }
 
@@ -599,9 +622,38 @@ struct GeneralSettingsTab: View {
                         .font(.caption)
                         .foregroundColor(.waqtuMuted)
 
+                    Toggle("Play Adhan sound", isOn: $settings.overlayPlayAdhanSound)
+                    Text("Play the Adhan when the overlay appears.")
+                        .font(.caption)
+                        .foregroundColor(.waqtuMuted)
+
                     Button("Test Overlay") { showTestOverlay() }
                         .buttonStyle(.bordered)
                         .tint(.waqtuPrimary)
+                }
+
+                Divider()
+                    .padding(.vertical, 4)
+
+                Toggle("Reminder notifications", isOn: $settings.reminderNotificationEnabled)
+                    .onChange(of: settings.reminderNotificationEnabled) { _, _ in
+                        viewModel?.rescheduleReminderNotifications()
+                    }
+                Text("Notify you before each prayer (e.g. \"Asr in 5 minutes\").")
+                    .font(.caption)
+                    .foregroundColor(.waqtuMuted)
+
+                if settings.reminderNotificationEnabled {
+                    Picker("Notify before", selection: $settings.reminderMinutesBefore) {
+                        Text("5 minutes").tag(5)
+                        Text("10 minutes").tag(10)
+                        Text("15 minutes").tag(15)
+                        Text("30 minutes").tag(30)
+                    }
+                    .pickerStyle(.menu)
+                    .onChange(of: settings.reminderMinutesBefore) { _, _ in
+                        viewModel?.rescheduleReminderNotifications()
+                    }
                 }
             } header: {
                 Text("Prayer Reminders")
@@ -657,7 +709,8 @@ struct GeneralSettingsTab: View {
     private func showTestOverlay() {
         let testWindow = OverlayWindow(
             prayerName: .maghrib,
-            durationMinutes: settings.overlayDuration
+            durationMinutes: settings.overlayDuration,
+            playAdhanSound: settings.overlayPlayAdhanSound
         ) {}
         testWindow.makeKeyAndOrderFront(nil)
     }
