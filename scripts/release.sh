@@ -63,7 +63,8 @@ FILE_LENGTH=$(stat -f%z "$DMG_PATH" 2>/dev/null || stat -c%s "$DMG_PATH")
 # 4. Upload to R2
 echo "[3/4] Uploading to R2..."
 cd "$WORKER_DIR"
-npx wrangler r2 object put "$R2_BUCKET/$DMG_NAME" --file="$DMG_PATH"
+# Wrangler v4 defaults to local unless --remote is provided.
+npx wrangler r2 object put "$R2_BUCKET/$DMG_NAME" --file="$DMG_PATH" --remote
 cd "$PROJECT_DIR"
 echo "    Uploaded: $DMG_NAME"
 

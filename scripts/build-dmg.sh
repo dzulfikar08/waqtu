@@ -25,6 +25,68 @@ if [[ ! -d "$APP_PATH" ]]; then
   exit 1
 fi
 
+# Re-sign the app bundle for distribution (Developer ID + hardened runtime).
+# You can override by exporting CODESIGN_IDENTITY (recommended: use the certificate SHA-1).
+if [[ -z "${CODESIGN_IDENTITY:-}" ]]; then
+  # Use the first matching Developer ID Application identity (SHA-1 hash) from keychain search list.
+  CODESIGN_IDENTITY=$(
+    security find-identity -v -p codesigning 2>/dev/null \
+      | awk '/Developer ID Application: Dzulfikar/ { print $2; exit }'
+  )
+  if [[ -z "$CODESIGN_IDENTITY" ]]; then
+    echo "Error: Could not find Developer ID Application identity in keychain search list."
+    echo "Set CODESIGN_IDENTITY to your Developer ID cert (preferably SHA-1) and retry."
+    exit 1
+  fi
+fi
+echo " Re-signing $APP_NAME.app with hardened runtime..."
+codesign --deep --force --verify --verbose \
+  --sign "$CODESIGN_IDENTITY" \
+  --options runtime \
+  "$APP_PATH"
+
+# Notarize + staple (recommended for distribution)
+# Uses either NOTARY_KEYCHAIN_PROFILE (recommended) OR NOTARY_APPLE_ID + NOTARY_TEAM_ID + NOTARY_PASSWORD.
+# To skip: export NOTARIZE=0
+NOTARIZE="${NOTARIZE:-1}"
+# Default profile name (created via: xcrun notarytool store-credentials "waqtu-notary" ...)
+NOTARY_KEYCHAIN_PROFILE="${NOTARY_KEYCHAIN_PROFILE:-waqtu-notary}"
+NOTARY_APPLE_ID="${NOTARY_APPLE_ID:-}"
+NOTARY_TEAM_ID="${NOTARY_TEAM_ID:-}"
+NOTARY_PASSWORD="${NOTARY_PASSWORD:-}"
+
+if [[ "$NOTARIZE" == "1" ]]; then
+  ZIP_PATH="$BUILD_DIR/Waqtu.zip"
+  echo " Zipping for notarization..."
+  rm -f "$ZIP_PATH"
+  ditto -c -k --keepParent "$APP_PATH" "$ZIP_PATH"
+
+  echo " Submitting to Apple notarization..."
+  if [[ -n "$NOTARY_KEYCHAIN_PROFILE" ]]; then
+    xcrun notarytool submit "$ZIP_PATH" --keychain-profile "$NOTARY_KEYCHAIN_PROFILE" --wait
+  else
+    if [[ -z "$NOTARY_APPLE_ID" || -z "$NOTARY_TEAM_ID" || -z "$NOTARY_PASSWORD" ]]; then
+      echo "Error: Notarization enabled but credentials not set."
+      echo "Set either:"
+      echo "  - NOTARY_KEYCHAIN_PROFILE (preferred; created via: xcrun notarytool store-credentials)"
+      echo "or:"
+      echo "  - NOTARY_APPLE_ID, NOTARY_TEAM_ID, NOTARY_PASSWORD (app-specific password)"
+      exit 1
+    fi
+    xcrun notarytool submit "$ZIP_PATH" \
+      --apple-id "$NOTARY_APPLE_ID" \
+      --team-id "$NOTARY_TEAM_ID" \
+      --password "$NOTARY_PASSWORD" \
+      --wait
+  fi
+
+  echo " Stapling notarization ticket..."
+  xcrun stapler staple "$APP_PATH"
+
+  echo " Verifying Gatekeeper acceptance..."
+  spctl --assess --verbose "$APP_PATH"
+fi
+
 echo " Preparing DMG..."
 rm -rf "$DMG_DIR"
 mkdir -p "$DMG_DIR"
