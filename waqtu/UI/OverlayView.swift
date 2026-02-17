@@ -12,6 +12,7 @@ struct OverlayView: View {
     @State private var currentTime: String = ""
     @State private var isDismissing = false
     @State private var timerCancellable: AnyCancellable?
+    @State private var adhanSound: NSSound?
 
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -96,6 +97,7 @@ struct OverlayView: View {
                 Button(action: {
                     guard !isDismissing else { return }
                     isDismissing = true
+                    stopAdhanSound()
                     // Stop timer immediately before triggering close to prevent use-after-free
                     timerCancellable?.cancel()
                     timerCancellable = nil
@@ -126,7 +128,9 @@ struct OverlayView: View {
         .onAppear {
             updateCurrentTime()
             if playAdhanSound, let url = Bundle.main.url(forResource: "adhan", withExtension: "mp3") {
-                NSSound(contentsOf: url, byReference: false)?.play()
+                let sound = NSSound(contentsOf: url, byReference: false)
+                adhanSound = sound
+                sound?.play()
             }
             timerCancellable = timer.sink(receiveValue: { _ in
                 guard !isDismissing else { return }
@@ -135,6 +139,7 @@ struct OverlayView: View {
             })
         }
         .onDisappear {
+            stopAdhanSound()
             timerCancellable?.cancel()
             timerCancellable = nil
         }
@@ -160,5 +165,10 @@ struct OverlayView: View {
 
     private func updateCountdown() {
         if countdown > 0 { countdown -= 1 }
+    }
+
+    private func stopAdhanSound() {
+        adhanSound?.stop()
+        adhanSound = nil
     }
 }

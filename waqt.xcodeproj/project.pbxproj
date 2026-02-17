@@ -260,6 +260,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		AA50DE852F4174E2006EDD6E /* Embed Sparkle */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
