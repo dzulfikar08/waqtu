@@ -43,6 +43,10 @@ final class AppViewModel {
         setupLocationUpdates()
         calculatePrayers()
         setupTimer()
+        // If calendar protection was already on, request access and regenerate today’s events (e.g. after relaunch)
+        if settings.calendarProtectionEnabled {
+            requestCalendarAccessAndRegenerate()
+        }
         Task { @MainActor in
             await licenseManager.validate()
         }

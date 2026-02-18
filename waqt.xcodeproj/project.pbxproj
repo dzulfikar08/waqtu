@@ -447,13 +447,14 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Waqtu;
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times. Full access is required to add and remove these events.";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqt needs your location to calculate accurate prayer times.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqtu needs your location to calculate accurate prayer times.";
 				INFOPLIST_KEY_SUFeedURL = "https://waqt-updates.dzulfikar-at.workers.dev/appcast.xml";
 				INFOPLIST_KEY_SUPublicEDKey = "ST4I7E9UtjShTiPHebZWDNOPHIuOarKcjCVLCN1QyWc=";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -461,7 +462,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.14;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtu;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -477,13 +478,14 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Waqtu;
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times. Full access is required to add and remove these events.";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqt needs your location to calculate accurate prayer times.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqtu needs your location to calculate accurate prayer times.";
 				INFOPLIST_KEY_SUFeedURL = "https://waqt-updates.dzulfikar-at.workers.dev/appcast.xml";
 				INFOPLIST_KEY_SUPublicEDKey = "ST4I7E9UtjShTiPHebZWDNOPHIuOarKcjCVLCN1QyWc=";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -491,7 +493,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.14;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtu;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

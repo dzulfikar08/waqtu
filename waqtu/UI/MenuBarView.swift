@@ -662,11 +662,16 @@ struct GeneralSettingsTab: View {
             CalendarProtectionSection(
                 settings: settings,
                 calendarsGroupedBySource: calendarsGroupedBySource,
+                hasCalendarAccess: viewModel?.calendarManager.hasAccess ?? false,
                 onEnableFirstTime: {
                     if !settings.hasSeenCalendarProtectionExplanation {
                         showCalendarExplanation = true
                     }
                     viewModel?.requestCalendarAccessAndRegenerate()
+                    // Refresh calendar list after permission may have been granted
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        calendarsGroupedBySource = calendarManager.calendarsGroupedBySource()
+                    }
                 },
                 onRemoveAllWaqtuEvents: {
                     showRemoveWaqtuEventsAlert = true
@@ -688,6 +693,12 @@ struct GeneralSettingsTab: View {
         .padding()
         .onAppear {
             calendarsGroupedBySource = calendarManager.calendarsGroupedBySource()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            // Refresh calendar list when user returns to app (e.g. after granting access in System Settings)
+            if settings.calendarProtectionEnabled {
+                calendarsGroupedBySource = calendarManager.calendarsGroupedBySource()
+            }
         }
         .alert("Calendar Protection", isPresented: $showCalendarExplanation) {
             Button("OK") {
@@ -720,6 +731,7 @@ struct GeneralSettingsTab: View {
 struct CalendarProtectionSection: View {
     @Bindable var settings: AppSettings
     let calendarsGroupedBySource: [(source: EKSource, calendars: [EKCalendar])]
+    let hasCalendarAccess: Bool
     let onEnableFirstTime: () -> Void
     let onRemoveAllWaqtuEvents: () -> Void
 
@@ -743,6 +755,14 @@ struct CalendarProtectionSection: View {
                 .foregroundColor(.waqtuMuted)
 
             if settings.calendarProtectionEnabled {
+                HStack(spacing: 6) {
+                    Image(systemName: hasCalendarAccess ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                        .font(.system(size: 12))
+                        .foregroundColor(hasCalendarAccess ? .waqtuPrimary : .waqtuGold)
+                    Text(hasCalendarAccess ? "Calendar access granted" : "Calendar access denied — enable in System Settings → Privacy & Security → Calendars")
+                        .font(.caption)
+                        .foregroundColor(hasCalendarAccess ? .waqtuMuted : .waqtuGold)
+                }
                 HStack {
                     Text("Block duration")
                     Spacer()
