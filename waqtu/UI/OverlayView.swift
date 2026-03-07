@@ -7,6 +7,7 @@ struct OverlayView: View {
     let durationMinutes: Int
     let playAdhanSound: Bool
     let onDismiss: () -> Void
+    let onSnooze: (Int) -> Void
 
     @State private var countdown: Int
     @State private var currentTime: String = ""
@@ -16,11 +17,12 @@ struct OverlayView: View {
 
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    init(prayerName: PrayerName, durationMinutes: Int, playAdhanSound: Bool = false, onDismiss: @escaping () -> Void) {
+    init(prayerName: PrayerName, durationMinutes: Int, playAdhanSound: Bool = false, onDismiss: @escaping () -> Void, onSnooze: @escaping (Int) -> Void) {
         self.prayerName = prayerName
         self.durationMinutes = durationMinutes
         self.playAdhanSound = playAdhanSound
         self.onDismiss = onDismiss
+        self.onSnooze = onSnooze
         self._countdown = State(initialValue: durationMinutes * 60)
     }
 
@@ -93,8 +95,30 @@ struct OverlayView: View {
                 }
                 .padding(.bottom, 40)
 
-                // Dismiss button with Mutabaah style
-                Button(action: {
+                // Snooze and Dismiss buttons
+                HStack(spacing: 16) {
+                    Menu {
+                        Button("15 minutes") { handleSnooze(15) }
+                        Button("10 minutes") { handleSnooze(10) }
+                        Button("5 minutes") { handleSnooze(5) }
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "bell.badge")
+                                .font(.system(size: 18))
+                            Text("Snooze")
+                                .font(.system(size: 16, weight: .semibold))
+                        }
+                        .foregroundStyle(Color(red: 0.91, green: 0.94, blue: 0.93))
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 14)
+                        .background(Color.white.opacity(0.12))
+                        .cornerRadius(12)
+                    }
+                    .menuStyle(.borderlessButton)
+                    .fixedSize()
+
+                    // Dismiss button with Mutabaah style
+                    Button(action: {
                     guard !isDismissing else { return }
                     isDismissing = true
                     stopAdhanSound()
@@ -122,15 +146,26 @@ struct OverlayView: View {
                     .cornerRadius(12)
                 }
                 .buttonStyle(.plain)
+                }
                 .padding(.bottom, 60)
             }
         }
         .onAppear {
             updateCurrentTime()
-            if playAdhanSound, let url = Bundle.main.url(forResource: "adhan", withExtension: "mp3") {
-                let sound = NSSound(contentsOf: url, byReference: false)
-                adhanSound = sound
-                sound?.play()
+            if playAdhanSound {
+                let resourceName: String
+                switch prayerName {
+                case .fajr:
+                    resourceName = "adhan"   // Fajr adhan
+                default:
+                    resourceName = "azan1"   // Other prayers
+                }
+
+                if let url = Bundle.main.url(forResource: resourceName, withExtension: "mp3") {
+                    let sound = NSSound(contentsOf: url, byReference: false)
+                    adhanSound = sound
+                    sound?.play()
+                }
             }
             timerCancellable = timer.sink(receiveValue: { _ in
                 guard !isDismissing else { return }
@@ -170,5 +205,14 @@ struct OverlayView: View {
     private func stopAdhanSound() {
         adhanSound?.stop()
         adhanSound = nil
+    }
+
+    private func handleSnooze(_ minutes: Int) {
+        guard !isDismissing else { return }
+        isDismissing = true
+        stopAdhanSound()
+        timerCancellable?.cancel()
+        timerCancellable = nil
+        onSnooze(minutes)
     }
 }

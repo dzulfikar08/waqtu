@@ -211,27 +211,42 @@ struct LocationDisplayView: View {
     var isRefreshing: Bool = false
     var onLocateMe: (() -> Void)?
 
-    var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "location.fill")
-                .font(.system(size: 10))
-                .foregroundColor(.waqtuMuted)
-            Text(locationDisplay)
-                .font(.system(size: 11))
-                .foregroundColor(.waqtuMuted)
-                .lineLimit(1)
+    private var hijriDateString: String {
+        let calendar = Calendar(identifier: .islamicUmmAlQura)
+        let formatter = DateFormatter()
+        formatter.calendar = calendar
+        formatter.dateFormat = "d MMMM yyyy"
+        formatter.locale = Locale(identifier: "en")
+        return formatter.string(from: Date())
+    }
 
-            if showLocateMe, let onLocateMe {
-                Spacer(minLength: 4)
-                Button(action: onLocateMe) {
-                    Image(systemName: isRefreshing ? "arrow.clockwise" : "location.circle.fill")
-                        .font(.system(size: 12))
-                        .foregroundColor(.waqtuPrimary)
-                        .symbolEffect(.rotate, value: isRefreshing)
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 6) {
+                Image(systemName: "location.fill")
+                    .font(.system(size: 10))
+                    .foregroundColor(.waqtuMuted)
+                Text(locationDisplay)
+                    .font(.system(size: 11))
+                    .foregroundColor(.waqtuMuted)
+                    .lineLimit(1)
+
+                if showLocateMe, let onLocateMe {
+                    Spacer(minLength: 4)
+                    Button(action: onLocateMe) {
+                        Image(systemName: isRefreshing ? "arrow.clockwise" : "location.circle.fill")
+                            .font(.system(size: 12))
+                            .foregroundColor(.waqtuPrimary)
+                            .symbolEffect(.rotate, value: isRefreshing)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(isRefreshing)
                 }
-                .buttonStyle(.plain)
-                .disabled(isRefreshing)
             }
+
+            Text(hijriDateString)
+                .font(.system(size: 10))
+                .foregroundColor(.waqtuMuted.opacity(0.9))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
@@ -433,6 +448,11 @@ struct SettingsView: View {
                         Label("General", systemImage: "gearshape.fill")
                     }
 
+                PrayerTimesSettingsTab(settings: settings, viewModel: viewModel)
+                    .tabItem {
+                        Label("Prayer Times", systemImage: "clock.fill")
+                    }
+
                 LocationSettingsTab(settings: settings, viewModel: viewModel)
                     .tabItem {
                         Label("Location", systemImage: "location.fill")
@@ -603,6 +623,149 @@ struct UpgradeFullScreenView: View {
     private func openStore() {
         if let url = URL(string: "https://getwaqtu.com") {
             NSWorkspace.shared.open(url)
+        }
+    }
+}
+
+// MARK: - Prayer Times Settings Tab
+struct PrayerTimesSettingsTab: View {
+    @Bindable var settings: AppSettings
+    var viewModel: AppViewModel?
+
+    private static let calculationMethods: [(id: String, label: String)] = [
+        ("muslimWorldLeague", "Muslim World League"),
+        ("moonsightingCommittee", "Moonsighting Committee (North America, UK)"),
+        ("northAmerica", "ISNA (North America)"),
+        ("egyptian", "Egyptian General Authority"),
+        ("karachi", "University of Islamic Sciences, Karachi"),
+        ("ummAlQura", "Umm al-Qura (Makkah)"),
+        ("dubai", "Dubai (UAE)"),
+        ("qatar", "Qatar"),
+        ("kuwait", "Kuwait"),
+        ("singapore", "Singapore / Malaysia / Indonesia"),
+        ("tehran", "Tehran"),
+        ("turkey", "Turkey (Diyanet)"),
+        ("other", "Custom (angles)"),
+    ]
+
+    private static let highLatitudeRules: [(id: String, label: String)] = [
+        ("auto", "Auto (recommended for location)"),
+        ("middleOfTheNight", "Middle of the night"),
+        ("seventhOfTheNight", "Seventh of the night (above 48° latitude)"),
+        ("twilightAngle", "Twilight angle"),
+    ]
+
+    var body: some View {
+        Form {
+            Section {
+                Picker("Calculation method", selection: $settings.calculationMethod) {
+                    ForEach(Self.calculationMethods, id: \.id) { m in
+                        Text(m.label).tag(m.id)
+                    }
+                }
+                .pickerStyle(.menu)
+                .onChange(of: settings.calculationMethod) { _, _ in notifyPrayerSettingsChanged() }
+                Text("Choose the method used by your local mosque or region.")
+                    .font(.caption)
+                    .foregroundColor(.waqtuMuted)
+
+                Picker("Asr calculation", selection: $settings.madhab) {
+                    Text("Shafi (earlier)").tag("shafi")
+                    Text("Hanafi (later)").tag("hanafi")
+                }
+                .pickerStyle(.menu)
+                .onChange(of: settings.madhab) { _, _ in notifyPrayerSettingsChanged() }
+                Text("Shafi, Maliki, Hanbali use earlier Asr; Hanafi uses later.")
+                    .font(.caption)
+                    .foregroundColor(.waqtuMuted)
+
+                Picker("High latitude rule", selection: $settings.highLatitudeRule) {
+                    ForEach(Self.highLatitudeRules, id: \.id) { r in
+                        Text(r.label).tag(r.id)
+                    }
+                }
+                .pickerStyle(.menu)
+                .onChange(of: settings.highLatitudeRule) { _, _ in notifyPrayerSettingsChanged() }
+                Text("For locations above ~48° latitude. Auto picks based on your location.")
+                    .font(.caption)
+                    .foregroundColor(.waqtuMuted)
+            } header: {
+                Text("Calculation")
+            }
+
+            Section {
+                AdjustmentRow(label: "Fajr", value: Binding(
+                    get: { settings.adjustmentFajr },
+                    set: { settings.adjustmentFajr = $0 }
+                ), onChange: notifyPrayerSettingsChanged)
+                AdjustmentRow(label: "Sunrise", value: Binding(
+                    get: { settings.adjustmentSunrise },
+                    set: { settings.adjustmentSunrise = $0 }
+                ), onChange: notifyPrayerSettingsChanged)
+                AdjustmentRow(label: "Dhuhr", value: Binding(
+                    get: { settings.adjustmentDhuhr },
+                    set: { settings.adjustmentDhuhr = $0 }
+                ), onChange: notifyPrayerSettingsChanged)
+                AdjustmentRow(label: "Asr", value: Binding(
+                    get: { settings.adjustmentAsr },
+                    set: { settings.adjustmentAsr = $0 }
+                ), onChange: notifyPrayerSettingsChanged)
+                AdjustmentRow(label: "Maghrib", value: Binding(
+                    get: { settings.adjustmentMaghrib },
+                    set: { settings.adjustmentMaghrib = $0 }
+                ), onChange: notifyPrayerSettingsChanged)
+                AdjustmentRow(label: "Isha", value: Binding(
+                    get: { settings.adjustmentIsha },
+                    set: { settings.adjustmentIsha = $0 }
+                ), onChange: notifyPrayerSettingsChanged)
+            } header: {
+                Text("Minute corrections")
+            } footer: {
+                Text("Add or subtract minutes per prayer. Useful if your local times differ slightly from the calculation.")
+            }
+        }
+        .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
+        .background(Color.waqtuBackground)
+        .padding()
+    }
+
+    private func notifyPrayerSettingsChanged() {
+        NotificationCenter.default.post(name: Notification.Name("prayerTimeSettingsChanged"), object: nil)
+    }
+}
+
+// MARK: - Adjustment Row (stepper for -60 to +60)
+struct AdjustmentRow: View {
+    let label: String
+    @Binding var value: Int
+    var onChange: (() -> Void)?
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .frame(width: 70, alignment: .leading)
+            Spacer()
+            HStack(spacing: 8) {
+                Button("-") {
+                    value = max(-60, value - 1)
+                    onChange?()
+                }
+                .buttonStyle(.bordered)
+                .frame(width: 28)
+                .disabled(value <= -60)
+                Text("\(value >= 0 ? "+" : "")\(value)")
+                    .font(.system(.body, design: .monospaced))
+                    .foregroundColor(.waqtuPrimary)
+                    .frame(width: 36, alignment: .center)
+                Button("+") {
+                    value = min(60, value + 1)
+                    onChange?()
+                }
+                .buttonStyle(.bordered)
+                .frame(width: 28)
+                .disabled(value >= 60)
+            }
         }
     }
 }

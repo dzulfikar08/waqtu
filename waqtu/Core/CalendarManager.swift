@@ -13,7 +13,9 @@ import EventKit
 private let waqtuEventTag = "Created by Waqtu"
 
 final class CalendarManager {
-    private let eventStore = EKEventStore()
+    /// Shared event store. Multiple EKEventStore instances can corrupt authorization state on macOS 14+.
+    private static let sharedEventStore = EKEventStore()
+    private var eventStore: EKEventStore { Self.sharedEventStore }
 
     // MARK: - Permission
 

@@ -90,6 +90,55 @@ final class AppSettings {
         set { UserDefaults.standard.set(newValue, forKey: "hasSeenCalendarProtectionExplanation") }
     }
 
+    // Prayer time calculation
+    /// Calculation method (e.g. muslimWorldLeague, moonsightingCommittee). Raw value of Adhan.CalculationMethod.
+    var calculationMethod: String {
+        get { UserDefaults.standard.string(forKey: "calculationMethod") ?? "muslimWorldLeague" }
+        set { UserDefaults.standard.set(newValue, forKey: "calculationMethod") }
+    }
+
+    /// Asr calculation: shafi (earlier) or hanafi (later).
+    var madhab: String {
+        get { UserDefaults.standard.string(forKey: "madhab") ?? "shafi" }
+        set { UserDefaults.standard.set(newValue, forKey: "madhab") }
+    }
+
+    /// High latitude rule: "auto", "middleOfTheNight", "seventhOfTheNight", "twilightAngle".
+    var highLatitudeRule: String {
+        get { UserDefaults.standard.string(forKey: "highLatitudeRule") ?? "auto" }
+        set { UserDefaults.standard.set(newValue, forKey: "highLatitudeRule") }
+    }
+
+    /// Minute adjustments per prayer (-60 to +60). Applied on top of method defaults.
+    var adjustmentFajr: Int {
+        get { clampedAdjustment(UserDefaults.standard.integer(forKey: "adjustmentFajr")) }
+        set { UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentFajr") }
+    }
+    var adjustmentSunrise: Int {
+        get { clampedAdjustment(UserDefaults.standard.integer(forKey: "adjustmentSunrise")) }
+        set { UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentSunrise") }
+    }
+    var adjustmentDhuhr: Int {
+        get { clampedAdjustment(UserDefaults.standard.integer(forKey: "adjustmentDhuhr")) }
+        set { UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentDhuhr") }
+    }
+    var adjustmentAsr: Int {
+        get { clampedAdjustment(UserDefaults.standard.integer(forKey: "adjustmentAsr")) }
+        set { UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentAsr") }
+    }
+    var adjustmentMaghrib: Int {
+        get { clampedAdjustment(UserDefaults.standard.integer(forKey: "adjustmentMaghrib")) }
+        set { UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentMaghrib") }
+    }
+    var adjustmentIsha: Int {
+        get { clampedAdjustment(UserDefaults.standard.integer(forKey: "adjustmentIsha")) }
+        set { UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentIsha") }
+    }
+
+    private func clampedAdjustment(_ value: Int) -> Int {
+        min(60, max(-60, value))
+    }
+
     // Quranic quote
     static let quranicQuote = "Indeed, prayer is obligatory on the believers at the specified time."
     static let quranicReference = "— Quran 4:103"
@@ -97,16 +146,31 @@ final class AppSettings {
     init() {
         // Set default values if not set
         if !UserDefaults.standard.bool(forKey: "settingsInitialized") {
-            UserDefaults.standard.set(true, forKey: "settingsInitialized")
-            UserDefaults.standard.set(true, forKey: "overlayEnabled")
-            UserDefaults.standard.set(10, forKey: "overlayDuration") // 10 minutes
-            UserDefaults.standard.set(false, forKey: "overlayPlayAdhanSound")
-            UserDefaults.standard.set(true, forKey: "reminderNotificationEnabled")
-            UserDefaults.standard.set(5, forKey: "reminderMinutesBefore")
-            UserDefaults.standard.set(true, forKey: "autoDetectLocation")
-            // Default: Mecca coordinates
-            UserDefaults.standard.set(21.4225, forKey: "manualLatitude")
-            UserDefaults.standard.set(39.8262, forKey: "manualLongitude")
+            applyDefaults()
         }
+    }
+
+    /// Clears all settings and resets to defaults. Use for "Reset Waqtu".
+    func resetAll() {
+        if let bundleId = Bundle.main.bundleIdentifier {
+            UserDefaults.standard.removePersistentDomain(forName: bundleId)
+        }
+        UserDefaults.standard.synchronize()
+        applyDefaults()
+    }
+
+    private func applyDefaults() {
+        UserDefaults.standard.set(true, forKey: "settingsInitialized")
+        UserDefaults.standard.set(true, forKey: "overlayEnabled")
+        UserDefaults.standard.set(10, forKey: "overlayDuration")
+        UserDefaults.standard.set(false, forKey: "overlayPlayAdhanSound")
+        UserDefaults.standard.set(true, forKey: "reminderNotificationEnabled")
+        UserDefaults.standard.set(5, forKey: "reminderMinutesBefore")
+        UserDefaults.standard.set(true, forKey: "autoDetectLocation")
+        UserDefaults.standard.set(21.4225, forKey: "manualLatitude")
+        UserDefaults.standard.set(39.8262, forKey: "manualLongitude")
+        UserDefaults.standard.set("muslimWorldLeague", forKey: "calculationMethod")
+        UserDefaults.standard.set("shafi", forKey: "madhab")
+        UserDefaults.standard.set("auto", forKey: "highLatitudeRule")
     }
 }

@@ -96,6 +96,13 @@ final class AppViewModel {
             }
             .store(in: &cancellables)
 
+        // Recalculate prayers when user changes prayer time settings
+        NotificationCenter.default.publisher(for: Notification.Name("prayerTimeSettingsChanged"))
+            .sink { [weak self] _ in
+                self?.calculatePrayers()
+            }
+            .store(in: &cancellables)
+
         // Initial location display
         updateLocationDisplay()
     }

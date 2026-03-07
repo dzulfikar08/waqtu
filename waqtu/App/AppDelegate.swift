@@ -1,4 +1,5 @@
 import Cocoa
+import ServiceManagement
 import Sparkle
 import CoreLocation
 import UserNotifications
@@ -25,6 +26,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SP
         NSApp.setActivationPolicy(.accessory)
         requestLocationPermission()
         UNUserNotificationCenter.current().delegate = self
+        Self.applyLaunchAtLogin(UserDefaults.standard.bool(forKey: "launchAtLogin"))
+    }
+
+    /// Registers or unregisters the app with macOS login items. Call when the user toggles the setting or on launch.
+    /// - Returns: `false` if registration failed (e.g. user denied in System Settings); caller should revert the toggle.
+    @discardableResult
+    static func applyLaunchAtLogin(_ enabled: Bool) -> Bool {
+        let service = SMAppService.mainApp
+        do {
+            if enabled {
+                try service.register()
+            } else {
+                try service.unregister()
+            }
+            return true
+        } catch {
+            NSLog("Launch at Login: failed to \(enabled ? "register" : "unregister"): %@", error.localizedDescription)
+            if enabled {
+                UserDefaults.standard.set(false, forKey: "launchAtLogin")
+            }
+            return false
+        }
     }
 
     func updater(_ updater: SPUUpdater, willScheduleUpdateCheckAfterDelay delay: TimeInterval) {
