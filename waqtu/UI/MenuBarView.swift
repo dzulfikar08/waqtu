@@ -43,7 +43,12 @@ struct MenuBarView: View {
             )
 
             // Location used for prayer times
-            LocationDisplayView(locationDisplay: viewModel.locationDisplay)
+            LocationDisplayView(
+                locationDisplay: viewModel.locationDisplay,
+                showLocateMe: viewModel.settings.autoDetectLocation,
+                isRefreshing: viewModel.isRefreshingLocation,
+                onLocateMe: { viewModel.refreshLocation() }
+            )
 
             Divider()
 
@@ -202,6 +207,9 @@ struct NextPrayerHeader: View {
 // MARK: - Location Display
 struct LocationDisplayView: View {
     let locationDisplay: String
+    var showLocateMe: Bool = false
+    var isRefreshing: Bool = false
+    var onLocateMe: (() -> Void)?
 
     var body: some View {
         HStack(spacing: 6) {
@@ -212,6 +220,18 @@ struct LocationDisplayView: View {
                 .font(.system(size: 11))
                 .foregroundColor(.waqtuMuted)
                 .lineLimit(1)
+
+            if showLocateMe, let onLocateMe {
+                Spacer(minLength: 4)
+                Button(action: onLocateMe) {
+                    Image(systemName: isRefreshing ? "arrow.clockwise" : "location.circle.fill")
+                        .font(.system(size: 12))
+                        .foregroundColor(.waqtuPrimary)
+                        .symbolEffect(.rotate, value: isRefreshing)
+                }
+                .buttonStyle(.plain)
+                .disabled(isRefreshing)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
@@ -413,7 +433,7 @@ struct SettingsView: View {
                         Label("General", systemImage: "gearshape.fill")
                     }
 
-                LocationSettingsTab(settings: settings)
+                LocationSettingsTab(settings: settings, viewModel: viewModel)
                     .tabItem {
                         Label("Location", systemImage: "location.fill")
                     }
@@ -425,7 +445,7 @@ struct SettingsView: View {
                         }
                 }
 
-                AboutSettingsTab(trialManager: viewModel?.trialManager, isLicensed: viewModel?.licenseManager.isLicensed ?? false, onCheckForUpdates: onCheckForUpdates)
+                AboutSettingsTab(trialManager: viewModel?.trialManager, isLicensed: viewModel?.licenseManager.isLicensed ?? false, onCheckForUpdates: onCheckForUpdates, onResetWaqtu: viewModel.map { vm in { vm.resetAllAndQuit() } })
                     .tabItem {
                         Label("About", systemImage: "info.circle.fill")
                     }
@@ -663,14 +683,18 @@ struct GeneralSettingsTab: View {
                 settings: settings,
                 calendarsGroupedBySource: calendarsGroupedBySource,
                 hasCalendarAccess: viewModel?.calendarManager.hasAccess ?? false,
+                isRefreshingCalendarAccess: viewModel?.isRefreshingCalendarAccess ?? false,
                 onEnableFirstTime: {
                     if !settings.hasSeenCalendarProtectionExplanation {
                         showCalendarExplanation = true
                     }
-                    viewModel?.requestCalendarAccessAndRegenerate()
-                    // Refresh calendar list after permission may have been granted
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                        calendarsGroupedBySource = calendarManager.calendarsGroupedBySource()
+                    viewModel?.requestCalendarAccessAndRegenerate {
+                        calendarsGroupedBySource = (viewModel?.calendarManager ?? calendarManager).calendarsGroupedBySource()
+                    }
+                },
+                onRefreshCalendarAccess: {
+                    viewModel?.refreshCalendarAccess {
+                        calendarsGroupedBySource = (viewModel?.calendarManager ?? calendarManager).calendarsGroupedBySource()
                     }
                 },
                 onRemoveAllWaqtuEvents: {
@@ -680,6 +704,11 @@ struct GeneralSettingsTab: View {
 
             Section {
                 Toggle("Launch at Login", isOn: $settings.launchAtLogin)
+                    .onChange(of: settings.launchAtLogin) { _, enabled in
+                        if !AppDelegate.applyLaunchAtLogin(enabled) {
+                            settings.launchAtLogin = false
+                        }
+                    }
                 Text("Start Waqtu automatically when you log in.")
                     .font(.caption)
                     .foregroundColor(.waqtuMuted)
@@ -692,12 +721,28 @@ struct GeneralSettingsTab: View {
         .background(Color.waqtuBackground)
         .padding()
         .onAppear {
-            calendarsGroupedBySource = calendarManager.calendarsGroupedBySource()
+            // On macOS 14+, EventKit returns no calendars until we've requested full access. Request first, then refresh the list.
+            let manager = viewModel?.calendarManager ?? calendarManager
+            if let viewModel {
+                viewModel.requestCalendarAccessForListing {
+                    calendarsGroupedBySource = manager.calendarsGroupedBySource()
+                }
+            } else {
+                Task {
+                    try? await manager.requestAccess()
+                    await MainActor.run {
+                        calendarsGroupedBySource = manager.calendarsGroupedBySource()
+                    }
+                }
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
-            // Refresh calendar list when user returns to app (e.g. after granting access in System Settings)
-            if settings.calendarProtectionEnabled {
-                calendarsGroupedBySource = calendarManager.calendarsGroupedBySource()
+            // Re-request access and refresh list when user returns (e.g. after granting in System Settings)
+            Task {
+                try? await (viewModel?.calendarManager ?? calendarManager).requestAccess()
+                await MainActor.run {
+                    calendarsGroupedBySource = (viewModel?.calendarManager ?? calendarManager).calendarsGroupedBySource()
+                }
             }
         }
         .alert("Calendar Protection", isPresented: $showCalendarExplanation) {
@@ -718,12 +763,17 @@ struct GeneralSettingsTab: View {
     }
 
     private func showTestOverlay() {
-        let testWindow = OverlayWindow(
-            prayerName: .maghrib,
-            durationMinutes: settings.overlayDuration,
-            playAdhanSound: settings.overlayPlayAdhanSound
-        ) {}
-        testWindow.makeKeyAndOrderFront(nil)
+        if let viewModel {
+            viewModel.showTestOverlay()
+        } else {
+            let testWindow = OverlayWindow(
+                prayerName: .maghrib,
+                durationMinutes: settings.overlayDuration,
+                playAdhanSound: settings.overlayPlayAdhanSound,
+                onDismiss: {}
+            )
+            testWindow.makeKeyAndOrderFront(nil)
+        }
     }
 }
 
@@ -732,7 +782,9 @@ struct CalendarProtectionSection: View {
     @Bindable var settings: AppSettings
     let calendarsGroupedBySource: [(source: EKSource, calendars: [EKCalendar])]
     let hasCalendarAccess: Bool
+    var isRefreshingCalendarAccess: Bool = false
     let onEnableFirstTime: () -> Void
+    var onRefreshCalendarAccess: (() -> Void)?
     let onRemoveAllWaqtuEvents: () -> Void
 
     private var selectedCalendarTitle: String {
@@ -755,13 +807,48 @@ struct CalendarProtectionSection: View {
                 .foregroundColor(.waqtuMuted)
 
             if settings.calendarProtectionEnabled {
+                let hasCalendars = !calendarsGroupedBySource.flatMap(\.calendars).isEmpty
+                let effectiveAccess = hasCalendarAccess || hasCalendars
                 HStack(spacing: 6) {
-                    Image(systemName: hasCalendarAccess ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                    Image(systemName: effectiveAccess ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
                         .font(.system(size: 12))
-                        .foregroundColor(hasCalendarAccess ? .waqtuPrimary : .waqtuGold)
-                    Text(hasCalendarAccess ? "Calendar access granted" : "Calendar access denied — enable in System Settings → Privacy & Security → Calendars")
+                        .foregroundColor(effectiveAccess ? .waqtuPrimary : .waqtuGold)
+                    Text(effectiveAccess ? "Calendar access granted" : "Calendar access denied — enable in System Settings → Privacy & Security → Calendars")
                         .font(.caption)
-                        .foregroundColor(hasCalendarAccess ? .waqtuMuted : .waqtuGold)
+                        .foregroundColor(effectiveAccess ? .waqtuMuted : .waqtuGold)
+                }
+                if !effectiveAccess {
+                    Button("Open Calendar Settings") {
+                        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Calendars") {
+                            NSWorkspace.shared.open(url)
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.waqtuPrimary)
+                    Text("If System Settings already shows Full Access, toggle Waqtu off then on to refresh. Restart Mac if it still fails.")
+                        .font(.caption)
+                        .foregroundColor(.waqtuMuted)
+                }
+                if let onRefresh = onRefreshCalendarAccess {
+                    Button {
+                        onRefresh()
+                    } label: {
+                        HStack {
+                            if isRefreshingCalendarAccess {
+                                ProgressView()
+                                    .scaleEffect(0.7)
+                            } else {
+                                Image(systemName: "arrow.clockwise.circle.fill")
+                            }
+                            Text("Refresh calendar access")
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.waqtuPrimary)
+                    .disabled(isRefreshingCalendarAccess)
+                    Text("Re-request full access and reload calendars. Use if your Outlook or other calendars don't appear. If they still don't show, quit and reopen Waqtu.")
+                        .font(.caption)
+                        .foregroundColor(.waqtuMuted)
                 }
                 HStack {
                     Text("Block duration")
@@ -832,6 +919,7 @@ struct CalendarProtectionSection: View {
 // MARK: - Location Settings Tab
 struct LocationSettingsTab: View {
     @Bindable var settings: AppSettings
+    var viewModel: AppViewModel?
 
     var body: some View {
         Form {
@@ -840,6 +928,28 @@ struct LocationSettingsTab: View {
                 Text("Use your Mac's location for accurate prayer times.")
                     .font(.caption)
                     .foregroundColor(.waqtuMuted)
+
+                if settings.autoDetectLocation, let vm = viewModel {
+                    Button {
+                        vm.refreshLocation()
+                    } label: {
+                        HStack {
+                            if vm.isRefreshingLocation {
+                                ProgressView()
+                                    .scaleEffect(0.7)
+                            } else {
+                                Image(systemName: "location.circle.fill")
+                            }
+                            Text("Locate Me")
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.waqtuPrimary)
+                    .disabled(vm.isRefreshingLocation)
+                    Text("Refresh your current location for accurate prayer times.")
+                        .font(.caption)
+                        .foregroundColor(.waqtuMuted)
+                }
             } header: {
                 Text("Location Source")
             }
@@ -884,6 +994,8 @@ struct AboutSettingsTab: View {
     var trialManager: TrialManager?
     var isLicensed: Bool = false
     var onCheckForUpdates: (() -> Void)?
+    var onResetWaqtu: (() -> Void)?
+    @State private var showResetConfirmation = false
 
     private var versionString: String {
         let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
@@ -943,10 +1055,44 @@ struct AboutSettingsTab: View {
             .background(Color.waqtuDark.opacity(0.4))
             .cornerRadius(12)
 
+            if let onReset = onResetWaqtu {
+                VStack(alignment: .leading, spacing: 8) {
+                    Button("Reset Waqtu", role: .destructive) {
+                        showResetConfirmation = true
+                    }
+                    .buttonStyle(.bordered)
+                    Text("Clears all settings and calendar events, then quits. Use to fix calendar access issues. Your license is preserved.")
+                        .font(.caption)
+                        .foregroundColor(.waqtuMuted)
+
+                    DisclosureGroup("Clean uninstall (manual)") {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("1. Quit Waqtu")
+                            Text("2. Drag Waqtu from Applications to Trash")
+                            Text("3. Delete: ~/Library/Preferences/dat.waqtu.plist")
+                            Text("4. System Settings → Privacy & Security → Calendars → remove Waqtu")
+                            Text("5. Restart Mac (clears calaccessd state)")
+                        }
+                        .font(.caption)
+                        .foregroundColor(.waqtuMuted)
+                        .padding(.top, 4)
+                    }
+                    .font(.caption)
+                }
+            }
+
             Spacer()
         }
         .frame(maxWidth: .infinity)
         .background(Color.waqtuBackground)
+        .alert("Reset Waqtu?", isPresented: $showResetConfirmation) {
+            Button("Cancel", role: .cancel) {}
+            Button("Reset & Quit", role: .destructive) {
+                onResetWaqtu?()
+            }
+        } message: {
+            Text("All settings will be reset to defaults, Waqtu events will be removed from your calendar, and the app will quit. Your license is preserved. Reopen Waqtu to start fresh.")
+        }
     }
 
     @ViewBuilder

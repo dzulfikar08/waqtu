@@ -14,7 +14,9 @@ final class AppViewModel {
     let licenseManager: LicenseManager
 
     private var timer: Timer?
+    private var snoozeTimer: Timer?
     private var shownPrayers: Set<String> = []
+    private var lastShownPrayerForSnooze: PrayerTime?
 
     var todayPrayers: [PrayerTime] = []
     var nextPrayer: PrayerTime?
@@ -23,6 +25,12 @@ final class AppViewModel {
 
     /// Human-readable location used for prayer times (city, country or "Manual: Mecca").
     var locationDisplay: String = "Getting location..."
+
+    /// True while a "Locate Me" refresh is in progress.
+    var isRefreshingLocation: Bool = false
+
+    /// True while calendar access is being refreshed.
+    var isRefreshingCalendarAccess: Bool = false
 
     /// Full access: trial active, trial used (legacy), or valid license.
     var hasAccess: Bool {
@@ -63,6 +71,16 @@ final class AppViewModel {
             }
             .store(in: &cancellables)
 
+        locationManager.$isRefreshing
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] refreshing in
+                self?.isRefreshingLocation = refreshing
+                if !refreshing {
+                    self?.updateLocationDisplay()
+                }
+            }
+            .store(in: &cancellables)
+
         // Listen for manual location changes from settings
         NotificationCenter.default.publisher(for: Notification.Name("locationChanged"))
             .sink { [weak self] _ in
@@ -80,6 +98,13 @@ final class AppViewModel {
 
         // Initial location display
         updateLocationDisplay()
+    }
+
+    /// Forces a fresh location fix. Call when user taps "Locate Me".
+    func refreshLocation() {
+        guard settings.autoDetectLocation else { return }
+        locationDisplay = "Updating..."
+        locationManager.refreshLocation()
     }
 
     private func updateLocationDisplay() {
@@ -217,15 +242,35 @@ final class AppViewModel {
             existing.close()      // Then close
         }
 
+        lastShownPrayerForSnooze = prayer
+
         let newWindow = OverlayWindow(
             prayerName: prayer.name,
             durationMinutes: settings.overlayDuration,
-            playAdhanSound: settings.overlayPlayAdhanSound
-        ) { [weak self] in
-            self?.overlayWindow = nil
-        }
+            playAdhanSound: settings.overlayPlayAdhanSound,
+            onDismiss: { [weak self] in
+                self?.overlayWindow = nil
+            },
+            onSnooze: { [weak self] minutes in
+                self?.scheduleOverlaySnooze(minutes: minutes)
+            }
+        )
         overlayWindow = newWindow
         newWindow.makeKeyAndOrderFront(nil)
+    }
+
+    private func scheduleOverlaySnooze(minutes: Int) {
+        snoozeTimer?.invalidate()
+        snoozeTimer = nil
+
+        guard let prayer = lastShownPrayerForSnooze else { return }
+
+        snoozeTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(minutes * 60), repeats: false) { [weak self] _ in
+            self?.snoozeTimer = nil
+            DispatchQueue.main.async {
+                self?.showOverlay(for: prayer)
+            }
+        }
     }
 
     func resetShownPrayers() {
@@ -239,8 +284,12 @@ final class AppViewModel {
     // MARK: - Calendar Protection
 
     /// Request calendar access and regenerate today's prayer events. Call when user enables the feature or at midnight.
-    func requestCalendarAccessAndRegenerate() {
-        guard settings.calendarProtectionEnabled else { return }
+    /// - Parameter completion: Called on the main actor after the request finishes (granted or denied). Use to refresh the calendar list in the UI.
+    func requestCalendarAccessAndRegenerate(completion: (() -> Void)? = nil) {
+        guard settings.calendarProtectionEnabled else {
+            completion?()
+            return
+        }
         Task { @MainActor in
             do {
                 try await calendarManager.requestAccess()
@@ -248,6 +297,15 @@ final class AppViewModel {
             } catch {
                 // Permission denied or error — keep setting as-is; user can retry from Settings
             }
+            completion?()
+        }
+    }
+
+    /// Request calendar access only (e.g. to populate the calendar list in settings). Does not require calendar protection to be enabled.
+    func requestCalendarAccessForListing(completion: @escaping () -> Void) {
+        Task { @MainActor in
+            try? await calendarManager.requestAccess()
+            completion()
         }
     }
 
@@ -273,6 +331,22 @@ final class AppViewModel {
         }
     }
 
+    /// Re-requests full calendar access and refreshes the calendar list. Call when user taps "Refresh calendar access".
+    /// Use when Outlook or other calendars don't appear — re-prompting can upgrade from "Add Only" to "Full Access".
+    func refreshCalendarAccess(completion: @escaping () -> Void) {
+        isRefreshingCalendarAccess = true
+        Task { @MainActor in
+            defer { isRefreshingCalendarAccess = false }
+            do {
+                try await calendarManager.requestAccess()
+                regenerateCalendarEventsIfEnabled()
+            } catch {
+                // Permission denied — user can retry from Settings
+            }
+            completion()
+        }
+    }
+
     /// Remove all Waqtu-created events from the calendar. Call when user disables feature or taps "Remove all Waqtu events".
     func removeAllWaqtuEvents() {
         do {
@@ -282,6 +356,15 @@ final class AppViewModel {
         }
     }
 
+    /// Resets all settings, removes calendar events, and quits. Use for "Reset Waqtu" — fixes stale config (e.g. calaccessd issues).
+    /// License is preserved.
+    func resetAllAndQuit() {
+        settings.resetAll()
+        AppDelegate.applyLaunchAtLogin(false)
+        try? calendarManager.deleteAllWaqtuEvents()
+        NSApplication.shared.terminate(nil)
+    }
+
     func showTestOverlay() {
         // Close any existing overlay first and clear the reference
         if let existing = overlayWindow {
@@ -289,19 +372,27 @@ final class AppViewModel {
             existing.close()      // Then close
         }
 
+        let testPrayer = PrayerTime(name: .maghrib, time: Date())
+        lastShownPrayerForSnooze = testPrayer
+
         let testWindow = OverlayWindow(
             prayerName: .maghrib,
             durationMinutes: settings.overlayDuration,
-            playAdhanSound: settings.overlayPlayAdhanSound
-        ) { [weak self] in
-            self?.overlayWindow = nil
-        }
+            playAdhanSound: settings.overlayPlayAdhanSound,
+            onDismiss: { [weak self] in
+                self?.overlayWindow = nil
+            },
+            onSnooze: { [weak self] minutes in
+                self?.scheduleOverlaySnooze(minutes: minutes)
+            }
+        )
         overlayWindow = testWindow
         testWindow.makeKeyAndOrderFront(nil)
     }
 
     deinit {
         timer?.invalidate()
+        snoozeTimer?.invalidate()
         cancellables.forEach { $0.cancel() }
     }
 }

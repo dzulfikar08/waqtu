@@ -40,9 +40,13 @@ if [[ -z "${CODESIGN_IDENTITY:-}" ]]; then
   fi
 fi
 echo " Re-signing $APP_NAME.app with hardened runtime..."
+# Preserve the Xcode entitlements (including Calendar access) when re-signing with
+# the Developer ID certificate. Without this, Hardened Runtime builds lose the
+# personal-information.calendars entitlement and EventKit calls fail in release builds.
 codesign --deep --force --verify --verbose \
   --sign "$CODESIGN_IDENTITY" \
   --options runtime \
+  --preserve-metadata=entitlements \
   "$APP_PATH"
 
 # Notarize + staple (recommended for distribution)
