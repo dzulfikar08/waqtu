@@ -28,13 +28,9 @@ struct OverlayView: View {
 
     var body: some View {
         ZStack {
-            // Background gradient matching Mutabaah style
-            LinearGradient(
-                colors: [Color(red: 0.102, green: 0.18, blue: 0.145), Color(red: 0.176, green: 0.37, blue: 0.30)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
+            // Enhanced animated background
+            AnimatedGradientBackground()
+                .ignoresSafeArea()
 
             VStack(spacing: 40) {
                 Spacer()
@@ -214,5 +210,105 @@ struct OverlayView: View {
         timerCancellable?.cancel()
         timerCancellable = nil
         onSnooze(minutes)
+    }
+}
+
+struct AnimatedGradientBackground: View {
+    @State private var animationPhase: CGFloat = 0
+    
+    var body: some View {
+        ZStack {
+            // Base gradient with multiple color stops
+            MeshGradientBackground(phase: animationPhase)
+            
+            // Radial glow effects for depth
+            RadialGradient(
+                colors: [
+                    Color(red: 0.29, green: 0.55, blue: 0.43).opacity(0.3),
+                    Color.clear
+                ],
+                center: UnitPoint(x: 0.3 + animationPhase * 0.1, y: 0.2),
+                startRadius: 0,
+                endRadius: 400
+            )
+            
+            RadialGradient(
+                colors: [
+                    Color(red: 0.42, green: 0.66, blue: 0.53).opacity(0.2),
+                    Color.clear
+                ],
+                center: UnitPoint(x: 0.7 - animationPhase * 0.1, y: 0.8),
+                startRadius: 0,
+                endRadius: 350
+            )
+            
+            // Subtle animated particles
+            ParticleField()
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 8).repeatForever(autoreverses: true)) {
+                animationPhase = 1.0
+            }
+        }
+    }
+}
+
+struct MeshGradientBackground: View {
+    let phase: CGFloat
+    
+    var body: some View {
+        LinearGradient(
+            stops: [
+                .init(color: Color(red: 0.08, green: 0.15, blue: 0.12), location: 0.0),
+                .init(color: Color(red: 0.102 + phase * 0.02, green: 0.18 + phase * 0.03, blue: 0.145 + phase * 0.02), location: 0.3),
+                .init(color: Color(red: 0.14, green: 0.28, blue: 0.22), location: 0.5),
+                .init(color: Color(red: 0.176 - phase * 0.02, green: 0.37 - phase * 0.03, blue: 0.30 - phase * 0.02), location: 0.7),
+                .init(color: Color(red: 0.22, green: 0.42, blue: 0.35), location: 1.0)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+}
+
+struct ParticleField: View {
+    @State private var particles: [Particle] = []
+    
+    struct Particle: Identifiable {
+        let id = UUID()
+        let x: CGFloat
+        let y: CGFloat
+        let size: CGFloat
+        let opacity: Double
+        let duration: Double
+    }
+    
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                ForEach(particles) { particle in
+                    Circle()
+                        .fill(Color.white.opacity(particle.opacity))
+                        .frame(width: particle.size, height: particle.size)
+                        .position(x: particle.x * geometry.size.width, y: particle.y * geometry.size.height)
+                        .blur(radius: particle.size / 2)
+                }
+            }
+            .onAppear {
+                generateParticles()
+            }
+        }
+    }
+    
+    private func generateParticles() {
+        particles = (0..<30).map { _ in
+            Particle(
+                x: CGFloat.random(in: 0...1),
+                y: CGFloat.random(in: 0...1),
+                size: CGFloat.random(in: 1...3),
+                opacity: Double.random(in: 0.1...0.3),
+                duration: Double.random(in: 3...6)
+            )
+        }
     }
 }
