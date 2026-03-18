@@ -28,14 +28,27 @@ fi
 # Re-sign the app bundle for distribution (Developer ID + hardened runtime).
 # You can override by exporting CODESIGN_IDENTITY (recommended: use the certificate SHA-1).
 if [[ -z "${CODESIGN_IDENTITY:-}" ]]; then
-  # Use the first matching Developer ID Application identity (SHA-1 hash) from keychain search list.
+  # Try to find Developer ID Application identity first (for production distribution)
   CODESIGN_IDENTITY=$(
     security find-identity -v -p codesigning 2>/dev/null \
       | awk '/Developer ID Application: Dzulfikar/ { print $2; exit }'
   )
+  
+  # Fall back to Apple Development certificate if no Developer ID found
   if [[ -z "$CODESIGN_IDENTITY" ]]; then
-    echo "Error: Could not find Developer ID Application identity in keychain search list."
-    echo "Set CODESIGN_IDENTITY to your Developer ID cert (preferably SHA-1) and retry."
+    CODESIGN_IDENTITY=$(
+      security find-identity -v -p codesigning 2>/dev/null \
+        | awk '/Apple Development: Dzulfikar/ { print $2; exit }'
+    )
+    if [[ -n "$CODESIGN_IDENTITY" ]]; then
+      echo "⚠️  Using Apple Development certificate (not for production distribution)"
+      echo "    For production, get a Developer ID Application certificate"
+    fi
+  fi
+  
+  if [[ -z "$CODESIGN_IDENTITY" ]]; then
+    echo "Error: Could not find any code signing identity in keychain search list."
+    echo "Set CODESIGN_IDENTITY to your certificate (preferably SHA-1) and retry."
     exit 1
   fi
 fi
@@ -51,8 +64,19 @@ codesign --deep --force --verify --verbose \
 
 # Notarize + staple (recommended for distribution)
 # Uses either NOTARY_KEYCHAIN_PROFILE (recommended) OR NOTARY_APPLE_ID + NOTARY_TEAM_ID + NOTARY_PASSWORD.
-# To skip: export NOTARIZE=0
-NOTARIZE="${NOTARIZE:-1}"
+# To enable: export NOTARIZE=1 (requires notarization credentials setup)
+# Auto-skip notarization if using development certificate (can't be notarized)
+CERT_NAME=$(security find-identity -v -p codesigning 2>/dev/null | grep "$CODESIGN_IDENTITY" | head -1)
+if [[ "$CERT_NAME" =~ "Apple Development" ]]; then
+  NOTARIZE="${NOTARIZE:-0}"
+  if [[ "$NOTARIZE" == "1" ]]; then
+    echo "⚠️  Notarization disabled: Apple Development certificates cannot be notarized"
+    NOTARIZE=0
+  fi
+else
+  # Default to skip notarization even with Developer ID cert (can enable with NOTARIZE=1)
+  NOTARIZE="${NOTARIZE:-0}"
+fi
 # Default profile name (created via: xcrun notarytool store-credentials "waqtu-notary" ...)
 NOTARY_KEYCHAIN_PROFILE="${NOTARY_KEYCHAIN_PROFILE:-waqtu-notary}"
 NOTARY_APPLE_ID="${NOTARY_APPLE_ID:-}"
