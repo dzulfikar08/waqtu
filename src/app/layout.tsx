@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, DM_Sans } from "next/font/google";
+import { Fraunces, Outfit } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
@@ -9,7 +9,7 @@ const fraunces = Fraunces({
   display: "swap",
 });
 
-const dmSans = DM_Sans({
+const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
@@ -18,7 +18,7 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Waqtu — Prayer times for your day",
   description:
-    "Gentle prayer reminders and calendar protection for Mac. Know when to pray, block time in your calendar, and stay consistent.",
+    "Prayer times in your menu bar. Calendar blocks during prayers. Teams shows you as busy. Made for Muslim professionals on Mac.",
 };
 
 export default function RootLayout({
@@ -27,8 +27,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${dmSans.variable} scroll-smooth`}>
-      <body className="min-h-screen font-sans antialiased grain">
+    <html
+      lang="en"
+      className={`${fraunces.variable} ${outfit.variable} scroll-smooth`}
+    >
+      <body className="min-h-screen font-sans antialiased">
         <Script
           defer
           src="https://assets.onedollarstats.com/stonks.js"

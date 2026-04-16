@@ -55,14 +55,6 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		// Email is now required - Polar validates email domains
-		if (!email) {
-			return NextResponse.json(
-				{ error: "Email is required" },
-				{ status: 400 },
-			);
-		}
-
 		if (!POLAR_ACCESS_TOKEN) {
 			console.error("POLAR_ACCESS_TOKEN is not configured");
 			return NextResponse.json(

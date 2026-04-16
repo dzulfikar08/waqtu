@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   createCheckout,
   POLAR_PRODUCTS,
@@ -33,12 +33,8 @@ export default function Home() {
   const [expandedMedia, setExpandedMedia] = useState<MediaType | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [email, setEmail] = useState("");
-  const [emailModalTier, setEmailModalTier] = useState<
-    "PRO_MONTHLY" | "PRO_LIFETIME" | null
-  >(null);
-  const [emailError, setEmailError] = useState("");
   const [showCheckoutSuccess, setShowCheckoutSuccess] = useState(false);
+  const [voucherCopied, setVoucherCopied] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -46,7 +42,6 @@ export default function Home() {
     const success = params.get("checkout") === "success";
     setShowCheckoutSuccess(success);
     if (success) {
-      // Track successful purchase return
       window.Stonks?.event("checkout_success_return");
       const el = document.getElementById("download");
       el?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -75,7 +70,8 @@ export default function Home() {
 
     const handleScrollDepth = () => {
       const scrollPercent =
-        (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
+        (window.scrollY /
+          (document.body.scrollHeight - window.innerHeight)) *
         100;
 
       if (scrollPercent >= 25 && !hasHit25) {
@@ -117,69 +113,55 @@ export default function Home() {
     };
   }, [mobileMenuOpen]);
 
-  const handleCheckoutClick = (tier: "PRO_MONTHLY" | "PRO_LIFETIME") => {
+  const handleCheckoutClick = async (tier: "PRO_MONTHLY" | "PRO_LIFETIME") => {
     if (!isTierAvailable(tier)) {
       console.error("Product not configured:", tier);
       window.location.href = "#download";
       return;
     }
-    // Track checkout start
     window.Stonks?.event("checkout_start", { tier });
-    // Open email modal
-    setEmailModalTier(tier);
-    setEmailError("");
-  };
-
-  const handleCheckout = async () => {
-    if (!emailModalTier) return;
-
-    // Validate email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email || !emailRegex.test(email)) {
-      setEmailError("Please enter a valid email address");
-      return;
-    }
-
-    const productId = POLAR_PRODUCTS[emailModalTier];
-    setIsLoading((prev) => ({ ...prev, [emailModalTier]: true }));
+    setIsLoading((prev) => ({ ...prev, [tier]: true }));
 
     try {
-      const { url } = await createCheckout({ productId, email });
-      // Track checkout redirect
-      window.Stonks?.event("checkout_redirect", { tier: emailModalTier, email });
-      // Close modal and redirect
-      setEmailModalTier(null);
+      const { url } = await createCheckout({ productId: POLAR_PRODUCTS[tier] });
+      window.Stonks?.event("checkout_redirect", { tier });
       window.location.href = url;
     } catch (error) {
       console.error("Checkout error:", error);
-      // Track checkout error
       window.Stonks?.event("checkout_error", {
-        tier: emailModalTier,
-        error: error instanceof Error ? error.message : "Failed to create checkout",
+        tier,
+        error: error instanceof Error
+          ? error.message
+          : "Failed to create checkout",
       });
-      setEmailError(
-        error instanceof Error ? error.message : "Failed to create checkout",
-      );
-      setIsLoading((prev) => ({ ...prev, [emailModalTier]: false }));
+      setIsLoading((prev) => ({ ...prev, [tier]: false }));
     }
   };
 
+  const copyVoucher = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText("WAQTU299");
+      setVoucherCopied(true);
+      window.Stonks?.event("voucher_copied", { code: "WAQTU299" });
+      setTimeout(() => setVoucherCopied(false), 2000);
+    } catch {
+      // Clipboard API not available
+    }
+  }, []);
+
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Background gradient mesh */}
+      {/* Background — single subtle gradient, not triple mesh */}
       <div
         className="pointer-events-none fixed inset-0 z-0"
         aria-hidden
         style={{
-          background: `
-            radial-gradient(ellipse 80% 50% at 50% -20%, rgba(74, 139, 111, 0.18), transparent),
-            radial-gradient(ellipse 60% 40% at 90% 60%, rgba(45, 95, 76, 0.2), transparent),
-            radial-gradient(ellipse 50% 30% at 10% 80%, rgba(212, 165, 116, 0.08), transparent)
-          `,
+          background:
+            "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(74, 139, 111, 0.12), transparent)",
         }}
       />
 
-      {/* Header */}
+      {/* ===== HEADER ===== */}
       <header
         className={`
           fixed top-0 left-0 right-0 z-50
@@ -187,12 +169,11 @@ export default function Home() {
           transition-all duration-300 ease-out
           ${
             isScrolled || mobileMenuOpen
-              ? "py-3 bg-[var(--waqtu-bg)]/98 backdrop-blur-xl border-b border-[var(--waqtu-border)] shadow-sm"
+              ? "py-3 bg-[var(--waqtu-bg)]/98 backdrop-blur-xl border-b border-[var(--waqtu-border)]"
               : "py-5 bg-transparent border-b border-transparent"
           }
         `}
       >
-        {/* Logo */}
         <a
           href="#"
           onClick={handleNavClick}
@@ -201,12 +182,12 @@ export default function Home() {
           Waqtu
         </a>
 
-        {/* Desktop Navigation */}
+        {/* Desktop nav */}
         <nav className="hidden sm:flex items-center gap-8 text-sm">
           <a
             href="#features"
             onClick={handleNavClick}
-            className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+            className="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)] transition-colors"
             data-s-event="nav_click"
             data-s-event-props='{"destination":"features"}'
           >
@@ -215,7 +196,7 @@ export default function Home() {
           <a
             href="#pricing"
             onClick={handleNavClick}
-            className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+            className="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)] transition-colors"
             data-s-event="nav_click"
             data-s-event-props='{"destination":"pricing"}'
           >
@@ -224,7 +205,7 @@ export default function Home() {
           <a
             href="#faq"
             onClick={handleNavClick}
-            className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+            className="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)] transition-colors"
             data-s-event="nav_click"
             data-s-event-props='{"destination":"faq"}'
           >
@@ -233,22 +214,20 @@ export default function Home() {
           <a
             href="#pricing"
             onClick={handleNavClick}
-            className="rounded-full bg-[var(--waqtu-primary)] px-5 py-2.5 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_24px_rgba(74,139,111,0.35)]"
+            className="rounded-full bg-[var(--waqtu-primary)] px-5 py-2.5 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)]"
             data-s-event="cta_click"
             data-s-event-props='{"location":"header","text":"Get Waqtu"}'
           >
-            Get Waqtu
+            Get Waqtu — $2.99
           </a>
         </nav>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile menu button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="sm:hidden relative z-50 p-2 -mr-2 text-[var(--waqtu-text)] touch-manipulation"
           aria-label="Toggle menu"
           aria-expanded={mobileMenuOpen}
-          data-s-event="mobile_menu_toggle"
-          data-s-event-props={`{"state":"${mobileMenuOpen ? "close" : "open"}"}`}
         >
           <svg
             className={`h-6 w-6 transition-transform duration-300 ${mobileMenuOpen ? "rotate-90" : ""}`}
@@ -274,7 +253,7 @@ export default function Home() {
           </svg>
         </button>
 
-        {/* Mobile Menu - Combined overlay and content */}
+        {/* Mobile menu overlay */}
         <div
           className={`
             fixed inset-0 sm:hidden
@@ -289,31 +268,6 @@ export default function Home() {
           style={{ zIndex: 40, backgroundColor: "rgb(15, 25, 20)" }}
           onClick={() => setMobileMenuOpen(false)}
         >
-          {/* Close button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setMobileMenuOpen(false);
-            }}
-            className="absolute top-6 right-4 p-2 text-[var(--waqtu-text)] touch-manipulation"
-            aria-label="Close menu"
-          >
-            <svg
-              className="h-8 w-8"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2.5}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-
-          {/* Menu content */}
           <nav
             className="relative flex-1 flex flex-col items-center justify-center gap-10 px-6"
             onClick={(e) => e.stopPropagation()}
@@ -322,8 +276,6 @@ export default function Home() {
               href="#features"
               onClick={handleNavClick}
               className="text-3xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors py-2"
-              data-s-event="nav_click"
-              data-s-event-props='{"destination":"features","location":"mobile_menu"}'
             >
               Features
             </a>
@@ -331,8 +283,6 @@ export default function Home() {
               href="#pricing"
               onClick={handleNavClick}
               className="text-3xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors py-2"
-              data-s-event="nav_click"
-              data-s-event-props='{"destination":"pricing","location":"mobile_menu"}'
             >
               Pricing
             </a>
@@ -340,19 +290,15 @@ export default function Home() {
               href="#faq"
               onClick={handleNavClick}
               className="text-3xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors py-2"
-              data-s-event="nav_click"
-              data-s-event-props='{"destination":"faq","location":"mobile_menu"}'
             >
               FAQ
             </a>
             <a
               href="#pricing"
               onClick={handleNavClick}
-              className="mt-4 rounded-full bg-[var(--waqtu-primary)] px-10 py-4 text-xl font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_24px_rgba(74,139,111,0.35)]"
-              data-s-event="cta_click"
-              data-s-event-props='{"location":"mobile_menu","text":"Get Waqtu"}'
+              className="mt-4 rounded-full bg-[var(--waqtu-primary)] px-10 py-4 text-xl font-medium text-[var(--waqtu-bg)]"
             >
-              Get Waqtu
+              Get Waqtu — $2.99
             </a>
           </nav>
         </div>
@@ -362,54 +308,66 @@ export default function Home() {
         {/* Spacer for fixed header */}
         <div className="h-20 sm:h-24" />
 
-        {/* Hero Section */}
-        <section className="px-6 pb-32 sm:px-10 md:px-14 md:pb-44">
+        {/* ===== HERO ===== */}
+        <section className="px-6 pb-28 sm:px-10 md:px-14 md:pb-40">
           <div className="flex flex-col items-center text-center">
-            <p
-              className="animate-fade-up mb-6 text-sm font-medium uppercase tracking-[0.2em] text-[var(--waqtu-gold)]"
+            {/* Voucher badge — dashed coupon style */}
+            <button
+              onClick={copyVoucher}
+              className="animate-fade-up mb-8 inline-flex items-center gap-2.5 rounded-full border border-dashed border-[var(--waqtu-gold)]/40 bg-[var(--waqtu-gold)]/[0.06] px-5 py-2 transition-all hover:border-[var(--waqtu-gold)]/60 cursor-pointer"
               style={{ animationDelay: "0ms", opacity: 0 }}
+              data-s-event="voucher_click"
+              data-s-event-props='{"location":"hero_badge","code":"WAQTU299"}'
             >
-              Prayer times · Calendar protection · Mac menu bar
-            </p>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--waqtu-gold)]">
+                Limited offer
+              </span>
+              <span className="h-3 w-px bg-[var(--waqtu-gold)]/30" />
+              <span className="font-mono text-sm font-bold text-[var(--waqtu-gold)]">
+                {voucherCopied ? "Copied!" : "WAQTU299"}
+              </span>
+              <span className="text-xs text-[var(--waqtu-muted)]">
+                &rarr; $2.99
+              </span>
+            </button>
+
             <h1
-              className="font-display animate-fade-up max-w-4xl text-4xl font-semibold leading-[1.15] tracking-tight text-[var(--waqtu-text)] sm:text-5xl md:text-6xl md:leading-[1.1]"
+              className="font-display animate-fade-up max-w-3xl text-4xl font-semibold leading-[1.1] tracking-tight text-[var(--waqtu-text)] sm:text-5xl md:text-[3.5rem] md:leading-[1.08]"
               style={{ animationDelay: "80ms", opacity: 0 }}
             >
-              You check your calendar,
+              Your calendar blocks lunch.
               <br />
-              <span className="text-[var(--waqtu-light)]">
-                see a meeting at 1:15 PM.
-              </span>
-              <br />
-              But Dhuhr is at 1:00 PM.
+              Why not{" "}
+              <span className="text-[var(--waqtu-gold)]">prayer</span>?
             </h1>
+
             <p
-              className="animate-fade-up mt-8 max-w-xl text-lg leading-relaxed text-[var(--waqtu-muted)]"
+              className="animate-fade-up mt-6 max-w-lg text-lg leading-relaxed text-[var(--waqtu-muted)]"
               style={{ animationDelay: "160ms", opacity: 0 }}
             >
-              Time for prayer, without the awkward calendar conflicts. Waqtu
-              sits in your menu bar and blocks your calendar during prayer
-              times—so Outlook and Teams show you as busy before you even step
-              away.
+              Waqtu blocks your work calendar during prayer times. Your
+              colleagues see you as busy in Teams. No more choosing between
+              meetings and prayer.
             </p>
+
             <div
-              className="animate-fade-up mt-12 flex flex-wrap items-center justify-center gap-4"
+              className="animate-fade-up mt-10 flex flex-wrap items-center justify-center gap-4"
               style={{ animationDelay: "240ms", opacity: 0 }}
             >
               <a
                 href="#pricing"
-                className="group inline-flex items-center gap-2 rounded-full bg-[var(--waqtu-primary)] px-6 py-3.5 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_28px_rgba(74,139,111,0.4)]"
+                className="group inline-flex items-center gap-2 rounded-full bg-[var(--waqtu-primary)] px-7 py-3.5 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-lg hover:shadow-[var(--waqtu-primary)]/20"
                 data-s-event="cta_click"
-                data-s-event-props='{"location":"hero","text":"Get Waqtu for Mac"}'
+                data-s-event-props='{"location":"hero","text":"Get Waqtu — $2.99"}'
               >
-                Get Waqtu for Mac
+                Get Waqtu — $2.99
                 <span className="transition-transform group-hover:translate-x-0.5">
-                  →
+                  &rarr;
                 </span>
               </a>
               <a
                 href="#features"
-                className="inline-flex items-center gap-2 text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+                className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
                 data-s-event="nav_click"
                 data-s-event-props='{"destination":"features","location":"hero"}'
               >
@@ -417,203 +375,58 @@ export default function Home() {
               </a>
             </div>
 
-            {/* Trust indicators */}
+            {/* Trust indicators — minimal dots, not badges */}
             <div
-              className="animate-fade-up mt-16 flex flex-wrap items-center justify-center gap-8 text-[var(--waqtu-muted)]"
+              className="animate-fade-up mt-14 flex flex-wrap items-center justify-center gap-4 text-sm text-[var(--waqtu-muted)] sm:gap-6"
               style={{ animationDelay: "320ms", opacity: 0 }}
             >
-              <div className="flex items-center gap-2">
-                <svg
-                  className="h-5 w-5 text-[var(--waqtu-gold)]"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <span className="text-sm">30-day money-back guarantee</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm">Free to try</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm">macOS 12+</span>
-              </div>
+              <span>30-day money-back</span>
+              <span className="hidden sm:inline text-[var(--waqtu-border)]">
+                &middot;
+              </span>
+              <span>Free to try</span>
+              <span className="hidden sm:inline text-[var(--waqtu-border)]">
+                &middot;
+              </span>
+              <span>macOS 12+</span>
             </div>
           </div>
         </section>
 
-        {/* Problem Agitation Section */}
-        <section className="relative z-10 section-tint-1 px-6 py-16 sm:px-10 md:px-14 md:py-24">
-          <div className="mx-auto max-w-2xl">
-            <h2 className="font-display mb-6 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
-              We know what it's like.
-            </h2>
-            <div className="space-y-4 text-[var(--waqtu-muted)] leading-relaxed">
-              <p>
-                You're in back-to-back meetings. The prayer time comes and goes.
-                You make a mental note to "make it up later"{" "}
-                <em className="text-[var(--waqtu-gold)]">(again)</em>. Or you
-                step away and come back to "Where were you?" messages.
-              </p>
-              <p>
-                Your calendar doesn't know about your prayers. Your colleagues
-                don't either.
-              </p>
-              <p className="text-[var(--waqtu-text)] font-medium">
-                It's not that work is more important. It's just... louder.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Your Day with Waqtu - Timeline */}
-        <section className="relative z-10 section-tint-2 px-6 py-16 sm:px-10 md:px-14 md:py-24">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="font-display mb-4 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
-              Your day with Waqtu
-            </h2>
-            <p className="mx-auto mb-12 max-w-2xl text-center text-[var(--waqtu-muted)]">
-              See how Waqtu fits into your daily rhythm.
-            </p>
-
-            <div className="relative">
-              {/* Timeline line */}
-              <div className="absolute left-4 top-0 h-full w-0.5 bg-[var(--waqtu-border)] sm:left-6" />
-
-              <div className="space-y-8">
-                {/* Fajr */}
-                <div className="relative flex gap-4 sm:gap-6">
-                  <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--waqtu-bg)] border-2 border-[var(--waqtu-gold)] sm:h-10 sm:w-10">
-                    <span className="text-xs text-[var(--waqtu-gold)]">🌙</span>
-                  </div>
-                  <div className="flex-1 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-6 backdrop-blur-sm">
-                    <h3 className="font-display font-semibold text-[var(--waqtu-gold)]">
-                      Morning · Fajr
-                    </h3>
-                    <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
-                      A gentle wake-up reminder. Your calendar is still yours—no
-                      blocks needed while you sleep.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Work begins */}
-                <div className="relative flex gap-4 sm:gap-6">
-                  <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--waqtu-bg)] border-2 border-[var(--waqtu-muted)] sm:h-10 sm:w-10">
-                    <span className="text-xs text-[var(--waqtu-muted)]">
-                      💻
-                    </span>
-                  </div>
-                  <div className="flex-1 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-6 backdrop-blur-sm">
-                    <h3 className="font-display font-semibold text-[var(--waqtu-text)]">
-                      Mid-morning · Work begins
-                    </h3>
-                    <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
-                      Waqtu sits quietly in your menu bar, showing a countdown
-                      to Dhuhr. No interruptions.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Dhuhr */}
-                <div className="relative flex gap-4 sm:gap-6">
-                  <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--waqtu-bg)] border-2 border-[var(--waqtu-primary)] sm:h-10 sm:w-10">
-                    <span className="text-xs text-[var(--waqtu-primary)]">
-                      🕌
-                    </span>
-                  </div>
-                  <div className="flex-1 rounded-2xl border border-[var(--waqtu-primary)]/30 bg-[var(--waqtu-card)]/80 p-6 backdrop-blur-sm">
-                    <h3 className="font-display font-semibold text-[var(--waqtu-primary)]">
-                      1:00 PM · Dhuhr arrives
-                    </h3>
-                    <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
-                      A calm full-screen reminder appears. You dismiss it when
-                      ready—and your calendar now shows you{" "}
-                      <span className="text-[var(--waqtu-primary)]">
-                        "busy"
-                      </span>{" "}
-                      until 1:20 PM.
-                    </p>
-                    <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
-                      Your colleagues see "Busy" in Teams. No awkward "where
-                      were you?" messages.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Asr & Maghrib */}
-                <div className="relative flex gap-4 sm:gap-6">
-                  <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--waqtu-bg)] border-2 border-[var(--waqtu-primary)] sm:h-10 sm:w-10">
-                    <span className="text-xs text-[var(--waqtu-primary)]">
-                      🕌
-                    </span>
-                  </div>
-                  <div className="flex-1 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-6 backdrop-blur-sm">
-                    <h3 className="font-display font-semibold text-[var(--waqtu-text)]">
-                      Afternoon · Asr & Maghrib
-                    </h3>
-                    <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
-                      Same peaceful rhythm. You step away, your calendar
-                      protects you, you return.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Isha */}
-                <div className="relative flex gap-4 sm:gap-6">
-                  <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--waqtu-bg)] border-2 border-[var(--waqtu-gold)] sm:h-10 sm:w-10">
-                    <span className="text-xs text-[var(--waqtu-gold)]">🌙</span>
-                  </div>
-                  <div className="flex-1 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-6 backdrop-blur-sm">
-                    <h3 className="font-display font-semibold text-[var(--waqtu-gold)]">
-                      Evening · Isha
-                    </h3>
-                    <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
-                      Final prayer of the day, final block on your calendar.
-                      Tomorrow, Waqtu is there again.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Quote strip */}
-        <section className="relative z-10 section-tint-1 border-y border-[var(--waqtu-border)] px-6 py-10 sm:px-10 md:px-14">
-          <blockquote
-            className="animate-fade-in mx-auto max-w-2xl text-center text-lg italic leading-relaxed text-[var(--waqtu-muted)]"
-            style={{ opacity: 0 }}
-          >
-            "Indeed, prayer is obligatory on the believers at specified times."
+        {/* ===== QURAN VERSE STRIP ===== */}
+        <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-10 sm:px-10 md:px-14">
+          <blockquote className="mx-auto max-w-2xl text-center text-lg italic leading-relaxed text-[var(--waqtu-muted)]">
+            &ldquo;Indeed, prayer is obligatory on the believers at specified
+            times.&rdquo;
           </blockquote>
           <cite className="mt-3 block text-center text-sm not-italic text-[var(--waqtu-gold)]">
-            — Quran 4:103
+            &mdash; Quran 4:103
           </cite>
         </section>
 
-        {/* Features Section */}
+        {/* ===== FEATURES ===== */}
         <section
           id="features"
-          className="relative z-10 section-tint-2 px-6 py-24 sm:px-10 md:px-14 md:py-32"
+          className="relative z-10 px-6 py-24 sm:px-10 md:px-14 md:py-32"
         >
-          <div className="mx-auto max-w-6xl">
-            <h2 className="font-display mb-4 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
-              What Waqtu does
+          <div className="mx-auto max-w-5xl">
+            <h2 className="font-display mb-3 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
+              How it works
             </h2>
-            <p className="mx-auto mb-16 max-w-2xl text-center text-[var(--waqtu-muted)]">
-              Three thoughtful features designed to help you stay consistent
-              with your prayers without disrupting your workflow.
+            <p className="mx-auto mb-16 max-w-md text-center text-[var(--waqtu-muted)]">
+              Three things. That&rsquo;s it.
             </p>
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+
+            {/* No card backgrounds — editorial style, just text and icons */}
+            <div className="grid gap-10 sm:gap-12 sm:grid-cols-3">
               {[
                 {
-                  title: "Never wonder when the next prayer is",
+                  title: "Prayer countdown in your menu bar",
                   description:
-                    "A quick glance at your menu bar tells you. No checking apps, no guessing.",
+                    "One glance tells you when the next prayer is. No apps to open, nothing to check.",
                   icon: (
                     <svg
-                      className="h-6 w-6"
+                      className="h-5 w-5"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -625,32 +438,12 @@ export default function Home() {
                   ),
                 },
                 {
-                  title: "Calm, not alarming",
+                  title: "Calendar protection",
                   description:
-                    "A peaceful overlay appears when it's time. Dismiss when you're ready to pray.",
+                    "Creates busy blocks in Exchange, iCloud, or your default calendar. Teams shows you as busy. No explanation needed.",
                   icon: (
                     <svg
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={1.5}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-                      />
-                    </svg>
-                  ),
-                },
-                {
-                  title: "Your faith on your calendar",
-                  description:
-                    "Waqtu creates busy blocks in your calendar—Exchange, iCloud, or default. Outlook & Teams show you as busy.",
-                  icon: (
-                    <svg
-                      className="h-6 w-6"
+                      className="h-5 w-5"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -664,430 +457,264 @@ export default function Home() {
                     </svg>
                   ),
                 },
-              ].map((item, i) => (
-                <article
-                  key={item.title}
-                  className="group rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-8 backdrop-blur-sm transition-all hover:border-[var(--waqtu-primary)]/30 hover:bg-[var(--waqtu-card)]/80"
-                  style={{
-                    animationDelay: `${320 + i * 60}ms`,
-                  }}
-                >
-                  <span className="mb-4 block text-[var(--waqtu-gold)] opacity-80">
+                {
+                  title: "Calm reminders, not alarms",
+                  description:
+                    "A peaceful overlay when it\u2019s time to pray. You dismiss it when you\u2019re ready. Waqtu waits.",
+                  icon: (
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
+                      />
+                    </svg>
+                  ),
+                },
+              ].map((item) => (
+                <div key={item.title}>
+                  <span className="mb-4 block text-[var(--waqtu-gold)]">
                     {item.icon}
                   </span>
-                  <h3 className="font-display mb-3 text-lg font-semibold text-[var(--waqtu-text)]">
+                  <h3 className="font-display mb-2 text-lg font-semibold text-[var(--waqtu-text)]">
                     {item.title}
                   </h3>
-                  <p className="text-[var(--waqtu-muted)] leading-relaxed">
+                  <p className="text-[15px] leading-relaxed text-[var(--waqtu-muted)]">
                     {item.description}
                   </p>
-                </article>
+                </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Visual Showcase Section */}
-        <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-16 sm:px-10 md:px-14 md:py-24">
+        {/* ===== VISUAL SHOWCASE ===== */}
+        <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-20 sm:px-10 md:px-14 md:py-28">
           <div className="mx-auto max-w-5xl">
-            <h2 className="font-display mb-4 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
+            <h2 className="font-display mb-3 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
               See Waqtu in action
             </h2>
-            <p className="mx-auto mb-12 max-w-2xl text-center text-[var(--waqtu-muted)]">
-              A calm reminder when it's time to pray. Your calendar protected
-              during prayer times.
+            <p className="mx-auto mb-12 max-w-md text-center text-[var(--waqtu-muted)]">
+              Prayer times at a glance. Calm reminders. Calendar blocked.
             </p>
 
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {/* Image - Menu bar prayer times */}
+            <div className="grid gap-6 md:grid-cols-3">
+              {/* Menu bar screenshot */}
               <div
-                className="flex flex-col rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all"
+                className="flex flex-col rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/40 p-3 cursor-pointer hover:border-[var(--waqtu-primary)]/40 transition-all"
                 onClick={() => setExpandedMedia("menuBar")}
                 data-s-event="media_expand"
                 data-s-event-props='{"type":"image","media":"menuBar"}'
               >
-                <div className="mb-3">
-                  <h3 className="font-display text-lg font-semibold text-[var(--waqtu-text)]">
-                    Prayer times in your menu bar
-                  </h3>
-                  <p className="mt-1 text-sm text-[var(--waqtu-muted)]">
-                    A quick glance tells you when the next prayer is. No checking
-                    apps, no guessing. Click to expand.
-                  </p>
-                </div>
                 <img
                   src="/waqtu-4.webp"
                   alt="Waqtu menu bar showing prayer time countdown"
-                  className="w-full flex-1 rounded-xl border border-[var(--waqtu-border)] object-cover aspect-video"
+                  className="w-full rounded-lg border border-[var(--waqtu-border)] object-cover aspect-video"
                 />
+                <p className="mt-3 px-1 text-sm text-[var(--waqtu-muted)]">
+                  Prayer countdown at a glance
+                </p>
               </div>
 
-              {/* Video 2 - Full screen reminder */}
+              {/* Full screen reminder video */}
               <div
-                className="flex flex-col rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all"
+                className="flex flex-col rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/40 p-3 cursor-pointer hover:border-[var(--waqtu-primary)]/40 transition-all"
                 onClick={() => setExpandedMedia("video2")}
                 data-s-event="media_expand"
                 data-s-event-props='{"type":"video","media":"fullscreen_reminder"}'
               >
-                <div className="mb-3">
-                  <h3 className="font-display text-lg font-semibold text-[var(--waqtu-text)]">
-                    The moment work stops, prayer begins
-                  </h3>
-                  <p className="mt-1 text-sm text-[var(--waqtu-muted)]">
-                    A gentle full-screen nudge that interrupts your flow for
-                    what matters. You choose when to dismiss—it waits
-                    respectfully until you do. Click to expand.
-                  </p>
-                </div>
                 <video
                   autoPlay
                   loop
                   muted
                   playsInline
-                  className="w-full flex-1 rounded-xl border border-[var(--waqtu-border)] object-cover aspect-video"
+                  className="w-full rounded-lg border border-[var(--waqtu-border)] object-cover aspect-video"
                 >
                   <source src="/waqtu-3.mp4" type="video/mp4" />
                 </video>
+                <p className="mt-3 px-1 text-sm text-[var(--waqtu-muted)]">
+                  A calm nudge when it&rsquo;s time
+                </p>
               </div>
 
-              {/* Image - Teams calendar */}
+              {/* Teams calendar screenshot */}
               <div
-                className="flex flex-col rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-4 backdrop-blur-sm cursor-pointer hover:border-[var(--waqtu-primary)]/50 transition-all"
+                className="flex flex-col rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/40 p-3 cursor-pointer hover:border-[var(--waqtu-primary)]/40 transition-all"
                 onClick={() => setExpandedMedia("image")}
                 data-s-event="media_expand"
                 data-s-event-props='{"type":"image","media":"teams_calendar"}'
               >
-                <div className="mb-3">
-                  <h3 className="font-display text-lg font-semibold text-[var(--waqtu-text)]">
-                    Your calendar respects your prayers
-                  </h3>
-                  <p className="mt-1 text-sm text-[var(--waqtu-muted)]">
-                    Waqtu blocks your calendar during prayer times. Teams shows
-                    you as "Busy". Click to expand.
-                  </p>
-                </div>
                 <img
                   src="/waqtu.webp"
                   alt="Teams calendar showing prayer time blocked as busy"
-                  className="w-full flex-1 rounded-xl border border-[var(--waqtu-border)] object-cover aspect-video"
+                  className="w-full rounded-lg border border-[var(--waqtu-border)] object-cover aspect-video"
                 />
+                <p className="mt-3 px-1 text-sm text-[var(--waqtu-muted)]">
+                  Calendar shows you as busy during prayers
+                </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Testimonials Section - Hidden until we have real feedback */}
-        {/* <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-16 sm:px-10 md:px-14 md:py-24">
-          <div className="mx-auto max-w-4xl">
-            <h2 className="font-display mb-4 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
-              Join Muslims who've made prayer part of their work day
-            </h2>
-            <p className="mx-auto mb-12 max-w-2xl text-center text-[var(--waqtu-muted)]">
-              No more choosing between meetings and prayer.
-            </p>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {[
-                {
-                  name: "Ahmed",
-                  role: "Software Engineer, London",
-                  text: "Waqtu solved the 'where were you?' problem at work. My colleagues now see me as busy during Dhuhr—it just feels respectful all around.",
-                },
-                {
-                  name: "Fatima",
-                  role: "Product Manager, Toronto",
-                  text: "I used to feel guilty choosing between meetings and prayer. Now I don't have to choose.",
-                },
-                {
-                  name: "Yusuf",
-                  role: "Remote Designer, NYC",
-                  text: "Finally, an app that doesn't feel like it's judging me. It just helps.",
-                },
-              ].map((testimonial, i) => (
-                <div
-                  key={i}
-                  className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-6 backdrop-blur-sm"
-                >
-                  <p className="mb-4 text-[var(--waqtu-muted)] leading-relaxed">
-                    "{testimonial.text}"
-                  </p>
-                  <div>
-                    <p className="font-medium text-[var(--waqtu-text)]">
-                      {testimonial.name}
-                    </p>
-                    <p className="text-sm text-[var(--waqtu-muted)]">
-                      {testimonial.role}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section> */}
-
-        {/* Pricing Section */}
+        {/* ===== PRICING ===== */}
         <section
           id="pricing"
-          className="relative z-10 section-tint-3 px-6 py-24 sm:px-10 md:px-14 md:py-32"
+          className="relative z-10 px-6 py-24 sm:px-10 md:px-14 md:py-32"
         >
-          <div className="mx-auto max-w-xl">
-            <h2 className="font-display mb-4 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
-              Simple, transparent pricing
+          <div className="mx-auto max-w-lg">
+            <h2 className="font-display mb-12 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
+              One payment. Yours forever.
             </h2>
-            <p className="mx-auto mb-16 max-w-2xl text-center text-[var(--waqtu-muted)]">
-              Everything you need to protect your prayer times. Forever.
-            </p>
-            <div className="grid gap-8 sm:grid-cols-1">
-              {[
-                {
-                  name: "Lifetime",
-                  price: "$9.99",
-                  period: "once",
-                  originalPrice: "$14.99",
-                  description: "Best value for long-term use",
-                  features: [
-                    "Menu bar prayer times & countdown",
-                    "Full-screen reminders (calm, not alarming)",
-                    "Calendar protection (Exchange, iCloud, or default)",
-                    "Works offline—your location never leaves your Mac",
-                    "Lifetime updates & support",
-                    "Use on 1 Mac",
-                    "30-day money-back guarantee",
-                  ],
-                  cta: "Get lifetime access",
-                  featured: true,
-                },
-              ].map((plan) => (
-                <div
-                  key={plan.name}
-                  className={`pricing-card relative rounded-2xl border p-8 ${
-                    plan.featured
-                      ? "border-[var(--waqtu-primary)] bg-[var(--waqtu-card)]/80 featured"
-                      : "border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60"
-                  }`}
-                >
-                  {plan.featured && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="rounded-full bg-[var(--waqtu-primary)] px-3 py-1 text-xs font-medium text-[var(--waqtu-bg)]">
-                        Most popular
-                      </span>
-                    </div>
-                  )}
-                  <h3 className="font-display text-center text-lg font-semibold text-[var(--waqtu-text)]">
-                    {plan.name}
-                  </h3>
-                  <p className="mt-2 text-center text-sm text-[var(--waqtu-muted)]">
-                    {plan.description}
-                  </p>
-                  <div className="mt-6 flex items-baseline justify-center gap-2">
-                    <div className="flex items-baseline gap-1">
-                      <span className="font-display text-4xl font-semibold text-[var(--waqtu-text)]">
-                        {plan.price}
-                      </span>
-                      <span className="text-[var(--waqtu-muted)]">
-                        /{plan.period}
-                      </span>
-                    </div>
-                    {plan.originalPrice && (
-                      <span className="text-sm text-[var(--waqtu-muted)] line-through">
-                        {plan.originalPrice}
-                      </span>
-                    )}
+
+            <div className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)] p-8 sm:p-10">
+              <h3 className="font-display text-center text-lg font-semibold text-[var(--waqtu-text)]">
+                Lifetime Access
+              </h3>
+
+              <div className="mt-6 flex items-baseline justify-center gap-3">
+                <span className="font-display text-4xl font-bold text-[var(--waqtu-text)]">
+                  $9.99
+                </span>
+                <span className="text-lg text-[var(--waqtu-muted)] line-through">
+                  $14.99
+                </span>
+              </div>
+
+              {/* Voucher code box — dashed coupon style */}
+              <div className="voucher-box mt-6 rounded-lg px-4 py-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--waqtu-muted)]">
+                      Code
+                    </span>
+                    <span className="font-mono text-lg font-bold tracking-widest text-[var(--waqtu-gold)]">
+                      WAQTU299
+                    </span>
                   </div>
                   <button
-                    onClick={() => {
-                      if (plan.name === "Lifetime") {
-                        handleCheckoutClick("PRO_LIFETIME");
-                      } else {
-                        window.location.href = "#download";
-                      }
-                    }}
-                    disabled={
-                      isLoading.PRO_LIFETIME ||
-                      (plan.name === "Lifetime" &&
-                        !isTierAvailable("PRO_LIFETIME"))
-                    }
-                    className={`mt-6 block w-full rounded-full px-6 py-3 text-center font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-                      plan.featured
-                        ? "bg-[var(--waqtu-primary)] text-[var(--waqtu-bg)] hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_24px_rgba(74,139,111,0.35)]"
-                        : "border border-[var(--waqtu-border-strong)] text-[var(--waqtu-text)] hover:border-[var(--waqtu-primary)] hover:bg-[var(--waqtu-card)]"
-                    }`}
-                    data-s-event="cta_click"
-                    data-s-event-props='{"location":"pricing","text":"Get lifetime access","tier":"lifetime"}'
+                    onClick={copyVoucher}
+                    className="text-sm font-medium text-[var(--waqtu-gold)] transition-colors hover:text-[var(--waqtu-text)]"
+                    data-s-event="voucher_copy"
+                    data-s-event-props='{"location":"pricing_card","code":"WAQTU299"}'
                   >
-                    {isLoading.PRO_LIFETIME && plan.name === "Lifetime"
-                      ? "Redirecting..."
-                      : plan.cta}
+                    {voucherCopied ? "Copied!" : "Copy"}
                   </button>
-                  <p className="mt-3 text-center text-sm text-[var(--waqtu-muted)]">
-                    Not sure?{" "}
-                    <a
-                      href="#download"
-                      className="text-[var(--waqtu-primary)] hover:underline"
+                </div>
+                <p className="mt-2 text-center text-xs text-[var(--waqtu-muted)]">
+                  Enter at checkout &mdash; price drops to{" "}
+                  <span className="font-semibold text-[var(--waqtu-gold)]">
+                    $2.99
+                  </span>
+                </p>
+              </div>
+
+              {/* Feature list */}
+              <ul className="mt-8 space-y-3">
+                {[
+                  "Prayer times in your menu bar",
+                  "Calendar protection (Exchange, iCloud, default)",
+                  "Calm full-screen reminders",
+                  "Works completely offline",
+                  "Lifetime updates",
+                  "30-day money-back guarantee",
+                ].map((feature) => (
+                  <li key={feature} className="flex items-start gap-2">
+                    <svg
+                      className="mt-0.5 h-4 w-4 shrink-0 text-[var(--waqtu-primary)]"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
                     >
-                      Try free first
-                    </a>
-                    . No credit card required.
-                  </p>
-                  <ul className="mt-8 space-y-3">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2">
-                        <svg
-                          className="mt-0.5 h-4 w-4 shrink-0 text-[var(--waqtu-primary)]"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <span className="text-sm text-[var(--waqtu-muted)]">
-                          {feature}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span className="text-sm text-[var(--waqtu-muted)]">
+                      {feature}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={() => handleCheckoutClick("PRO_LIFETIME")}
+                disabled={
+                  isLoading.PRO_LIFETIME || !isTierAvailable("PRO_LIFETIME")
+                }
+                className="mt-8 block w-full rounded-full bg-[var(--waqtu-primary)] px-6 py-3.5 text-center font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-lg hover:shadow-[var(--waqtu-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                data-s-event="cta_click"
+                data-s-event-props='{"location":"pricing","text":"Get lifetime access — $2.99","tier":"lifetime"}'
+              >
+                {isLoading.PRO_LIFETIME
+                  ? "Redirecting..."
+                  : "Get lifetime access — $2.99"}
+              </button>
+
+              <p className="mt-3 text-center text-xs text-[var(--waqtu-muted)]">
+                You&rsquo;ll enter your email at checkout. Your license key will be sent there.
+              </p>
+
+              <p className="mt-4 text-center text-sm text-[var(--waqtu-muted)]">
+                Not sure?{" "}
+                <a
+                  href="#download"
+                  className="text-[var(--waqtu-primary)] hover:underline"
+                >
+                  Try free first
+                </a>
+              </p>
             </div>
           </div>
         </section>
 
-        {/* What happens next */}
-        <section className="relative z-10 px-6 py-16 sm:px-10 md:px-14 md:py-24">
-          <div className="mx-auto max-w-2xl">
-            <h2 className="font-display mb-3 text-center text-xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-2xl">
-              What happens next
-            </h2>
-            <p className="mx-auto mb-10 max-w-lg text-center text-[var(--waqtu-muted)]">
-              Three quick steps and you're done.
-            </p>
-
-            <div className="grid gap-6 sm:gap-8">
-              {/* Step 1 */}
-              <div className="group relative flex gap-4 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-5 backdrop-blur-sm transition-all hover:border-[var(--waqtu-primary)]/30 hover:bg-[var(--waqtu-card)]/80 sm:gap-6 sm:p-6">
-                <div className="flex shrink-0 items-center justify-center">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--waqtu-primary)] text-sm font-semibold text-[var(--waqtu-bg)]">
-                    1
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-display font-semibold text-[var(--waqtu-text)]">
-                    Check your email
-                  </h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-[var(--waqtu-muted)] sm:mt-2">
-                    Your license key arrives within a minute. If you don't see
-                    it, check spam or promotions.
-                  </p>
-                </div>
-              </div>
-
-              {/* Step 2 */}
-              <div className="group relative flex gap-4 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-5 backdrop-blur-sm transition-all hover:border-[var(--waqtu-primary)]/30 hover:bg-[var(--waqtu-card)]/80 sm:gap-6 sm:p-6">
-                <div className="flex shrink-0 items-center justify-center">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--waqtu-primary)] text-sm font-semibold text-[var(--waqtu-bg)]">
-                    2
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-display font-semibold text-[var(--waqtu-text)]">
-                    Download & install
-                  </h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-[var(--waqtu-muted)] sm:mt-2">
-                    Grab the DMG from the section below. Drag Waqtu to your
-                    Applications folder and launch it.
-                  </p>
-                </div>
-              </div>
-
-              {/* Step 3 */}
-              <div className="group relative flex gap-4 rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/60 p-5 backdrop-blur-sm transition-all hover:border-[var(--waqtu-primary)]/30 hover:bg-[var(--waqtu-card)]/80 sm:gap-6 sm:p-6">
-                <div className="flex shrink-0 items-center justify-center">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--waqtu-primary)] text-sm font-semibold text-[var(--waqtu-bg)]">
-                    3
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-display font-semibold text-[var(--waqtu-text)]">
-                    Activate your license
-                  </h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-[var(--waqtu-muted)] sm:mt-2">
-                    Open Waqtu, go to{" "}
-                    <span className="font-medium text-[var(--waqtu-text)]">
-                      Settings → Upgrade
-                    </span>
-                    , paste your key, and tap{" "}
-                    <span className="font-medium text-[var(--waqtu-text)]">
-                      Activate this device
-                    </span>
-                    .
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Note */}
-            <p className="mt-8 text-center text-sm text-[var(--waqtu-dim)]">
-              One license, one Mac. Your key is tied to this device—sharing the
-              app file won't unlock it for others.
-            </p>
-          </div>
-        </section>
-
-        {/* FAQ Section */}
+        {/* ===== FAQ ===== */}
         <section
           id="faq"
-          className="relative z-10 section-tint-1 border-y border-[var(--waqtu-border)] px-6 py-24 sm:px-10 md:px-14 md:py-32"
+          className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-24 sm:px-10 md:px-14 md:py-32"
         >
           <div className="mx-auto max-w-3xl">
-            <h2 className="font-display mb-4 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
-              Frequently asked questions
+            <h2 className="font-display mb-12 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
+              Common questions
             </h2>
-            <p className="mx-auto mb-16 max-w-2xl text-center text-[var(--waqtu-muted)]">
-              Everything you need to know about Waqtu.
-            </p>
             <div className="space-y-0">
               {[
                 {
                   question: "Which macOS versions are supported?",
                   answer:
-                    "Waqtu supports macOS 12 (Monterey) and later, including the latest macOS releases. Both Intel and Apple Silicon Macs are supported.",
+                    "macOS 12 (Monterey) and later. Both Intel and Apple Silicon Macs are supported.",
                 },
                 {
                   question: "How does calendar protection work?",
                   answer:
-                    "Waqtu can create events in your default calendar app, or sync with Exchange/iCloud calendars. These events show you as 'busy' during prayer times, so your Outlook and Teams status will reflect this automatically.",
-                },
-                {
-                  question: "Can I customize prayer calculation methods?",
-                  answer:
-                    "Yes! Waqtu supports multiple calculation methods including Muslim World League, ISNA, Egyptian General Authority, Umm Al-Qura, and more. You can also adjust angles and minutes for precise control.",
+                    "Waqtu creates events in your default calendar app, or syncs with Exchange/iCloud calendars. These events show you as 'busy' during prayer times — Outlook and Teams reflect this automatically.",
                 },
                 {
                   question: "Does Waqtu work offline?",
                   answer:
-                    "Once downloaded, Waqtu works completely offline. Prayer times are calculated locally on your Mac. An internet connection is only needed for the initial download and updates.",
+                    "Yes. Prayer times are calculated locally on your Mac. Internet is only needed for the initial download and updates.",
                 },
                 {
                   question: "Is my location data private?",
                   answer:
-                    "Absolutely. Your location is used solely for accurate prayer time calculations and never leaves your device. We don't collect, store, or share any location data.",
+                    "Your location is used only for prayer time calculations and never leaves your Mac. We don't collect, store, or share any location data.",
                 },
                 {
                   question: "Is there a free trial?",
                   answer:
-                    "Yes. Download Waqtu and try it free. When you're ready, purchase the lifetime license for $9.99. No subscriptions, no recurring fees.",
+                    "Yes. Download Waqtu and try it free. When you're ready, use code WAQTU299 at checkout for lifetime access at $2.99.",
                 },
                 {
                   question: "How do refunds work?",
                   answer:
-                    "If you're not satisfied with Waqtu, contact us within 30 days of purchase for a full refund. No questions asked.",
-                },
-                {
-                  question: "Does the app track my prayers?",
-                  answer:
-                    "Waqtu focuses on notifications and calendar integration. We don't track or record which prayers you've completed - that's personal and stays between you and your faith.",
+                    "Not satisfied? Contact us within 30 days for a full refund. No questions asked.",
                 },
               ].map((faq, index) => (
                 <div
@@ -1128,12 +755,12 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CTA Section */}
+        {/* ===== DOWNLOAD CTA ===== */}
         <section
           id="download"
           className="relative z-10 px-6 py-24 sm:px-10 md:px-14 md:py-32"
         >
-          <div className="mx-auto max-w-2xl rounded-3xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/80 p-10 text-center backdrop-blur-sm sm:p-12 md:p-16">
+          <div className="mx-auto max-w-2xl rounded-3xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)] p-10 text-center sm:p-14">
             {showCheckoutSuccess && (
               <div className="mb-6 flex items-center justify-center gap-2 rounded-xl border border-[var(--waqtu-primary)]/40 bg-[var(--waqtu-primary)]/10 px-4 py-3 sm:mb-8">
                 <svg
@@ -1154,15 +781,15 @@ export default function Home() {
               </div>
             )}
             <h2 className="font-display text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
-              Begin today
+              Start today
             </h2>
-            <p className="mt-4 text-[var(--waqtu-muted)] sm:mt-5">
-              Free to try. No account needed. macOS 12 or later.
+            <p className="mt-3 text-[var(--waqtu-muted)]">
+              Free to try. No account needed. macOS 12+.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4">
               <a
                 href={DOWNLOAD_URL}
-                className="group inline-flex items-center gap-2 rounded-full bg-[var(--waqtu-primary)] px-8 py-4 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-[0_0_32px_rgba(74,139,111,0.45)] sm:px-10"
+                className="group inline-flex items-center gap-2 rounded-full bg-[var(--waqtu-primary)] px-8 py-4 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-lg hover:shadow-[var(--waqtu-primary)]/20 sm:px-10"
                 data-s-event="download_click"
                 data-s-event-props='{"location":"download_cta","text":"Download Waqtu"}'
               >
@@ -1183,21 +810,17 @@ export default function Home() {
               </a>
               <a
                 href="#pricing"
-                className="group inline-flex items-center gap-2 rounded-full border border-[var(--waqtu-border)] px-8 py-4 font-medium text-[var(--waqtu-text)] transition-colors hover:border-[var(--waqtu-primary)] hover:bg-[var(--waqtu-card)] sm:px-10"
+                className="inline-flex items-center gap-2 rounded-full border border-[var(--waqtu-border)] px-8 py-4 font-medium text-[var(--waqtu-text)] transition-colors hover:border-[var(--waqtu-primary)] sm:px-10"
                 data-s-event="cta_click"
-                data-s-event-props='{"location":"download_cta","text":"Lifetime access $9.99"}'
+                data-s-event-props='{"location":"download_cta","text":"Lifetime access — $2.99"}'
               >
-                <span className="text-[var(--waqtu-gold)]">·</span>
-                Lifetime access $9.99
+                Lifetime access &mdash; $2.99
               </a>
             </div>
-            <p className="mt-6 text-sm text-[var(--waqtu-dim)] sm:mt-8">
-              One Mac. One lifetime.
-            </p>
           </div>
         </section>
 
-        {/* Footer */}
+        {/* ===== FOOTER ===== */}
         <footer className="relative z-10 border-t border-[var(--waqtu-border)] px-6 py-10 sm:px-10 md:px-14">
           <div className="mx-auto max-w-6xl">
             <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
@@ -1207,7 +830,7 @@ export default function Home() {
               <nav className="flex flex-wrap items-center justify-center gap-6 text-sm">
                 <a
                   href="/privacy"
-                  className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+                  className="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)] transition-colors"
                   data-s-event="footer_link_click"
                   data-s-event-props='{"link":"privacy"}'
                 >
@@ -1215,7 +838,7 @@ export default function Home() {
                 </a>
                 <a
                   href="/terms"
-                  className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+                  className="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)] transition-colors"
                   data-s-event="footer_link_click"
                   data-s-event-props='{"link":"terms"}'
                 >
@@ -1223,33 +846,22 @@ export default function Home() {
                 </a>
                 <a
                   href="mailto:dzulfikar.at@gmail.com"
-                  className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+                  className="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)] transition-colors"
                   data-s-event="footer_link_click"
                   data-s-event-props='{"link":"support"}'
                 >
                   Support
                 </a>
-                <a
-                  href="mailto:dzulfikar.at@gmail.com"
-                  className="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
-                  data-s-event="footer_link_click"
-                  data-s-event-props='{"link":"contact"}'
-                >
-                  Contact
-                </a>
               </nav>
               <p className="text-sm text-[var(--waqtu-muted)]">
-                Prayer times for your day
+                &copy; 2026 Waqtu
               </p>
-            </div>
-            <div className="mt-8 text-center text-sm text-[var(--waqtu-muted)]">
-              <p>© 2026 Waqtu. Made with intention.</p>
             </div>
           </div>
         </footer>
       </main>
 
-      {/* Fullscreen Media Viewer */}
+      {/* ===== FULLSCREEN MEDIA VIEWER ===== */}
       {expandedMedia && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
@@ -1280,17 +892,7 @@ export default function Home() {
             className="max-w-6xl max-h-[90vh] w-full px-4"
             onClick={(e) => e.stopPropagation()}
           >
-            {expandedMedia === "video" ? (
-              <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="w-full rounded-lg shadow-2xl"
-              >
-                <source src="/waqtu.mp4" type="video/mp4" />
-              </video>
-            ) : expandedMedia === "video2" ? (
+            {expandedMedia === "video2" ? (
               <video
                 autoPlay
                 loop
@@ -1317,66 +919,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Email modal for checkout */}
-      {emailModalTier && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-          onClick={() => {
-            if (!isLoading[emailModalTier]) {
-              window.Stonks?.event("checkout_cancel", { tier: emailModalTier, step: "email_modal" });
-              setEmailModalTier(null);
-            }
-          }}
-        >
-          <div
-            className="w-full max-w-md rounded-2xl bg-[var(--waqtu-card)] p-6 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-xl font-semibold text-[var(--waqtu-text)]">
-              Enter your email
-            </h3>
-            <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
-              We'll send your receipt and license key to this email address.
-            </p>
-            <input
-              type="email"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setEmailError("");
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleCheckout();
-              }}
-              autoFocus
-              className="mt-4 w-full rounded-lg border border-[var(--waqtu-border)] bg-[var(--waqtu-bg)] px-4 py-3 text-[var(--waqtu-text)] placeholder:text-[var(--waqtu-dim)] focus:border-[var(--waqtu-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--waqtu-primary)]"
-            />
-            {emailError && (
-              <p className="mt-2 text-sm text-red-500">{emailError}</p>
-            )}
-            <div className="mt-6 flex gap-3">
-              <button
-                onClick={() => {
-                  window.Stonks?.event("checkout_cancel", { tier: emailModalTier, step: "email_modal" });
-                  setEmailModalTier(null);
-                }}
-                disabled={isLoading[emailModalTier]}
-                className="flex-1 rounded-full border border-[var(--waqtu-border)] px-4 py-2.5 text-[var(--waqtu-text)] transition-colors hover:bg-[var(--waqtu-bg)] disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCheckout}
-                disabled={isLoading[emailModalTier] || !email}
-                className="flex-1 rounded-full bg-[var(--waqtu-primary)] px-4 py-2.5 font-medium text-[var(--waqtu-bg)] transition-colors hover:bg-[var(--waqtu-primary-soft)] disabled:opacity-50"
-              >
-                {isLoading[emailModalTier] ? "Creating..." : "Continue"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
