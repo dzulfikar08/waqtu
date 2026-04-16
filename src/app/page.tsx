@@ -214,11 +214,15 @@ export default function Home() {
           <a
             href="#pricing"
             onClick={handleNavClick}
-            className="rounded-full bg-[var(--waqtu-primary)] px-5 py-2.5 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)]"
+            className="neu-btn inline-flex items-center gap-2 px-5 py-2.5 font-medium text-[var(--waqtu-bg)]"
             data-s-event="cta_click"
             data-s-event-props='{"location":"header","text":"Get Waqtu"}'
           >
-            Get Waqtu — $2.99
+            <span>Get Waqtu —</span>
+            <span className="font-mono font-bold">$2.99</span>
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M19 12l-7 7-7-7" />
+            </svg>
           </a>
         </nav>
 
@@ -296,9 +300,13 @@ export default function Home() {
             <a
               href="#pricing"
               onClick={handleNavClick}
-              className="mt-4 rounded-full bg-[var(--waqtu-primary)] px-10 py-4 text-xl font-medium text-[var(--waqtu-bg)]"
+              className="neu-btn mt-4 inline-flex items-center gap-2 px-10 py-4 text-xl font-medium text-[var(--waqtu-bg)]"
             >
-              Get Waqtu — $2.99
+              <span>Get Waqtu —</span>
+              <span className="font-mono font-bold">$2.99</span>
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M19 12l-7 7-7-7" />
+              </svg>
             </a>
           </nav>
         </div>
@@ -311,11 +319,16 @@ export default function Home() {
         {/* ===== HERO ===== */}
         <section className="px-6 pb-28 sm:px-10 md:px-14 md:pb-40">
           <div className="flex flex-col items-center text-center">
-            {/* Voucher badge — dashed coupon style */}
+            {/* Voucher badge — neumorphic raised style */}
             <button
               onClick={copyVoucher}
-              className="animate-fade-up mb-8 inline-flex items-center gap-2.5 rounded-full border border-dashed border-[var(--waqtu-gold)]/40 bg-[var(--waqtu-gold)]/[0.06] px-5 py-2 transition-all hover:border-[var(--waqtu-gold)]/60 cursor-pointer"
-              style={{ animationDelay: "0ms", opacity: 0 }}
+              className="animate-fade-up mb-8 inline-flex items-center gap-2.5 rounded-full px-5 py-2.5 cursor-pointer transition-all hover:scale-105"
+              style={{
+                animationDelay: "0ms",
+                opacity: 0,
+                background: "linear-gradient(145deg, rgba(212, 165, 116, 0.12), rgba(212, 165, 116, 0.06))",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(212, 165, 116, 0.2) inset",
+              }}
               data-s-event="voucher_click"
               data-s-event-props='{"location":"hero_badge","code":"WAQTU299"}'
             >
@@ -356,14 +369,15 @@ export default function Home() {
             >
               <a
                 href="#pricing"
-                className="group inline-flex items-center gap-2 rounded-full bg-[var(--waqtu-primary)] px-7 py-3.5 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-lg hover:shadow-[var(--waqtu-primary)]/20"
+                className="neu-btn group inline-flex items-center gap-2 px-7 py-3.5 font-medium text-[var(--waqtu-bg)]"
                 data-s-event="cta_click"
                 data-s-event-props='{"location":"hero","text":"Get Waqtu — $2.99"}'
               >
-                Get Waqtu — $2.99
-                <span className="transition-transform group-hover:translate-x-0.5">
-                  &rarr;
-                </span>
+                <span>Get Waqtu —</span>
+                <span className="font-mono font-bold">$2.99</span>
+                <svg className="h-4 w-4 transition-transform group-hover:translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M19 12l-7 7-7-7" />
+                </svg>
               </a>
               <a
                 href="#features"
@@ -507,7 +521,7 @@ export default function Home() {
             <div className="grid gap-6 md:grid-cols-3">
               {/* Menu bar screenshot */}
               <div
-                className="flex flex-col rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/40 p-3 cursor-pointer hover:border-[var(--waqtu-primary)]/40 transition-all"
+                className="neu-card flex flex-col p-4 cursor-pointer"
                 onClick={() => setExpandedMedia("menuBar")}
                 data-s-event="media_expand"
                 data-s-event-props='{"type":"image","media":"menuBar"}'
@@ -515,7 +529,7 @@ export default function Home() {
                 <img
                   src="/waqtu-4.webp"
                   alt="Waqtu menu bar showing prayer time countdown"
-                  className="w-full rounded-lg border border-[var(--waqtu-border)] object-cover aspect-video"
+                  className="w-full rounded-lg object-cover aspect-video"
                 />
                 <p className="mt-3 px-1 text-sm text-[var(--waqtu-muted)]">
                   Prayer countdown at a glance
@@ -524,7 +538,7 @@ export default function Home() {
 
               {/* Full screen reminder video */}
               <div
-                className="flex flex-col rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/40 p-3 cursor-pointer hover:border-[var(--waqtu-primary)]/40 transition-all"
+                className="neu-card flex flex-col p-4 cursor-pointer"
                 onClick={() => setExpandedMedia("video2")}
                 data-s-event="media_expand"
                 data-s-event-props='{"type":"video","media":"fullscreen_reminder"}'
@@ -534,7 +548,7 @@ export default function Home() {
                   loop
                   muted
                   playsInline
-                  className="w-full rounded-lg border border-[var(--waqtu-border)] object-cover aspect-video"
+                  className="w-full rounded-lg object-cover aspect-video"
                 >
                   <source src="/waqtu-3.mp4" type="video/mp4" />
                 </video>
@@ -545,7 +559,7 @@ export default function Home() {
 
               {/* Teams calendar screenshot */}
               <div
-                className="flex flex-col rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)]/40 p-3 cursor-pointer hover:border-[var(--waqtu-primary)]/40 transition-all"
+                className="neu-card flex flex-col p-4 cursor-pointer"
                 onClick={() => setExpandedMedia("image")}
                 data-s-event="media_expand"
                 data-s-event-props='{"type":"image","media":"teams_calendar"}'
@@ -553,7 +567,7 @@ export default function Home() {
                 <img
                   src="/waqtu.webp"
                   alt="Teams calendar showing prayer time blocked as busy"
-                  className="w-full rounded-lg border border-[var(--waqtu-border)] object-cover aspect-video"
+                  className="w-full rounded-lg object-cover aspect-video"
                 />
                 <p className="mt-3 px-1 text-sm text-[var(--waqtu-muted)]">
                   Calendar shows you as busy during prayers
@@ -573,7 +587,7 @@ export default function Home() {
               One payment. Yours forever.
             </h2>
 
-            <div className="rounded-2xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)] p-8 sm:p-10">
+            <div className="neu-card p-8 sm:p-10">
               <h3 className="font-display text-center text-lg font-semibold text-[var(--waqtu-text)]">
                 Lifetime Access
               </h3>
@@ -587,28 +601,26 @@ export default function Home() {
                 </span>
               </div>
 
-              {/* Voucher code box — dashed coupon style */}
-              <div className="voucher-box mt-6 rounded-lg px-4 py-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--waqtu-muted)]">
-                      Code
-                    </span>
-                    <span className="font-mono text-lg font-bold tracking-widest text-[var(--waqtu-gold)]">
-                      WAQTU299
-                    </span>
+              {/* Voucher code box — realistic coupon style */}
+              <div className="mt-6">
+                <div className="voucher-box rounded-lg">
+                  <div className="voucher-content">
+                    <span className="voucher-label">CODE</span>
+                    <div className="voucher-dash" />
+                    <span className="voucher-code">WAQTU299</span>
+                    <div className="voucher-dash" />
+                    <button
+                      onClick={copyVoucher}
+                      className="voucher-copy-btn"
+                      data-s-event="voucher_copy"
+                      data-s-event-props='{"location":"pricing_card","code":"WAQTU299"}'
+                    >
+                      {voucherCopied ? "Copied!" : "Copy"}
+                    </button>
                   </div>
-                  <button
-                    onClick={copyVoucher}
-                    className="text-sm font-medium text-[var(--waqtu-gold)] transition-colors hover:text-[var(--waqtu-text)]"
-                    data-s-event="voucher_copy"
-                    data-s-event-props='{"location":"pricing_card","code":"WAQTU299"}'
-                  >
-                    {voucherCopied ? "Copied!" : "Copy"}
-                  </button>
                 </div>
-                <p className="mt-2 text-center text-xs text-[var(--waqtu-muted)]">
-                  Enter at checkout &mdash; price drops to{" "}
+                <p className="mt-3 voucher-note">
+                  Enter at checkout — price drops to{" "}
                   <span className="font-semibold text-[var(--waqtu-gold)]">
                     $2.99
                   </span>
@@ -649,13 +661,18 @@ export default function Home() {
                 disabled={
                   isLoading.PRO_LIFETIME || !isTierAvailable("PRO_LIFETIME")
                 }
-                className="mt-8 block w-full rounded-full bg-[var(--waqtu-primary)] px-6 py-3.5 text-center font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-lg hover:shadow-[var(--waqtu-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="neu-btn mt-8 block w-full px-6 py-3.5 text-center font-medium text-[var(--waqtu-bg)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
                 data-s-event="cta_click"
                 data-s-event-props='{"location":"pricing","text":"Get lifetime access — $2.99","tier":"lifetime"}'
               >
                 {isLoading.PRO_LIFETIME
                   ? "Redirecting..."
-                  : "Get lifetime access — $2.99"}
+                  : (
+                    <>
+                      <span>Get lifetime access —</span>
+                      <span className="font-mono font-bold">$2.99</span>
+                    </>
+                  )}
               </button>
 
               <p className="mt-3 text-center text-xs text-[var(--waqtu-muted)]">
@@ -760,9 +777,9 @@ export default function Home() {
           id="download"
           className="relative z-10 px-6 py-24 sm:px-10 md:px-14 md:py-32"
         >
-          <div className="mx-auto max-w-2xl rounded-3xl border border-[var(--waqtu-border)] bg-[var(--waqtu-surface)] p-10 text-center sm:p-14">
+          <div className="neu-card mx-auto max-w-2xl rounded-[24px] p-10 text-center sm:p-14">
             {showCheckoutSuccess && (
-              <div className="mb-6 flex items-center justify-center gap-2 rounded-xl border border-[var(--waqtu-primary)]/40 bg-[var(--waqtu-primary)]/10 px-4 py-3 sm:mb-8">
+              <div className="neu-raised mb-6 flex items-center justify-center gap-2 rounded-2xl px-4 py-3 sm:mb-8" style={{ background: "linear-gradient(145deg, rgba(74, 139, 111, 0.15), rgba(74, 139, 111, 0.08))" }}>
                 <svg
                   className="h-5 w-5 text-[var(--waqtu-primary)]"
                   fill="currentColor"
@@ -789,7 +806,7 @@ export default function Home() {
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4">
               <a
                 href={DOWNLOAD_URL}
-                className="group inline-flex items-center gap-2 rounded-full bg-[var(--waqtu-primary)] px-8 py-4 font-medium text-[var(--waqtu-bg)] transition-all hover:bg-[var(--waqtu-primary-soft)] hover:shadow-lg hover:shadow-[var(--waqtu-primary)]/20 sm:px-10"
+                className="neu-btn group inline-flex items-center gap-2 px-8 py-4 font-medium text-[var(--waqtu-bg)] sm:px-10"
                 data-s-event="download_click"
                 data-s-event-props='{"location":"download_cta","text":"Download Waqtu"}'
               >
@@ -810,11 +827,11 @@ export default function Home() {
               </a>
               <a
                 href="#pricing"
-                className="inline-flex items-center gap-2 rounded-full border border-[var(--waqtu-border)] px-8 py-4 font-medium text-[var(--waqtu-text)] transition-colors hover:border-[var(--waqtu-primary)] sm:px-10"
+                className="neu-btn-secondary inline-flex items-center gap-2 px-8 py-4 font-medium text-[var(--waqtu-text)] sm:px-10"
                 data-s-event="cta_click"
                 data-s-event-props='{"location":"download_cta","text":"Lifetime access — $2.99"}'
               >
-                Lifetime access &mdash; $2.99
+                Lifetime access — <span className="font-mono font-bold">$2.99</span>
               </a>
             </div>
           </div>
