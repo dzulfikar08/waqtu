@@ -978,6 +978,21 @@ export default function Home() {
                   answer:
                     "Not satisfied? Contact us within 30 days for a full refund. No questions asked.",
                 },
+                {
+                  question: "How is Waqtu different from other prayer apps?",
+                  answer:
+                    "Waqtu is the only native Mac app that combines menu bar prayer countdown with automatic calendar blocking. Other apps show prayer times — Waqtu also ensures your colleagues see you as busy during prayers, directly in Teams and Outlook.",
+                },
+                {
+                  question: "Does Waqtu support different prayer calculation methods?",
+                  answer:
+                    "Yes. Waqtu supports multiple calculation methods including MWL, ISNA, Egyptian General Authority, and Umm al-Qura. You can also adjust the Asr calculation for Hanafi or Shafi'i madhab.",
+                },
+                {
+                  question: "Can I match Waqtu to my local mosque times?",
+                  answer:
+                    "Yes. You can add a custom time offset for each prayer to match your local mosque schedule. This ensures your calendar blocks and reminders align with your congregation.",
+                },
               ].map((faq, index) => (
                 <div
                   key={index}
