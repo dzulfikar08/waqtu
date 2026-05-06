@@ -690,7 +690,7 @@ export default function Home() {
               </div>
             </div>
             <p className="mt-6 text-center text-sm text-[var(--waqtu-muted)]">
-              More coming — Google Calendar sync, Apple Watch, and more.
+              <a href="/changelog" className="text-[var(--waqtu-primary)] hover:underline">See what&apos;s new</a> — Slack integration, prayer streaks, dark/light theme, and more.
             </p>
           </div>
         </section>
@@ -987,6 +987,22 @@ export default function Home() {
                 Waqtu
               </span>
               <nav className="flex flex-wrap items-center justify-center gap-6 text-sm">
+                <a
+                  href="/changelog"
+                  className="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)] transition-colors"
+                  data-s-event="footer_link_click"
+                  data-s-event-props='{"link":"changelog"}'
+                >
+                  Changelog
+                </a>
+                <a
+                  href="/blog"
+                  className="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)] transition-colors"
+                  data-s-event="footer_link_click"
+                  data-s-event-props='{"link":"blog"}'
+                >
+                  Blog
+                </a>
                 <a
                   href="/privacy"
                   className="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)] transition-colors"

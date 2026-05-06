@@ -30,6 +30,26 @@ export default function ResourcesPage() {
         </p>
 
         <div className="grid gap-8 sm:grid-cols-2">
+          {/* Slack Setup Guide */}
+          <div className="neu-card p-8">
+            <h2 className="font-display mb-3 text-xl font-semibold text-[var(--waqtu-text)]">
+              Slack Status Setup
+            </h2>
+            <p className="mb-4 text-sm text-[var(--waqtu-muted)] leading-relaxed">
+              Step-by-step guide to auto-set your Slack status to &ldquo;Praying&rdquo; during prayer times.
+              Create a Slack app, get your token, and connect it to Waqtu.
+            </p>
+            <Link
+              href="/resources/slack-setup"
+              className="neu-btn inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-[var(--waqtu-bg)]"
+            >
+              View setup guide
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </Link>
+          </div>
+
           {/* Prayer Accommodation Template */}
           <div className="neu-card p-8">
             <h2 className="font-display mb-3 text-xl font-semibold text-[var(--waqtu-text)]">

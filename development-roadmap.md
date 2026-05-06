@@ -64,16 +64,59 @@
 
 ---
 
-## Phase 4: Growth (16 → 24 weeks)
+## Phase 4: Growth (16 → 24 weeks) ⏳
 
 ### Platform Expansion
-- [ ] iOS companion app (share calendar events, view streaks)
-- [ ] Apple Watch complications (prayer countdown on wrist) — frequently requested
-- [ ] Widgets (macOS Notification Center, iOS home screen)
+
+#### 4.1 iOS Companion App (6–8 weeks)
+- **Scope**: Read-only companion — view prayer times, streaks, and calendar events synced from the Mac app via iCloud
+- **Tech**: SwiftUI with shared Adhan calculation engine, iCloud Core Data or NSUbiquitousKeyValueStore for streak sync
+- **Screens**: Today view (prayer times + streaks), Weekly heatmap, Settings (calculation method sync), Widget
+- **Why not full Mac feature parity?** The Mac app is the hub. iOS is a companion for checking times on the go. No location, no calendar blocking, no overlay on iOS v1
+- **Key risk**: iCloud sync reliability. Plan fallback: manual refresh + local-only mode
+
+#### 4.2 Apple Watch Complications (2–3 weeks)
+- **Scope**: WatchOS target in existing Xcode project with watchOS complications
+- **Complications**: Modular Large (next prayer + countdown), Circular Small (prayer icon + countdown minutes), Graphic Corner (prayer name)
+- **Data source**: WatchConnectivity or shared UserDefaults via app group from iOS companion
+- **Why this first**: Most-requested feature across Reddit/forums. Low effort (complications are simple SwiftUI views), high impact
+- **Key risk**: WatchConnectivity latency. Mitigation: cache prayer times locally on watch, refresh once daily
+
+#### 4.3 macOS Widgets (1–2 weeks)
+- **Scope**: Notification Center widgets for macOS 14+
+- **Widgets**: Next prayer countdown (small), Today's prayer timeline (medium), Weekly streak (large)
+- **Tech**: WidgetKit, shared container with main app for prayer data
+- **Why**: Low effort, native macOS feature, differentiator (no competitor has macOS widgets)
 
 ### Community
-- [ ] Mosque time sync (partner with Mawaqit or similar for local mosque data)
-- [ ] Congregation finder — see which colleagues also use Waqtu (opt-in)
+
+#### 4.4 Mosque Time Sync (3–4 weeks)
+- **Scope**: Partner with Mawaqit or similar mosque time API to auto-sync mosque-specific jama'ah times
+- **Flow**: User searches their mosque → Waqtu fetches official times → applies them as a "mosque profile" with auto-adjustments
+- **Tech**: REST API integration, offline cache of mosque times (JSON)
+- **Why now**: #1 complaint in research — "I can never match my local mosque times"
+- **Key risk**: API availability and reliability. Plan fallback: manual mosque profile with user-entered offsets
+
+#### 4.5 Congregation Finder (2–3 weeks, opt-in)
+- **Scope**: Opt-in feature showing which colleagues in your Slack workspace or organization also use Waqtu
+- **Privacy-first**: Only shows count of users, never names. Requires explicit opt-in
+- **Why later**: Requires backend infrastructure. Evaluate after iOS app ships
+
+### Phase 4 Execution Order
+
+| Order | Item | Effort | Impact | Dependencies |
+|-------|------|--------|--------|--------------|
+| 1 | Apple Watch complications | 2–3 weeks | High | iOS companion (or standalone via WatchConnectivity) |
+| 2 | iOS companion app | 6–8 weeks | High | iCloud sync setup |
+| 3 | macOS widgets | 1–2 weeks | Medium | None |
+| 4 | Mosque time sync | 3–4 weeks | High | API partner agreement |
+| 5 | Congregation finder | 2–3 weeks | Low-Medium | Backend infra |
+
+### Phase 4 Success Metrics
+- iOS app: 500+ downloads in first month
+- Watch complications: Mentioned in 3+ App Store reviews
+- Mosque sync: 50+ mosques synced in first month
+- Overall: 2,000+ total Waqtu users across all platforms
 
 ---
 

@@ -18,6 +18,24 @@ interface BlogPost {
 
 const posts: BlogPost[] = [
   {
+    slug: "slack-status-prayer-times",
+    title: "Automatically Set Your Slack Status to 'Praying' During Prayer Times",
+    description:
+      "How Waqtu's new Slack integration lets your team know you're praying — automatically. Your status sets and clears itself.",
+    date: "May 2026",
+    category: "Feature",
+    readTime: "3 min read",
+  },
+  {
+    slug: "prayer-streaks-build-consistency",
+    title: "Prayer Streaks: How Tracking Builds Consistency in Your Salah",
+    description:
+      "Why streak tracking works and how Waqtu's automatic prayer log, streak counter, and accountability features help you build consistent habits.",
+    date: "May 2026",
+    category: "Feature",
+    readTime: "4 min read",
+  },
+  {
     slug: "block-calendar-prayer-times",
     title: "How to Block Your Calendar for Prayer Times on Mac",
     description:
@@ -51,6 +69,15 @@ const posts: BlogPost[] = [
       "Practical scripts and templates for discussing prayer needs with managers and colleagues — without making it awkward.",
     date: "April 2026",
     category: "Workplace",
+    readTime: "5 min read",
+  },
+  {
+    slug: "why-mac-prayer-times-app",
+    title: "Why You Need a Prayer Times App on Your Mac (Not Just Your Phone)",
+    description:
+      "Browser bookmarks and phone apps fall short for Muslim professionals. Here's why a native Mac app changes everything.",
+    date: "May 2026",
+    category: "Guide",
     readTime: "5 min read",
   },
   {
