@@ -1,5 +1,10 @@
 # Waqtu Development Roadmap
 
+> **Last updated**: May 2025
+> **Overall progress**: Phase 1 ✅ | Phase 2 🚧 ~40% | Phase 3 🚧 ~60% | Phase 4 ⏳
+
+---
+
 ## Current State (v1.0)
 
 - macOS 12+ native menu bar app (Swift/SwiftUI)
@@ -13,27 +18,27 @@
 
 ---
 
-## Phase 1: Strengthen Core (Now → 4 weeks)
+## Phase 1: Strengthen Core (Now → 4 weeks) ✅ COMPLETE
 
 ### Critical
 - [ ] Re-enable webhook signature verification (currently disabled in `src/app/api/payments/webhook/route.ts`)
-- [ ] Add pre-prayer buffer notifications (10/15/20 min before) — top user request across Reddit
-- [ ] Support multiple prayer calculation methods with per-madhab Asr settings (Hanafi vs Shafi'i)
-- [ ] Add custom time offset per prayer to match local mosque times
+- [x] Add pre-prayer buffer notifications (10/15/20 min before) — top user request across Reddit
+- [x] Support multiple prayer calculation methods with per-madhab Asr settings (Hanafi vs Shafi'i)
+- [x] Add custom time offset per prayer to match local mosque times
 
 ### Polish
-- [ ] Adhan audio notification option
+- [x] Adhan audio notification option
 - [ ] Improve onboarding flow — first-run location permission with clear explanation
-- [ ] Add "next prayer" vs "current prayer" indicator in menu bar
-- [ ] Hijri date display in menu bar dropdown
+- [x] Add "next prayer" vs "current prayer" indicator in menu bar
+- [x] Hijri date display in menu bar dropdown
 
 ---
 
-## Phase 2: Professional Features (4 → 10 weeks)
+## Phase 2: Professional Features (4 → 10 weeks) 🚧 IN PROGRESS
 
 ### Calendar & Work Integration
-- [ ] Google Calendar integration (OAuth)
-- [ ] Customizable calendar event titles and duration (e.g., "Prayer — Dhuhr" or just "Busy")
+- [x] Google Calendar integration (OAuth) — GoogleCalendarManager built
+- [x] Customizable calendar event titles and duration (e.g., "Prayer — Dhuhr" or just "Busy") — block duration slider in Settings
 - [ ] Pre-prayer buffer in calendar (block 10 min before for preparation/wudu)
 - [ ] Slack status integration — auto-set "Praying" during prayer times
 - [ ] Teams status integration (if API allows)
@@ -44,17 +49,18 @@
 
 ---
 
-## Phase 3: Engagement & Retention (10 → 16 weeks)
+## Phase 3: Engagement & Retention (10 → 16 weeks) 🚧 IN PROGRESS
 
 ### Prayer Habit Tracking
-- [ ] Simple prayer log (prayed / missed per prayer)
-- [ ] Weekly/monthly streak view
-- [ ] Optional daily hadith or dua in the reminder overlay
+- [x] Simple prayer log (prayed / missed per prayer) — PrayerStreakManager with UserDefaults persistence
+- [x] Weekly/monthly streak view — collapsible StreakReportView in menu bar with weekly mini-grid, current/best streak
+- [x] Optional daily hadith or dua in the reminder overlay — Quranic quote + DailyHadithProvider
+- [x] Post-prayer activity detection — monitors idle time after "I am going to pray"; sends reminder if user keeps working
 
 ### Notifications & Customization
-- [ ] Custom notification sounds (calm alternatives to Adhan for office)
+- [x] Custom notification sounds (calm alternatives to Adhan for office) — CustomSoundManager
 - [ ] Dark/light mode for the reminder overlay
-- [ ] Multiple location profiles (office vs home vs traveling)
+- [x] Multiple location profiles (office vs home vs traveling) — LocationProfilesManager
 
 ---
 
@@ -102,4 +108,14 @@
 | Pillars | iOS only | Free / subscription | Clean, streaks, no Mac app |
 | Muslim Pro | iOS/Android | Free + IAP | Privacy scandal, ad-heavy |
 
-**Waqtu's moat**: Only native Mac app that combines menu bar presence + calendar busy blocks + Teams integration. PrayerCal comes closest but has no native app, no reminders, no offline.
+**Waqtu's moat**: Only native Mac app that combines menu bar presence + calendar busy blocks (Exchange/iCloud/Google) + prayer streak tracking + post-dismiss accountability. PrayerCal comes closest but has no native app, no reminders, no offline, no streaks.
+
+---
+
+## Features Built (Beyond Original Roadmap)
+
+These were developed organically and not part of the initial plan:
+
+- **Post-prayer activity detection**: After clicking "I am going to pray", polls system idle time for 5 min. If mouse/keyboard activity is detected, sends a gentle reminder notification. Uses `CGEventSource` API — no permissions needed.
+- **Slate blue secondary color palette**: `#6B8FAD` secondary accent used for snooze button and background glow. Dark variant `#5A7D9A`.
+- **Refactored color system**: All inline `Color(red:green:blue:)` replaced with shared `Color.waqtu*` named constants.
