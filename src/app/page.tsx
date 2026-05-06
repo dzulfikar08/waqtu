@@ -833,6 +833,10 @@ export default function Home() {
                 Lifetime Access
               </h3>
 
+              <p className="mt-4 text-center text-sm text-[var(--waqtu-muted)]">
+                No subscription. One payment, forever.
+              </p>
+
               <div className="mt-6 flex items-baseline justify-center gap-3">
                 <span className="font-display text-4xl font-bold text-[var(--waqtu-text)]">
                   $9.99
