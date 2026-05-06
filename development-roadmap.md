@@ -1,7 +1,7 @@
 # Waqtu Development Roadmap
 
 > **Last updated**: May 2025
-> **Overall progress**: Phase 1 ✅ | Phase 2 🚧 ~50% | Phase 3 ✅ | Phase 4 ⏳
+> **Overall progress**: Phase 1 ✅ | Phase 2 🚧 ~85% | Phase 3 ✅ | Phase 4 ⏳
 
 ---
 
@@ -21,7 +21,7 @@
 ## Phase 1: Strengthen Core (Now → 4 weeks) ✅ COMPLETE
 
 ### Critical
-- [ ] Re-enable webhook signature verification (currently disabled in `src/app/api/payments/webhook/route.ts`)
+- [x] Re-enable webhook signature verification (currently disabled in `src/app/api/payments/webhook/route.ts`) — Standard Webhooks HMAC verification active with Polar.sh
 - [x] Add pre-prayer buffer notifications (10/15/20 min before) — top user request across Reddit
 - [x] Support multiple prayer calculation methods with per-madhab Asr settings (Hanafi vs Shafi'i)
 - [x] Add custom time offset per prayer to match local mosque times
@@ -40,12 +40,12 @@
 - [x] Google Calendar integration (OAuth) — GoogleCalendarManager built
 - [x] Customizable calendar event titles and duration (e.g., "Prayer — Dhuhr" or just "Busy") — block duration slider in Settings
 - [x] Pre-prayer buffer in calendar (block 0-10 min before for preparation/wudu) — slider in Calendar Protection settings
-- [ ] Slack status integration — auto-set "Praying" during prayer times
-- [ ] Teams status integration (if API allows)
+- [x] Slack status integration — auto-set "Praying" during prayer times via Keychain-backed token, auto-expires
+- [~] Teams status integration — Microsoft Graph presence API requires admin-consented delegated permissions; impractical for individual Mac app
 
 ### Workplace Advocacy
-- [ ] Generate "prayer accommodation" email template for HR/managers (PrayerCal is building this)
-- [ ] Add printable/forwardable "prayer times card" for sharing with colleagues
+- [x] Generate "prayer accommodation" email template for HR/managers — live at /resources/prayer-accommodation
+- [x] Add printable/forwardable "prayer times card" for sharing with colleagues — live at /resources/prayer-times-card
 
 ---
 
