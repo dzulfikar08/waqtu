@@ -1,7 +1,7 @@
 # Waqtu Development Roadmap
 
 > **Last updated**: May 2025
-> **Overall progress**: Phase 1 ✅ | Phase 2 🚧 ~40% | Phase 3 🚧 ~60% | Phase 4 ⏳
+> **Overall progress**: Phase 1 ✅ | Phase 2 🚧 ~50% | Phase 3 ✅ | Phase 4 ⏳
 
 ---
 
@@ -28,7 +28,7 @@
 
 ### Polish
 - [x] Adhan audio notification option
-- [ ] Improve onboarding flow — first-run location permission with clear explanation
+- [x] Improve onboarding flow — 4-step welcome walkthrough on first launch, explains privacy-first location
 - [x] Add "next prayer" vs "current prayer" indicator in menu bar
 - [x] Hijri date display in menu bar dropdown
 
@@ -39,7 +39,7 @@
 ### Calendar & Work Integration
 - [x] Google Calendar integration (OAuth) — GoogleCalendarManager built
 - [x] Customizable calendar event titles and duration (e.g., "Prayer — Dhuhr" or just "Busy") — block duration slider in Settings
-- [ ] Pre-prayer buffer in calendar (block 10 min before for preparation/wudu)
+- [x] Pre-prayer buffer in calendar (block 0-10 min before for preparation/wudu) — slider in Calendar Protection settings
 - [ ] Slack status integration — auto-set "Praying" during prayer times
 - [ ] Teams status integration (if API allows)
 
@@ -59,7 +59,7 @@
 
 ### Notifications & Customization
 - [x] Custom notification sounds (calm alternatives to Adhan for office) — CustomSoundManager
-- [ ] Dark/light mode for the reminder overlay
+- [x] Dark/light mode for the reminder overlay — theme picker in Settings, warm cream light theme
 - [x] Multiple location profiles (office vs home vs traveling) — LocationProfilesManager
 
 ---
