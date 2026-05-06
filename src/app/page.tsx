@@ -157,7 +157,7 @@ export default function Home() {
         aria-hidden
         style={{
           background:
-            "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(74, 139, 111, 0.12), transparent), radial-gradient(ellipse 60% 40% at 80% 50%, rgba(107, 143, 173, 0.06), transparent)",
+            "radial-gradient(ellipse 80% 50% at 30% -10%, rgba(74, 139, 111, 0.10), transparent), radial-gradient(ellipse 70% 50% at 80% 20%, rgba(107, 143, 173, 0.08), transparent)",
         }}
       />
 
@@ -421,7 +421,7 @@ export default function Home() {
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-lg font-medium leading-relaxed text-[var(--waqtu-text)]">
               Your location never leaves your Mac. No ads. No tracking.{" "}
-              <span className="text-[var(--waqtu-blue)]">Ever.</span>
+              <span className="text-[var(--waqtu-gold)]">Ever.</span>
             </p>
             <p className="mt-3 text-sm text-[var(--waqtu-muted)]">
               &ldquo;Indeed, prayer is obligatory on the believers at specified times.&rdquo; — Quran 4:103
@@ -432,7 +432,7 @@ export default function Home() {
         {/* ===== FEATURES ===== */}
         <section
           id="features"
-          className="relative z-10 px-6 py-24 sm:px-10 md:px-14 md:py-32"
+          className="relative z-10 section-tint-blue px-6 py-24 sm:px-10 md:px-14 md:py-32"
         >
           <div className="mx-auto max-w-5xl">
             <h2 className="font-display mb-3 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
@@ -485,7 +485,6 @@ export default function Home() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9.75L9 16.5m0 0l-2.25-2.25M9 16.5l2.25-2.25" />
                     </svg>
                   ),
-                  iconColor: "text-[var(--waqtu-blue)]",
                 },
                 {
                   title: "Location stays private",
@@ -496,7 +495,6 @@ export default function Home() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                     </svg>
                   ),
-                  iconColor: "text-[var(--waqtu-blue)]",
                 },
                 {
                   title: "No ads, no subscriptions",
@@ -507,11 +505,10 @@ export default function Home() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                     </svg>
                   ),
-                  iconColor: "text-[var(--waqtu-blue)]",
                 },
               ].map((item) => (
                 <div key={item.title}>
-                  <span className={`mb-4 block ${item.iconColor || "text-[var(--waqtu-gold)]"}`}>
+                  <span className="mb-4 block text-[var(--waqtu-gold)]">
                     {item.icon}
                   </span>
                   <h3 className="font-display mb-2 text-lg font-semibold text-[var(--waqtu-text)]">
@@ -596,7 +593,7 @@ export default function Home() {
         </section>
 
         {/* ===== WHY WAQTU ===== */}
-        <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-24 sm:px-10 md:px-14 md:py-32">
+        <section className="relative z-10 section-tint-blue border-y border-[var(--waqtu-border)] px-6 py-24 sm:px-10 md:px-14 md:py-32">
           <div className="mx-auto max-w-3xl">
             <h2 className="font-display mb-3 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
               Why Waqtu
@@ -662,7 +659,7 @@ export default function Home() {
         <section className="relative z-10 px-6 py-24 sm:px-10 md:px-14 md:py-32">
           <div className="mx-auto max-w-2xl">
             <div className="neu-card p-8 sm:p-10">
-              <svg className="mb-4 h-8 w-8 text-[var(--waqtu-blue)]/50" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="mb-4 h-8 w-8 text-[var(--waqtu-gold)]/40" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
               </svg>
               <p className="text-lg leading-relaxed text-[var(--waqtu-text)]">
@@ -810,7 +807,7 @@ export default function Home() {
         {/* ===== FAQ ===== */}
         <section
           id="faq"
-          className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-24 sm:px-10 md:px-14 md:py-32"
+          className="relative z-10 section-tint-blue border-y border-[var(--waqtu-border)] px-6 py-24 sm:px-10 md:px-14 md:py-32"
         >
           <div className="mx-auto max-w-3xl">
             <h2 className="font-display mb-12 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
@@ -878,7 +875,7 @@ export default function Home() {
                       {faq.question}
                     </span>
                     <svg
-                      className="faq-icon h-5 w-5 shrink-0 text-[var(--waqtu-blue)] transition-transform duration-300"
+                      className="faq-icon h-5 w-5 shrink-0 text-[var(--waqtu-gold)] transition-transform duration-300"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"

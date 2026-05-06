@@ -31,6 +31,7 @@
   --waqtu-bg-tint-1: rgba(74, 139, 111, 0.03);
   --waqtu-bg-tint-2: rgba(212, 165, 116, 0.03);
   --waqtu-bg-tint-3: rgba(45, 95, 76, 0.03);
+  --waqtu-bg-tint-blue: rgba(107, 143, 173, 0.04);
 }
 
 @theme inline {
@@ -293,6 +294,10 @@ body {
   background: var(--waqtu-bg-tint-3);
 }
 
+.section-tint-blue {
+  background: var(--waqtu-bg-tint-blue);
+}
+
 /* Smooth scroll */
 html {
   scroll-behavior: smooth;
@@ -352,7 +357,7 @@ a[href] {
 }
 
 .comparison-table thead th.waqtu-col {
-  color: var(--waqtu-blue);
+  color: var(--waqtu-gold);
 }
 
 .comparison-table tbody td {
@@ -369,7 +374,7 @@ a[href] {
 }
 
 .comparison-table tbody td.waqtu-col {
-  color: var(--waqtu-blue);
+  color: var(--waqtu-gold);
   font-weight: 600;
 }
 
