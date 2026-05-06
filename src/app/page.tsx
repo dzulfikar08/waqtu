@@ -727,6 +727,69 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ===== WHY WAQTU ===== */}
+        <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-24 sm:px-10 md:px-14 md:py-32">
+          <div className="mx-auto max-w-3xl">
+            <h2 className="font-display mb-3 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
+              Why Waqtu
+            </h2>
+            <p className="mx-auto mb-12 max-w-md text-center text-[var(--waqtu-muted)]">
+              The only native Mac app with menu bar presence and calendar blocking.
+            </p>
+
+            <div className="overflow-x-auto">
+              <table className="comparison-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th className="waqtu-col">Waqtu</th>
+                    <th>Sajda</th>
+                    <th>Guidance</th>
+                    <th>PrayerCal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Menu bar countdown</td>
+                    <td className="waqtu-col"><span className="check">&#10003;</span></td>
+                    <td><span className="check">&#10003;</span></td>
+                    <td><span className="check">&#10003;</span></td>
+                    <td><span className="dash">&mdash;</span></td>
+                  </tr>
+                  <tr>
+                    <td>Calendar blocking</td>
+                    <td className="waqtu-col"><span className="check">&#10003;</span></td>
+                    <td><span className="dash">&mdash;</span></td>
+                    <td><span className="dash">&mdash;</span></td>
+                    <td><span className="check">&#10003;</span></td>
+                  </tr>
+                  <tr>
+                    <td>Works offline</td>
+                    <td className="waqtu-col"><span className="check">&#10003;</span></td>
+                    <td><span className="check">&#10003;</span></td>
+                    <td><span className="check">&#10003;</span></td>
+                    <td><span className="dash">&mdash;</span></td>
+                  </tr>
+                  <tr>
+                    <td>No ads or tracking</td>
+                    <td className="waqtu-col"><span className="check">&#10003;</span></td>
+                    <td><span className="check">&#10003;</span></td>
+                    <td><span className="check">&#10003;</span></td>
+                    <td><span className="check">&#10003;</span></td>
+                  </tr>
+                  <tr>
+                    <td>Price</td>
+                    <td className="waqtu-col price-label">$2.99</td>
+                    <td>$3.99</td>
+                    <td>Free</td>
+                    <td>Free</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
         {/* ===== PRICING ===== */}
         <section
           id="pricing"
