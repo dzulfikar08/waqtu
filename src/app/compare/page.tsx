@@ -33,31 +33,31 @@ const competitors = [
     name: "Waqtu",
     price: "$2.99 intro / $9.99 lifetime",
     platform: "macOS 12+",
-    highlights: [true, true, true, true, true, true, true, true, true, true, true, true],
+    highlights: [true, true, true, true, true, true, true, true, true, true, true, true, true],
   },
   {
     name: "Sajda",
     price: "Free / $3.99 Pro",
     platform: "macOS 13+",
-    highlights: [true, false, false, true, true, true, true, false, false, false, false, false],
+    highlights: [true, false, false, true, true, true, true, false, false, false, false, false, false],
   },
   {
     name: "Minarah",
     price: "Free",
     platform: "macOS 14+",
-    highlights: [false, false, false, true, false, false, true, false, true, false, false, false],
+    highlights: [false, false, false, true, false, false, true, false, true, false, false, false, false],
   },
   {
     name: "PrayerCal",
     price: "Free",
     platform: "Web (ICS)",
-    highlights: [false, true, false, false, true, false, false, false, false, false, false, false],
+    highlights: [false, true, false, false, true, false, false, false, false, false, false, false, false],
   },
   {
     name: "Guidance",
     price: "Free",
     platform: "macOS + iOS",
-    highlights: [false, false, false, false, true, false, false, false, false, false, false, false],
+    highlights: [false, false, false, false, true, false, false, false, false, false, false, false, false],
   },
 ];
 
@@ -73,6 +73,7 @@ const features = [
   "Focus mode (screen block)",
   "Hijri date display",
   "Prayer log / streaks",
+  "Slack status integration",
   "One-time payment (no subscription)",
 ];
 

@@ -117,5 +117,6 @@
 These were developed organically and not part of the initial plan:
 
 - **Post-prayer activity detection**: After clicking "I am going to pray", polls system idle time for 5 min. If mouse/keyboard activity is detected, sends a gentle reminder notification. Uses `CGEventSource` API — no permissions needed.
+- **Slack status integration**: Auto-sets user's Slack status to "Praying" during prayer times. Uses Slack's `users.profile.set` API with `status_expiration` for auto-clear. Keychain-backed User OAuth Token (users.profile:write scope). Configured via Settings → Slack tab with status text and emoji customization.
 - **Slate blue secondary color palette**: `#6B8FAD` secondary accent used for snooze button and background glow. Dark variant `#5A7D9A`.
 - **Refactored color system**: All inline `Color(red:green:blue:)` replaced with shared `Color.waqtu*` named constants.
