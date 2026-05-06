@@ -790,6 +790,34 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ===== TESTIMONIAL ===== */}
+        <section className="relative z-10 px-6 py-24 sm:px-10 md:px-14 md:py-32">
+          <div className="mx-auto max-w-2xl">
+            <div className="neu-card p-8 sm:p-10">
+              <svg className="mb-4 h-8 w-8 text-[var(--waqtu-gold)]/40" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+              </svg>
+              <p className="text-lg leading-relaxed text-[var(--waqtu-text)]">
+                I built Waqtu because I was spending 12 hours a day in front of my Mac
+                and missing prayers because of meetings. Now my calendar automatically
+                blocks prayer times, and I&rsquo;ve been consistent for months.
+              </p>
+              <div className="mt-6 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--waqtu-primary)] text-sm font-bold text-[var(--waqtu-bg)]">
+                  D
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-[var(--waqtu-text)]">Dzulfikar</p>
+                  <p className="text-xs text-[var(--waqtu-muted)]">Founder, Waqtu</p>
+                </div>
+              </div>
+            </div>
+            <p className="mt-6 text-center text-sm text-[var(--waqtu-muted)]">
+              More coming — Google Calendar sync, Apple Watch, and more.
+            </p>
+          </div>
+        </section>
+
         {/* ===== PRICING ===== */}
         <section
           id="pricing"
