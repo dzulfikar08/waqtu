@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Outfit } from "next/font/google";
 import Script from "next/script";
+import { JsonLd } from "@/components/json-ld";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -15,10 +16,60 @@ const outfit = Outfit({
   display: "swap",
 });
 
+const siteUrl = "https://getwaqtu.com";
+
 export const metadata: Metadata = {
-  title: "Waqtu — Prayer times for your day",
+  metadataBase: new URL(siteUrl),
+  title: "Waqtu — Prayer Times in Your Menu Bar for Mac",
   description:
-    "Prayer times in your menu bar. Calendar blocks during prayers. Teams shows you as busy. Made for Muslim professionals on Mac.",
+    "Waqtu shows prayer times in your Mac menu bar, blocks your work calendar during prayers, and shows you as busy in Teams. Made for Muslim professionals. macOS 12+.",
+  keywords: [
+    "prayer times mac",
+    "mac menu bar prayer times",
+    "islamic prayer app mac",
+    "salah reminder macos",
+    "muslim productivity app",
+    "calendar prayer blocks",
+    "teams busy prayer",
+    "waqtu",
+  ],
+  authors: [{ name: "Waqtu" }],
+  creator: "Waqtu",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteUrl,
+    siteName: "Waqtu",
+    title: "Waqtu — Prayer Times in Your Menu Bar for Mac",
+    description:
+      "Prayer times in your Mac menu bar. Calendar blocks during prayers. Teams shows you as busy. Made for Muslim professionals.",
+    images: [
+      {
+        url: `${siteUrl}/og-image.webp`,
+        width: 1200,
+        height: 630,
+        alt: "Waqtu — Prayer times in your Mac menu bar",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Waqtu — Prayer Times in Your Menu Bar for Mac",
+    description:
+      "Prayer times in your Mac menu bar. Calendar blocks during prayers. Teams shows you as busy.",
+    images: [`${siteUrl}/og-image.webp`],
+  },
+  alternates: {
+    canonical: siteUrl,
+  },
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({
@@ -32,6 +83,7 @@ export default function RootLayout({
       className={`${fraunces.variable} ${outfit.variable} scroll-smooth`}
     >
       <body className="min-h-screen font-sans antialiased">
+        <JsonLd />
         <Script
           defer
           src="https://assets.onedollarstats.com/stonks.js"

@@ -1,0 +1,161 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - link "Waqtu" [ref=e4] [cursor=pointer]:
+        - /url: "#"
+      - navigation [ref=e5]:
+        - link "Features" [ref=e6] [cursor=pointer]:
+          - /url: "#features"
+        - link "Pricing" [ref=e7] [cursor=pointer]:
+          - /url: "#pricing"
+        - link "FAQ" [ref=e8] [cursor=pointer]:
+          - /url: "#faq"
+        - link "Get Waqtu — $2.99" [ref=e9] [cursor=pointer]:
+          - /url: "#pricing"
+    - main [ref=e10]:
+      - generic [ref=e13]:
+        - button "Limited offer WAQTU299 → $2.99" [ref=e14] [cursor=pointer]:
+          - generic [ref=e15]: Limited offer
+          - generic [ref=e17]: WAQTU299
+          - generic [ref=e18]: → $2.99
+        - heading "Your calendar blocks lunch. Why not prayer?" [level=1] [ref=e19]:
+          - text: Your calendar blocks lunch.
+          - text: Why not prayer?
+        - paragraph [ref=e20]: Waqtu blocks your work calendar during prayer times. Your colleagues see you as busy in Teams. No more choosing between meetings and prayer.
+        - generic [ref=e21]:
+          - link "Get Waqtu — $2.99 →" [ref=e22] [cursor=pointer]:
+            - /url: "#pricing"
+            - text: Get Waqtu — $2.99
+            - generic [ref=e23]: →
+          - link "See how it works" [ref=e24] [cursor=pointer]:
+            - /url: "#features"
+        - generic [ref=e25]:
+          - generic [ref=e26]: 30-day money-back
+          - generic [ref=e27]: ·
+          - generic [ref=e28]: Free to try
+          - generic [ref=e29]: ·
+          - generic [ref=e30]: macOS 12+
+      - generic [ref=e31]:
+        - blockquote [ref=e32]: “Indeed, prayer is obligatory on the believers at specified times.”
+        - generic [ref=e33]: — Quran 4:103
+      - generic [ref=e35]:
+        - heading "How it works" [level=2] [ref=e36]
+        - paragraph [ref=e37]: Three things. That’s it.
+        - generic [ref=e38]:
+          - generic [ref=e39]:
+            - img [ref=e41]
+            - heading "Prayer countdown in your menu bar" [level=3] [ref=e44]
+            - paragraph [ref=e45]: One glance tells you when the next prayer is. No apps to open, nothing to check.
+          - generic [ref=e46]:
+            - img [ref=e48]
+            - heading "Calendar protection" [level=3] [ref=e50]
+            - paragraph [ref=e51]: Creates busy blocks in Exchange, iCloud, or your default calendar. Teams shows you as busy. No explanation needed.
+          - generic [ref=e52]:
+            - img [ref=e54]
+            - heading "Calm reminders, not alarms" [level=3] [ref=e56]
+            - paragraph [ref=e57]: A peaceful overlay when it’s time to pray. You dismiss it when you’re ready. Waqtu waits.
+      - generic [ref=e59]:
+        - heading "See Waqtu in action" [level=2] [ref=e60]
+        - paragraph [ref=e61]: Prayer times at a glance. Calm reminders. Calendar blocked.
+        - generic [ref=e62]:
+          - generic [ref=e63] [cursor=pointer]:
+            - img "Waqtu menu bar showing prayer time countdown" [ref=e64]
+            - paragraph [ref=e65]: Prayer countdown at a glance
+          - paragraph [ref=e68] [cursor=pointer]: A calm nudge when it’s time
+          - generic [ref=e69] [cursor=pointer]:
+            - img "Teams calendar showing prayer time blocked as busy" [ref=e70]
+            - paragraph [ref=e71]: Calendar shows you as busy during prayers
+      - generic [ref=e73]:
+        - heading "One payment. Yours forever." [level=2] [ref=e74]
+        - generic [ref=e75]:
+          - heading "Lifetime Access" [level=3] [ref=e76]
+          - generic [ref=e77]:
+            - generic [ref=e78]: $9.99
+            - generic [ref=e79]: $14.99
+          - generic [ref=e80]:
+            - generic [ref=e81]:
+              - generic [ref=e82]:
+                - generic [ref=e83]: Code
+                - generic [ref=e84]: WAQTU299
+              - button "Copy" [ref=e85]
+            - paragraph [ref=e86]: Enter at checkout — price drops to $2.99
+          - list [ref=e87]:
+            - listitem [ref=e88]:
+              - img [ref=e89]
+              - generic [ref=e91]: Prayer times in your menu bar
+            - listitem [ref=e92]:
+              - img [ref=e93]
+              - generic [ref=e95]: Calendar protection (Exchange, iCloud, default)
+            - listitem [ref=e96]:
+              - img [ref=e97]
+              - generic [ref=e99]: Calm full-screen reminders
+            - listitem [ref=e100]:
+              - img [ref=e101]
+              - generic [ref=e103]: Works completely offline
+            - listitem [ref=e104]:
+              - img [ref=e105]
+              - generic [ref=e107]: Lifetime updates
+            - listitem [ref=e108]:
+              - img [ref=e109]
+              - generic [ref=e111]: 30-day money-back guarantee
+          - button "Get lifetime access — $2.99" [disabled] [ref=e112]
+          - paragraph [ref=e113]:
+            - text: Not sure?
+            - link "Try free first" [ref=e114] [cursor=pointer]:
+              - /url: "#download"
+      - generic [ref=e116]:
+        - heading "Common questions" [level=2] [ref=e117]
+        - generic [ref=e118]:
+          - generic [ref=e119]:
+            - button "Which macOS versions are supported?" [ref=e120] [cursor=pointer]:
+              - generic [ref=e121]: Which macOS versions are supported?
+              - img [ref=e122]
+            - paragraph [ref=e124]: macOS 12 (Monterey) and later. Both Intel and Apple Silicon Macs are supported.
+          - generic [ref=e125]:
+            - button "How does calendar protection work?" [ref=e126] [cursor=pointer]:
+              - generic [ref=e127]: How does calendar protection work?
+              - img [ref=e128]
+            - paragraph [ref=e130]: Waqtu creates events in your default calendar app, or syncs with Exchange/iCloud calendars. These events show you as 'busy' during prayer times — Outlook and Teams reflect this automatically.
+          - generic [ref=e131]:
+            - button "Does Waqtu work offline?" [ref=e132] [cursor=pointer]:
+              - generic [ref=e133]: Does Waqtu work offline?
+              - img [ref=e134]
+            - paragraph [ref=e136]: Yes. Prayer times are calculated locally on your Mac. Internet is only needed for the initial download and updates.
+          - generic [ref=e137]:
+            - button "Is my location data private?" [ref=e138] [cursor=pointer]:
+              - generic [ref=e139]: Is my location data private?
+              - img [ref=e140]
+            - paragraph [ref=e142]: Your location is used only for prayer time calculations and never leaves your Mac. We don't collect, store, or share any location data.
+          - generic [ref=e143]:
+            - button "Is there a free trial?" [ref=e144] [cursor=pointer]:
+              - generic [ref=e145]: Is there a free trial?
+              - img [ref=e146]
+            - paragraph [ref=e148]: Yes. Download Waqtu and try it free. When you're ready, use code WAQTU299 at checkout for lifetime access at $2.99.
+          - generic [ref=e149]:
+            - button "How do refunds work?" [ref=e150] [cursor=pointer]:
+              - generic [ref=e151]: How do refunds work?
+              - img [ref=e152]
+            - paragraph [ref=e154]: Not satisfied? Contact us within 30 days for a full refund. No questions asked.
+      - generic [ref=e156]:
+        - heading "Start today" [level=2] [ref=e157]
+        - paragraph [ref=e158]: Free to try. No account needed. macOS 12+.
+        - generic [ref=e159]:
+          - link "Download Waqtu" [ref=e160] [cursor=pointer]:
+            - /url: https://waqt-updates.dzulfikar-at.workers.dev/latest
+            - text: Download Waqtu
+            - img [ref=e161]
+          - link "Lifetime access — $2.99" [ref=e163] [cursor=pointer]:
+            - /url: "#pricing"
+      - generic [ref=e166]:
+        - generic [ref=e167]: Waqtu
+        - navigation [ref=e168]:
+          - link "Privacy" [ref=e169] [cursor=pointer]:
+            - /url: /privacy
+          - link "Terms" [ref=e170] [cursor=pointer]:
+            - /url: /terms
+          - link "Support" [ref=e171] [cursor=pointer]:
+            - /url: mailto:dzulfikar.at@gmail.com
+        - paragraph [ref=e172]: © 2026 Waqtu
+  - button "Open Next.js Dev Tools" [ref=e178] [cursor=pointer]:
+    - img [ref=e179]
+  - alert [ref=e182]

@@ -1,0 +1,4 @@
+[     172ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3099/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[     236ms] [LOG] [HMR] connected @ http://localhost:3099/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[     260ms] [LOG] [onedollarstats]
+Script successfully connected! Debug domain not set @ http://localhost:3099/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297

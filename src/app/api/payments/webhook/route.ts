@@ -95,10 +95,12 @@ export async function POST(request: NextRequest) {
 			ts: webhookTimestamp,
 		});
 
-		// Verify webhook signature - TEMPORARILY DISABLED for debugging
-		// TODO: Re-enable once signature verification is fixed
-		/*
-		if (POLAR_WEBHOOK_SECRET && webhookId && webhookSignature && webhookTimestamp) {
+		// Verify webhook signature
+		if (POLAR_WEBHOOK_SECRET) {
+			if (!webhookId || !webhookSignature || !webhookTimestamp) {
+				console.error("[WEBHOOK] Missing signature headers");
+				return NextResponse.json({ error: "Missing signature headers" }, { status: 401 });
+			}
 			const isValid = verifyPolarSignature(
 				body,
 				webhookId,
@@ -106,18 +108,17 @@ export async function POST(request: NextRequest) {
 				webhookTimestamp,
 				POLAR_WEBHOOK_SECRET,
 			);
-			console.log("[WEBHOOK DEBUG] Signature valid:", isValid);
+			console.log("[WEBHOOK] Signature valid:", isValid);
 			if (!isValid) {
-				console.error("Invalid webhook signature");
+				console.error("[WEBHOOK] Invalid webhook signature");
 				return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
 			}
 		} else {
-			console.warn(
-				"Webhook signature verification skipped - headers or secret not configured",
-			);
+			console.warn("[WEBHOOK] POLAR_WEBHOOK_SECRET not configured - accepting all webhooks (dev only)");
+			if (process.env.NODE_ENV === "production") {
+				return NextResponse.json({ error: "Webhook secret not configured" }, { status: 500 });
+			}
 		}
-		*/
-		console.log("[WEBHOOK] Signature verification DISABLED - allowing all webhooks");
 
 		const event = JSON.parse(body) as {
 			type: string;
