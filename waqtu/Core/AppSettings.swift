@@ -99,6 +99,26 @@ final class AppSettings {
         set { UserDefaults.standard.set(newValue, forKey: "calendarProtectionCalendarId") }
     }
 
+    // MARK: - Slack Integration
+
+    /// Enable auto-setting Slack status during prayer times.
+    var slackEnabled: Bool {
+        get { UserDefaults.standard.bool(forKey: "slackEnabled") }
+        set { UserDefaults.standard.set(newValue, forKey: "slackEnabled") }
+    }
+
+    /// Status text shown during prayer (e.g., "Praying — Dhuhr").
+    var slackStatusText: String {
+        get { UserDefaults.standard.string(forKey: "slackStatusText") ?? "Praying" }
+        set { UserDefaults.standard.set(newValue, forKey: "slackStatusText") }
+    }
+
+    /// Status emoji shown during prayer (e.g., "🙏").
+    var slackStatusEmoji: String {
+        get { UserDefaults.standard.string(forKey: "slackStatusEmoji") ?? ":pray:" }
+        set { UserDefaults.standard.set(newValue, forKey: "slackStatusEmoji") }
+    }
+
     /// Whether the first-run onboarding has been completed.
     var hasCompletedOnboarding: Bool {
         get { UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") }

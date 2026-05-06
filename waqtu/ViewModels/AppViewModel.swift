@@ -14,6 +14,7 @@ final class AppViewModel {
     let trialManager: TrialManager
     let licenseManager: LicenseManager
     let streakManager: PrayerStreakManager
+    let slackManager: SlackManager
 
     private var timer: Timer?
     private var snoozeTimer: Timer?
@@ -52,6 +53,7 @@ final class AppViewModel {
         self.locationManager = LocationManager()
         self.calendarManager = CalendarManager()
         self.streakManager = PrayerStreakManager()
+        self.slackManager = SlackManager()
         setupLocationUpdates()
         calculatePrayers()
         setupTimer()
@@ -274,6 +276,9 @@ final class AppViewModel {
         )
         overlayWindow = newWindow
         newWindow.makeKeyAndOrderFront(nil)
+
+        // Set Slack status if enabled
+        updateSlackPrayingStatus(for: prayer.name)
     }
 
     private func scheduleOverlaySnooze(minutes: Int) {
@@ -288,6 +293,34 @@ final class AppViewModel {
             DispatchQueue.main.async {
                 self?.showOverlay(for: prayer)
             }
+        }
+    }
+
+    // MARK: - Slack Status
+
+    private func updateSlackPrayingStatus(for prayer: PrayerName) {
+        guard settings.slackEnabled,
+              let token = slackManager.loadToken() else { return }
+
+        let text = "\(settings.slackStatusText) — \(prayer.displayName)"
+        let emoji = settings.slackStatusEmoji
+        let expiration = settings.overlayDuration + settings.calendarPreBufferMinutes
+
+        Task {
+            try? await slackManager.setStatus(
+                token: token,
+                text: text,
+                emoji: emoji,
+                expirationMinutes: expiration
+            )
+        }
+    }
+
+    /// Manually clear Slack status (e.g., when user disables feature).
+    func clearSlackStatus() {
+        guard let token = slackManager.loadToken() else { return }
+        Task {
+            try? await slackManager.clearStatus(token: token)
         }
     }
 

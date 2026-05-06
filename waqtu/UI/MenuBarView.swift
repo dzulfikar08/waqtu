@@ -597,6 +597,11 @@ struct SettingsView: View {
                     }
 
                 if let vm = viewModel {
+                    SlackSettingsTab(settings: settings, slackManager: vm.slackManager)
+                        .tabItem {
+                            Label("Slack", systemImage: "message.fill")
+                        }
+
                     UpgradeSettingsTab(trialManager: vm.trialManager, licenseManager: vm.licenseManager)
                         .tabItem {
                             Label("Upgrade", systemImage: "crown.fill")
@@ -760,6 +765,139 @@ struct UpgradeFullScreenView: View {
 
     private func openStore() {
         if let url = URL(string: "https://getwaqtu.com") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+}
+
+// MARK: - Slack Settings Tab
+struct SlackSettingsTab: View {
+    @Bindable var settings: AppSettings
+    let slackManager: SlackManager
+    @State private var tokenInput: String = ""
+    @State private var showTokenHelp = false
+    @FocusState private var isTokenFocused: Bool
+
+    var body: some View {
+        Form {
+            Section {
+                Toggle("Auto-set Slack status", isOn: $settings.slackEnabled)
+                Text("Your Slack status will change to \"Praying\" during prayer times and auto-clear when the prayer block ends.")
+                    .font(.caption)
+                    .foregroundColor(.waqtuMuted)
+            } header: {
+                Text("Integration")
+            }
+
+            if settings.slackEnabled {
+                Section {
+                    HStack {
+                        if slackManager.isConnected {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.waqtuPrimary)
+                            Text("Connected to Slack")
+                                .font(.system(size: 13))
+                                .foregroundColor(.waqtuText)
+                        } else {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.red.opacity(0.7))
+                            Text("Not connected")
+                                .font(.system(size: 13))
+                                .foregroundColor(.waqtuMuted)
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("User OAuth Token")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.waqtuMuted)
+
+                        HStack {
+                            SecureField("xoxp-...", text: $tokenInput)
+                                .textFieldStyle(.roundedBorder)
+                                .focused($isTokenFocused)
+
+                            Button(slackManager.isConnected ? "Update" : "Connect") {
+                                saveToken()
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.waqtuPrimary)
+                            .disabled(tokenInput.trimmingCharacters(in: .whitespaces).isEmpty)
+                        }
+
+                        if slackManager.isConnected {
+                            Button("Disconnect", role: .destructive) {
+                                slackManager.deleteToken()
+                                tokenInput = ""
+                            }
+                            .font(.caption)
+                        }
+                    }
+
+                    Button {
+                        showTokenHelp = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "questionmark.circle")
+                                .font(.system(size: 12))
+                            Text("How to get a Slack token")
+                                .font(.system(size: 12))
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundColor(.waqtuPrimary)
+                } header: {
+                    Text("Connection")
+                }
+
+                Section {
+                    HStack {
+                        Text("Status text")
+                        Spacer()
+                        TextField("Praying", text: $settings.slackStatusText)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: 180)
+                    }
+
+                    HStack {
+                        Text("Status emoji")
+                        Spacer()
+                        TextField(":pray:", text: $settings.slackStatusEmoji)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: 180)
+                    }
+                    Text("Use Slack emoji codes like :mosque: or :pray:. Unicode emoji also works: 🙏 🕌")
+                        .font(.caption)
+                        .foregroundColor(.waqtuMuted)
+                } header: {
+                    Text("Status")
+                }
+            }
+        }
+        .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
+        .background(Color.waqtuBackground)
+        .padding()
+        .onAppear {
+            tokenInput = slackManager.loadToken() ?? ""
+        }
+        .alert("Getting a Slack Token", isPresented: $showTokenHelp) {
+            Button("Open Slack API", action: openSlackAPI)
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("1. Open the Slack API site and create a new app.\n2. Under OAuth & Permissions, add the scope users.profile:write.\n3. Install to your workspace.\n4. Copy the \"User OAuth Token\" (starts with xoxp-).\n5. Paste it above and click Connect.")
+        }
+    }
+
+    private func saveToken() {
+        let trimmed = tokenInput.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return }
+        slackManager.storeToken(trimmed)
+        isTokenFocused = false
+    }
+
+    private func openSlackAPI() {
+        if let url = URL(string: "https://api.slack.com/apps") {
             NSWorkspace.shared.open(url)
         }
     }
