@@ -260,6 +260,7 @@ final class AppViewModel {
             prayerName: prayer.name,
             durationMinutes: settings.overlayDuration,
             playAdhanSound: settings.overlayPlayAdhanSound,
+            theme: settings.overlayTheme,
             onDismiss: { [weak self] in
                 self?.overlayWindow = nil
             },
@@ -395,13 +396,15 @@ final class AppViewModel {
         let prayers = calculator.calculatePrayerTimes(for: Date())
         let duration = settings.calendarBlockDuration
         let reminder = settings.calendarProtectionReminder
+        let preBuffer = settings.calendarPreBufferMinutes
         do {
             try calendarManager.regeneratePrayerEvents(
                 for: Date(),
                 prayers: prayers,
                 durationMinutes: duration,
                 calendar: cal,
-                addReminder: reminder
+                addReminder: reminder,
+                preBufferMinutes: preBuffer
             )
         } catch {
             // Log or surface error if needed
@@ -456,6 +459,7 @@ final class AppViewModel {
             prayerName: .maghrib,
             durationMinutes: settings.overlayDuration,
             playAdhanSound: settings.overlayPlayAdhanSound,
+            theme: settings.overlayTheme,
             onDismiss: { [weak self] in
                 self?.overlayWindow = nil
             },

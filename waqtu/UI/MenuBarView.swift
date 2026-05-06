@@ -926,6 +926,15 @@ struct GeneralSettingsTab: View {
                     .foregroundColor(.waqtuMuted)
 
                 if settings.overlayEnabled {
+                    Picker("Theme", selection: $settings.overlayTheme) {
+                        Text("Dark").tag("dark")
+                        Text("Light").tag("light")
+                    }
+                    .pickerStyle(.menu)
+                    Text("Choose a dark or light appearance for the prayer overlay.")
+                        .font(.caption)
+                        .foregroundColor(.waqtuMuted)
+
                     HStack {
                         Text("Duration")
                         Spacer()
@@ -1176,6 +1185,26 @@ struct CalendarProtectionSection: View {
                         NotificationCenter.default.post(name: Notification.Name("calendarProtectionSettingsChanged"), object: nil)
                     }
                 Text("Alert 5 minutes before each prayer block.")
+                    .font(.caption)
+                    .foregroundColor(.waqtuMuted)
+
+                HStack {
+                    Text("Start before prayer")
+                    Spacer()
+                    Text("\(settings.calendarPreBufferMinutes) min")
+                        .foregroundColor(.waqtuPrimary)
+                        .monospacedDigit()
+                    Slider(value: Binding(
+                        get: { Double(settings.calendarPreBufferMinutes) },
+                        set: { settings.calendarPreBufferMinutes = Int($0) }
+                    ), in: 0...10, step: 1)
+                    .frame(width: 120)
+                    .tint(.waqtuPrimary)
+                }
+                .onChange(of: settings.calendarPreBufferMinutes) { _, _ in
+                    NotificationCenter.default.post(name: Notification.Name("calendarProtectionSettingsChanged"), object: nil)
+                }
+                Text("Block your calendar this many minutes before each prayer for wudu and preparation.")
                     .font(.caption)
                     .foregroundColor(.waqtuMuted)
 

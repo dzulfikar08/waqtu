@@ -77,16 +77,18 @@ final class CalendarManager {
     // MARK: - Create Event
 
     /// Creates a single prayer block event. Marked as busy and optionally with 5 min alert.
+    /// - Parameter preBufferMinutes: Start the block this many minutes before the actual prayer time (for wudu/preparation).
     func createPrayerEvent(
         prayerName: String,
         startDate: Date,
         durationMinutes: Int,
         calendar: EKCalendar,
-        addReminder: Bool
+        addReminder: Bool,
+        preBufferMinutes: Int = 0
     ) throws {
         let event = EKEvent(eventStore: eventStore)
         event.title = "Prayer – \(prayerName)"
-        event.startDate = startDate
+        event.startDate = startDate.addingTimeInterval(TimeInterval(-preBufferMinutes * 60))
         event.endDate = startDate.addingTimeInterval(TimeInterval(durationMinutes * 60))
         event.calendar = calendar
         event.notes = waqtuEventTag
@@ -146,7 +148,8 @@ final class CalendarManager {
         prayers: [PrayerTime],
         durationMinutes: Int,
         calendar: EKCalendar,
-        addReminder: Bool
+        addReminder: Bool,
+        preBufferMinutes: Int = 0
     ) throws {
         try deleteWaqtuEvents(for: date)
         for prayer in prayers {
@@ -155,7 +158,8 @@ final class CalendarManager {
                 startDate: prayer.time,
                 durationMinutes: durationMinutes,
                 calendar: calendar,
-                addReminder: addReminder
+                addReminder: addReminder,
+                preBufferMinutes: preBufferMinutes
             )
         }
     }

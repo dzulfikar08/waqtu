@@ -27,6 +27,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, SPUUpdaterDelegate, SP
         requestLocationPermission()
         UNUserNotificationCenter.current().delegate = self
         Self.applyLaunchAtLogin(UserDefaults.standard.bool(forKey: "launchAtLogin"))
+        showOnboardingIfNeeded()
+    }
+
+    private func showOnboardingIfNeeded() {
+        guard !UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            let window = OnboardingWindow {
+                UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
+            }
+            window.makeKeyAndOrderFront(nil)
+        }
     }
 
     /// Registers or unregisters the app with macOS login items. Call when the user toggles the setting or on launch.

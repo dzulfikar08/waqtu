@@ -5,16 +5,18 @@ final class OverlayWindow: NSWindow {
     private let prayerName: PrayerName
     private let durationMinutes: Int
     private let playAdhanSound: Bool
+    private let theme: String
     private var overlayTimer: Timer?
     private var onDismissCallback: (() -> Void)?
     private var onSnoozeCallback: ((Int) -> Void)?
     private var onPrayerCommitCallback: (() -> Void)?
     private var isDismissing = false
 
-    init(prayerName: PrayerName, durationMinutes: Int, playAdhanSound: Bool, onDismiss: @escaping () -> Void, onSnooze: ((Int) -> Void)? = nil, onPrayerCommit: (() -> Void)? = nil) {
+    init(prayerName: PrayerName, durationMinutes: Int, playAdhanSound: Bool, theme: String = "dark", onDismiss: @escaping () -> Void, onSnooze: ((Int) -> Void)? = nil, onPrayerCommit: (() -> Void)? = nil) {
         self.prayerName = prayerName
         self.durationMinutes = durationMinutes
         self.playAdhanSound = playAdhanSound
+        self.theme = theme
         super.init(
             contentRect: NSScreen.main?.frame ?? .zero,
             styleMask: [.borderless, .fullSizeContentView],
@@ -41,6 +43,7 @@ final class OverlayWindow: NSWindow {
             prayerName: self.prayerName,
             durationMinutes: self.durationMinutes,
             playAdhanSound: self.playAdhanSound,
+            theme: self.theme,
             onDismiss: { [weak self] in
                 guard let self = self, !self.isDismissing else { return }
                 self.dismissOverlay()

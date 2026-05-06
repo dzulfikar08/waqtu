@@ -6,6 +6,7 @@ struct OverlayView: View {
     let prayerName: PrayerName
     let durationMinutes: Int
     let playAdhanSound: Bool
+    let theme: String
     let onDismiss: () -> Void
     let onSnooze: (Int) -> Void
     let onPrayerCommit: (() -> Void)?
@@ -18,10 +19,22 @@ struct OverlayView: View {
 
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    init(prayerName: PrayerName, durationMinutes: Int, playAdhanSound: Bool = false, onDismiss: @escaping () -> Void, onSnooze: @escaping (Int) -> Void, onPrayerCommit: (() -> Void)? = nil) {
+    private var isLight: Bool { theme == "light" }
+
+    // Light theme colors
+    private var textColor: Color { isLight ? Color.waqtuBackground : Color.waqtuText }
+    private var mutedColor: Color { isLight ? Color(hex: "#5A7D6A") : Color.waqtuMuted }
+    private var bgBaseTop: Color { isLight ? Color(hex: "#F5F0E8") : Color(red: 0.08, green: 0.15, blue: 0.12) }
+    private var bgBaseBottom: Color { isLight ? Color(hex: "#E8E0D0") : Color(red: 0.22, green: 0.42, blue: 0.35) }
+    private var glowPrimary: Color { isLight ? Color.waqtuPrimary.opacity(0.15) : Color.waqtuPrimary.opacity(0.3) }
+    private var glowSecondary: Color { isLight ? Color.waqtuSecondary.opacity(0.1) : Color.waqtuSecondary.opacity(0.2) }
+    private var overlayRingBg: Color { isLight ? Color.black.opacity(0.08) : Color.white.opacity(0.15) }
+
+    init(prayerName: PrayerName, durationMinutes: Int, playAdhanSound: Bool = false, theme: String = "dark", onDismiss: @escaping () -> Void, onSnooze: @escaping (Int) -> Void, onPrayerCommit: (() -> Void)? = nil) {
         self.prayerName = prayerName
         self.durationMinutes = durationMinutes
         self.playAdhanSound = playAdhanSound
+        self.theme = theme
         self.onDismiss = onDismiss
         self.onSnooze = onSnooze
         self.onPrayerCommit = onPrayerCommit
@@ -30,8 +43,8 @@ struct OverlayView: View {
 
     var body: some View {
         ZStack {
-            // Enhanced animated background
-            AnimatedGradientBackground()
+            // Animated background
+            AnimatedGradientBackground(isLight: isLight)
                 .ignoresSafeArea()
 
             VStack(spacing: 40) {
@@ -40,18 +53,18 @@ struct OverlayView: View {
                 // Prayer name
                 Text(prayerName.displayName.uppercased())
                     .font(.system(size: 64, weight: .bold))
-                    .foregroundStyle(Color.waqtuText)
+                    .foregroundStyle(textColor)
 
                 // Current time
                 Text(currentTime)
                     .font(.system(size: 32, weight: .medium))
-                    .foregroundStyle(Color.waqtuMuted)
+                    .foregroundStyle(mutedColor)
 
                 // Countdown with circular indicator
                 VStack(spacing: 16) {
                     ZStack {
                         Circle()
-                            .stroke(Color.white.opacity(0.15), lineWidth: 8)
+                            .stroke(overlayRingBg, lineWidth: 8)
                             .frame(width: 120, height: 120)
 
                         Circle()
@@ -69,12 +82,12 @@ struct OverlayView: View {
 
                         Text(countdownText)
                             .font(.system(size: 28, weight: .bold, design: .monospaced))
-                            .foregroundStyle(Color.waqtuText)
+                            .foregroundStyle(textColor)
                     }
 
                     Text("Time remaining")
                         .font(.system(size: 14))
-                        .foregroundStyle(Color.waqtuMuted)
+                        .foregroundStyle(mutedColor)
                 }
 
                 Spacer()
@@ -83,7 +96,7 @@ struct OverlayView: View {
                 VStack(spacing: 12) {
                     Text(AppSettings.quranicQuote)
                         .font(.system(size: 18, weight: .medium))
-                        .foregroundStyle(Color.waqtuText)
+                        .foregroundStyle(textColor)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 40)
 
@@ -216,17 +229,21 @@ struct OverlayView: View {
 }
 
 struct AnimatedGradientBackground: View {
+    let isLight: Bool
     @State private var animationPhase: CGFloat = 0
+
+    private var glowPrimary: Color { isLight ? Color.waqtuPrimary.opacity(0.15) : Color.waqtuPrimary.opacity(0.3) }
+    private var glowSecondary: Color { isLight ? Color.waqtuSecondary.opacity(0.1) : Color.waqtuSecondary.opacity(0.2) }
     
     var body: some View {
         ZStack {
             // Base gradient with multiple color stops
-            MeshGradientBackground(phase: animationPhase)
+            MeshGradientBackground(phase: animationPhase, isLight: isLight)
             
             // Radial glow effects for depth
             RadialGradient(
                 colors: [
-                    Color.waqtuPrimary.opacity(0.3),
+                    glowPrimary,
                     Color.clear
                 ],
                 center: UnitPoint(x: 0.3 + animationPhase * 0.1, y: 0.2),
@@ -236,7 +253,7 @@ struct AnimatedGradientBackground: View {
             
             RadialGradient(
                 colors: [
-                    Color.waqtuSecondary.opacity(0.2),
+                    glowSecondary,
                     Color.clear
                 ],
                 center: UnitPoint(x: 0.7 - animationPhase * 0.1, y: 0.8),
@@ -245,7 +262,7 @@ struct AnimatedGradientBackground: View {
             )
             
             // Subtle animated particles
-            ParticleField()
+            ParticleField(isLight: isLight)
         }
         .onAppear {
             withAnimation(.easeInOut(duration: 8).repeatForever(autoreverses: true)) {
@@ -257,23 +274,39 @@ struct AnimatedGradientBackground: View {
 
 struct MeshGradientBackground: View {
     let phase: CGFloat
+    let isLight: Bool
     
     var body: some View {
-        LinearGradient(
-            stops: [
-                .init(color: Color(red: 0.08, green: 0.15, blue: 0.12), location: 0.0),
-                .init(color: Color(red: 0.102 + phase * 0.02, green: 0.18 + phase * 0.03, blue: 0.145 + phase * 0.02), location: 0.3),
-                .init(color: Color(red: 0.14, green: 0.28, blue: 0.22), location: 0.5),
-                .init(color: Color(red: 0.176 - phase * 0.02, green: 0.37 - phase * 0.03, blue: 0.30 - phase * 0.02), location: 0.7),
-                .init(color: Color(red: 0.22, green: 0.42, blue: 0.35), location: 1.0)
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+        if isLight {
+            LinearGradient(
+                stops: [
+                    .init(color: Color(hex: "#F5F0E8"), location: 0.0),
+                    .init(color: Color(hex: "#EDE5D8"), location: 0.3),
+                    .init(color: Color(hex: "#E8DFCF"), location: 0.5),
+                    .init(color: Color(hex: "#E0D7C5"), location: 0.7),
+                    .init(color: Color(hex: "#D8CEBA"), location: 1.0)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        } else {
+            LinearGradient(
+                stops: [
+                    .init(color: Color(red: 0.08, green: 0.15, blue: 0.12), location: 0.0),
+                    .init(color: Color(red: 0.102 + phase * 0.02, green: 0.18 + phase * 0.03, blue: 0.145 + phase * 0.02), location: 0.3),
+                    .init(color: Color(red: 0.14, green: 0.28, blue: 0.22), location: 0.5),
+                    .init(color: Color(red: 0.176 - phase * 0.02, green: 0.37 - phase * 0.03, blue: 0.30 - phase * 0.02), location: 0.7),
+                    .init(color: Color(red: 0.22, green: 0.42, blue: 0.35), location: 1.0)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
     }
 }
 
 struct ParticleField: View {
+    let isLight: Bool
     @State private var particles: [Particle] = []
     
     struct Particle: Identifiable {
@@ -290,7 +323,7 @@ struct ParticleField: View {
             ZStack {
                 ForEach(particles) { particle in
                     Circle()
-                        .fill(Color.white.opacity(particle.opacity))
+                        .fill((isLight ? Color.black : Color.white).opacity(particle.opacity))
                         .frame(width: particle.size, height: particle.size)
                         .position(x: particle.x * geometry.size.width, y: particle.y * geometry.size.height)
                         .blur(radius: particle.size / 2)

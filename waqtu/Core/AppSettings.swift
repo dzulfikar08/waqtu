@@ -14,6 +14,12 @@ final class AppSettings {
         set { UserDefaults.standard.set(newValue, forKey: "overlayDuration") }
     }
 
+    /// Overlay theme: "dark" (default) or "light" for a brighter reminder.
+    var overlayTheme: String {
+        get { UserDefaults.standard.string(forKey: "overlayTheme") ?? "dark" }
+        set { UserDefaults.standard.set(newValue, forKey: "overlayTheme") }
+    }
+
     /// Play Adhan sound when the prayer overlay appears.
     var overlayPlayAdhanSound: Bool {
         get { UserDefaults.standard.bool(forKey: "overlayPlayAdhanSound") }
@@ -72,6 +78,15 @@ final class AppSettings {
         set { UserDefaults.standard.set(newValue, forKey: "calendarBlockDuration") }
     }
 
+    /// Minutes to start the calendar block before the actual prayer time (0–10). For wudu/preparation.
+    var calendarPreBufferMinutes: Int {
+        get {
+            let v = UserDefaults.standard.integer(forKey: "calendarPreBufferMinutes")
+            return v >= 0 && v <= 10 ? v : 0
+        }
+        set { UserDefaults.standard.set(newValue, forKey: "calendarPreBufferMinutes") }
+    }
+
     /// Add 5-minute-before reminder to prayer events.
     var calendarProtectionReminder: Bool {
         get { UserDefaults.standard.bool(forKey: "calendarProtectionReminder") }
@@ -82,6 +97,12 @@ final class AppSettings {
     var calendarProtectionCalendarId: String {
         get { UserDefaults.standard.string(forKey: "calendarProtectionCalendarId") ?? "" }
         set { UserDefaults.standard.set(newValue, forKey: "calendarProtectionCalendarId") }
+    }
+
+    /// Whether the first-run onboarding has been completed.
+    var hasCompletedOnboarding: Bool {
+        get { UserDefaults.standard.bool(forKey: "hasCompletedOnboarding") }
+        set { UserDefaults.standard.set(newValue, forKey: "hasCompletedOnboarding") }
     }
 
     /// Whether we've shown the "Waqtu will create daily prayer blocks" explanation once.
