@@ -2,6 +2,7 @@ import Foundation
 import Combine
 import AppKit
 import CoreLocation
+import UserNotifications
 
 @Observable
 final class AppViewModel {
@@ -15,6 +16,7 @@ final class AppViewModel {
 
     private var timer: Timer?
     private var snoozeTimer: Timer?
+    private var activityMonitorTimer: Timer?
     private var shownPrayers: Set<String> = []
     private var lastShownPrayerForSnooze: PrayerTime?
 
@@ -249,6 +251,7 @@ final class AppViewModel {
             existing.close()      // Then close
         }
 
+        stopActivityMonitor()
         lastShownPrayerForSnooze = prayer
 
         let newWindow = OverlayWindow(
@@ -260,6 +263,9 @@ final class AppViewModel {
             },
             onSnooze: { [weak self] minutes in
                 self?.scheduleOverlaySnooze(minutes: minutes)
+            },
+            onPrayerCommit: { [weak self] in
+                self?.startPostDismissActivityMonitor(for: prayer.name)
             }
         )
         overlayWindow = newWindow
@@ -269,6 +275,7 @@ final class AppViewModel {
     private func scheduleOverlaySnooze(minutes: Int) {
         snoozeTimer?.invalidate()
         snoozeTimer = nil
+        stopActivityMonitor()
 
         guard let prayer = lastShownPrayerForSnooze else { return }
 
@@ -278,6 +285,65 @@ final class AppViewModel {
                 self?.showOverlay(for: prayer)
             }
         }
+    }
+
+    // MARK: - Post-Dismiss Activity Monitor
+
+    /// After the user commits to pray, poll system idle time for a few minutes.
+    /// If they keep using the Mac (mouse/keyboard activity), send a gentle reminder.
+    private func startPostDismissActivityMonitor(for prayer: PrayerName) {
+        stopActivityMonitor()
+
+        let monitorWindowSeconds: TimeInterval = 5 * 60  // 5 minutes
+        let pollInterval: TimeInterval = 10               // check every 10s
+        let deadline = Date().addingTimeInterval(monitorWindowSeconds)
+
+        // Record the current idle baseline — if it ever *drops* sharply, user is active
+        var lastIdle = CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: .keyDown)
+
+        activityMonitorTimer = Timer.scheduledTimer(withTimeInterval: pollInterval, repeats: true) { [weak self] timer in
+            guard let self else {
+                timer.invalidate()
+                return
+            }
+
+            // Stop if we've passed the window
+            guard Date() < deadline else {
+                self.stopActivityMonitor()
+                return
+            }
+
+            let currentIdle = CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: .keyDown)
+
+            // Idle reset: user was idle, now they're active
+            if lastIdle > pollInterval && currentIdle < pollInterval {
+                self.deliverStillWorkingNotification(for: prayer)
+                self.stopActivityMonitor()
+                return
+            }
+
+            lastIdle = currentIdle
+        }
+    }
+
+    private func stopActivityMonitor() {
+        activityMonitorTimer?.invalidate()
+        activityMonitorTimer = nil
+    }
+
+    /// Show a gentle local notification reminding the user they committed to pray.
+    private func deliverStillWorkingNotification(for prayer: PrayerName) {
+        let content = UNMutableNotificationContent()
+        content.title = "Still at your Mac?"
+        content.body = "You tapped \"I am going to pray\" for \(prayer.displayName) but your Mac is still active. Don't forget your commitment."
+        content.sound = .default
+
+        let request = UNNotificationRequest(
+            identifier: "post-dismiss-activity-\(prayer.rawValue)-\(Date().timeIntervalSince1970)",
+            content: content,
+            trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        )
+        UNUserNotificationCenter.current().add(request)
     }
 
     func resetShownPrayers() {
@@ -400,6 +466,7 @@ final class AppViewModel {
     deinit {
         timer?.invalidate()
         snoozeTimer?.invalidate()
+        activityMonitorTimer?.invalidate()
         cancellables.forEach { $0.cancel() }
     }
 }

@@ -8,6 +8,7 @@ struct OverlayView: View {
     let playAdhanSound: Bool
     let onDismiss: () -> Void
     let onSnooze: (Int) -> Void
+    let onPrayerCommit: (() -> Void)?
 
     @State private var countdown: Int
     @State private var currentTime: String = ""
@@ -17,12 +18,13 @@ struct OverlayView: View {
 
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    init(prayerName: PrayerName, durationMinutes: Int, playAdhanSound: Bool = false, onDismiss: @escaping () -> Void, onSnooze: @escaping (Int) -> Void) {
+    init(prayerName: PrayerName, durationMinutes: Int, playAdhanSound: Bool = false, onDismiss: @escaping () -> Void, onSnooze: @escaping (Int) -> Void, onPrayerCommit: (() -> Void)? = nil) {
         self.prayerName = prayerName
         self.durationMinutes = durationMinutes
         self.playAdhanSound = playAdhanSound
         self.onDismiss = onDismiss
         self.onSnooze = onSnooze
+        self.onPrayerCommit = onPrayerCommit
         self._countdown = State(initialValue: durationMinutes * 60)
     }
 
@@ -118,9 +120,9 @@ struct OverlayView: View {
                     guard !isDismissing else { return }
                     isDismissing = true
                     stopAdhanSound()
-                    // Stop timer immediately before triggering close to prevent use-after-free
                     timerCancellable?.cancel()
                     timerCancellable = nil
+                    onPrayerCommit?()
                     onDismiss()
                 }) {
                     HStack(spacing: 8) {
