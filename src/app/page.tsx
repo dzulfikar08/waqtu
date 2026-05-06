@@ -27,22 +27,6 @@ type LoadingState = {
 
 type MediaType = "video" | "video2" | "image" | "menuBar";
 
-function Check() {
-  return (
-    <svg className="mx-auto h-5 w-5 text-[var(--waqtu-primary)]" fill="currentColor" viewBox="0 0 20 20">
-      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-    </svg>
-  );
-}
-
-function Dash() {
-  return (
-    <svg className="mx-auto h-5 w-5 text-[var(--waqtu-border)]" fill="none" viewBox="0 0 20 20" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 10h8" />
-    </svg>
-  );
-}
-
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<LoadingState>({});
@@ -442,125 +426,6 @@ export default function Home() {
             <p className="mt-3 text-sm text-[var(--waqtu-muted)]">
               &ldquo;Indeed, prayer is obligatory on the believers at specified times.&rdquo; — Quran 4:103
             </p>
-          </div>
-        </section>
-
-        {/* ===== PRIVACY DIFFERENTIATOR ===== */}
-        <section className="relative z-10 px-6 py-24 sm:px-10 md:px-14 md:py-32">
-          <div className="mx-auto max-w-3xl">
-            <div className="neu-card p-8 sm:p-12 text-center">
-              <svg className="mx-auto mb-6 h-12 w-12 text-[var(--waqtu-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-              </svg>
-              <h2 className="font-display mb-4 text-2xl font-semibold tracking-tight text-[var(--waqtu-text)]">
-                Your location never leaves your Mac
-              </h2>
-              <p className="mx-auto max-w-lg text-[var(--waqtu-muted)] leading-relaxed">
-                Unlike some prayer apps that sell your data, Waqtu calculates everything offline. Your location, prayer times, and calendar events stay on your device. No ads. No tracking. No servers.
-              </p>
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-[var(--waqtu-muted)]">
-                <span className="flex items-center gap-1.5">
-                  <svg className="h-4 w-4 text-[var(--waqtu-primary)]" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
-                  100% offline calculation
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <svg className="h-4 w-4 text-[var(--waqtu-primary)]" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
-                  No account needed
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <svg className="h-4 w-4 text-[var(--waqtu-primary)]" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
-                  Zero data collection
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ===== COMPARE STRIP ===== */}
-        <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-20 sm:px-10 md:px-14 md:py-28">
-          <div className="mx-auto max-w-5xl">
-            <h2 className="font-display mb-3 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
-              Why Waqtu?
-            </h2>
-            <p className="mx-auto mb-12 max-w-md text-center text-[var(--waqtu-muted)]">
-              The only Mac app that does it all. Offline. Private. One payment.
-            </p>
-            <div className="overflow-x-auto -mx-4 px-4">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-[var(--waqtu-border)]">
-                    <th className="py-3 pr-4 text-left font-medium text-[var(--waqtu-text)]">Feature</th>
-                    <th className="py-3 px-3 text-center font-medium text-[var(--waqtu-gold)]">Waqtu</th>
-                    <th className="py-3 px-3 text-center font-medium text-[var(--waqtu-muted)]">Sajda</th>
-                    <th className="py-3 px-3 text-center font-medium text-[var(--waqtu-muted)]">Minarah</th>
-                    <th className="py-3 px-3 text-center font-medium text-[var(--waqtu-muted)]">PrayerCal</th>
-                  </tr>
-                </thead>
-                <tbody className="text-[var(--waqtu-muted)]">
-                  {[
-                    ["Menu bar countdown", true, true, false, false],
-                    ["Calendar blocking", true, false, false, true],
-                    ["Teams/Outlook busy", true, false, false, false],
-                    ["Full-screen reminders", true, true, true, false],
-                    ["Offline calculation", true, true, false, true],
-                    ["Adhan audio", true, true, false, false],
-                    ["Privacy (no data sent)", true, true, true, true],
-                    ["One-time payment", true, true, false, true],
-                  ].map(([feature, waqtu, sajda, minarah, prayerCal], i) => (
-                    <tr key={i} className="border-b border-[var(--waqtu-border)]">
-                      <td className="py-3 pr-4 text-[var(--waqtu-text)]">{feature as string}</td>
-                      <td className="py-3 px-3 text-center">{waqtu ? <Check /> : <Dash />}</td>
-                      <td className="py-3 px-3 text-center">{sajda ? <Check /> : <Dash />}</td>
-                      <td className="py-3 px-3 text-center">{minarah ? <Check /> : <Dash />}</td>
-                      <td className="py-3 px-3 text-center">{prayerCal ? <Check /> : <Dash />}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p className="mt-6 text-center">
-              <a href="/compare" className="text-sm text-[var(--waqtu-primary)] hover:underline">
-                See full comparison &rarr;
-              </a>
-            </p>
-          </div>
-        </section>
-
-        {/* ===== TESTIMONIALS ===== */}
-        <section className="relative z-10 px-6 py-24 sm:px-10 md:px-14 md:py-32">
-          <div className="mx-auto max-w-5xl">
-            <h2 className="font-display mb-12 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
-              What users say
-            </h2>
-            <div className="grid gap-6 sm:grid-cols-3">
-              {[
-                {
-                  quote: "Finally, an app that actually blocks my Teams calendar. No more awkward 'sorry I missed Dhuhr' conversations.",
-                  name: "Ahmad R.",
-                  role: "Software Engineer",
-                },
-                {
-                  quote: "I love that it works completely offline. After the Muslim Pro privacy issues, I don't trust apps that send my location anywhere.",
-                  name: "Fatima H.",
-                  role: "Product Designer",
-                },
-                {
-                  quote: "The calm reminder overlay is perfect for the office. It's not an alarm — it's a gentle nudge. Exactly what I needed.",
-                  name: "Omar K.",
-                  role: "Consultant",
-                },
-              ].map((testimonial, i) => (
-                <div key={i} className="neu-card p-6 flex flex-col">
-                  <p className="flex-1 text-[var(--waqtu-muted)] leading-relaxed text-[15px] italic">
-                    &ldquo;{testimonial.quote}&rdquo;
-                  </p>
-                  <div className="mt-4 pt-4 border-t border-[var(--waqtu-border)]">
-                    <p className="font-medium text-[var(--waqtu-text)] text-sm">{testimonial.name}</p>
-                    <p className="text-[var(--waqtu-muted)] text-xs">{testimonial.role}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </section>
 
@@ -1105,30 +970,6 @@ export default function Home() {
                 Waqtu
               </span>
               <nav className="flex flex-wrap items-center justify-center gap-6 text-sm">
-                <a
-                  href="/compare"
-                  className="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)] transition-colors"
-                  data-s-event="footer_link_click"
-                  data-s-event-props='{"link":"compare"}'
-                >
-                  Compare
-                </a>
-                <a
-                  href="/blog"
-                  className="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)] transition-colors"
-                  data-s-event="footer_link_click"
-                  data-s-event-props='{"link":"blog"}'
-                >
-                  Blog
-                </a>
-                <a
-                  href="/resources"
-                  className="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)] transition-colors"
-                  data-s-event="footer_link_click"
-                  data-s-event-props='{"link":"resources"}'
-                >
-                  Resources
-                </a>
                 <a
                   href="/privacy"
                   className="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)] transition-colors"
