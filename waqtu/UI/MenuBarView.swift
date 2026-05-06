@@ -62,6 +62,11 @@ struct MenuBarView: View {
 
             Divider()
 
+            // Streak report
+            StreakReportView(streakManager: viewModel.streakManager)
+
+            Divider()
+
             // Controls
             ControlsSection(
                 overlayEnabled: $viewModel.settings.overlayEnabled,
@@ -306,6 +311,137 @@ struct PrayerRow: View {
         .contentShape(Rectangle())
         .onHover { hovering in
             isHovering = hovering
+        }
+    }
+}
+
+// MARK: - Streak Report
+struct StreakReportView: View {
+    let streakManager: PrayerStreakManager
+    @State private var isExpanded = false
+
+    private let prayerOrder: [String] = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"]
+    private let prayerIcons: [String: String] = [
+        "Fajr": "moon.stars.fill",
+        "Dhuhr": "sun.max.fill",
+        "Asr": "sun.haze.fill",
+        "Maghrib": "sunset.fill",
+        "Isha": "moon.fill"
+    ]
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header row — tappable to expand/collapse
+            Button(action: { withAnimation(.easeInOut(duration: 0.2)) { isExpanded.toggle() } }) {
+                HStack(spacing: 8) {
+                    Text("🔥")
+                        .font(.system(size: 13))
+                    Text("Streak \(streakManager.currentStreak)d")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(.waqtuGold)
+                    if streakManager.bestStreak > 0 {
+                        Text("· Best \(streakManager.bestStreak)d")
+                            .font(.system(size: 11))
+                            .foregroundColor(.waqtuMuted)
+                    }
+                    Spacer()
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 10))
+                        .foregroundColor(.waqtuMuted)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded {
+                Divider()
+                    .padding(.horizontal, 12)
+
+                VStack(spacing: 6) {
+                    // Today's prayer status
+                    ForEach(prayerOrder, id: \.self) { prayerName in
+                        prayerStatusRow(name: prayerName)
+                    }
+
+                    // Weekly mini-grid
+                    HStack(spacing: 4) {
+                        ForEach(streakManager.weeklyGrid, id: \.label) { day in
+                            VStack(spacing: 2) {
+                                Text(day.label.prefix(1).uppercased())
+                                    .font(.system(size: 9))
+                                    .foregroundColor(day.isToday ? .waqtuGold : .waqtuMuted)
+                                Text(day.status)
+                                    .font(.system(size: 13))
+                                    .foregroundColor(day.isToday ? .waqtuGold : .waqtuMuted)
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 4)
+
+                    // Week summary
+                    let week = streakManager.weeklyStats
+                    if week.total > 0 {
+                        Text("This week: \(week.prayed)/\(week.total) (\(Int(Double(week.prayed) / Double(week.total) * 100))%)")
+                            .font(.system(size: 10))
+                            .foregroundColor(.waqtuMuted)
+                    }
+                }
+                .padding(.vertical, 8)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func prayerStatusRow(name: String) -> some View {
+        let status = streakManager.statusFor(prayer: name)
+        let hasPassed: Bool = {
+            // Check if this prayer's time has passed today
+            let icon = prayerIcons[name] ?? "circle"
+            return status != nil || icon.isEmpty == false // simplified: show all
+        }()
+
+        HStack(spacing: 8) {
+            Image(systemName: prayerIcons[name] ?? "circle")
+                .font(.system(size: 11))
+                .foregroundColor(status == .prayed ? .waqtuPrimary : .waqtuMuted)
+                .frame(width: 16)
+
+            Text(name)
+                .font(.system(size: 12))
+                .foregroundColor(.waqtuText)
+
+            Spacer()
+
+            statusBadge(status)
+        }
+        .padding(.horizontal, 16)
+    }
+
+    @ViewBuilder
+    private func statusBadge(_ status: PrayerLogEntry.Status?) -> some View {
+        if let status {
+            switch status {
+            case .prayed:
+                Text("Prayed")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(.waqtuPrimary)
+            case .missed:
+                Text("Missed")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(.red.opacity(0.8))
+            case .late:
+                Text("Late")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(.waqtuGold)
+            }
+        } else {
+            Text("—")
+                .font(.system(size: 10))
+                .foregroundColor(.waqtuMuted)
         }
     }
 }

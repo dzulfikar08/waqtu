@@ -13,6 +13,7 @@ final class AppViewModel {
     let calendarManager: CalendarManager
     let trialManager: TrialManager
     let licenseManager: LicenseManager
+    let streakManager: PrayerStreakManager
 
     private var timer: Timer?
     private var snoozeTimer: Timer?
@@ -50,6 +51,7 @@ final class AppViewModel {
         self.reminderScheduler = PrayerReminderScheduler(settings: settings)
         self.locationManager = LocationManager()
         self.calendarManager = CalendarManager()
+        self.streakManager = PrayerStreakManager()
         setupLocationUpdates()
         calculatePrayers()
         setupTimer()
@@ -265,6 +267,7 @@ final class AppViewModel {
                 self?.scheduleOverlaySnooze(minutes: minutes)
             },
             onPrayerCommit: { [weak self] in
+                self?.streakManager.markPrayed(prayer: prayer.name.rawValue)
                 self?.startPostDismissActivityMonitor(for: prayer.name)
             }
         )
@@ -317,6 +320,7 @@ final class AppViewModel {
 
             // Idle reset: user was idle, now they're active
             if lastIdle > pollInterval && currentIdle < pollInterval {
+                self.streakManager.markMissed(prayer: prayer.rawValue)
                 self.deliverStillWorkingNotification(for: prayer)
                 self.stopActivityMonitor()
                 return

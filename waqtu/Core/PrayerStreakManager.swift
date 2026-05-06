@@ -209,6 +209,42 @@ final class PrayerStreakManager {
         defaults.set(data, forKey: logKey)
     }
 
+    /// A compact grid of the last 7 days for the streak report.
+    /// Returns an array of (dayLabel, statusIcon, isToday) tuples.
+    var weeklyGrid: [(label: String, status: String, isToday: Bool)] {
+        let calendar = Calendar.current
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+        let today = Date()
+        let todayStr = formatter.string(from: today)
+        let dayNamesFormatter = DateFormatter()
+        dayNamesFormatter.dateFormat = "E"
+
+        return (0..<7).compactMap { offset -> (String, String, Bool)? in
+            guard let date = calendar.date(byAdding: .day, value: -(6 - offset), to: today) else { return nil }
+            let dateStr = formatter.string(from: date)
+            let dayEntries = entries.filter { $0.date == dateStr }
+            let prayed = dayEntries.filter { $0.status == .prayed || $0.status == .late }.count
+            let isToday = dateStr == todayStr
+
+            let status: String
+            if dayEntries.isEmpty {
+                status = isToday ? " " : "·"
+            } else if prayed >= 5 {
+                status = "●"
+            } else if prayed > 0 {
+                status = "◐"
+            } else {
+                status = "○"
+            }
+
+            let weekday = Calendar.current.component(.weekday, from: date)
+            let label = dayNames[weekday - 1]
+            return (label, status, isToday)
+        }
+    }
+
     /// Remove all log data.
     func resetAll() {
         entries = []
