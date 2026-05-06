@@ -432,15 +432,17 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ===== QURAN VERSE STRIP ===== */}
+        {/* ===== TRUST STRIP ===== */}
         <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-10 sm:px-10 md:px-14">
-          <blockquote className="mx-auto max-w-2xl text-center text-lg italic leading-relaxed text-[var(--waqtu-muted)]">
-            &ldquo;Indeed, prayer is obligatory on the believers at specified
-            times.&rdquo;
-          </blockquote>
-          <cite className="mt-3 block text-center text-sm not-italic text-[var(--waqtu-gold)]">
-            &mdash; Quran 4:103
-          </cite>
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-lg font-medium leading-relaxed text-[var(--waqtu-text)]">
+              Your location never leaves your Mac. No ads. No tracking.{" "}
+              <span className="text-[var(--waqtu-gold)]">Ever.</span>
+            </p>
+            <p className="mt-3 text-sm text-[var(--waqtu-muted)]">
+              &ldquo;Indeed, prayer is obligatory on the believers at specified times.&rdquo; — Quran 4:103
+            </p>
+          </div>
         </section>
 
         {/* ===== PRIVACY DIFFERENTIATOR ===== */}
