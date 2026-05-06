@@ -35,15 +35,15 @@ struct OverlayView: View {
             VStack(spacing: 40) {
                 Spacer()
 
-                // Prayer name with accent
+                // Prayer name
                 Text(prayerName.displayName.uppercased())
                     .font(.system(size: 64, weight: .bold))
-                    .foregroundStyle(Color(red: 0.91, green: 0.94, blue: 0.93))
+                    .foregroundStyle(Color.waqtuText)
 
                 // Current time
                 Text(currentTime)
                     .font(.system(size: 32, weight: .medium))
-                    .foregroundStyle(Color(red: 0.66, green: 0.79, blue: 0.72))
+                    .foregroundStyle(Color.waqtuMuted)
 
                 // Countdown with circular indicator
                 VStack(spacing: 16) {
@@ -56,7 +56,7 @@ struct OverlayView: View {
                             .trim(from: 0, to: countdownProgress)
                             .stroke(
                                 LinearGradient(
-                                    colors: [Color(red: 0.29, green: 0.55, blue: 0.43), Color(red: 0.42, green: 0.66, blue: 0.53)],
+                                    colors: [Color.waqtuPrimary, Color.waqtuLight],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 ),
@@ -67,12 +67,12 @@ struct OverlayView: View {
 
                         Text(countdownText)
                             .font(.system(size: 28, weight: .bold, design: .monospaced))
-                            .foregroundStyle(Color(red: 0.91, green: 0.94, blue: 0.93))
+                            .foregroundStyle(Color.waqtuText)
                     }
 
                     Text("Time remaining")
                         .font(.system(size: 14))
-                        .foregroundStyle(Color(red: 0.66, green: 0.79, blue: 0.72))
+                        .foregroundStyle(Color.waqtuMuted)
                 }
 
                 Spacer()
@@ -81,13 +81,13 @@ struct OverlayView: View {
                 VStack(spacing: 12) {
                     Text(AppSettings.quranicQuote)
                         .font(.system(size: 18, weight: .medium))
-                        .foregroundStyle(Color(red: 0.91, green: 0.94, blue: 0.93))
+                        .foregroundStyle(Color.waqtuText)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 40)
 
                     Text(AppSettings.quranicReference)
                         .font(.system(size: 14))
-                        .foregroundStyle(Color(red: 0.83, green: 0.65, blue: 0.45))
+                        .foregroundStyle(Color.waqtuGold)
                 }
                 .padding(.bottom, 40)
 
@@ -104,10 +104,10 @@ struct OverlayView: View {
                             Text("Snooze")
                                 .font(.system(size: 16, weight: .semibold))
                         }
-                        .foregroundStyle(Color(red: 0.91, green: 0.94, blue: 0.93))
+                        .foregroundStyle(Color.waqtuSecondary)
                         .padding(.horizontal, 24)
                         .padding(.vertical, 14)
-                        .background(Color.white.opacity(0.12))
+                        .background(Color.waqtuSecondary.opacity(0.15))
                         .cornerRadius(12)
                     }
                     .menuStyle(.borderlessButton)
@@ -134,7 +134,7 @@ struct OverlayView: View {
                     .padding(.vertical, 16)
                     .background(
                         LinearGradient(
-                            colors: [Color(red: 0.29, green: 0.55, blue: 0.43), Color(red: 0.42, green: 0.66, blue: 0.53)],
+                            colors: [Color.waqtuPrimary, Color.waqtuLight],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
@@ -224,7 +224,7 @@ struct AnimatedGradientBackground: View {
             // Radial glow effects for depth
             RadialGradient(
                 colors: [
-                    Color(red: 0.29, green: 0.55, blue: 0.43).opacity(0.3),
+                    Color.waqtuPrimary.opacity(0.3),
                     Color.clear
                 ],
                 center: UnitPoint(x: 0.3 + animationPhase * 0.1, y: 0.2),
@@ -234,7 +234,7 @@ struct AnimatedGradientBackground: View {
             
             RadialGradient(
                 colors: [
-                    Color(red: 0.42, green: 0.66, blue: 0.53).opacity(0.2),
+                    Color.waqtuSecondary.opacity(0.2),
                     Color.clear
                 ],
                 center: UnitPoint(x: 0.7 - animationPhase * 0.1, y: 0.8),

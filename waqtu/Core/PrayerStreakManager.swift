@@ -1,0 +1,217 @@
+//
+//  PrayerStreakManager.swift
+//  waqtu
+//
+//  Prayer habit tracking: prayed/missed per prayer, daily/weekly/monthly streaks.
+//  Stored in UserDefaults as a simple JSON dictionary.
+//
+
+import Foundation
+
+/// A single prayer log entry for a specific date and prayer.
+struct PrayerLogEntry: Codable, Identifiable {
+    var id: String { "\(date)-\(prayer)" }
+    let date: String       // yyyy-MM-dd
+    let prayer: String     // Fajr, Dhuhr, Asr, Maghrib, Isha
+    let status: Status
+    let loggedAt: Date
+
+    enum Status: String, Codable {
+        case prayed
+        case missed
+        case late  // prayed but late
+    }
+}
+
+@Observable
+final class PrayerStreakManager {
+    private let defaults = UserDefaults.standard
+    private let logKey = "prayerLogEntries"
+
+    private(set) var entries: [PrayerLogEntry] = []
+
+    init() {
+        load()
+    }
+
+    // MARK: - Logging
+
+    func logPrayer(prayer: String, status: PrayerLogEntry.Status, date: Date = Date()) {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let dateString = formatter.string(from: date)
+
+        // Remove any existing entry for this prayer+date
+        entries.removeAll { $0.date == dateString && $0.prayer == prayer }
+
+        let entry = PrayerLogEntry(
+            date: dateString,
+            prayer: prayer,
+            status: status,
+            loggedAt: Date()
+        )
+        entries.append(entry)
+        save()
+    }
+
+    func markPrayed(prayer: String, date: Date = Date()) {
+        logPrayer(prayer: prayer, status: .prayed, date: date)
+    }
+
+    func markMissed(prayer: String, date: Date = Date()) {
+        logPrayer(prayer: prayer, status: .missed, date: date)
+    }
+
+    // MARK: - Queries
+
+    /// Get today's log entries.
+    var todayEntries: [PrayerLogEntry] {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let today = formatter.string(from: Date())
+        return entries.filter { $0.date == today }
+    }
+
+    /// How many prayers were prayed today.
+    var todayPrayedCount: Int {
+        todayEntries.filter { $0.status == .prayed || $0.status == .late }.count
+    }
+
+    /// Current streak: consecutive days where all 5 prayers were prayed.
+    var currentStreak: Int {
+        calculateStreak(endingAt: Date())
+    }
+
+    /// Best streak ever recorded.
+    var bestStreak: Int {
+        let allDates = uniqueDates()
+        var best = 0
+        for date in allDates {
+            let streak = calculateStreak(endingAt: date)
+            best = max(best, streak)
+        }
+        return best
+    }
+
+    /// Weekly stats: prayers prayed this week (Mon–Sun).
+    var weeklyStats: (prayed: Int, missed: Int, total: Int) {
+        let calendar = Calendar.current
+        guard let weekStart = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date())) else {
+            return (0, 0, 0)
+        }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+
+        var prayed = 0, missed = 0
+        let today = Date()
+        var current = weekStart
+        while current <= today {
+            let dateStr = formatter.string(from: current)
+            let dayEntries = entries.filter { $0.date == dateStr }
+            prayed += dayEntries.filter { $0.status == .prayed || $0.status == .late }.count
+            missed += dayEntries.filter { $0.status == .missed }.count
+            current = calendar.date(byAdding: .day, value: 1, to: current) ?? today
+        }
+        let totalDays = max(1, calendar.dateComponents([.day], from: weekStart, to: today).day ?? 0 + 1)
+        return (prayed, missed, totalDays * 5)
+    }
+
+    /// Monthly stats for the given month.
+    func monthlyStats(for date: Date = Date()) -> (prayed: Int, missed: Int, completionRate: Double) {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month], from: date)
+        guard let monthStart = calendar.date(from: components),
+              let range = calendar.range(of: .day, in: .month, for: monthStart) else {
+            return (0, 0, 0)
+        }
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+
+        var prayed = 0, missed = 0
+        for day in 1...range.count {
+            guard let dayDate = calendar.date(byAdding: .day, value: day - 1, to: monthStart),
+                  dayDate <= Date() else { break }
+            let dateStr = formatter.string(from: dayDate)
+            let dayEntries = entries.filter { $0.date == dateStr }
+            prayed += dayEntries.filter { $0.status == .prayed || $0.status == .late }.count
+            missed += dayEntries.filter { $0.status == .missed }.count
+        }
+
+        let total = prayed + missed
+        let rate = total > 0 ? Double(prayed) / Double(total) * 100 : 0
+        return (prayed, missed, rate)
+    }
+
+    /// Has the user logged this prayer today?
+    func hasLogged(prayer: String, date: Date = Date()) -> Bool {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let dateStr = formatter.string(from: date)
+        return entries.contains { $0.date == dateStr && $0.prayer == prayer }
+    }
+
+    /// Get status for a specific prayer today.
+    func statusFor(prayer: String, date: Date = Date()) -> PrayerLogEntry.Status? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let dateStr = formatter.string(from: date)
+        return entries.first { $0.date == dateStr && $0.prayer == prayer }?.status
+    }
+
+    // MARK: - Private
+
+    private func uniqueDates() -> [Date] {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        var seen = Set<String>()
+        return entries.compactMap { entry -> Date? in
+            guard seen.insert(entry.date).inserted else { return nil }
+            return formatter.date(from: entry.date)
+        }.sorted(by: >)
+    }
+
+    private func calculateStreak(endingAt endDate: Date) -> Int {
+        let calendar = Calendar.current
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+
+        var streak = 0
+        var current = calendar.startOfDay(for: endDate)
+
+        while true {
+            let dateStr = formatter.string(from: current)
+            let dayEntries = entries.filter { $0.date == dateStr }
+            let prayedCount = dayEntries.filter { $0.status == .prayed || $0.status == .late }.count
+
+            // A day counts if all 5 prayers were prayed
+            guard prayedCount >= 5 else { break }
+
+            streak += 1
+            guard let previous = calendar.date(byAdding: .day, value: -1, to: current) else { break }
+            current = previous
+        }
+
+        return streak
+    }
+
+    private func load() {
+        guard let data = defaults.data(forKey: logKey),
+              let decoded = try? JSONDecoder().decode([PrayerLogEntry].self, from: data) else {
+            entries = []
+            return
+        }
+        entries = decoded
+    }
+
+    private func save() {
+        guard let data = try? JSONEncoder().encode(entries) else { return }
+        defaults.set(data, forKey: logKey)
+    }
+
+    /// Remove all log data.
+    func resetAll() {
+        entries = []
+        defaults.removeObject(forKey: logKey)
+    }
+}

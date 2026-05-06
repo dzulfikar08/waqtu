@@ -11,6 +11,8 @@ extension Color {
     static let waqtuGold = Color(hex: "#D4A574")
     static let waqtuText = Color(hex: "#E8F0ED")
     static let waqtuMuted = Color(hex: "#A8C9B8")
+    static let waqtuSecondary = Color(hex: "#6B8FAD")
+    static let waqtuSecondaryDark = Color(hex: "#5A7D9A")
 }
 
 struct MenuBarView: View {
