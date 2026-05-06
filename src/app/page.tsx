@@ -668,9 +668,11 @@ export default function Home() {
                 blocks prayer times, and I&rsquo;ve been consistent for months.
               </p>
               <div className="mt-6 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--waqtu-primary)] text-sm font-bold text-[var(--waqtu-bg)]">
-                  D
-                </div>
+                <img
+                  src="/dzulfikar.webp"
+                  alt="Dzulfikar, Founder"
+                  className="h-10 w-10 rounded-full object-cover"
+                />
                 <div>
                   <p className="text-sm font-medium text-[var(--waqtu-text)]">Dzulfikar</p>
                   <p className="text-xs text-[var(--waqtu-muted)]">Founder, Waqtu</p>
