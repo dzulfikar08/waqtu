@@ -15,6 +15,7 @@ final class AppViewModel {
     let licenseManager: LicenseManager
     let streakManager: PrayerStreakManager
     let slackManager: SlackManager
+    let sharedBridge = SharedDataBridge()
 
     private var timer: Timer?
     private var snoozeTimer: Timer?
@@ -178,6 +179,8 @@ final class AppViewModel {
         updateCountdown()
         // Schedule \"Asr in 5 minutes\"-style notifications
         reminderScheduler.scheduleReminders(for: todayPrayers)
+        // Push data to shared container for iOS/watch/widgets
+        pushToSharedContainer()
     }
 
     private func setupTimer() {
@@ -248,6 +251,45 @@ final class AppViewModel {
         return "\(formatter.string(from: prayer.time))-\(prayer.name.rawValue)"
     }
 
+    /// Push latest prayer times and streaks to shared app group for iOS/watch/widgets.
+    func pushToSharedContainer() {
+        sharedBridge.pushPrayerTimes(
+            prayers: todayPrayers,
+            locationLabel: locationDisplay,
+            calculationMethod: settings.calculationMethod
+        )
+        sharedBridge.pushWatchComplicationData(
+            nextPrayer: nextPrayer,
+            locationLabel: locationDisplay
+        )
+        sharedBridge.pushStreakData(
+            currentStreak: streakManager.currentStreak,
+            bestStreak: streakManager.bestStreak,
+            todayPrayed: streakManager.todayPrayedCount,
+            weeklyGrid: mapWeeklyGrid()
+        )
+    }
+
+    private func mapWeeklyGrid() -> [StreakData.DayDot] {
+        streakManager.weeklyGrid.map { item in
+            StreakData.DayDot(
+                date: "",
+                label: item.label,
+                status: mapDotStatus(item.status),
+                isToday: item.isToday
+            )
+        }
+    }
+
+    private func mapDotStatus(_ status: String) -> StreakData.DayDot.DotStatus {
+        switch status {
+        case "●": return .complete
+        case "◐": return .partial
+        case "○": return .missed
+        default: return .empty
+        }
+    }
+
     private func showOverlay(for prayer: PrayerTime) {
         // Close any existing overlay first
         if let existing = overlayWindow {
@@ -271,6 +313,7 @@ final class AppViewModel {
             },
             onPrayerCommit: { [weak self] in
                 self?.streakManager.markPrayed(prayer: prayer.name.rawValue)
+                self?.pushToSharedContainer()
                 self?.startPostDismissActivityMonitor(for: prayer.name)
             }
         )
@@ -355,6 +398,7 @@ final class AppViewModel {
             // Idle reset: user was idle, now they're active
             if lastIdle > pollInterval && currentIdle < pollInterval {
                 self.streakManager.markMissed(prayer: prayer.rawValue)
+                self.pushToSharedContainer()
                 self.deliverStillWorkingNotification(for: prayer)
                 self.stopActivityMonitor()
                 return

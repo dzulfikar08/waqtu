@@ -3,6 +3,9 @@ import SwiftUI
 
 @Observable
 final class AppSettings {
+    /// Shared app-group container for widget/watch/iOS sync.
+    private let sharedDefaults = UserDefaults(suiteName: "group.com.waqtu.shared") ?? UserDefaults.standard
+    private let cloudStore = NSUbiquitousKeyValueStore.default
     // Overlay settings
     var overlayEnabled: Bool {
         get { UserDefaults.standard.bool(forKey: "overlayEnabled") }
@@ -131,49 +134,83 @@ final class AppSettings {
         set { UserDefaults.standard.set(newValue, forKey: "hasSeenCalendarProtectionExplanation") }
     }
 
-    // Prayer time calculation
-    /// Calculation method (e.g. muslimWorldLeague, moonsightingCommittee). Raw value of Adhan.CalculationMethod.
     var calculationMethod: String {
         get { UserDefaults.standard.string(forKey: "calculationMethod") ?? "muslimWorldLeague" }
-        set { UserDefaults.standard.set(newValue, forKey: "calculationMethod") }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "calculationMethod")
+            sharedDefaults.set(newValue, forKey: "calculationMethod")
+            cloudStore.set(newValue, forKey: "calculationMethod")
+            cloudStore.synchronize()
+        }
     }
 
-    /// Asr calculation: shafi (earlier) or hanafi (later).
     var madhab: String {
         get { UserDefaults.standard.string(forKey: "madhab") ?? "shafi" }
-        set { UserDefaults.standard.set(newValue, forKey: "madhab") }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "madhab")
+            sharedDefaults.set(newValue, forKey: "madhab")
+            cloudStore.set(newValue, forKey: "madhab")
+            cloudStore.synchronize()
+        }
     }
 
-    /// High latitude rule: "auto", "middleOfTheNight", "seventhOfTheNight", "twilightAngle".
     var highLatitudeRule: String {
         get { UserDefaults.standard.string(forKey: "highLatitudeRule") ?? "auto" }
-        set { UserDefaults.standard.set(newValue, forKey: "highLatitudeRule") }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "highLatitudeRule")
+            sharedDefaults.set(newValue, forKey: "highLatitudeRule")
+            cloudStore.set(newValue, forKey: "highLatitudeRule")
+            cloudStore.synchronize()
+        }
     }
 
-    /// Minute adjustments per prayer (-60 to +60). Applied on top of method defaults.
     var adjustmentFajr: Int {
         get { clampedAdjustment(UserDefaults.standard.integer(forKey: "adjustmentFajr")) }
-        set { UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentFajr") }
+        set {
+            UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentFajr")
+            sharedDefaults.set(clampedAdjustment(newValue), forKey: "adjustmentFajr")
+            cloudStore.set(clampedAdjustment(newValue), forKey: "adjustmentFajr")
+        }
     }
     var adjustmentSunrise: Int {
         get { clampedAdjustment(UserDefaults.standard.integer(forKey: "adjustmentSunrise")) }
-        set { UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentSunrise") }
+        set {
+            UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentSunrise")
+            sharedDefaults.set(clampedAdjustment(newValue), forKey: "adjustmentSunrise")
+            cloudStore.set(clampedAdjustment(newValue), forKey: "adjustmentSunrise")
+        }
     }
     var adjustmentDhuhr: Int {
         get { clampedAdjustment(UserDefaults.standard.integer(forKey: "adjustmentDhuhr")) }
-        set { UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentDhuhr") }
+        set {
+            UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentDhuhr")
+            sharedDefaults.set(clampedAdjustment(newValue), forKey: "adjustmentDhuhr")
+            cloudStore.set(clampedAdjustment(newValue), forKey: "adjustmentDhuhr")
+        }
     }
     var adjustmentAsr: Int {
         get { clampedAdjustment(UserDefaults.standard.integer(forKey: "adjustmentAsr")) }
-        set { UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentAsr") }
+        set {
+            UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentAsr")
+            sharedDefaults.set(clampedAdjustment(newValue), forKey: "adjustmentAsr")
+            cloudStore.set(clampedAdjustment(newValue), forKey: "adjustmentAsr")
+        }
     }
     var adjustmentMaghrib: Int {
         get { clampedAdjustment(UserDefaults.standard.integer(forKey: "adjustmentMaghrib")) }
-        set { UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentMaghrib") }
+        set {
+            UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentMaghrib")
+            sharedDefaults.set(clampedAdjustment(newValue), forKey: "adjustmentMaghrib")
+            cloudStore.set(clampedAdjustment(newValue), forKey: "adjustmentMaghrib")
+        }
     }
     var adjustmentIsha: Int {
         get { clampedAdjustment(UserDefaults.standard.integer(forKey: "adjustmentIsha")) }
-        set { UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentIsha") }
+        set {
+            UserDefaults.standard.set(clampedAdjustment(newValue), forKey: "adjustmentIsha")
+            sharedDefaults.set(clampedAdjustment(newValue), forKey: "adjustmentIsha")
+            cloudStore.set(clampedAdjustment(newValue), forKey: "adjustmentIsha")
+        }
     }
 
     private func clampedAdjustment(_ value: Int) -> Int {
