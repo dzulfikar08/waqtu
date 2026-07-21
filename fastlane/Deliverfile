@@ -1,0 +1,6 @@
+# Defaults shared by deliver lanes. Most options are set per-lane in the Fastfile.
+# Run `fastlane deliver download_metadata -a dat.waqtu.ios` once the ASC record exists
+# to populate fastlane/metadata/ios, then edit and push with the *_metadata lanes.
+
+precheck_include_in_app_purchases(false)
+automatic_release(false)

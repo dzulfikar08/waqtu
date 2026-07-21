@@ -1,0 +1,4 @@
+# App Store Connect shared config. Per-lane code overrides app_identifier.
+app_identifier ENV["APP_IDENTIFIER"] || "dat.waqtu"   # default (MAS)
+apple_id      ENV["APP_STORE_CONNECT_APPLE_ID"]        # your Apple ID email
+team_id       "F6Q6UFUK69"
