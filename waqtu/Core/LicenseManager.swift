@@ -2,8 +2,9 @@
 //  LicenseManager.swift
 //  waqtu
 //
-//  Polar license key: activate once per device, validate on launch.
-//  Keys stored in Keychain (persists across reinstalls).
+//  Two licensing backends selected at compile time:
+//   - MAS build (Mac App Store): StoreKit 2 non-consumable IAP.
+//   - Direct-distribution build: Polar.sh license key (activate/validate).
 //
 
 import Foundation
@@ -13,6 +14,104 @@ enum LicenseError: Error {
     case message(String)
 }
 
+#if MAS
+import StoreKit
+
+/// Mac App Store licensing via StoreKit 2 non-consumable in-app purchase.
+/// Entitlement is owned by the App Store; nothing is persisted locally.
+/// Non-isolated to stay call-site compatible with the direct-distribution backend;
+/// the observable `isLicensed` is only mutated on the main actor.
+@Observable
+final class LicenseManager: @unchecked Sendable {
+    /// App Store Connect product identifier for the lifetime unlock.
+    static let lifetimeProductID = "dat.waqtu.lifetime"
+
+    private(set) var isLicensed: Bool = false
+    private var transactionListener: Task<Void, Never>?
+
+    init(bundleIdentifier: String = Bundle.main.bundleIdentifier ?? "dat.waqtu") {
+        transactionListener = listenForTransactions()
+        Task { await refreshEntitlement() }
+    }
+
+    deinit { transactionListener?.cancel() }
+
+    /// Presents the App Store purchase sheet for lifetime access.
+    func purchase() async -> Result<Void, LicenseError> {
+        do {
+            let products = try await Product.products(for: [Self.lifetimeProductID])
+            guard let product = products.first else {
+                return .failure(.message("Purchase unavailable right now."))
+            }
+            let result = try await product.purchase()
+            switch result {
+            case .success(let verification):
+                let transaction = try checkVerified(verification)
+                await refreshEntitlement()
+                await transaction.finish()
+                return .success(())
+            case .userCancelled:
+                return .failure(.message("Purchase cancelled."))
+            case .pending:
+                return .failure(.message("Purchase pending approval."))
+            @unknown default:
+                return .failure(.message("Unknown purchase result."))
+            }
+        } catch {
+            return .failure(.message(error.localizedDescription))
+        }
+    }
+
+    /// Restores prior purchases (signed in with the same Apple ID). Also called on launch.
+    func restore() async {
+        try? await AppStore.sync()
+        await refreshEntitlement()
+    }
+
+    /// Mirrors the Polar backend's launch-time validation entry point.
+    func validate() async {
+        await refreshEntitlement()
+    }
+
+    private func refreshEntitlement() async {
+        for await result in Transaction.currentEntitlements {
+            if let transaction = try? checkVerified(result),
+               transaction.productID == Self.lifetimeProductID {
+                await markLicensed(true)
+                return
+            }
+        }
+        await markLicensed(false)
+    }
+
+    private func listenForTransactions() -> Task<Void, Never> {
+        Task.detached { [weak self] in
+            for await result in Transaction.updates {
+                guard let self else { return }
+                if let transaction = try? self.checkVerified(result),
+                   transaction.productID == Self.lifetimeProductID {
+                    await self.markLicensed(true)
+                    await transaction.finish()
+                }
+            }
+        }
+    }
+
+    @MainActor
+    private func markLicensed(_ value: Bool) { isLicensed = value }
+
+    private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
+        switch result {
+        case .verified(let value):
+            return value
+        case .unverified:
+            throw LicenseError.message("StoreKit transaction verification failed.")
+        }
+    }
+}
+#else
+/// Direct-distribution licensing via Polar.sh (license key activate/validate).
+/// Excluded from the Mac App Store build (App Store requires In-App Purchase).
 @Observable
 final class LicenseManager {
     static let licenseAPIBase = "https://waqt-updates.dzulfikar-at.workers.dev"
@@ -183,3 +282,4 @@ private struct ValidateResponse: Codable {
     let valid: Bool
     let error: String?
 }
+#endif

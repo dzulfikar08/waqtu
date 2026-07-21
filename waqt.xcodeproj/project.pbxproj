@@ -7,12 +7,34 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		32D0237D9FD6219D7400D6FE /* (null) in Frameworks */ = {isa = PBXBuildFile; };
+		3007496DC20FE55E360B94BA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D88A066BFF738D65FDF14C54 /* Foundation.framework */; };
+		32D0237D9FD6219D7400D6FE /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		3C2F5A8F3980599AD9C85006 /* waqtu-mac-widget in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E25A23E603463AFFEA2FAB02 /* waqtu-mac-widget */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3EDB55A983EE583686964834 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0A98A87F32902589F60A5DB /* Foundation.framework */; };
+		664A82B75B1FC2E095D5F546 /* waqtu-mac-widget in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E25A23E603463AFFEA2FAB02 /* waqtu-mac-widget */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7CB78973DC80F3385AC757EE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E814699275DB5EF2E2B6AC60 /* Foundation.framework */; };
+		913CA09F6A43B2B77132976B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0A98A87F32902589F60A5DB /* Foundation.framework */; };
 		AA447E9D2F417E8200A6E861 /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = 1333C6AA761E8AC4FC22AEC1 /* Adhan */; };
 		AA50DE822F4174E2006EDD6E /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = AA50DE812F4174E2006EDD6E /* Sparkle */; };
+		C17B4582B11CD69A2CDDEDCF /* waqtu-widget in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 47D6F5E916FFD6DA5FC1879D /* waqtu-widget */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		FE96562A027EDE3137DD1A52 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E814699275DB5EF2E2B6AC60 /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		9146193D16424C6D218464DA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA40DE7E2F4174E2006EDD6D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 396F02F3E8E4BB62620A9CB6;
+			remoteInfo = "waqtu-mac-widget";
+		};
+		A3C1D0FD55F5F38CE318CD1C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA40DE7E2F4174E2006EDD6D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 396F02F3E8E4BB62620A9CB6;
+			remoteInfo = "waqtu-mac-widget";
+		};
 		AA40DE942F4174E3006EDD6D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AA40DE7E2F4174E2006EDD6D /* Project object */;
@@ -27,40 +49,200 @@
 			remoteGlobalIDString = AA40DE852F4174E2006EDD6D;
 			remoteInfo = waqtu;
 		};
+		FD1A2774D82C68F1C7052313 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA40DE7E2F4174E2006EDD6D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FED58D04EF35838AF8144A21;
+			remoteInfo = "waqtu-widget";
+		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		788BAA79A8B16F89787E1DB3 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				664A82B75B1FC2E095D5F546 /* waqtu-mac-widget in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		923F52219D934E02F866CF81 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				3C2F5A8F3980599AD9C85006 /* waqtu-mac-widget in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B447A6367143F6982DE7BDBE /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				C17B4582B11CD69A2CDDEDCF /* waqtu-widget in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		47D6F5E916FFD6DA5FC1879D /* waqtu-widget */ = {isa = PBXFileReference; includeInIndex = 0; path = "waqtu-widget"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B051D8F6787F0DA803FE5E5 /* waqtu-mas */ = {isa = PBXFileReference; includeInIndex = 0; path = "waqtu-mas"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA2B768E2F440BAE005EC86C /* public_ed25519.pem */ = {isa = PBXFileReference; lastKnownFileType = text; name = public_ed25519.pem; path = waqtu/Resources/public_ed25519.pem; sourceTree = "<group>"; };
 		AA40DE862F4174E2006EDD6D /* waqtu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = waqtu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA40DE932F4174E3006EDD6D /* waqtuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = waqtuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA40DE9D2F4174E3006EDD6D /* waqtuUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = waqtuUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0A98A87F32902589F60A5DB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		D88A066BFF738D65FDF14C54 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS11.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		E25A23E603463AFFEA2FAB02 /* waqtu-mac-widget */ = {isa = PBXFileReference; includeInIndex = 0; path = "waqtu-mac-widget"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E814699275DB5EF2E2B6AC60 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		F302ECD96F7C0432C2E86FA2 /* waqtu-ios */ = {isa = PBXFileReference; includeInIndex = 0; path = "waqtu-ios"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F54AD20B8E6472CEC93A520D /* waqtu-watch */ = {isa = PBXFileReference; includeInIndex = 0; path = "waqtu-watch"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		1CC4EE56D09A975B5419C60A /* shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = shared;
+			sourceTree = "<group>";
+		};
+		3B87E626326006D1F430CA36 /* shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = shared;
+			sourceTree = "<group>";
+		};
+		46AE63D97061125F50462FFC /* watch */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = watch;
+			sourceTree = "<group>";
+		};
+		51D557A67480F8B25A2F4DA7 /* shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = shared;
+			sourceTree = "<group>";
+		};
+		729DA62ACB0B8883E56C5CC6 /* ios */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = ios;
+			sourceTree = "<group>";
+		};
+		7E791B335D63AEBBB6C110A9 /* ios-widget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = "ios-widget";
+			sourceTree = "<group>";
+		};
+		88F976BBAE5A4CFDC5BEDFBB /* macos-widget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = "macos-widget";
+			sourceTree = "<group>";
+		};
 		AA40DE882F4174E2006EDD6D /* waqtu */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = waqtu;
 			sourceTree = "<group>";
 		};
 		AA40DE962F4174E3006EDD6D /* waqtuTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = waqtuTests;
 			sourceTree = "<group>";
 		};
 		AA40DEA02F4174E3006EDD6D /* waqtuUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = waqtuUITests;
+			sourceTree = "<group>";
+		};
+		B06870183C8BB48B1E5BBBD6 /* shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = shared;
+			sourceTree = "<group>";
+		};
+		C4AF80E4B9C53B3D3F72D0AE /* shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = shared;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		0C36F1F06D224D2FD934B2B4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				913CA09F6A43B2B77132976B /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		156FBCBB4185252B38A5F33A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3007496DC20FE55E360B94BA /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3AE45BB6D2A3233F6AEF722D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE96562A027EDE3137DD1A52 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4D3395950518ACAA660463A3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7CB78973DC80F3385AC757EE /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EC9AEB2772894A5497D296D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3EDB55A983EE583686964834 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AA40DE832F4174E2006EDD6D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				AA447E9D2F417E8200A6E861 /* Adhan in Frameworks */,
-				32D0237D9FD6219D7400D6FE /* (null) in Frameworks */,
+				32D0237D9FD6219D7400D6FE /* BuildFile in Frameworks */,
 				AA50DE822F4174E2006EDD6E /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -82,9 +264,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		74AE78322C35671B960C6783 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				E814699275DB5EF2E2B6AC60 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
 		AA2B76B92F44177E005EC86C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				74AE78322C35671B960C6783 /* iOS */,
+				BB341D63B60D2B6D30DA9D72 /* watchOS */,
+				CA33D4658ED2BC34ADDAB107 /* OS X */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -98,6 +291,15 @@
 				AA40DEA02F4174E3006EDD6D /* waqtuUITests */,
 				AA2B76B92F44177E005EC86C /* Frameworks */,
 				AA40DE872F4174E2006EDD6D /* Products */,
+				C4AF80E4B9C53B3D3F72D0AE /* shared */,
+				729DA62ACB0B8883E56C5CC6 /* ios */,
+				B06870183C8BB48B1E5BBBD6 /* shared */,
+				7E791B335D63AEBBB6C110A9 /* ios-widget */,
+				51D557A67480F8B25A2F4DA7 /* shared */,
+				46AE63D97061125F50462FFC /* watch */,
+				1CC4EE56D09A975B5419C60A /* shared */,
+				88F976BBAE5A4CFDC5BEDFBB /* macos-widget */,
+				3B87E626326006D1F430CA36 /* shared */,
 			);
 			sourceTree = "<group>";
 		};
@@ -107,13 +309,134 @@
 				AA40DE862F4174E2006EDD6D /* waqtu.app */,
 				AA40DE932F4174E3006EDD6D /* waqtuTests.xctest */,
 				AA40DE9D2F4174E3006EDD6D /* waqtuUITests.xctest */,
+				F302ECD96F7C0432C2E86FA2 /* waqtu-ios */,
+				47D6F5E916FFD6DA5FC1879D /* waqtu-widget */,
+				F54AD20B8E6472CEC93A520D /* waqtu-watch */,
+				E25A23E603463AFFEA2FAB02 /* waqtu-mac-widget */,
+				8B051D8F6787F0DA803FE5E5 /* waqtu-mas */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		BB341D63B60D2B6D30DA9D72 /* watchOS */ = {
+			isa = PBXGroup;
+			children = (
+				D88A066BFF738D65FDF14C54 /* Foundation.framework */,
+			);
+			name = watchOS;
+			sourceTree = "<group>";
+		};
+		CA33D4658ED2BC34ADDAB107 /* OS X */ = {
+			isa = PBXGroup;
+			children = (
+				C0A98A87F32902589F60A5DB /* Foundation.framework */,
+			);
+			name = "OS X";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		0A8A72BC95731ACC48AB6DD7 /* waqtu-mas */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 80492647C6AAEB42871B31E3 /* Build configuration list for PBXNativeTarget "waqtu-mas" */;
+			buildPhases = (
+				D9E95BA7A923F59BFF5BB75E /* Sources */,
+				0C36F1F06D224D2FD934B2B4 /* Frameworks */,
+				566229BB16F3DFF97CFC2FE2 /* Resources */,
+				788BAA79A8B16F89787E1DB3 /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3A80F40D0C745C64DD477D65 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				AA40DE882F4174E2006EDD6D /* waqtu */,
+				C4AF80E4B9C53B3D3F72D0AE /* shared */,
+			);
+			name = "waqtu-mas";
+			packageProductDependencies = (
+				1333C6AA761E8AC4FC22AEC1 /* Adhan */,
+			);
+			productName = "waqtu-mas";
+			productReference = 8B051D8F6787F0DA803FE5E5 /* waqtu-mas */;
+			productType = "com.apple.product-type.application";
+		};
+		396F02F3E8E4BB62620A9CB6 /* waqtu-mac-widget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 29DAD16C37E3A62C78E58EF9 /* Build configuration list for PBXNativeTarget "waqtu-mac-widget" */;
+			buildPhases = (
+				94FEAEEA2DA37980B862AFD6 /* Sources */,
+				5EC9AEB2772894A5497D296D /* Frameworks */,
+				23BAEB7FD9E846AA76B8BEC3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				88F976BBAE5A4CFDC5BEDFBB /* macos-widget */,
+				3B87E626326006D1F430CA36 /* shared */,
+			);
+			name = "waqtu-mac-widget";
+			packageProductDependencies = (
+				1333C6AA761E8AC4FC22AEC1 /* Adhan */,
+			);
+			productName = "waqtu-mac-widget";
+			productReference = E25A23E603463AFFEA2FAB02 /* waqtu-mac-widget */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		9447D38450DE718DD48026B9 /* waqtu-watch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4A6CB03CE435F7D643F855D7 /* Build configuration list for PBXNativeTarget "waqtu-watch" */;
+			buildPhases = (
+				32E211682FFD26AA6FC65D23 /* Sources */,
+				156FBCBB4185252B38A5F33A /* Frameworks */,
+				2E6C57CE739B0698B0C5CC94 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				46AE63D97061125F50462FFC /* watch */,
+				1CC4EE56D09A975B5419C60A /* shared */,
+			);
+			name = "waqtu-watch";
+			packageProductDependencies = (
+				1333C6AA761E8AC4FC22AEC1 /* Adhan */,
+			);
+			productName = "waqtu-watch";
+			productReference = F54AD20B8E6472CEC93A520D /* waqtu-watch */;
+			productType = "com.apple.product-type.application";
+		};
+		A9D27C353E5CC887DC7C2DE0 /* waqtu-ios */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7B8D5272E23A646B35FECF91 /* Build configuration list for PBXNativeTarget "waqtu-ios" */;
+			buildPhases = (
+				C853A5EC94C37819A777F099 /* Sources */,
+				4D3395950518ACAA660463A3 /* Frameworks */,
+				29DF4DAE613C6DD298200352 /* Resources */,
+				B447A6367143F6982DE7BDBE /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FB30F9F5097570482D551BA6 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				729DA62ACB0B8883E56C5CC6 /* ios */,
+				B06870183C8BB48B1E5BBBD6 /* shared */,
+			);
+			name = "waqtu-ios";
+			packageProductDependencies = (
+				1333C6AA761E8AC4FC22AEC1 /* Adhan */,
+			);
+			productName = "waqtu-ios";
+			productReference = F302ECD96F7C0432C2E86FA2 /* waqtu-ios */;
+			productType = "com.apple.product-type.application";
+		};
 		AA40DE852F4174E2006EDD6D /* waqtu */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA40DEA72F4174E3006EDD6D /* Build configuration list for PBXNativeTarget "waqtu" */;
@@ -122,13 +445,16 @@
 				AA40DE832F4174E2006EDD6D /* Frameworks */,
 				AA40DE842F4174E2006EDD6D /* Resources */,
 				AA50DE852F4174E2006EDD6E /* Embed Sparkle */,
+				923F52219D934E02F866CF81 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				06A8C260AFB54EAA0F1FAC1F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				AA40DE882F4174E2006EDD6D /* waqtu */,
+				C4AF80E4B9C53B3D3F72D0AE /* shared */,
 			);
 			name = waqtu;
 			packageProductDependencies = (
@@ -156,8 +482,6 @@
 				AA40DE962F4174E3006EDD6D /* waqtuTests */,
 			);
 			name = waqtuTests;
-			packageProductDependencies = (
-			);
 			productName = waqtuTests;
 			productReference = AA40DE932F4174E3006EDD6D /* waqtuTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -179,11 +503,33 @@
 				AA40DEA02F4174E3006EDD6D /* waqtuUITests */,
 			);
 			name = waqtuUITests;
-			packageProductDependencies = (
-			);
 			productName = waqtuUITests;
 			productReference = AA40DE9D2F4174E3006EDD6D /* waqtuUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		FED58D04EF35838AF8144A21 /* waqtu-widget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EBA3DD532756D1205CBA7F86 /* Build configuration list for PBXNativeTarget "waqtu-widget" */;
+			buildPhases = (
+				B10181E6C86C28D774A5C6BE /* Sources */,
+				3AE45BB6D2A3233F6AEF722D /* Frameworks */,
+				637A9A7260393BCECCF2F3EE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				7E791B335D63AEBBB6C110A9 /* ios-widget */,
+				51D557A67480F8B25A2F4DA7 /* shared */,
+			);
+			name = "waqtu-widget";
+			packageProductDependencies = (
+				1333C6AA761E8AC4FC22AEC1 /* Adhan */,
+			);
+			productName = "waqtu-widget";
+			productReference = 47D6F5E916FFD6DA5FC1879D /* waqtu-widget */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -195,6 +541,22 @@
 				LastSwiftUpdateCheck = 1630;
 				LastUpgradeCheck = 1630;
 				TargetAttributes = {
+					A9D27C353E5CC887DC7C2DE0 = {
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+								groups = (
+									group.com.waqtu.shared,
+								);
+							};
+							com.apple.iCloud = {
+								enabled = 1;
+								services = (
+									"Key-value",
+								);
+							};
+						};
+					};
 					AA40DE852F4174E2006EDD6D = {
 						CreatedOnToolsVersion = 16.3;
 					};
@@ -229,11 +591,51 @@
 				AA40DE852F4174E2006EDD6D /* waqtu */,
 				AA40DE922F4174E3006EDD6D /* waqtuTests */,
 				AA40DE9C2F4174E3006EDD6D /* waqtuUITests */,
+				A9D27C353E5CC887DC7C2DE0 /* waqtu-ios */,
+				FED58D04EF35838AF8144A21 /* waqtu-widget */,
+				9447D38450DE718DD48026B9 /* waqtu-watch */,
+				396F02F3E8E4BB62620A9CB6 /* waqtu-mac-widget */,
+				0A8A72BC95731ACC48AB6DD7 /* waqtu-mas */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		23BAEB7FD9E846AA76B8BEC3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		29DF4DAE613C6DD298200352 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2E6C57CE739B0698B0C5CC94 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		566229BB16F3DFF97CFC2FE2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		637A9A7260393BCECCF2F3EE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AA40DE842F4174E2006EDD6D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -280,6 +682,20 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		32E211682FFD26AA6FC65D23 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		94FEAEEA2DA37980B862AFD6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AA40DE822F4174E2006EDD6D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -301,9 +717,42 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B10181E6C86C28D774A5C6BE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C853A5EC94C37819A777F099 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D9E95BA7A923F59BFF5BB75E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		06A8C260AFB54EAA0F1FAC1F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "waqtu-mac-widget";
+			target = 396F02F3E8E4BB62620A9CB6 /* waqtu-mac-widget */;
+			targetProxy = A3C1D0FD55F5F38CE318CD1C /* PBXContainerItemProxy */;
+		};
+		3A80F40D0C745C64DD477D65 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "waqtu-mac-widget";
+			target = 396F02F3E8E4BB62620A9CB6 /* waqtu-mac-widget */;
+			targetProxy = 9146193D16424C6D218464DA /* PBXContainerItemProxy */;
+		};
 		AA40DE952F4174E3006EDD6D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = AA40DE852F4174E2006EDD6D /* waqtu */;
@@ -314,9 +763,217 @@
 			target = AA40DE852F4174E2006EDD6D /* waqtu */;
 			targetProxy = AA40DE9E2F4174E3006EDD6D /* PBXContainerItemProxy */;
 		};
+		FB30F9F5097570482D551BA6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "waqtu-widget";
+			target = FED58D04EF35838AF8144A21 /* waqtu-widget */;
+			targetProxy = FD1A2774D82C68F1C7052313 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		06DEA8D89164440688F8EDB8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = "ios-widget/ios-widget.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F6Q6UFUK69;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Waqtu Widget";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtu.ios.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		2C89FB5748A5B2DDCB1D57F2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = ios/ios.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F6Q6UFUK69;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Waqtu;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqtu uses your location to calculate accurate prayer times.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtu.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		48E802DFDBE218F61EA25E77 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = "ios-widget/ios-widget.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F6Q6UFUK69;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Waqtu Widget";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtu.ios.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		4E173D78C1C5423B809E2072 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = watch/watch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F6Q6UFUK69;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Waqtu;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = dat.waqtu.ios;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtu.ios.watch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		5612A80F5E019FCDD5B87DCE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "macos-widget/macos-widget.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F6Q6UFUK69;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Waqtu Widget";
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "dat.waqtu.mac-widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		637636F0D21B8F5F37D62DD3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = watch/watch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F6Q6UFUK69;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Waqtu;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = dat.waqtu.ios;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtu.ios.watch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		7A40AF73C4C405FADE286656 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "macos-widget/macos-widget.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F6Q6UFUK69;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Waqtu Widget";
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "dat.waqtu.mac-widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A06CF2BFB37448FA8A5999F0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = "waqtu-mas/waqtu-mas.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 28;
+				DEVELOPMENT_TEAM = F6Q6UFUK69;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Waqtu;
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times. Full access is required to add and remove these events.";
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqtu needs your location to calculate accurate prayer times.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.9.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtu;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) MAS";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
 		AA40DEA52F4174E3006EDD6D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -572,9 +1229,111 @@
 			};
 			name = Release;
 		};
+		EB0820E589C4880582A53B6F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = ios/ios.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F6Q6UFUK69;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Waqtu;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqtu uses your location to calculate accurate prayer times.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtu.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F65C72A06F0E948AA1F2AAD9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = "waqtu-mas/waqtu-mas.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 28;
+				DEVELOPMENT_TEAM = F6Q6UFUK69;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Waqtu;
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times. Full access is required to add and remove these events.";
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqtu needs your location to calculate accurate prayer times.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.9.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtu;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) MAS";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		29DAD16C37E3A62C78E58EF9 /* Build configuration list for PBXNativeTarget "waqtu-mac-widget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A40AF73C4C405FADE286656 /* Release */,
+				5612A80F5E019FCDD5B87DCE /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4A6CB03CE435F7D643F855D7 /* Build configuration list for PBXNativeTarget "waqtu-watch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4E173D78C1C5423B809E2072 /* Release */,
+				637636F0D21B8F5F37D62DD3 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7B8D5272E23A646B35FECF91 /* Build configuration list for PBXNativeTarget "waqtu-ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EB0820E589C4880582A53B6F /* Release */,
+				2C89FB5748A5B2DDCB1D57F2 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		80492647C6AAEB42871B31E3 /* Build configuration list for PBXNativeTarget "waqtu-mas" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F65C72A06F0E948AA1F2AAD9 /* Release */,
+				A06CF2BFB37448FA8A5999F0 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		AA40DE812F4174E2006EDD6D /* Build configuration list for PBXProject "waqt" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -607,6 +1366,15 @@
 			buildConfigurations = (
 				AA40DEAE2F4174E3006EDD6D /* Debug */,
 				AA40DEAF2F4174E3006EDD6D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EBA3DD532756D1205CBA7F86 /* Build configuration list for PBXNativeTarget "waqtu-widget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				06DEA8D89164440688F8EDB8 /* Release */,
+				48E802DFDBE218F61EA25E77 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

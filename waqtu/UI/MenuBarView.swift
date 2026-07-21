@@ -643,7 +643,30 @@ struct UpgradeSettingsTab: View {
                             .font(.system(size: 13))
                             .foregroundColor(.waqtuMuted)
                     }
-                    Text("Buy once at getwaqtu.com — you’ll get a license key by email. Enter it below to activate this Mac.")
+                    #if MAS
+                    Text("Unlock Waqtu for lifetime access on this Mac with a one-time purchase.")
+                        .font(.system(size: 13))
+                        .foregroundColor(.waqtuMuted)
+                    VStack(alignment: .leading, spacing: 8) {
+                        if let err = activationError {
+                            Text(err)
+                                .font(.system(size: 11))
+                                .foregroundColor(.red)
+                        }
+                        Button(isActivating ? "Processing\u{2026}" : "Buy Lifetime Access") {
+                            purchaseLifetime()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.waqtuPrimary)
+                        .disabled(isActivating)
+                        Button("Restore Purchases") {
+                            restorePurchases()
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(.waqtuPrimary)
+                    }
+                    #else
+                    Text("Buy once at getwaqtu.com \u{2014} you\u{2019}ll get a license key by email. Enter it below to activate this Mac.")
                         .font(.system(size: 13))
                         .foregroundColor(.waqtuMuted)
 
@@ -659,7 +682,7 @@ struct UpgradeSettingsTab: View {
                                 .font(.system(size: 11))
                                 .foregroundColor(.red)
                         }
-                        Button(isActivating ? "Activating…" : "Activate this device") {
+                        Button(isActivating ? "Activating\u{2026}" : "Activate this device") {
                             activateLicense()
                         }
                         .buttonStyle(.borderedProminent)
@@ -674,6 +697,7 @@ struct UpgradeSettingsTab: View {
                     }
                     .buttonStyle(.bordered)
                     .tint(.waqtuPrimary)
+                    #endif
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -681,6 +705,7 @@ struct UpgradeSettingsTab: View {
         }
     }
 
+    #if !MAS
     private func activateLicense() {
         activationError = nil
         isActivating = true
@@ -695,6 +720,21 @@ struct UpgradeSettingsTab: View {
             }
         }
     }
+    #else
+    private func purchaseLifetime() {
+        activationError = nil
+        isActivating = true
+        Task { @MainActor in
+            let result = await licenseManager.purchase()
+            isActivating = false
+            if case .failure(.message(let msg)) = result { activationError = msg }
+        }
+    }
+
+    private func restorePurchases() {
+        Task { @MainActor in await licenseManager.restore() }
+    }
+    #endif
 }
 
 // MARK: - Day 7: Full-screen upgrade (Settings)
@@ -711,7 +751,34 @@ struct UpgradeFullScreenView: View {
             Text("Upgrade")
                 .font(.system(size: 26, weight: .semibold))
                 .foregroundColor(.waqtuText)
-            Text("Your trial has ended. Buy lifetime access at getwaqtu.com — you’ll get a license key by email. Enter it below to activate this Mac.")
+            #if MAS
+            Text("Your trial has ended. Unlock Waqtu for lifetime access with a one-time purchase.")
+                .font(.system(size: 14))
+                .foregroundColor(.waqtuMuted)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+
+            VStack(alignment: .leading, spacing: 8) {
+                if let err = activationError {
+                    Text(err)
+                        .font(.system(size: 11))
+                        .foregroundColor(.red)
+                }
+                Button(isActivating ? "Processing\u{2026}" : "Buy Lifetime Access") {
+                    purchaseLifetime()
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.waqtuPrimary)
+                .disabled(isActivating)
+                Button("Restore Purchases") {
+                    restorePurchases()
+                }
+                .buttonStyle(.bordered)
+                .tint(.waqtuPrimary)
+            }
+            .frame(width: 280)
+            #else
+            Text("Your trial has ended. Buy lifetime access at getwaqtu.com \u{2014} you\u{2019}ll get a license key by email. Enter it below to activate this Mac.")
                 .font(.system(size: 14))
                 .foregroundColor(.waqtuMuted)
                 .multilineTextAlignment(.center)
@@ -729,7 +796,7 @@ struct UpgradeFullScreenView: View {
                         .font(.system(size: 11))
                         .foregroundColor(.red)
                 }
-                Button(isActivating ? "Activating…" : "Activate this device") {
+                Button(isActivating ? "Activating\u{2026}" : "Activate this device") {
                     activateLicense()
                 }
                 .buttonStyle(.borderedProminent)
@@ -743,11 +810,13 @@ struct UpgradeFullScreenView: View {
             }
             .buttonStyle(.bordered)
             .tint(.waqtuPrimary)
+            #endif
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
+    #if !MAS
     private func activateLicense() {
         activationError = nil
         isActivating = true
@@ -768,6 +837,21 @@ struct UpgradeFullScreenView: View {
             NSWorkspace.shared.open(url)
         }
     }
+    #else
+    private func purchaseLifetime() {
+        activationError = nil
+        isActivating = true
+        Task { @MainActor in
+            let result = await licenseManager.purchase()
+            isActivating = false
+            if case .failure(.message(let msg)) = result { activationError = msg }
+        }
+    }
+
+    private func restorePurchases() {
+        Task { @MainActor in await licenseManager.restore() }
+    }
+    #endif
 }
 
 // MARK: - Slack Settings Tab
