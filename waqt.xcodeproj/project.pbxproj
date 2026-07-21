@@ -11,6 +11,7 @@
 		32D0237D9FD6219D7400D6FE /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
 		3C2F5A8F3980599AD9C85006 /* waqtu-mac-widget in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E25A23E603463AFFEA2FAB02 /* waqtu-mac-widget */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3EDB55A983EE583686964834 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0A98A87F32902589F60A5DB /* Foundation.framework */; };
+		42894EF4FF9905BB5AEC22AA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E814699275DB5EF2E2B6AC60 /* Foundation.framework */; };
 		664A82B75B1FC2E095D5F546 /* waqtu-mac-widget in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E25A23E603463AFFEA2FAB02 /* waqtu-mac-widget */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7CB78973DC80F3385AC757EE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E814699275DB5EF2E2B6AC60 /* Foundation.framework */; };
 		913CA09F6A43B2B77132976B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0A98A87F32902589F60A5DB /* Foundation.framework */; };
@@ -21,6 +22,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		0FC1B88D0AB4987A0027B27D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA40DE7E2F4174E2006EDD6D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A9D27C353E5CC887DC7C2DE0;
+			remoteInfo = "waqtu-ios";
+		};
 		9146193D16424C6D218464DA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AA40DE7E2F4174E2006EDD6D /* Project object */;
@@ -103,11 +111,29 @@
 		AA40DE9D2F4174E3006EDD6D /* waqtuUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = waqtuUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0A98A87F32902589F60A5DB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		D88A066BFF738D65FDF14C54 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS11.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		DB2A040F2D5A069C913C22FD /* waqtu-ios-uitests */ = {isa = PBXFileReference; includeInIndex = 0; path = "waqtu-ios-uitests"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E25A23E603463AFFEA2FAB02 /* waqtu-mac-widget */ = {isa = PBXFileReference; includeInIndex = 0; path = "waqtu-mac-widget"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E814699275DB5EF2E2B6AC60 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		F302ECD96F7C0432C2E86FA2 /* waqtu-ios */ = {isa = PBXFileReference; includeInIndex = 0; path = "waqtu-ios"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F54AD20B8E6472CEC93A520D /* waqtu-watch */ = {isa = PBXFileReference; includeInIndex = 0; path = "waqtu-watch"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		9132727DD6BA482F956A5F7E /* Exceptions for "macos-widget" folder in "waqtu-mac-widget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 396F02F3E8E4BB62620A9CB6 /* waqtu-mac-widget */;
+		};
+		AC05C5CBC20BF6658B481567 /* Exceptions for "ios-widget" folder in "waqtu-widget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = FED58D04EF35838AF8144A21 /* waqtu-widget */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1CC4EE56D09A975B5419C60A /* shared */ = {
@@ -148,6 +174,7 @@
 		7E791B335D63AEBBB6C110A9 /* ios-widget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				AC05C5CBC20BF6658B481567 /* Exceptions for "ios-widget" folder in "waqtu-widget" target */,
 			);
 			path = "ios-widget";
 			sourceTree = "<group>";
@@ -155,8 +182,16 @@
 		88F976BBAE5A4CFDC5BEDFBB /* macos-widget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				9132727DD6BA482F956A5F7E /* Exceptions for "macos-widget" folder in "waqtu-mac-widget" target */,
 			);
 			path = "macos-widget";
+			sourceTree = "<group>";
+		};
+		93B740C16A1438F2EF0A3F9C /* ios-uitests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = "ios-uitests";
 			sourceTree = "<group>";
 		};
 		AA40DE882F4174E2006EDD6D /* waqtu */ = {
@@ -261,6 +296,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D4C393938C18FCB2D55B6EAC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				42894EF4FF9905BB5AEC22AA /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -300,6 +343,7 @@
 				1CC4EE56D09A975B5419C60A /* shared */,
 				88F976BBAE5A4CFDC5BEDFBB /* macos-widget */,
 				3B87E626326006D1F430CA36 /* shared */,
+				93B740C16A1438F2EF0A3F9C /* ios-uitests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -314,6 +358,7 @@
 				F54AD20B8E6472CEC93A520D /* waqtu-watch */,
 				E25A23E603463AFFEA2FAB02 /* waqtu-mac-widget */,
 				8B051D8F6787F0DA803FE5E5 /* waqtu-mas */,
+				DB2A040F2D5A069C913C22FD /* waqtu-ios-uitests */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -362,6 +407,27 @@
 			productName = "waqtu-mas";
 			productReference = 8B051D8F6787F0DA803FE5E5 /* waqtu-mas */;
 			productType = "com.apple.product-type.application";
+		};
+		28C9C6397833C38DBF253268 /* waqtu-ios-uitests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C7F5006663E6CC306FCFFA2B /* Build configuration list for PBXNativeTarget "waqtu-ios-uitests" */;
+			buildPhases = (
+				E2F441F5C2C8EBA09DC835F4 /* Sources */,
+				D4C393938C18FCB2D55B6EAC /* Frameworks */,
+				DD959A8DC4C6E021EFA3EF83 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7C23D067FEB93EBED10A34F6 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				93B740C16A1438F2EF0A3F9C /* ios-uitests */,
+			);
+			name = "waqtu-ios-uitests";
+			productName = "waqtu-ios-uitests";
+			productReference = DB2A040F2D5A069C913C22FD /* waqtu-ios-uitests */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 		396F02F3E8E4BB62620A9CB6 /* waqtu-mac-widget */ = {
 			isa = PBXNativeTarget;
@@ -596,6 +662,7 @@
 				9447D38450DE718DD48026B9 /* waqtu-watch */,
 				396F02F3E8E4BB62620A9CB6 /* waqtu-mac-widget */,
 				0A8A72BC95731ACC48AB6DD7 /* waqtu-mas */,
+				28C9C6397833C38DBF253268 /* waqtu-ios-uitests */,
 			);
 		};
 /* End PBXProject section */
@@ -651,6 +718,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		AA40DE9B2F4174E3006EDD6D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DD959A8DC4C6E021EFA3EF83 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -738,6 +812,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E2F441F5C2C8EBA09DC835F4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -752,6 +833,12 @@
 			name = "waqtu-mac-widget";
 			target = 396F02F3E8E4BB62620A9CB6 /* waqtu-mac-widget */;
 			targetProxy = 9146193D16424C6D218464DA /* PBXContainerItemProxy */;
+		};
+		7C23D067FEB93EBED10A34F6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "waqtu-ios";
+			target = A9D27C353E5CC887DC7C2DE0 /* waqtu-ios */;
+			targetProxy = 0FC1B88D0AB4987A0027B27D /* PBXContainerItemProxy */;
 		};
 		AA40DE952F4174E3006EDD6D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -780,7 +867,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "ios-widget/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Waqtu Widget";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
@@ -837,7 +925,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "ios-widget/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Waqtu Widget";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
@@ -885,7 +974,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "macos-widget/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Waqtu Widget";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
@@ -923,6 +1013,26 @@
 			};
 			name = Debug;
 		};
+		63C68CB493BC19891A61B3A8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = F6Q6UFUK69;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtu.ios.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = "waqtu-ios";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		7A40AF73C4C405FADE286656 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -930,7 +1040,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "macos-widget/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Waqtu Widget";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
@@ -1229,6 +1340,25 @@
 			};
 			name = Release;
 		};
+		DD17A43B3B43E449D288FB25 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = F6Q6UFUK69;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dat.waqtu.ios.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = "waqtu-ios";
+			};
+			name = Debug;
+		};
 		EB0820E589C4880582A53B6F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1366,6 +1496,15 @@
 			buildConfigurations = (
 				AA40DEAE2F4174E3006EDD6D /* Debug */,
 				AA40DEAF2F4174E3006EDD6D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C7F5006663E6CC306FCFFA2B /* Build configuration list for PBXNativeTarget "waqtu-ios-uitests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				63C68CB493BC19891A61B3A8 /* Release */,
+				DD17A43B3B43E449D288FB25 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
