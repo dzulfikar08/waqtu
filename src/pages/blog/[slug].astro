@@ -1,0 +1,23 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BlogPostLayout from "../../layouts/BlogPostLayout.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const canonical = `/blog/${post.id}`;
+---
+
+<BaseLayout title={`${post.data.title} — Waqtu Blog`} description={post.data.description} canonical={canonical} ogTitle={post.data.title} ogDescription={post.data.description}>
+  <BlogPostLayout title={post.data.title} description={post.data.description} pubDate={post.data.pubDate} category={post.data.category} readTime={post.data.readTime}>
+    <Content />
+  </BlogPostLayout>
+</BaseLayout>

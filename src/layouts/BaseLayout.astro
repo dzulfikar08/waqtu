@@ -1,0 +1,79 @@
+---
+import "@fontsource-variable/fraunces";
+import "@fontsource-variable/manrope";
+import "../styles/global.css";
+import JsonLd from "../components/JsonLd.astro";
+
+export interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+}
+
+const siteUrl = "https://getwaqtu.com";
+
+const {
+  title = "Waqtu — Prayer Times in Your Menu Bar for Mac",
+  description = "Prayer times in your Mac menu bar. Waqtu blocks your calendar during salah and shows you as busy in Teams and Slack. No ads, no tracking. macOS 12+.",
+  canonical = "/",
+  ogTitle,
+  ogDescription,
+  ogImage = "/og-image.webp",
+} = Astro.props;
+
+const canonicalUrl = new URL(canonical, siteUrl).href;
+const ogImageUrl = new URL(ogImage, siteUrl).href;
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta
+      name="keywords"
+      content="prayer times mac, mac menu bar prayer times, best prayer times app mac, prayer times app macos, salah reminder mac, menu bar prayer times mac, muslim productivity app, calendar prayer blocks, teams busy prayer, slack status prayer, waqtu"
+    />
+    <meta name="author" content="Waqtu" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content="Waqtu" />
+    <meta property="og:title" content={ogTitle ?? title} />
+    <meta property="og:description" content={ogDescription ?? description} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Waqtu — Prayer times in your Mac menu bar" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={ogTitle ?? title} />
+    <meta name="twitter:description" content={ogDescription ?? description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <meta name="theme-color" content="#0d1714" />
+
+    <JsonLd />
+
+    <script
+      defer
+      src="https://assets.onedollarstats.com/stonks.js"
+      is:inline
+    ></script>
+  </head>
+  <body class="min-h-screen font-sans antialiased">
+    <slot />
+  </body>
+</html>

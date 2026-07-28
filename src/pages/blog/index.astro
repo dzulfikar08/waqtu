@@ -1,0 +1,64 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BackLink from "../../components/BackLink.astro";
+import { getCollection } from "astro:content";
+
+// Preserve the curated display order shown on the original site.
+const order = [
+  "best-prayer-times-app-mac",
+  "show-prayer-times-menu-bar-mac",
+  "slack-status-prayer-times",
+  "prayer-streaks-build-consistency",
+  "block-calendar-prayer-times",
+  "muslim-pro-privacy-lesson",
+  "prayer-time-calculation-methods",
+  "tell-team-about-prayer",
+  "why-mac-prayer-times-app",
+  "menu-bar-prayer-times-guide",
+];
+
+const posts = (await getCollection("blog")).sort((a, b) => {
+  const ia = order.indexOf(a.id);
+  const ib = order.indexOf(b.id);
+  return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+});
+---
+
+<BaseLayout title="Blog — Waqtu" description="Tips, guides, and stories about prayer times, productivity, and building habits as a Muslim professional." canonical="/blog">
+  <div class="relative z-10 min-h-screen px-6 py-16 sm:px-10 md:px-14 md:py-24">
+    <div class="mx-auto max-w-4xl">
+      <BackLink href="/" label="Back to Waqtu" />
+
+      <h1 class="font-display mb-4 text-3xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-4xl">Waqtu Blog</h1>
+      <p class="mb-12 max-w-2xl text-[var(--waqtu-muted)] leading-relaxed">
+        Tips, guides, and stories about prayer times, productivity at work, and building consistent habits as a Muslim professional.
+      </p>
+
+      <div class="grid gap-6 sm:grid-cols-2">
+        {posts.map((post) => (
+          <a href={`/blog/${post.id}`} class="neu-card group p-6 flex flex-col hover:border-[var(--waqtu-primary)] transition-all">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--waqtu-gold)] bg-[var(--waqtu-gold)]/10 px-2 py-0.5 rounded-full">{post.data.category}</span>
+              <span class="text-xs text-[var(--waqtu-muted)]">{post.data.readTime}</span>
+            </div>
+            <h2 class="font-display mb-2 text-lg font-semibold text-[var(--waqtu-text)] group-hover:text-[var(--waqtu-primary)] transition-colors">{post.data.title}</h2>
+            <p class="flex-1 text-sm text-[var(--waqtu-muted)] leading-relaxed">{post.data.description}</p>
+            <div class="mt-4 pt-4 border-t border-[var(--waqtu-border)] flex items-center justify-between">
+              <span class="text-xs text-[var(--waqtu-muted)]">{post.data.pubDate}</span>
+              <span class="text-xs text-[var(--waqtu-primary)] group-hover:translate-x-1 transition-transform">Read more &rarr;</span>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <div class="mt-16 neu-card p-8 text-center">
+        <h2 class="font-display mb-2 text-xl font-semibold text-[var(--waqtu-text)]">Get updates</h2>
+        <p class="mb-4 text-[var(--waqtu-muted)]">New articles about prayer, productivity, and updates from Waqtu.</p>
+        <a href="/#download" class="neu-btn inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]">
+          Download Waqtu
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

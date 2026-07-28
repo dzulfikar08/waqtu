@@ -1,0 +1,72 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BackLink from "../../components/BackLink.astro";
+
+interface Resource {
+  href: string;
+  title: string;
+  blurb: string;
+}
+
+const resources: Resource[] = [
+  {
+    href: "/resources/slack-setup",
+    title: "Slack Status Setup",
+    blurb: "Step-by-step guide to auto-set your Slack status to “Praying” during prayer times. Create a Slack app, get your token, and connect it to Waqtu.",
+  },
+  {
+    href: "/resources/prayer-accommodation",
+    title: "Prayer Accommodation Email",
+    blurb: "A professional email template to request prayer accommodations from your manager or HR department. Customizable and respectful.",
+  },
+  {
+    href: "/resources/prayer-times-card",
+    title: "Prayer Times Card",
+    blurb: "A printable prayer times card you can share with colleagues or post at your desk. Shows your typical prayer windows so the team knows when you’re unavailable.",
+  },
+  {
+    href: "/blog/tell-team-about-prayer",
+    title: "For Managers",
+    blurb: "A short guide for managers and team leads on supporting Muslim colleagues. Covers Ramadan, prayer times, and how to create an inclusive workplace.",
+  },
+  {
+    href: "/blog/prayer-time-calculation-methods",
+    title: "Calculation Methods Guide",
+    blurb: "Understand the difference between MWL, ISNA, Egyptian, Umm al-Qura and other prayer time calculation methods. Find the one your mosque uses.",
+  },
+];
+---
+
+<BaseLayout title="Resources — Waqtu" description="Free resources for Muslim professionals: prayer accommodation email templates, prayer times cards, and workplace guides." canonical="/resources">
+  <div class="relative z-10 min-h-screen px-6 py-16 sm:px-10 md:px-14 md:py-24">
+    <div class="mx-auto max-w-4xl">
+      <BackLink href="/" label="Back to Waqtu" />
+      <h1 class="font-display mb-4 text-3xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-4xl">Resources</h1>
+      <p class="mb-12 max-w-2xl text-[var(--waqtu-muted)] leading-relaxed">
+        Free resources to help Muslim professionals navigate prayer at work — email templates, prayer times cards, and workplace guides.
+      </p>
+
+      <div class="grid gap-8 sm:grid-cols-2">
+        {resources.map((r) => (
+          <div class="neu-card p-8">
+            <h2 class="font-display mb-3 text-xl font-semibold text-[var(--waqtu-text)]">{r.title}</h2>
+            <p class="mb-4 text-sm text-[var(--waqtu-muted)] leading-relaxed">{r.blurb}</p>
+            <a href={r.href} class="neu-btn inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-[var(--waqtu-bg)]">
+              View guide
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+            </a>
+          </div>
+        ))}
+      </div>
+
+      <div class="mt-16 neu-card p-8 text-center">
+        <h2 class="font-display mb-2 text-xl font-semibold text-[var(--waqtu-text)]">More questions?</h2>
+        <p class="mb-4 text-[var(--waqtu-muted)]">Check our FAQ or reach out directly. We&apos;re here to help.</p>
+        <div class="flex flex-wrap items-center justify-center gap-4">
+          <a href="/#faq" class="neu-btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm font-medium text-[var(--waqtu-text)]">View FAQ</a>
+          <a href="mailto:dzulfikar.at@gmail.com" class="neu-btn inline-flex items-center gap-2 px-6 py-3 text-sm font-medium text-[var(--waqtu-bg)]">Contact Support</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
