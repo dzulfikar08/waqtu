@@ -1,7 +1,7 @@
 # Waqtu Development Roadmap
 
-> **Last updated**: May 2025
-> **Overall progress**: Phase 1 ✅ | Phase 2 🚧 ~85% | Phase 3 ✅ | Phase 4 ⏳
+> **Last updated**: 6 May 2025
+> **Overall progress**: Phase 1 ✅ | Phase 2 ✅ | Phase 3 ✅ | Phase 4 🚧 ~60%
 
 ---
 
@@ -64,33 +64,25 @@
 
 ---
 
-## Phase 4: Growth (16 → 24 weeks) ⏳
+## Phase 4: Growth (16 → 24 weeks) 🚧 IN PROGRESS
 
-### Platform Expansion
+### ✅ 4.1 Apple Watch Complications (code complete, pending Xcode targets)
+- 5 complication families: Graphic Corner, Graphic Circular, Graphic Rectangular, Modular Large, Modular Small
+- Cached prayer times with once-daily refresh
+- SharedDataBridge pushes data from Mac app
 
-#### 4.1 iOS Companion App (6–8 weeks)
-- **Scope**: Read-only companion — view prayer times, streaks, and calendar events synced from the Mac app via iCloud
-- **Tech**: SwiftUI with shared Adhan calculation engine, iCloud Core Data or NSUbiquitousKeyValueStore for streak sync
-- **Screens**: Today view (prayer times + streaks), Weekly heatmap, Settings (calculation method sync), Widget
-- **Why not full Mac feature parity?** The Mac app is the hub. iOS is a companion for checking times on the go. No location, no calendar blocking, no overlay on iOS v1
-- **Key risk**: iCloud sync reliability. Plan fallback: manual refresh + local-only mode
+### ✅ 4.2 iOS Companion App (code complete, pending Xcode targets)
+- Read-only companion — Today view, Streak view, Settings
+- iCloud sync via NSUbiquitousKeyValueStore + shared app group
+- Lock Screen / Home Screen widget (PrayerWidget)
 
-#### 4.2 Apple Watch Complications (2–3 weeks)
-- **Scope**: WatchOS target in existing Xcode project with watchOS complications
-- **Complications**: Modular Large (next prayer + countdown), Circular Small (prayer icon + countdown minutes), Graphic Corner (prayer name)
-- **Data source**: WatchConnectivity or shared UserDefaults via app group from iOS companion
-- **Why this first**: Most-requested feature across Reddit/forums. Low effort (complications are simple SwiftUI views), high impact
-- **Key risk**: WatchConnectivity latency. Mitigation: cache prayer times locally on watch, refresh once daily
+### ✅ 4.3 macOS Widgets (code complete, pending Xcode target)
+- Small: Next prayer countdown
+- Medium: Countdown + prayer timeline
+- Large: Weekly streak + prayer timeline
+- WidgetKit with shared app group data source
 
-#### 4.3 macOS Widgets (1–2 weeks)
-- **Scope**: Notification Center widgets for macOS 14+
-- **Widgets**: Next prayer countdown (small), Today's prayer timeline (medium), Weekly streak (large)
-- **Tech**: WidgetKit, shared container with main app for prayer data
-- **Why**: Low effort, native macOS feature, differentiator (no competitor has macOS widgets)
-
-### Community
-
-#### 4.4 Mosque Time Sync (3–4 weeks)
+### ⏳ 4.4 Mosque Time Sync (3–4 weeks, not started)
 - **Scope**: Partner with Mawaqit or similar mosque time API to auto-sync mosque-specific jama'ah times
 - **Flow**: User searches their mosque → Waqtu fetches official times → applies them as a "mosque profile" with auto-adjustments
 - **Tech**: REST API integration, offline cache of mosque times (JSON)
