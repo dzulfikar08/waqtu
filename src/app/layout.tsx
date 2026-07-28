@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Outfit } from "next/font/google";
+import { Fraunces, Manrope } from "next/font/google";
 import Script from "next/script";
 import { JsonLd } from "@/components/json-ld";
 import "./globals.css";
@@ -10,7 +10,7 @@ const fraunces = Fraunces({
   display: "swap",
 });
 
-const outfit = Outfit({
+const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
@@ -88,7 +88,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${outfit.variable} scroll-smooth`}
+      className={`${fraunces.variable} ${manrope.variable} scroll-smooth`}
     >
       <body className="min-h-screen font-sans antialiased">
         <JsonLd />
