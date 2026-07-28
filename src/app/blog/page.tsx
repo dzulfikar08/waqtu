@@ -18,6 +18,24 @@ interface BlogPost {
 
 const posts: BlogPost[] = [
   {
+    slug: "best-prayer-times-app-mac",
+    title: "Best Prayer Times App for Mac in 2026 (Compared & Ranked)",
+    description:
+      "The best prayer times apps for Mac in 2026, ranked by features, privacy, and price. Compare Waqtu, Sajda, Minarah, PrayerCal, and Guidance.",
+    date: "July 2026",
+    category: "Comparison",
+    readTime: "7 min read",
+  },
+  {
+    slug: "show-prayer-times-menu-bar-mac",
+    title: "How to Show Prayer Times in Your Mac Menu Bar (Setup Guide)",
+    description:
+      "Step-by-step: install Waqtu, set your location, match your mosque, and get a live prayer countdown in your Mac menu bar with calendar protection.",
+    date: "July 2026",
+    category: "Setup Guide",
+    readTime: "6 min read",
+  },
+  {
     slug: "slack-status-prayer-times",
     title: "Automatically Set Your Slack Status to 'Praying' During Prayer Times",
     description:

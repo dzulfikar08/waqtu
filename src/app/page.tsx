@@ -348,7 +348,7 @@ export default function Home() {
               className="font-display animate-fade-up max-w-3xl text-4xl font-semibold leading-[1.1] tracking-tight text-[var(--waqtu-text)] sm:text-5xl md:text-[3.5rem] md:leading-[1.08]"
               style={{ animationDelay: "80ms", opacity: 0 }}
             >
-              Prayer Times in Your Menu Bar
+              Prayer Times in Your Mac Menu Bar
             </h1>
             <p
               className="animate-fade-up mt-4 max-w-lg text-xl leading-relaxed text-[var(--waqtu-muted)] italic"
@@ -364,8 +364,8 @@ export default function Home() {
               className="animate-fade-up mt-6 max-w-lg text-lg leading-relaxed text-[var(--waqtu-muted)]"
               style={{ animationDelay: "160ms", opacity: 0 }}
             >
-              Waqtu blocks your work calendar during prayer times.
-              Your colleagues see you as busy — no explanation needed.
+              Waqtu blocks your work calendar during every salah.
+              Teams, Outlook, and Slack show you as busy — no explanation needed.
             </p>
 
             <div
@@ -412,6 +412,10 @@ export default function Home() {
                 &middot;
               </span>
               <span>macOS 12+</span>
+              <span className="hidden sm:inline text-[var(--waqtu-border)]">
+                &middot;
+              </span>
+              <span>30-day refund</span>
             </div>
           </div>
         </section>
@@ -426,6 +430,11 @@ export default function Home() {
             <p className="mt-3 text-sm text-[var(--waqtu-muted)]">
               &ldquo;Indeed, prayer is obligatory on the believers at specified times.&rdquo; — Quran 4:103
             </p>
+            <p className="mt-3 text-sm text-[var(--waqtu-muted)]">
+              <a href="/blog/muslim-pro-privacy-lesson" className="text-[var(--waqtu-primary)] hover:underline">Why we never track you</a>
+              {" "}&middot;{" "}
+              <a href="/privacy" className="text-[var(--waqtu-primary)] hover:underline">Read the privacy policy</a>
+            </p>
           </div>
         </section>
 
@@ -436,7 +445,7 @@ export default function Home() {
         >
           <div className="mx-auto max-w-5xl">
             <h2 className="font-display mb-3 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
-              How it works
+              Prayer Times for Mac, Built for the Workday
             </h2>
             <p className="mx-auto mb-16 max-w-md text-center text-[var(--waqtu-muted)]">
               Everything you need. Nothing you don&rsquo;t.
@@ -447,7 +456,7 @@ export default function Home() {
                 {
                   title: "Prayer countdown in your menu bar",
                   description:
-                    "One glance tells you when the next prayer is. No apps to open, nothing to check.",
+                    "Know exactly when the next salah is — without breaking your flow. One glance, no apps to open.",
                   icon: (
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <circle cx="12" cy="12" r="10" />
@@ -458,7 +467,7 @@ export default function Home() {
                 {
                   title: "Calendar protection",
                   description:
-                    "Blocks your calendar during every prayer. Teams shows you as busy. No explanation needed.",
+                    "Colleagues stop booking over your prayers. Your calendar blocks automatically, and Teams and Outlook show you as busy.",
                   icon: (
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
@@ -468,7 +477,7 @@ export default function Home() {
                 {
                   title: "Slack status integration",
                   description:
-                    "Your Slack status changes to \u2018Praying\u2019 during prayer times. Auto-clears when the block ends.",
+                    "Your team sees you’re praying before they message you. Your Slack status sets itself — and clears when the block ends.",
                   icon: (
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 01.778-.332 48.294 48.294 0 005.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
@@ -488,7 +497,7 @@ export default function Home() {
                 {
                   title: "Works completely offline",
                   description:
-                    "Prayer times calculated on your Mac. No internet needed after download.",
+                    "Pray on time even with no Wi-Fi. Every prayer time is calculated on your Mac — no servers, no connection needed.",
                   icon: (
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" />
@@ -499,7 +508,7 @@ export default function Home() {
                 {
                   title: "Location stays private",
                   description:
-                    "Calculated locally on your Mac. Never transmitted, never stored, never sold.",
+                    "Your location stays on your Mac. Never transmitted, never stored, never sold — unlike some prayer apps.",
                   icon: (
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
@@ -509,7 +518,7 @@ export default function Home() {
                 {
                   title: "No ads, no subscriptions",
                   description:
-                    "One payment. No recurring charges. No ad banners. Ever.",
+                    "Pay once, own it forever. No subscriptions, no ad banners, no upsells. Ever.",
                   icon: (
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -537,7 +546,7 @@ export default function Home() {
         <section className="relative z-10 border-y border-[var(--waqtu-border)] px-6 py-20 sm:px-10 md:px-14 md:py-28">
           <div className="mx-auto max-w-5xl">
             <h2 className="font-display mb-3 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
-              See Waqtu in action
+              See Waqtu in Action — Menu Bar, Reminders, Calendar
             </h2>
             <p className="mx-auto mb-12 max-w-md text-center text-[var(--waqtu-muted)]">
               Prayer times at a glance. Calm reminders. Calendar blocked.
@@ -606,10 +615,10 @@ export default function Home() {
         <section className="relative z-10 section-tint-blue border-y border-[var(--waqtu-border)] px-6 py-24 sm:px-10 md:px-14 md:py-32">
           <div className="mx-auto max-w-3xl">
             <h2 className="font-display mb-3 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
-              Why Waqtu
+              Why Waqtu Is the Best Mac Prayer Times App
             </h2>
             <p className="mx-auto mb-12 max-w-md text-center text-[var(--waqtu-muted)]">
-              The only native Mac app with menu bar presence and calendar blocking.
+              The only native Mac app that puts prayer times in your menu bar and blocks your calendar at the same time — all offline.
             </p>
 
             <div className="overflow-x-auto">
@@ -662,6 +671,10 @@ export default function Home() {
                 </tbody>
               </table>
             </div>
+              <p className="mt-6 text-center text-sm text-[var(--waqtu-muted)]">
+                Want the full breakdown?{" "}
+                <a href="/compare" className="text-[var(--waqtu-primary)] hover:underline">See the feature-by-feature comparison of Mac prayer apps &rarr;</a>
+              </p>
           </div>
         </section>
 
@@ -688,6 +701,10 @@ export default function Home() {
                   <p className="text-xs text-[var(--waqtu-muted)]">Founder, Waqtu</p>
                 </div>
               </div>
+              <p className="mt-4 text-sm text-[var(--waqtu-muted)] leading-relaxed">
+                A solo-built, privacy-first Mac app.{" "}
+                <a href="/blog/why-mac-prayer-times-app" className="text-[var(--waqtu-primary)] hover:underline">Read why I built Waqtu &rarr;</a>
+              </p>
             </div>
             <p className="mt-6 text-center text-sm text-[var(--waqtu-muted)]">
               <a href="/changelog" className="text-[var(--waqtu-primary)] hover:underline">See what&apos;s new</a> — Slack integration, prayer streaks, dark/light theme, and more.
@@ -722,6 +739,9 @@ export default function Home() {
                   $14.99
                 </span>
               </div>
+              <p className="mt-3 text-center text-xs text-[var(--waqtu-muted)]">
+                30-day money-back guarantee &middot; Works offline &middot; No tracking
+              </p>
 
               {/* Voucher code box — realistic coupon style */}
               <div className="mt-6">
@@ -821,7 +841,7 @@ export default function Home() {
         >
           <div className="mx-auto max-w-3xl">
             <h2 className="font-display mb-12 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
-              Common questions
+              Frequently Asked Questions About Waqtu
             </h2>
             <div className="space-y-0">
               {[
@@ -914,6 +934,70 @@ export default function Home() {
           </div>
         </section>
 
+
+        {/* ===== GUIDES & RESOURCES ===== */}
+        <section className="relative z-10 px-6 py-24 sm:px-10 md:px-14 md:py-32">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="font-display mb-3 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
+              Guides &amp; Resources for Praying at Work
+            </h2>
+            <p className="mx-auto mb-12 max-w-md text-center text-[var(--waqtu-muted)]">
+              Practical reads on protecting your prayers during the workday.
+            </p>
+
+            <div className="grid gap-6 sm:grid-cols-2">
+              {[
+                {
+                  href: "/blog/best-prayer-times-app-mac",
+                  tag: "Comparison",
+                  title: "Best Prayer Times App for Mac in 2026",
+                  blurb:
+                    "We ranked the top Mac prayer apps by features, privacy, and price. Here’s how they stack up.",
+                },
+                {
+                  href: "/blog/show-prayer-times-menu-bar-mac",
+                  tag: "Setup Guide",
+                  title: "How to Show Prayer Times in Your Mac Menu Bar",
+                  blurb:
+                    "Step-by-step: install Waqtu, set your location, and get a prayer countdown in your menu bar in minutes.",
+                },
+                {
+                  href: "/blog/block-calendar-prayer-times",
+                  tag: "Guide",
+                  title: "How to Block Your Calendar for Prayer Times on Mac",
+                  blurb:
+                    "Make Outlook and Teams show you as busy during every salah — automatically.",
+                },
+                {
+                  href: "/blog/muslim-pro-privacy-lesson",
+                  tag: "Privacy",
+                  title: "Why Your Prayer App Shouldn’t Track You",
+                  blurb:
+                    "The Muslim Pro data scandal — and why Waqtu calculates everything offline.",
+                },
+              ].map((g) => (
+                <a
+                  key={g.href}
+                  href={g.href}
+                  className="neu-card group p-6 flex flex-col hover:border-[var(--waqtu-primary)] transition-all"
+                >
+                  <span className="mb-3 inline-flex w-fit text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--waqtu-gold)] bg-[var(--waqtu-gold)]/10 px-2 py-0.5 rounded-full">
+                    {g.tag}
+                  </span>
+                  <h3 className="font-display mb-2 text-lg font-semibold text-[var(--waqtu-text)] group-hover:text-[var(--waqtu-primary)] transition-colors">
+                    {g.title}
+                  </h3>
+                  <p className="flex-1 text-sm text-[var(--waqtu-muted)] leading-relaxed">
+                    {g.blurb}
+                  </p>
+                  <span className="mt-4 text-sm text-[var(--waqtu-primary)] group-hover:translate-x-1 transition-transform">
+                    Read more &rarr;
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
         {/* ===== DOWNLOAD CTA ===== */}
         <section
           id="download"
@@ -1002,6 +1086,14 @@ export default function Home() {
                   data-s-event-props='{"link":"blog"}'
                 >
                   Blog
+                </a>
+                <a
+                  href="/compare"
+                  className="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)] transition-colors"
+                  data-s-event="footer_link_click"
+                  data-s-event-props='{"link":"compare"}'
+                >
+                  Compare
                 </a>
                 <a
                   href="/privacy"

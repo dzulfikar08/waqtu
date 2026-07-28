@@ -15,11 +15,16 @@ export function JsonLd() {
           priceCurrency: "USD",
           availability: "https://schema.org/InStock",
         },
-        aggregateRating: {
-          "@type": "AggregateRating",
-          ratingValue: "5",
-          ratingCount: "1",
-        },
+        author: { "@type": "Person", name: "Dzulfikar Ats Tsauri", url: "https://getwaqtu.com" },
+        publisher: { "@id": "https://getwaqtu.com/#organization" },
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://getwaqtu.com/#organization",
+        name: "Waqtu",
+        url: "https://getwaqtu.com",
+        logo: "https://getwaqtu.com/og-image.webp",
+        founder: { "@type": "Person", name: "Dzulfikar Ats Tsauri" },
       },
       {
         "@type": "FAQPage",
