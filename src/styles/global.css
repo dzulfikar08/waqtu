@@ -7,38 +7,43 @@
    polished surfaces.
    ========================================================================= */
 :root {
-  --waqtu-bg: #0d1714;
-  --waqtu-bg-2: #0f1914;
-  --waqtu-surface: #1a2e25;
-  --waqtu-card: #1f352b;
-  --waqtu-primary: #4a8b6f;
-  --waqtu-primary-soft: #3d7560;
-  --waqtu-light: #6ba888;
-  --waqtu-gold: #d4a574;
-  --waqtu-gold-dim: #b8926a;
-  --waqtu-text: #e8f0ed;
-  --waqtu-muted: #8fa89c;
-  --waqtu-border: rgba(107, 168, 136, 0.15);
-  --waqtu-border-strong: rgba(107, 168, 136, 0.25);
+  /* paper + ink */
+  --waqtu-bg: #f6f5f1;
+  --waqtu-bg-2: #ffffff;
+  --waqtu-surface: #ffffff;
+  --waqtu-card: #ffffff;
+  --waqtu-text: #16201c;
+  --waqtu-muted: #5d6b64;
+  --waqtu-border: rgba(22, 32, 28, 0.09);
+  --waqtu-border-strong: rgba(22, 32, 28, 0.16);
 
-  /* slate blue accent */
-  --waqtu-blue: #6b8fad;
-  --waqtu-blue-dim: #5a7d9a;
-  --waqtu-blue-soft: rgba(107, 143, 173, 0.15);
-  --waqtu-blue-glow: rgba(107, 143, 173, 0.08);
+  /* primary — deep forest green, used sparingly */
+  --waqtu-primary: #2f6b52;
+  --waqtu-primary-soft: #3d7a60;
+  --waqtu-light: #5a9b7f;
 
-  /* neumorphic shadows for dark theme */
-  --neu-light: rgba(255, 255, 255, 0.04);
-  --neu-dark: rgba(0, 0, 0, 0.4);
-  --neu-shadow-light: 0 8px 24px rgba(255, 255, 255, 0.03), 0 2px 6px rgba(255, 255, 255, 0.02);
-  --neu-shadow-raised: 0 8px 24px var(--neu-dark), 0 2px 6px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-  --neu-shadow-inset: 0 2px 8px var(--neu-dark) inset, 0 1px 2px rgba(255, 255, 255, 0.05) inset;
+  /* gold — voucher + price only */
+  --waqtu-gold: #a6743a;
+  --waqtu-gold-dim: #8a5f30;
 
-  /* section background tints */
-  --waqtu-bg-tint-1: rgba(74, 139, 111, 0.06);
-  --waqtu-bg-tint-2: rgba(212, 165, 116, 0.055);
-  --waqtu-bg-tint-3: rgba(45, 95, 76, 0.06);
-  --waqtu-bg-tint-blue: rgba(107, 143, 173, 0.07);
+  /* slate blue secondary accent */
+  --waqtu-blue: #46637a;
+  --waqtu-blue-dim: #38515f;
+  --waqtu-blue-soft: rgba(70, 99, 122, 0.10);
+  --waqtu-blue-glow: rgba(70, 99, 122, 0.06);
+
+  /* soft light surfaces */
+  --neu-light: rgba(255, 255, 255, 0.7);
+  --neu-dark: rgba(22, 32, 28, 0.08);
+  --neu-shadow-light: 0 1px 2px rgba(22, 32, 28, 0.04);
+  --neu-shadow-raised: 0 1px 2px rgba(22, 32, 28, 0.04), 0 10px 30px rgba(22, 32, 28, 0.06);
+  --neu-shadow-inset: 0 1px 2px rgba(22, 32, 28, 0.05) inset;
+
+  /* section tints — soft warm bands on paper */
+  --waqtu-bg-tint-1: rgba(47, 107, 82, 0.045);
+  --waqtu-bg-tint-2: rgba(166, 116, 58, 0.04);
+  --waqtu-bg-tint-3: rgba(45, 95, 76, 0.035);
+  --waqtu-bg-tint-blue: rgba(70, 99, 122, 0.05);
 
   --font-sans: "Manrope Variable", system-ui, sans-serif;
   --font-display: "Fraunces Variable", Georgia, serif;
@@ -111,75 +116,81 @@ body::before {
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.035;
-  mix-blend-mode: overlay;
+  opacity: 0.022;
+  mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 .font-display { font-family: var(--font-display); }
 
-/* ============================= neumorphism utilities ============================= */
+/* ============================= surfaces ============================= */
 .neu-card {
-  background: linear-gradient(145deg, #1a2922, #132119);
-  box-shadow: var(--neu-shadow-raised);
-  border-radius: 20px;
-  transition: all 0.3s ease;
+  background: var(--waqtu-bg-2);
+  box-shadow: 0 1px 2px rgba(22, 32, 28, 0.04), 0 10px 30px rgba(22, 32, 28, 0.06);
+  border: 1px solid var(--waqtu-border);
+  border-radius: 18px;
+  transition: all 0.25s ease;
 }
 .neu-card:hover {
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  box-shadow: 0 2px 6px rgba(22, 32, 28, 0.06), 0 16px 40px rgba(22, 32, 28, 0.09);
+  border-color: var(--waqtu-border-strong);
 }
 
 .neu-btn {
-  background: linear-gradient(145deg, #4a8b6f, #3d7560);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-  border-radius: 16px;
+  background: var(--waqtu-primary);
+  color: #ffffff;
+  box-shadow: 0 1px 2px rgba(47, 107, 82, 0.2), 0 6px 16px rgba(47, 107, 82, 0.18);
+  border-radius: 12px;
   border: none;
   transition: all 0.2s ease;
 }
 .neu-btn:hover {
-  background: linear-gradient(145deg, #5a9b7f, #4d8570);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 3px 8px rgba(0, 0, 0, 0.3);
+  background: #357a5e;
+  box-shadow: 0 2px 4px rgba(47, 107, 82, 0.25), 0 10px 24px rgba(47, 107, 82, 0.26);
   transform: translateY(-1px);
 }
 .neu-btn:active {
-  background: linear-gradient(145deg, #3d7560, #4a8b6f);
-  box-shadow: var(--neu-shadow-inset);
-  transform: translateY(1px);
+  background: #285c45;
+  box-shadow: 0 1px 2px rgba(47, 107, 82, 0.2) inset;
+  transform: translateY(0);
 }
 
 .neu-btn-secondary {
-  background: linear-gradient(145deg, #1a2922, #132119);
-  box-shadow: var(--neu-shadow-raised);
-  border-radius: 16px;
-  border: 1px solid rgba(107, 168, 136, 0.2);
+  background: var(--waqtu-bg-2);
+  color: var(--waqtu-text);
+  box-shadow: 0 1px 2px rgba(22, 32, 28, 0.04);
+  border-radius: 12px;
+  border: 1px solid var(--waqtu-border-strong);
   transition: all 0.2s ease;
 }
 .neu-btn-secondary:hover {
-  border-color: rgba(107, 168, 136, 0.35);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-color: var(--waqtu-primary);
+  box-shadow: 0 4px 14px rgba(22, 32, 28, 0.08);
 }
 
 .neu-raised {
-  background: linear-gradient(145deg, #1f352b, #182822);
-  box-shadow: var(--neu-shadow-raised);
-  border-radius: 20px;
+  background: var(--waqtu-bg-2);
+  box-shadow: 0 1px 2px rgba(22, 32, 28, 0.04), 0 10px 30px rgba(22, 32, 28, 0.05);
+  border: 1px solid var(--waqtu-border);
+  border-radius: 18px;
 }
 
 .neu-pressed {
-  background: linear-gradient(145deg, #182822, #1f352b);
+  background: rgba(47, 107, 82, 0.07);
   box-shadow: var(--neu-shadow-inset);
-  border-radius: 16px;
+  border-radius: 12px;
 }
 
 .neu-badge {
-  background: linear-gradient(145deg, #1a2922, #132119);
+  background: var(--waqtu-bg-2);
   box-shadow: var(--neu-shadow-inset);
+  border: 1px solid var(--waqtu-border);
 }
 
 /* ============================= voucher coupon ============================= */
 .voucher-box {
-  background: rgba(255, 255, 255, 0.03);
-  border: 2px dashed rgba(107, 168, 136, 0.3);
+  background: rgba(47, 107, 82, 0.05);
+  border: 2px dashed rgba(47, 107, 82, 0.3);
   position: relative;
   padding: 14px 16px;
   overflow: hidden;
@@ -202,7 +213,7 @@ body::before {
 .voucher-dash {
   width: 2px;
   height: 20px;
-  background: repeating-linear-gradient(to bottom, rgba(107, 168, 136, 0.3), rgba(107, 168, 136, 0.3) 4px, transparent 4px, transparent 8px);
+  background: repeating-linear-gradient(to bottom, rgba(47, 107, 82, 0.3), rgba(47, 107, 82, 0.3) 4px, transparent 4px, transparent 8px);
 }
 .voucher-copy-btn {
   display: inline-flex;
