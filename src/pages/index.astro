@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import HeroAppMock from "../components/HeroAppMock.astro";
 
 const lifetimeProductId = import.meta.env.PUBLIC_POLAR_PRODUCT_PRO_LIFETIME ?? "";
 
@@ -236,6 +237,8 @@ const trust = ["No ads", "No tracking", "Works offline", "macOS 12+", "30-day re
             ))}
           </div>
         </div>
+
+        <HeroAppMock />
       </section>
 
       <!-- ===== TRUST STRIP ===== -->
