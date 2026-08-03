@@ -75,6 +75,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         completionHandler()
     }
 
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        // Show banners + sound even while the menu-bar popover is open (app frontmost).
+        completionHandler([.banner, .sound])
+    }
+
     private func requestLocationPermission() {
         let status: CLAuthorizationStatus
         if #available(macOS 14.0, *) {

@@ -67,6 +67,11 @@ struct MenuBarView: View {
 
             Divider()
 
+            // Pomodoro timer
+            PomodoroSection(pomodoroManager: viewModel.pomodoroManager, nextPrayer: viewModel.nextPrayer)
+
+            Divider()
+
             // Controls
             ControlsSection(
                 overlayEnabled: $viewModel.settings.overlayEnabled,
@@ -503,6 +508,238 @@ struct ControlRowButtonStyle: ButtonStyle {
     }
 }
 
+// MARK: - Pomodoro Section
+struct PomodoroSection: View {
+    @Bindable var pomodoroManager: PomodoroManager
+    var nextPrayer: PrayerTime?
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Phase + countdown header
+            HStack(spacing: 10) {
+                Image(systemName: pomodoroManager.phase.symbolName)
+                    .foregroundColor(.waqtuGold)
+                    .font(.system(size: 12))
+                    .frame(width: 18, alignment: .center)
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(pomodoroManager.phase.displayName)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(.waqtuText)
+                    if let prayer = pomodoroManager.clampedBeforePrayer {
+                        Text("Stops before \(prayer)")
+                            .font(.system(size: 10))
+                            .foregroundColor(.waqtuMuted)
+                    } else if pomodoroManager.isPaused {
+                        Text("Paused")
+                            .font(.system(size: 10))
+                            .foregroundColor(.waqtuMuted)
+                    }
+                }
+
+                Spacer(minLength: 8)
+
+                Text(pomodoroManager.timeText)
+                    .font(.system(size: 16, weight: .semibold))
+                    .monospacedDigit()
+                    .foregroundColor(.waqtuGold)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+
+            // Progress bar
+            if pomodoroManager.isRunning {
+                ProgressView(value: pomodoroManager.progress)
+                    .tint(.waqtuPrimary)
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 6)
+            }
+
+            // Cycle dots
+            HStack(spacing: 4) {
+                ForEach(0..<pomodoroManager.cycleTarget, id: \.self) { i in
+                    Circle()
+                        .fill(i < pomodoroManager.cyclesCompleted ? Color.waqtuPrimary : Color.waqtuDark)
+                        .frame(width: 6, height: 6)
+                }
+                Spacer()
+            }
+            .padding(.horizontal, 12)
+            .padding(.bottom, 8)
+
+            // Controls
+            HStack(spacing: 8) {
+                if pomodoroManager.phase == .idle {
+                    Button {
+                        pomodoroManager.start(nextPrayer: nextPrayer)
+                    } label: {
+                        Label("Start", systemImage: "play.fill")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.waqtuPrimary)
+                } else {
+                    Button {
+                        pomodoroManager.isPaused ? pomodoroManager.resume() : pomodoroManager.pause()
+                    } label: {
+                        Label(pomodoroManager.isPaused ? "Resume" : "Pause",
+                              systemImage: pomodoroManager.isPaused ? "play.fill" : "pause.fill")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.waqtuPrimary)
+
+                    Button {
+                        pomodoroManager.skip(nextPrayer: nextPrayer)
+                    } label: {
+                        Label("Skip", systemImage: "forward.fill")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button {
+                        pomodoroManager.reset()
+                    } label: {
+                        Image(systemName: "arrow.counterclockwise")
+                            .font(.system(size: 12))
+                    }
+                    .buttonStyle(.bordered)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.bottom, 10)
+        }
+    }
+}
+
+// MARK: - Pomodoro Settings Tab
+struct PomodoroSettingsTab: View {
+    @Bindable var settings: AppSettings
+    var onBrowse: () -> Void = {}
+
+    var body: some View {
+        Form {
+            Section {
+                HStack {
+                    Text("Focus")
+                    Spacer()
+                    Text("\(settings.focusMinutes) min")
+                        .foregroundColor(.waqtuPrimary)
+                        .monospacedDigit()
+                    Slider(value: Binding(
+                        get: { Double(settings.focusMinutes) },
+                        set: { settings.focusMinutes = Int($0) }
+                    ), in: 5...90, step: 5)
+                    .frame(width: 120)
+                    .tint(.waqtuPrimary)
+                }
+                Text("Length of each focus block.")
+                    .font(.caption)
+                    .foregroundColor(.waqtuMuted)
+
+                HStack {
+                    Text("Short break")
+                    Spacer()
+                    Text("\(settings.breakMinutes) min")
+                        .foregroundColor(.waqtuPrimary)
+                        .monospacedDigit()
+                    Slider(value: Binding(
+                        get: { Double(settings.breakMinutes) },
+                        set: { settings.breakMinutes = Int($0) }
+                    ), in: 1...30, step: 1)
+                    .frame(width: 120)
+                    .tint(.waqtuPrimary)
+                }
+
+                HStack {
+                    Text("Long break")
+                    Spacer()
+                    Text("\(settings.longBreakMinutes) min")
+                        .foregroundColor(.waqtuPrimary)
+                        .monospacedDigit()
+                    Slider(value: Binding(
+                        get: { Double(settings.longBreakMinutes) },
+                        set: { settings.longBreakMinutes = Int($0) }
+                    ), in: 1...60, step: 1)
+                    .frame(width: 120)
+                    .tint(.waqtuPrimary)
+                }
+
+                HStack {
+                    Text("Cycles before long break")
+                    Spacer()
+                    Text("\(settings.cyclesBeforeLongBreak)")
+                        .foregroundColor(.waqtuPrimary)
+                        .monospacedDigit()
+                    Slider(value: Binding(
+                        get: { Double(settings.cyclesBeforeLongBreak) },
+                        set: { settings.cyclesBeforeLongBreak = Int($0) }
+                    ), in: 1...8, step: 1)
+                    .frame(width: 120)
+                    .tint(.waqtuPrimary)
+                }
+            } header: {
+                Text("Focus")
+            }
+
+            Section {
+                Toggle("Intention & dua", isOn: $settings.intentionDua)
+                Text("Frame each session — Bismillah to begin, Alhamdulillah on completion.")
+                    .font(.caption)
+                    .foregroundColor(.waqtuMuted)
+
+                Toggle("Dhikr breaks", isOn: $settings.dhikrBreaks)
+                Text("Remind you of the post-salah tasbih (×33, ×33, ×34) during breaks.")
+                    .font(.caption)
+                    .foregroundColor(.waqtuMuted)
+
+                Toggle("Quran verse break", isOn: $settings.verseBreak)
+                Text("Show a short surah to recite during breaks.")
+                    .font(.caption)
+                    .foregroundColor(.waqtuMuted)
+
+                Toggle("Salah-aligned", isOn: $settings.salahAligned)
+                Text("End a focus block before the next adhan.")
+                    .font(.caption)
+                    .foregroundColor(.waqtuMuted)
+
+                Picker("Break audio", selection: $settings.breakAudio) {
+                    Text("None").tag("none")
+                    Text("Murattal").tag("murattal")
+                    Text("Dzikr").tag("dzikr")
+                    Text("Sholawat").tag("sholawat")
+                    Text("Auto (rotate)").tag("auto")
+                }
+                .pickerStyle(.menu)
+                Text("Looped during breaks. Add murattal.mp3 / dzikr.mp3 / sholawat.mp3. Auto rotates by cycle.")
+                    .font(.caption)
+                    .foregroundColor(.waqtuMuted)
+
+                Button {
+                    onBrowse()
+                } label: {
+                    Label("Browse & Download…", systemImage: "square.and.arrow.down")
+                        .font(.system(size: 12))
+                }
+                .buttonStyle(.bordered)
+                .tint(.waqtuPrimary)
+                if settings.breakAudio == "downloaded", let id = settings.downloadedAudioId,
+                   let title = AudioLibraryManager.item(id)?.title {
+                    Text("Selected: \(title)")
+                        .font(.caption)
+                        .foregroundColor(.waqtuPrimary)
+                }
+            } header: {
+                Text("Islamic Features")
+            }
+        }
+        .formStyle(.grouped)
+        .scrollContentBackground(.hidden)
+        .background(Color.waqtuBackground)
+        .padding()
+    }
+}
+
 // MARK: - Bottom Buttons
 struct BottomButtons: View {
     @Environment(\.openSettings) private var openSettings
@@ -550,6 +787,7 @@ struct SettingsView: View {
     @Bindable var settings: AppSettings
     var viewModel: AppViewModel?
     var onCheckForUpdates: (() -> Void)?
+    @State private var showAudioBrowser = false
 
     init(settings: AppSettings, viewModel: AppViewModel? = nil, onCheckForUpdates: (() -> Void)? = nil) {
         self.settings = settings
@@ -573,6 +811,11 @@ struct SettingsView: View {
                 NSApp.keyWindow?.makeKeyAndOrderFront(nil)
             }
         }
+        .sheet(isPresented: $showAudioBrowser) {
+            if let vm = viewModel {
+                AudioBrowserView(settings: settings, audioLibrary: vm.audioLibrary)
+            }
+        }
     }
 
     private var settingsTabs: some View {
@@ -589,6 +832,11 @@ struct SettingsView: View {
                 PrayerTimesSettingsTab(settings: settings, viewModel: viewModel)
                     .tabItem {
                         Label("Prayer Times", systemImage: "clock.fill")
+                    }
+
+                PomodoroSettingsTab(settings: settings, onBrowse: { showAudioBrowser = true })
+                    .tabItem {
+                        Label("Pomodoro", systemImage: "timer.fill")
                     }
 
                 LocationSettingsTab(settings: settings, viewModel: viewModel)

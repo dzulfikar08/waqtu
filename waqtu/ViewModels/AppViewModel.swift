@@ -15,6 +15,8 @@ final class AppViewModel {
     let licenseManager: LicenseManager
     let streakManager: PrayerStreakManager
     let slackManager: SlackManager
+    let pomodoroManager: PomodoroManager
+    let audioLibrary = AudioLibraryManager()
     let sharedBridge = SharedDataBridge()
 
     private var timer: Timer?
@@ -55,6 +57,7 @@ final class AppViewModel {
         self.calendarManager = CalendarManager()
         self.streakManager = PrayerStreakManager()
         self.slackManager = SlackManager()
+        self.pomodoroManager = PomodoroManager(settings: settings, audioLibrary: audioLibrary)
         setupLocationUpdates()
         calculatePrayers()
         setupTimer()
@@ -187,6 +190,7 @@ final class AppViewModel {
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             self?.updateCountdown()
             self?.checkPrayerTime()
+            self?.pomodoroManager.tick(now: Date(), nextPrayer: self?.nextPrayer)
         }
         setupMidnightTimer()
     }

@@ -64,7 +64,15 @@ struct WaqtuApp: App {
         MenuBarExtra {
             MenuBarView(viewModel: viewModel)
         } label: {
-            if let icon = Self.menuBarIcon {
+            if viewModel.pomodoroManager.isRunning {
+                HStack(spacing: 3) {
+                    Image(systemName: viewModel.pomodoroManager.isPaused
+                          ? "pause.circle"
+                          : viewModel.pomodoroManager.phase.symbolName)
+                    Text(viewModel.pomodoroManager.timeText)
+                        .monospacedDigit()
+                }
+            } else if let icon = Self.menuBarIcon {
                 Image(nsImage: icon)
             } else {
                 Image("MutabaahSymbol")

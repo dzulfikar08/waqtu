@@ -221,6 +221,72 @@ final class AppSettings {
     static let quranicQuote = "Indeed, prayer is obligatory on the believers at the specified time."
     static let quranicReference = "— Quran 4:103"
 
+    // MARK: - Islamic Pomodoro
+
+    var dhikrBreaks: Bool {
+        get { UserDefaults.standard.bool(forKey: "dhikrBreaks") }
+        set { UserDefaults.standard.set(newValue, forKey: "dhikrBreaks") }
+    }
+
+    var intentionDua: Bool {
+        get { UserDefaults.standard.bool(forKey: "intentionDua") }
+        set { UserDefaults.standard.set(newValue, forKey: "intentionDua") }
+    }
+
+    var salahAligned: Bool {
+        get { UserDefaults.standard.bool(forKey: "salahAligned") }
+        set { UserDefaults.standard.set(newValue, forKey: "salahAligned") }
+    }
+
+    var verseBreak: Bool {
+        get { UserDefaults.standard.bool(forKey: "verseBreak") }
+        set { UserDefaults.standard.set(newValue, forKey: "verseBreak") }
+    }
+
+    var focusMinutes: Int {
+        get {
+            let v = UserDefaults.standard.integer(forKey: "focusMinutes")
+            return v >= 1 && v <= 90 ? v : 25
+        }
+        set { UserDefaults.standard.set(newValue, forKey: "focusMinutes") }
+    }
+
+    var breakMinutes: Int {
+        get {
+            let v = UserDefaults.standard.integer(forKey: "breakMinutes")
+            return v >= 1 && v <= 30 ? v : 5
+        }
+        set { UserDefaults.standard.set(newValue, forKey: "breakMinutes") }
+    }
+
+    var longBreakMinutes: Int {
+        get {
+            let v = UserDefaults.standard.integer(forKey: "longBreakMinutes")
+            return v >= 1 && v <= 60 ? v : 15
+        }
+        set { UserDefaults.standard.set(newValue, forKey: "longBreakMinutes") }
+    }
+
+    var cyclesBeforeLongBreak: Int {
+        get {
+            let v = UserDefaults.standard.integer(forKey: "cyclesBeforeLongBreak")
+            return v >= 1 && v <= 8 ? v : 4
+        }
+        set { UserDefaults.standard.set(newValue, forKey: "cyclesBeforeLongBreak") }
+    }
+
+    var breakAudio: String {
+        get {
+            UserDefaults.standard.string(forKey: "breakAudio") ?? "none"
+        }
+        set { UserDefaults.standard.set(newValue, forKey: "breakAudio") }
+    }
+
+    var downloadedAudioId: String? {
+        get { UserDefaults.standard.string(forKey: "downloadedAudioId") }
+        set { UserDefaults.standard.set(newValue, forKey: "downloadedAudioId") }
+    }
+
     init() {
         // Set default values if not set
         if !UserDefaults.standard.bool(forKey: "settingsInitialized") {
@@ -250,5 +316,9 @@ final class AppSettings {
         UserDefaults.standard.set("muslimWorldLeague", forKey: "calculationMethod")
         UserDefaults.standard.set("shafi", forKey: "madhab")
         UserDefaults.standard.set("auto", forKey: "highLatitudeRule")
+        UserDefaults.standard.set(25, forKey: "focusMinutes")
+        UserDefaults.standard.set(5, forKey: "breakMinutes")
+        UserDefaults.standard.set(15, forKey: "longBreakMinutes")
+        UserDefaults.standard.set(4, forKey: "cyclesBeforeLongBreak")
     }
 }
