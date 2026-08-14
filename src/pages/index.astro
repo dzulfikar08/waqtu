@@ -2,8 +2,6 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import HeroAppMock from "../components/HeroAppMock.astro";
 
-const lifetimeProductId = import.meta.env.PUBLIC_POLAR_PRODUCT_PRO_LIFETIME ?? "";
-
 const features = [
   {
     title: "Prayer countdown in your menu bar",
@@ -409,7 +407,7 @@ const trust = ["No ads", "No tracking", "Works offline", "macOS 12+", "30-day re
               ))}
             </ul>
 
-            <button data-checkout="PRO_LIFETIME" data-product-id={lifetimeProductId} class="neu-btn mt-8 block w-full px-6 py-3.5 text-center font-medium text-[var(--waqtu-bg)] disabled:opacity-50" data-s-event="cta_click" data-s-event-props='{"location":"pricing","text":"Get lifetime access — $2.99","tier":"lifetime"}'>
+            <button data-checkout="PRO_LIFETIME" class="neu-btn mt-8 block w-full px-6 py-3.5 text-center font-medium text-[var(--waqtu-bg)] disabled:opacity-50" data-s-event="cta_click" data-s-event-props='{"location":"pricing","text":"Get lifetime access — $2.99","tier":"lifetime"}'>
               <span data-checkout-text>Get lifetime access — <span class="font-mono font-bold">$2.99</span></span>
             </button>
 

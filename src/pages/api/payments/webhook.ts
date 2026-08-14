@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 
 export const prerender = false;
 
@@ -69,15 +70,13 @@ function ok() {
   return new Response(JSON.stringify({ received: true }), { status: 200 });
 }
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.text();
     if (!body) return new Response(JSON.stringify({ error: "Invalid webhook request" }), { status: 400 });
 
-    const runtime = (locals as { runtime?: { env?: Record<string, string | undefined> } })?.runtime;
-    const env = runtime?.env ?? {};
-    const POLAR_ACCESS_TOKEN = env.POLAR_ACCESS_TOKEN ?? process.env.POLAR_ACCESS_TOKEN ?? "";
-    const POLAR_WEBHOOK_SECRET = env.POLAR_WEBHOOK_SECRET ?? process.env.POLAR_WEBHOOK_SECRET ?? "";
+    const POLAR_ACCESS_TOKEN = env.POLAR_ACCESS_TOKEN ?? "";
+    const POLAR_WEBHOOK_SECRET = env.POLAR_WEBHOOK_SECRET ?? "";
 
     const webhookId = request.headers.get("webhook-id");
     const webhookSignature = request.headers.get("webhook-signature");

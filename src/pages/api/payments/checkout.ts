@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 
 // Opt out of prerendering — this runs on the Cloudflare Worker at request time.
 export const prerender = false;
@@ -6,26 +7,29 @@ export const prerender = false;
 const POLAR_API_BASE = "https://api.polar.sh";
 
 interface CheckoutRequest {
-  productId: string;
-  email?: string;
+  tier?: string;
 }
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { productId } = body as CheckoutRequest;
+    const { tier } = body as CheckoutRequest;
+
+    // Product IDs live in Cloudflare vars so they can change without a rebuild.
+    const productId =
+      tier === "PRO_MONTHLY"
+        ? env.POLAR_PRODUCT_PRO_MONTHLY
+        : env.POLAR_PRODUCT_PRO_LIFETIME;
 
     if (!productId) {
-      return new Response(JSON.stringify({ error: "Product ID is required" }), { status: 400 });
+      console.error("POLAR_PRODUCT_PRO_LIFETIME is not configured");
+      return new Response(JSON.stringify({ error: "Product not configured" }), { status: 500 });
     }
 
-    const runtime = (locals as { runtime?: { env?: Record<string, string | undefined> } })?.runtime;
-    const env = runtime?.env ?? {};
-    const POLAR_ACCESS_TOKEN = env.POLAR_ACCESS_TOKEN ?? process.env.POLAR_ACCESS_TOKEN ?? "";
+    const POLAR_ACCESS_TOKEN = env.POLAR_ACCESS_TOKEN ?? "";
     const CLIENT_URL =
       env.PUBLIC_CLIENT_URL ??
       env.NEXT_PUBLIC_CLIENT_URL ??
-      process.env.PUBLIC_CLIENT_URL ??
       "https://getwaqtu.com";
 
     if (!POLAR_ACCESS_TOKEN) {

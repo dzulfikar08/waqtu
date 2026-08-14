@@ -14,6 +14,7 @@ export default defineConfig({
   adapter: cloudflare({
     imageService: "passthrough",
     platformProxy: { enabled: true },
+    configPath: "./wrangler.jsonc",
   }),
   integrations: [mdx(), sitemap()],
   vite: {

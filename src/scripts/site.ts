@@ -126,11 +126,6 @@ function initCheckout() {
   buttons.forEach((btn) => {
     btn.addEventListener("click", async () => {
       const tier = (btn.dataset.checkout || "PRO_LIFETIME") as "PRO_LIFETIME" | "PRO_MONTHLY";
-      const productId = btn.dataset.productId;
-      if (!productId) {
-        window.location.href = "#download";
-        return;
-      }
       stonks()?.event("checkout_start", { tier });
       btn.dataset.loading = "true";
       const text = btn.querySelector<HTMLElement>("[data-checkout-text]");
@@ -142,7 +137,7 @@ function initCheckout() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify({ productId }),
+          body: JSON.stringify({ tier }),
         });
         if (!res.ok) throw new Error("Failed to create checkout session");
         const { url } = (await res.json()) as { url: string };
