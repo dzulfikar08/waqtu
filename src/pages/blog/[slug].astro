@@ -17,7 +17,7 @@ const canonical = `/blog/${post.id}`;
 ---
 
 <BaseLayout title={`${post.data.title} — Waqtu Blog`} description={post.data.description} canonical={canonical} ogTitle={post.data.title} ogDescription={post.data.description}>
-  <BlogPostLayout title={post.data.title} description={post.data.description} pubDate={post.data.pubDate} category={post.data.category} readTime={post.data.readTime}>
+  <BlogPostLayout title={post.data.title} description={post.data.description} pubDate={post.data.pubDate} category={post.data.category} readTime={post.data.readTime} canonical={canonical}>
     <Content />
   </BlogPostLayout>
 </BaseLayout>

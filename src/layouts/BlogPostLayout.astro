@@ -7,10 +7,26 @@ export interface Props {
   pubDate: string;
   category: string;
   readTime: string;
+  canonical?: string;
 }
 
-const { title, pubDate, category, readTime } = Astro.props;
+const { title, description, pubDate, category, readTime, canonical = `/blog/${title}` } = Astro.props;
+
+const siteUrl = "https://getwaqtu.com";
+const canonicalUrl = new URL(canonical, siteUrl).href;
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: title,
+  description,
+  datePublished: pubDate,
+  author: { "@type": "Person", name: "Dzulfikar Ats Tsauri" },
+  publisher: { "@id": "https://getwaqtu.com/#organization" },
+  mainEntityOfPage: canonicalUrl,
+};
 ---
+
+<script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
 
 <div class="relative z-10 min-h-screen px-6 py-16 sm:px-10 md:px-14 md:py-24">
   <article class="mx-auto max-w-3xl">
