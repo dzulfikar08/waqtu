@@ -30,10 +30,58 @@ targets:
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         NSLocationWhenInUseUsageDescription: Waqtu uses your location once to calculate local prayer times. Times are computed on device and your location is never collected or sent anywhere.
+  Waqtu Watch App:
+    type: application
+    platform: watchOS
+    sources:
+      - watchOS/Waqtu Watch
+    dependencies:
+      - package: WaqtuCore
+      - target: Waqtu Watch Complications
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.waqtu.watchkitapp
+    entitlements:
+      path: watchOS/Waqtu Watch/WaqtuWatch.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.waqtu.prayer]
+    info:
+      path: watchOS/Waqtu Watch/Info.plist
+      properties:
+        CFBundleDisplayName: Waqtu
+        WKApplication: true
+        NSLocationWhenInUseUsageDescription: Waqtu uses your location once to calculate local prayer times on watch.
+  Waqtu Watch Complications:
+    type: app-extension
+    platform: watchOS
+    sources:
+      - watchOS/Complications
+      - watchOS/Waqtu Watch/SharedPrayerSettings.swift
+    dependencies:
+      - package: WaqtuCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.waqtu.watchkitapp.complications
+    entitlements:
+      path: watchOS/Complications/WaqtuComplications.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.waqtu.prayer]
+    info:
+      path: watchOS/Complications/Info.plist
+      properties:
+        CFBundleDisplayName: Waqtu Complications
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
 schemes:
   Waqtu:
     build:
       targets:
         Waqtu: all
+    run:
+      config: Debug
+  Waqtu Watch App:
+    build:
+      targets:
+        Waqtu Watch App: all
     run:
       config: Debug
