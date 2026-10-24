@@ -1,0 +1,28 @@
+{
+  "identifier" : "9341b6a6-d2e0-4f5a-a617-4481fed08c1d",
+  "type" : "Default",
+  "version" : 3,
+  "products" : [
+    {
+      "displayPrice" : "9.99",
+      "familyShareable" : false,
+      "internalID" : "9e655c21-1da2-478f-9ef0-373a17b5dc5c",
+      "localizations" : [
+        {
+          "description" : "Unlock Waqtu forever on this device. One-time purchase.",
+          "displayName" : "Lifetime Access",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "dat.waqtu.lifetime",
+      "referenceName" : "Waqtu Lifetime",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : []
+  }
+}

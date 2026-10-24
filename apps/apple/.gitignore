@@ -1,0 +1,10 @@
+# Build
+build/
+DerivedData/
+*.dmg
+
+# Xcode user-specific
+xcuserdata/
+
+# macOS
+.DS_Store

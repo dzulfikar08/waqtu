@@ -1,0 +1,12 @@
+# Devices + languages for `fastlane ios_screenshots`.
+# NOTE: snapshot() needs an iOS UITest target calling snapshot("Name") on each screen.
+# The project currently has no iOS UITest target — add one, or capture manually
+# with:  xcrun simctl io booted screenshot ~/Desktop/shot.png
+
+devices(["iPhone 15 Pro Max"])      # 6.7" required screenshot size
+languages(["en-US"])
+
+output_directory("./fastlane/screenshots/ios")
+clear_previous_screenshots(true)
+scheme("waqtu-ios-uitests")
+project("waqt.xcodeproj")
