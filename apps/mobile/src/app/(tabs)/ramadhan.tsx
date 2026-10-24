@@ -14,6 +14,7 @@ import { useCallback, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { Row, Section } from "@/components/ui";
+import { HalaqahCard } from "@/halaqah/components/HalaqahCard";
 import { useTranslation } from "@/i18n";
 import { spacing, useTheme } from "@/theme";
 import { CountdownCard } from "@/ramadhan/components/CountdownCard";
@@ -136,6 +137,7 @@ export default function RamadhanScreen() {
       )}
 
       <DailyCard ctx={ctx} night={night} />
+      <HalaqahCard />
       <KhatamCard ctx={ctx} locale={locale} />
       {config ? <ImsakiyahCard ctx={ctx} config={config} /> : null}
       <QadhaCard ctx={ctx} locale={locale} />

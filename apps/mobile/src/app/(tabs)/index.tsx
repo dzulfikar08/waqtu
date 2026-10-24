@@ -6,6 +6,7 @@ import { Checklist } from "@/components/today/Checklist";
 import { LocationPrompt, NextPrayerCard, PrayerTimesList } from "@/components/today/PrayerCards";
 import { StreakCard } from "@/components/today/StreakCard";
 import { Section } from "@/components/ui";
+import { HalaqahTodayRow } from "@/halaqah/components/HalaqahTodayRow";
 import { useMutabaah, useNow } from "@/hooks/useMutabaah";
 import { formatHijri } from "@/lib/hijri";
 import { useTranslation } from "@/i18n";
@@ -77,6 +78,7 @@ export default function TodayScreen() {
             <LocationPrompt />
           )}
           <StreakCard streak={model.streak} />
+          <HalaqahTodayRow />
           <Section title={t("today.checklist")}>
             <Checklist
               items={model.items}

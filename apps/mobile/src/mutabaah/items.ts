@@ -29,7 +29,14 @@ export const BUILTIN_ITEMS: readonly ItemDef[] = [
   { id: "dzikir_petang", kind: "check" },
   { id: "sedekah", kind: "check" },
   { id: "puasa", kind: "check" },
+  // Recorded when a halaqah session is finished. Not in the default checklist (Ramadhan only); users add it from the item manager.
+  { id: "halaqah", kind: "check" },
 ];
+
+/** What a fresh install shows: every built-in except the seasonal `halaqah`. */
+export const DEFAULT_ITEMS: readonly ItemDef[] = BUILTIN_ITEMS.filter(
+  (item) => item.id !== "halaqah",
+);
 
 export const MAX_LABEL = 40;
 export const MAX_COUNT = 10_000;
@@ -48,16 +55,16 @@ export function missingBuiltins(items: readonly ItemDef[]): ItemDef[] {
   return BUILTIN_ITEMS.filter((item) => !have.has(item.id));
 }
 
-/** Stored `items` setting → list. Anything malformed falls back to the built-ins rather than an empty checklist. */
+/** Stored `items` setting → list. Anything malformed falls back to the default items rather than an empty checklist. */
 export function parseItems(raw: string | null | undefined): ItemDef[] {
-  if (!raw) return [...BUILTIN_ITEMS];
+  if (!raw) return [...DEFAULT_ITEMS];
   let data: unknown;
   try {
     data = JSON.parse(raw);
   } catch {
-    return [...BUILTIN_ITEMS];
+    return [...DEFAULT_ITEMS];
   }
-  if (!Array.isArray(data)) return [...BUILTIN_ITEMS];
+  if (!Array.isArray(data)) return [...DEFAULT_ITEMS];
   const seen = new Set<string>();
   const items: ItemDef[] = [];
   for (const entry of data) {
