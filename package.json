@@ -18,7 +18,7 @@
     "fmt:check": "oxfmt --check .",
     "lint": "oxlint .",
     "fmt": "oxfmt .",
-    "test": "bun --filter @waqtu/core test"
+    "test": "bun --filter @waqtu/core test && bun --filter @waqtu/api test && bun --filter @waqtu/mobile test"
   },
   "devDependencies": {
     "oxfmt": "^0.62.0",

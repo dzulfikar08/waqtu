@@ -1,6 +1,7 @@
 name = "waqt-updates"
 main = "worker.ts"
-compatibility_date = "2024-01-01"
+compatibility_date = "2025-05-05"
+compatibility_flags = ["nodejs_compat"]
 
 [vars]
 ENVIRONMENT = "production"
@@ -13,3 +14,9 @@ database_id = "09cc030c-af46-437d-86c3-e15c3853939f"
 [[r2_buckets]]
 binding = "BUCKET"
 bucket_name = "waqt-releases"
+
+[[d1_databases]]
+binding = "APP_DB"
+database_name = "waqtu-db"
+database_id = "ec7bbfbc-9f2c-4a25-a26c-6022d9cd1ebf"
+migrations_dir = "migrations"

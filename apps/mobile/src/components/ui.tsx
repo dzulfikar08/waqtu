@@ -41,6 +41,45 @@ export function Row({
   );
 }
 
+/** A label with − / + buttons around the current value. */
+export function StepperRow({
+  label,
+  value,
+  onChange,
+  min,
+  max,
+}: {
+  label: string;
+  value: number;
+  onChange: (next: number) => void;
+  min: number;
+  max: number;
+}) {
+  const theme = useTheme();
+  const button = (symbol: string, next: number, disabled: boolean) => (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${label} ${symbol}`}
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      onPress={() => onChange(next)}
+      style={[styles.step, { borderColor: theme.border, opacity: disabled ? 0.4 : 1 }]}
+    >
+      <Text style={{ color: theme.text, fontSize: 20 }}>{symbol}</Text>
+    </Pressable>
+  );
+  return (
+    <View style={[styles.row, { borderColor: theme.border }]}>
+      <Text style={[styles.rowLabel, { color: theme.text }]}>{label}</Text>
+      <View style={styles.stepper}>
+        {button("−", value - 1, value <= min)}
+        <Text style={[styles.stepValue, { color: theme.text }]}>{value}</Text>
+        {button("+", value + 1, value >= max)}
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   section: { gap: spacing.sm },
   sectionTitle: {
@@ -60,4 +99,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   rowLabel: { fontSize: 16, flexShrink: 1 },
+  stepper: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
+  step: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  stepValue: { minWidth: 28, textAlign: "center", fontSize: 16 },
 });

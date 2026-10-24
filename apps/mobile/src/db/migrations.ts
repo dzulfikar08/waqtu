@@ -11,7 +11,22 @@ export const DATABASE_NAME = "waqtu.db";
 export const MIGRATIONS: readonly (readonly string[])[] = [
   // 1: app settings (key/value), e.g. the chosen language.
   ["CREATE TABLE settings (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL)"],
-  // 2: Ramadhan daily checks, khatam plan and log, qadha ledger.
+  // 2: mutabaah checklist entries (one row per day + item) and sync bookkeeping. `dirty` marks rows the
+  // server has not seen yet; `updated_at` (epoch ms) drives last-write-wins on both sides.
+  [
+    `CREATE TABLE entries (
+      date TEXT NOT NULL,
+      item_id TEXT NOT NULL,
+      value INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      dirty INTEGER NOT NULL DEFAULT 1,
+      PRIMARY KEY (date, item_id)
+    )`,
+    "CREATE INDEX entries_dirty ON entries (dirty) WHERE dirty = 1",
+    "ALTER TABLE settings ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0",
+    "ALTER TABLE settings ADD COLUMN dirty INTEGER NOT NULL DEFAULT 0",
+  ],
+  // 3: Ramadhan daily checks, khatam plan and log, qadha ledger.
   RAMADHAN_MIGRATION,
 ];
 

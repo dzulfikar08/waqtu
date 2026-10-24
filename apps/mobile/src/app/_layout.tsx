@@ -4,11 +4,16 @@ import { SQLiteProvider, type SQLiteDatabase } from "expo-sqlite";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 
+import { authClient } from "@/auth/client";
 import { initLocale } from "@/db/settings";
 import { DATABASE_NAME, migrate } from "@/db/migrations";
+import { useTranslation } from "@/i18n";
+import { PrayerNotificationController } from "@/notifications/PrayerNotificationController";
 import { setupNotificationChannels } from "@/notifications/setup";
+import { SyncController } from "@/sync/SyncController";
 import { useTheme } from "@/theme";
 import "@/i18n";
+import "@/notifications/background";
 
 void SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -19,6 +24,7 @@ async function initDatabase(db: SQLiteDatabase): Promise<void> {
 
 export default function RootLayout() {
   const theme = useTheme();
+  const { t } = useTranslation();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -33,7 +39,20 @@ export default function RootLayout() {
     <SQLiteProvider databaseName={DATABASE_NAME} onInit={initDatabase}>
       <ReadyProbe onReady={() => setReady(true)} />
       <StatusBar style={theme.dark ? "light" : "dark"} />
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen
+          name="items"
+          options={{
+            headerShown: true,
+            title: t("items.title"),
+            headerStyle: { backgroundColor: theme.background },
+            headerTintColor: theme.text,
+            headerShadowVisible: false,
+          }}
+        />
+      </Stack>
+      <PrayerNotificationController />
+      {authClient ? <SyncController client={authClient} /> : null}
     </SQLiteProvider>
   );
 }

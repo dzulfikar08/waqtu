@@ -1,4 +1,6 @@
 import { handleReleases, type ReleaseBucket } from "./releases";
+import { handleApp } from "./src/app";
+import type { AppEnv } from "./src/env";
 
 interface D1Database {
   prepare(query: string): {
@@ -117,7 +119,7 @@ async function polarValidate(
 export default {
   async fetch(
     request: Request,
-    env: {
+    env: AppEnv & {
       DB: D1Database;
       BUCKET: ReleaseBucket;
       POLAR_ACCESS_TOKEN?: string;
@@ -125,7 +127,11 @@ export default {
       RELEASE_UPLOAD_TOKEN?: string;
       R2_PUBLIC_BASE_URL?: string;
     },
+    ctx: ExecutionContext,
   ): Promise<Response> {
+    const appResponse = await handleApp(request, env, ctx);
+    if (appResponse) return appResponse;
+
     const url = new URL(request.url);
 
     const release = await handleReleases(request, env);
