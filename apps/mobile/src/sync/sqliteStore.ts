@@ -136,6 +136,25 @@ export function createSqliteStore(db: SqlDb, userId: string): SyncStore {
 }
 
 /**
+ * Detaches this phone from a deleted account: the cursors and the account marker go, the data stays
+ * and is marked unsynced. The next sign-in then adopts and uploads it as a first sign-in does,
+ * instead of treating it as another person's.
+ */
+export async function forgetAccount(db: SqlDb): Promise<void> {
+  await db.withTransactionAsync(async () => {
+    await db.runAsync("DELETE FROM settings WHERE key LIKE 'sync.cursor.%'");
+    await db.runAsync("DELETE FROM settings WHERE key = ?", SYNC_USER_KEY);
+    await db.runAsync("UPDATE entries SET dirty = 1");
+    const keys = await db.getAllAsync<{ key: string }>("SELECT key FROM settings");
+    for (const { key } of keys) {
+      if (isSyncedSettingKey(key)) {
+        await db.runAsync("UPDATE settings SET dirty = 1 WHERE key = ?", key);
+      }
+    }
+  });
+}
+
+/**
  * Local data follows the account on this device, except when a different account signs in: then the
  * previous account's rows and every sync cursor are cleared (the rows live on its server copy, and
  * switching back re-pulls them in full) so nothing is uploaded to the wrong account. The first sign-in keeps what was recorded offline and uploads it.

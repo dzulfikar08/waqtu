@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import WaitlistForm from "./WaitlistForm.astro";
-import { landing, REPO_URL, SUPPORT_EMAIL, type Locale } from "../i18n/landing";
+import { landing, REPO_URL, type Locale } from "../i18n/landing";
 import { ramadhan1448 } from "../lib/ramadhan";
 
 interface Props {
@@ -296,7 +296,7 @@ const nav = [
             {t.privacy.github}
           </a>
           <a
-            href="/privacy"
+            href={locale === "id" ? "/privacy" : "/en/privacy"}
             class="font-medium text-[var(--waqtu-primary)] underline underline-offset-4"
             data-s-event="cta_click"
             data-s-event-props={JSON.stringify({ location: "privacy", text: "policy" })}
@@ -386,10 +386,10 @@ const nav = [
         <a href="/resources" class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.footer.resources}</a>
         <a href="/changelog" class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.footer.changelog}</a>
         <a href="/mac" class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.nav.mac}</a>
-        <a href="/privacy" class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.footer.privacy}</a>
-        <a href="/terms" class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.footer.terms}</a>
+        <a href={locale === "id" ? "/privacy" : "/en/privacy"} class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.footer.privacy}</a>
+        <a href={locale === "id" ? "/terms" : "/en/terms"} class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.footer.terms}</a>
         <a href={REPO_URL} rel="noopener" class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.footer.github}</a>
-        <a href={`mailto:${SUPPORT_EMAIL}`} class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.footer.support}</a>
+        <a href={locale === "id" ? "/support" : "/en/support"} class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.footer.support}</a>
       </nav>
       <p class="text-sm text-[var(--waqtu-muted)]">&copy; 2026 Waqtu</p>
     </div>

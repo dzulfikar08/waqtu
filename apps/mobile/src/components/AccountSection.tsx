@@ -1,6 +1,6 @@
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
-import { Text } from "react-native";
+import { Alert, Text } from "react-native";
 
 import { type AuthClient } from "@/auth/client";
 import { appleSignInAvailable, signInWithApple, signInWithGoogle } from "@/auth/signIn";
@@ -8,6 +8,7 @@ import { Row, Section } from "@/components/ui";
 import { useSyncState } from "@/hooks/useSyncState";
 import { useTranslation } from "@/i18n";
 import { syncNow } from "@/sync/run";
+import { forgetAccount } from "@/sync/sqliteStore";
 import { spacing, useTheme } from "@/theme";
 
 /** Rendered only when the auth server is configured, so there is never a dead sign-in button. */
@@ -19,6 +20,7 @@ export function AccountSection({ client }: { client: AuthClient }) {
   const { data: session } = client.useSession();
   const [apple, setApple] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [deleteError, setDeleteError] = useState<"stale" | "failed" | null>(null);
 
   useEffect(() => {
     void appleSignInAvailable().then(setApple);
@@ -44,6 +46,30 @@ export function AccountSection({ client }: { client: AuthClient }) {
     }
   };
 
+  const deleteAccount = async () => {
+    setDeleteError(null);
+    try {
+      const { error } = await client.deleteUser();
+      if (error) {
+        setDeleteError(error.code === "SESSION_EXPIRED" ? "stale" : "failed");
+        return;
+      }
+      await forgetAccount(db);
+    } catch {
+      setDeleteError("failed");
+    }
+  };
+
+  const confirmDelete = () =>
+    Alert.alert(t("settings.deleteTitle"), t("settings.deleteBody"), [
+      { text: t("settings.deleteCancel"), style: "cancel" },
+      {
+        text: t("settings.deleteConfirm"),
+        style: "destructive",
+        onPress: () => void deleteAccount(),
+      },
+    ]);
+
   return (
     <Section title={t("settings.account")}>
       {session ? (
@@ -59,6 +85,7 @@ export function AccountSection({ client }: { client: AuthClient }) {
             disabled={sync.status === "syncing"}
           />
           <Row label={t("settings.signOut")} onPress={() => void run(() => client.signOut())} />
+          <Row label={t("settings.deleteAccount")} onPress={confirmDelete} destructive />
         </>
       ) : (
         <>
@@ -74,6 +101,11 @@ export function AccountSection({ client }: { client: AuthClient }) {
           />
         </>
       )}
+      {deleteError ? (
+        <Text style={{ color: theme.danger, padding: spacing.md }}>
+          {deleteError === "stale" ? t("settings.deleteStale") : t("settings.deleteFailed")}
+        </Text>
+      ) : null}
       {failed ? (
         <Text style={{ color: theme.muted, padding: spacing.md }}>
           {t("settings.signInFailed")}

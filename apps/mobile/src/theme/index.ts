@@ -24,6 +24,7 @@ export interface Theme {
   accentText: string;
   border: string;
   secondary: string;
+  danger: string;
 }
 
 export const lightTheme: Theme = {
@@ -36,6 +37,7 @@ export const lightTheme: Theme = {
   accentText: "#FFFFFF",
   border: "#E1E5EA",
   secondary: palette.secondary,
+  danger: "#B3261E",
 };
 
 export const darkTheme: Theme = {
@@ -48,6 +50,7 @@ export const darkTheme: Theme = {
   accentText: "#1A2E25",
   border: "#2D5F4C",
   secondary: palette.secondary,
+  danger: "#FFB4AB",
 };
 
 export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 } as const;

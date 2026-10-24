@@ -30,8 +30,9 @@ import {
 import { premiumApiFor, usePremium } from "@/premium/usePremium";
 import { radius, spacing, useTheme } from "@/theme";
 
-const PRIVACY_URL = "https://getwaqtu.com/privacy";
-const TERMS_URL = "https://getwaqtu.com/terms";
+/** The site serves Indonesian at the root and English under /en. */
+const legalUrl = (page: "privacy" | "terms", language: string) =>
+  `https://getwaqtu.com${language.startsWith("id") ? "" : "/en"}/${page}`;
 const UNLOCK_KEYS = ["halaqah", "sync", "ramadhan", "fiqh"] as const;
 
 type Message = { text: string; tone: "ok" | "problem" };
@@ -293,8 +294,8 @@ export default function PremiumScreen() {
         <View style={styles.block}>
           <Text style={{ color: theme.muted, fontSize: 13 }}>{t("premium.terms", { store })}</Text>
           <View style={styles.links}>
-            {link(t("premium.privacy"), PRIVACY_URL)}
-            {link(t("premium.termsLink"), TERMS_URL)}
+            {link(t("premium.privacy"), legalUrl("privacy", i18n.language))}
+            {link(t("premium.termsLink"), legalUrl("terms", i18n.language))}
           </View>
         </View>
       ) : null}
