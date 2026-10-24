@@ -1,3 +1,4 @@
+import "@/demo/clock";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { SQLiteProvider, type SQLiteDatabase } from "expo-sqlite";
