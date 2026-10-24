@@ -1,0 +1,47 @@
+---
+import BackLink from "../components/BackLink.astro";
+
+export interface Props {
+  title: string;
+  description: string;
+  pubDate: string;
+  category: string;
+  readTime: string;
+  canonical?: string;
+}
+
+const { title, description, pubDate, category, readTime, canonical = `/blog/${title}` } = Astro.props;
+
+const siteUrl = "https://getwaqtu.com";
+const canonicalUrl = new URL(canonical, siteUrl).href;
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: title,
+  description,
+  datePublished: pubDate,
+  author: { "@type": "Person", name: "Dzulfikar Ats Tsauri" },
+  publisher: { "@id": "https://getwaqtu.com/#organization" },
+  mainEntityOfPage: canonicalUrl,
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+
+<div class="relative z-10 min-h-screen px-6 py-16 sm:px-10 md:px-14 md:py-24">
+  <article class="mx-auto max-w-3xl">
+    <BackLink href="/blog" label="Back to Blog" />
+
+    <div class="flex items-center gap-3 mb-4">
+      <span class="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--waqtu-gold)] bg-[var(--waqtu-gold)]/10 px-2 py-0.5 rounded-full">{category}</span>
+      <span class="text-xs text-[var(--waqtu-muted)]">{readTime}</span>
+    </div>
+
+    <h1 class="font-display mb-3 text-3xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-4xl">{title}</h1>
+    <p class="mb-10 text-sm text-[var(--waqtu-muted)]">{pubDate}</p>
+
+    <div class="prose-waqtu">
+      <slot />
+    </div>
+  </article>
+</div>

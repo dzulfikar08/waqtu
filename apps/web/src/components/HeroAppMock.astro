@@ -1,0 +1,96 @@
+---
+// Stylized macOS menu-bar illustration of the Waqtu app.
+// Static mock: system status bar + Waqtu countdown pill + expanded prayer panel.
+// Pure markup — no JS. Themed via design tokens so it follows the light palette.
+---
+
+<section aria-label="Waqtu running in the macOS menu bar" class="hero-mock relative mx-auto mt-16 w-full max-w-3xl select-none">
+  {/* ===== macOS menu bar ===== */}
+  <div class="mac-bar relative flex items-center justify-between rounded-xl border border-[var(--waqtu-border)] bg-[var(--waqtu-bg-2)]/85 px-3 py-1.5 shadow-[0_1px_2px_rgba(22,32,28,0.04),0_12px_30px_rgba(22,32,28,0.08)] backdrop-blur">
+    {/* left: frontmost app + menus */}
+    <div class="flex items-center gap-3 text-[13px] text-[var(--waqtu-text)]">
+      <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M17.05 12.04c-.03-2.79 2.28-4.13 2.39-4.2-1.3-1.9-3.33-2.16-4.05-2.19-1.72-.18-3.36 1.01-4.24 1.01-.88 0-2.22-.99-3.65-.96-1.88.03-3.62 1.09-4.59 2.78-1.96 3.39-.5 8.4 1.4 11.16.93 1.35 2.04 2.87 3.49 2.81 1.4-.06 1.93-.91 3.63-.91 1.69 0 2.17.91 3.65.88 1.51-.03 2.46-1.38 3.38-2.74 1.07-1.58 1.51-3.12 1.54-3.2-.03-.01-2.96-1.14-2.99-4.52zM14.23 4.3c.77-.94 1.29-2.24 1.14-3.54-1.11.05-2.45.74-3.25 1.67-.71.82-1.34 2.15-1.17 3.42 1.24.1 2.5-.63 3.28-1.55z" />
+      </svg>
+      <span class="font-semibold">Finder</span>
+      <span class="hidden sm:inline text-[var(--waqtu-muted)]">File</span>
+      <span class="hidden sm:inline text-[var(--waqtu-muted)]">Edit</span>
+      <span class="hidden sm:inline text-[var(--waqtu-muted)]">View</span>
+      <span class="hidden md:inline text-[var(--waqtu-muted)]">Window</span>
+    </div>
+
+    {/* right: system icons + clock, then Waqtu pill (rightmost) with docked popover */}
+    <div class="flex items-center gap-3 text-[13px] text-[var(--waqtu-text)]">
+      <svg class="hidden sm:block h-3.5 w-3.5 text-[var(--waqtu-muted)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2 8.5C5 5.5 8.5 4 12 4s7 1.5 10 4.5M5 12c2-2 4.5-3 7-3s5 1 7 3M8.5 15.5c1-1 2.2-1.5 3.5-1.5s2.5.5 3.5 1.5M12 19h.01" />
+      </svg>
+      <svg class="hidden sm:block h-3.5 w-4 text-[var(--waqtu-muted)]" viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <rect x="1" y="2" width="18" height="10" rx="2.5" />
+        <rect x="3" y="4" width="13" height="6" rx="1" fill="currentColor" stroke="none" />
+        <rect x="20" y="5" width="2" height="4" rx="0.5" fill="currentColor" stroke="none" />
+      </svg>
+      <span class="hidden sm:inline text-[var(--waqtu-muted)] tabular-nums">Mon 9:41 AM</span>
+
+      {/* Waqtu status item — also the anchor for the popover */}
+      <div class="waqtu-anchor relative">
+        <div class="waqtu-pill flex items-center gap-1.5 rounded-md bg-[var(--waqtu-primary)]/12 px-2 py-1 font-medium text-[var(--waqtu-primary)] ring-1 ring-inset ring-[var(--waqtu-primary)]/25">
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3l8 4v5c0 4.5-3.2 7.6-8 9-4.8-1.4-8-4.5-8-9V7l8-4z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.5 12.2l1.8 1.8 3.4-3.6" />
+          </svg>
+          <span>Dhuhr</span>
+          <span class="font-mono text-[12px] tabular-nums">1:23</span>
+        </div>
+
+        {/* expanded panel — docked to the pill's right edge */}
+        <div class="popover absolute right-0 top-full z-20 mt-1.5 w-[260px] rounded-xl border border-[var(--waqtu-border)] bg-[var(--waqtu-bg-2)] p-3 shadow-[0_2px_6px_rgba(22,32,28,0.06),0_20px_45px_rgba(22,32,28,0.12)]">
+          <div class="mb-2 flex items-center justify-between">
+            <span class="font-display text-sm font-semibold text-[var(--waqtu-text)]">Today</span>
+            <span class="text-[11px] text-[var(--waqtu-muted)]">Jakarta</span>
+          </div>
+
+          <ul class="space-y-0.5 text-[13px]">
+            <li class="flex items-center justify-between rounded-md px-2 py-1 text-[var(--waqtu-muted)]">
+              <span class="flex items-center gap-2"><svg class="h-3 w-3 text-[var(--waqtu-primary)]" viewBox="0 0 20 20" fill="currentColor"><path d="M16.7 5.3a1 1 0 010 1.4l-8 8a1 1 0 01-1.4 0l-4-4a1 1 0 011.4-1.4L8 12.6l7.3-7.3a1 1 0 011.4 0z"/></svg>Fajr</span>
+              <span class="font-mono tabular-nums">5:12</span>
+            </li>
+            <li class="flex items-center justify-between rounded-md bg-[var(--waqtu-primary)]/10 px-2 py-1.5 text-[var(--waqtu-text)] ring-1 ring-inset ring-[var(--waqtu-primary)]/20">
+              <span class="flex items-center gap-2 font-semibold">
+                <svg class="h-3 w-3 text-[var(--waqtu-primary)]" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="10" r="4"/><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".4"/></svg>
+                Dhuhr
+              </span>
+              <span class="flex items-center gap-2">
+                <span class="rounded bg-[var(--waqtu-primary)] px-1.5 py-0.5 text-[10px] font-semibold text-white">NEXT</span>
+                <span class="font-mono tabular-nums">12:35</span>
+              </span>
+            </li>
+            <li class="flex items-center justify-between rounded-md px-2 py-1 text-[var(--waqtu-muted)]"><span class="pl-5">Asr</span><span class="font-mono tabular-nums">15:48</span></li>
+            <li class="flex items-center justify-between rounded-md px-2 py-1 text-[var(--waqtu-muted)]"><span class="pl-5">Maghrib</span><span class="font-mono tabular-nums">18:32</span></li>
+            <li class="flex items-center justify-between rounded-md px-2 py-1 text-[var(--waqtu-muted)]"><span class="pl-5">Isha</span><span class="font-mono tabular-nums">19:44</span></li>
+          </ul>
+
+          <div class="mt-2 border-t border-[var(--waqtu-border)] pt-2">
+            <div class="flex items-center justify-between rounded-md bg-[var(--waqtu-bg-tint-2)] px-2 py-1.5">
+              <span class="flex items-center gap-2 text-[12px] text-[var(--waqtu-text)]">
+                <svg class="h-3 w-3 text-[var(--waqtu-gold)]" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                Focus
+                <span class="rounded bg-[var(--waqtu-gold)]/15 px-1 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-[var(--waqtu-gold)]">murattal</span>
+              </span>
+              <span class="font-mono text-[12px] tabular-nums text-[var(--waqtu-text)]">25:00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* clearance so the absolute popover can't overlap the next section */}
+  <div class="h-64"></div>
+</section>
+
+<style>
+  .hero-mock { font-family: var(--font-sans); }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-mock { animation: fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 360ms; }
+  }
+</style>

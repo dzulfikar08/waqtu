@@ -1,0 +1,19 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Page not found — Waqtu" description="The page you're looking for doesn't exist." canonical="/404">
+  <div class="relative z-10 min-h-screen flex items-center justify-center px-6 py-24">
+    <div class="text-center max-w-md">
+      <p class="font-display text-6xl font-bold text-[var(--waqtu-gold)] mb-4">404</p>
+      <h1 class="font-display mb-3 text-2xl font-semibold tracking-tight text-[var(--waqtu-text)]">This page wandered off to pray</h1>
+      <p class="mb-8 text-[var(--waqtu-muted)] leading-relaxed">
+        The page you&apos;re looking for doesn&apos;t exist. Let&apos;s get you back on track.
+      </p>
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <a href="/" class="neu-btn inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]">Back to Waqtu</a>
+        <a href="/blog" class="neu-btn-secondary inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-text)]">Read the blog</a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

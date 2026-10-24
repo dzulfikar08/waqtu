@@ -1,0 +1,10 @@
+# https://developers.cloudflare.com/workers/static-assets/headers
+# Astro builds hashed static assets to /_astro/*
+/_astro/*
+  Cache-Control: public,max-age=31536000,immutable
+
+/*.webp
+  Cache-Control: public,max-age=2592000
+
+/*.mp4
+  Cache-Control: public,max-age=2592000

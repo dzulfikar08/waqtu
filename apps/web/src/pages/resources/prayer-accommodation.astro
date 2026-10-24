@@ -1,0 +1,130 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BackLink from "../../components/BackLink.astro";
+
+const title = "Prayer Accommodation Templates — Waqtu Resources";
+const description =
+  "Ready-to-use email templates for requesting prayer accommodations at work. Copy, customize, and send.";
+
+interface Template {
+  id: string;
+  title: string;
+  subject?: string;
+  body: string;
+}
+
+const managerBody = `Hi [Manager Name],
+
+I wanted to give you a quick heads-up about my daily schedule. I observe daily prayers that take about 10–15 minutes each, at specific times throughout the day. I'll be stepping away briefly for these — typically once in the afternoon (around 1–2 PM) and once in the late afternoon (around 4–5 PM), depending on the season.
+
+This won't affect my deliverables or availability for meetings — I work around my calendar and I'm happy to flex my time as needed. I've blocked these windows on my calendar so you can see when I'm away.
+
+Let me know if you have any questions!
+
+Best,
+[Your Name]`;
+
+const hrBody = `Dear [HR Contact Name],
+
+I'm writing to formally request a religious accommodation for daily prayer breaks, in accordance with [Company Name]'s diversity and inclusion policy and applicable employment laws.
+
+As a practicing Muslim, I observe five daily prayers at specific times. During standard work hours, this typically affects 1–2 prayer times per day, each requiring approximately 10–15 minutes. The specific times shift slightly throughout the year based on the solar calendar.
+
+I've already set up automatic calendar blocking for these windows so my availability is always visible. I'm happy to discuss any scheduling concerns and ensure my work commitments are fully met.
+
+Please let me know if you need any additional information or documentation.
+
+Thank you,
+[Your Name]`;
+
+const teamBody = `Hi team! Quick FYI — I have brief windows during the day for prayer (~15 min each). I've blocked them on my calendar so you'll see when I'm away. Nothing to worry about — just a heads-up in case you notice me stepping out at regular times. Happy to answer any questions! 🙂`;
+
+const templates: Template[] = [
+  { id: "tpl-manager", title: "To your manager (1-on-1)", subject: "Quick note about my schedule", body: managerBody },
+  { id: "tpl-hr", title: "To HR (formal accommodation request)", subject: "Request for religious accommodation — prayer breaks", body: hrBody },
+  { id: "tpl-team", title: "To your team (casual Slack/Teams)", body: teamBody },
+];
+
+const tips = [
+  "Customize [Manager Name], [Company Name], and [Your Name] before sending",
+  "Adjust the prayer time windows to match your timezone and season",
+  "The more casual and matter-of-fact you are, the better it's received",
+  "If you've already set up calendar blocking with Waqtu, mention it — it shows you're proactive",
+  "In most countries, religious accommodation is a legal right — you're not asking for a favor",
+];
+---
+
+<BaseLayout title={title} description={description} canonical="/resources/prayer-accommodation" ogTitle={title} ogDescription={description}>
+  <div class="relative z-10 min-h-screen px-6 py-16 sm:px-10 md:px-14 md:py-24">
+    <div class="mx-auto max-w-3xl">
+      <BackLink href="/resources" label="Back to Resources" />
+
+      <h1 class="font-display mb-4 text-3xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-4xl">Prayer Accommodation Templates</h1>
+      <p class="mb-10 max-w-2xl text-[var(--waqtu-muted)] leading-relaxed">
+        Ready-to-use email templates for requesting prayer accommodations at work. Copy, customize, and send. No need to overthink it.
+      </p>
+
+      <div class="space-y-8">
+        {templates.map((template) => {
+          const copyText = template.subject ? `Subject: ${template.subject}\n\n${template.body}` : template.body;
+          return (
+            <div class="neu-card p-6 sm:p-8">
+              <div class="flex items-start justify-between gap-4 mb-4">
+                <h2 class="font-display text-lg font-semibold text-[var(--waqtu-text)]">{template.title}</h2>
+                <button
+                  data-copy-source={template.id}
+                  class="copy-btn neu-btn-secondary shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[var(--waqtu-text)]"
+                >
+                  <span data-copy-label>Copy</span>
+                </button>
+              </div>
+              {template.subject && (
+                <p class="mb-3 text-sm text-[var(--waqtu-muted)]">
+                  <span class="font-medium text-[var(--waqtu-text)]">Subject: </span>{template.subject}
+                </p>
+              )}
+              <pre class="whitespace-pre-wrap text-sm text-[var(--waqtu-muted)] leading-relaxed font-sans bg-[var(--waqtu-bg)] rounded-lg p-4 border border-[var(--waqtu-border)] overflow-x-auto">{template.body}</pre>
+              <script type="text/plain" id={template.id} set:html={copyText}></script>
+            </div>
+          );
+        })}
+      </div>
+
+      <div class="mt-10 neu-card p-6">
+        <h2 class="font-display mb-2 text-lg font-semibold text-[var(--waqtu-text)]">Tips for sending these emails</h2>
+        <ul class="space-y-2 text-sm text-[var(--waqtu-muted)]">
+          {tips.map((tip) => <li>• {tip}</li>)}
+        </ul>
+      </div>
+
+      <div class="mt-8 text-center">
+        <a href="/#download" class="neu-btn inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]">
+          Download Waqtu
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>("[data-copy-source]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-copy-source");
+      const source = document.getElementById(id!);
+      if (!source) return;
+      const text = source.textContent ?? "";
+      try {
+        await navigator.clipboard.writeText(text);
+        const label = btn.querySelector("[data-copy-label]");
+        if (label) label.textContent = "Copied!";
+        setTimeout(() => {
+          const l = btn.querySelector("[data-copy-label]");
+          if (l) l.textContent = "Copy";
+        }, 2000);
+      } catch {
+        /* clipboard unavailable */
+      }
+    });
+  });
+</script>
