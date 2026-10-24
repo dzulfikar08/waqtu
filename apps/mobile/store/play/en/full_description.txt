@@ -1,0 +1,35 @@
+Waqtu shows prayer times and tracks your daily practice (mutabaah yaumiyah). It is made for people with packed schedules who still want to stay consistent. Prayer times are calculated on your phone, and your location is never sent to a server.
+
+Prayer times
+• Use your phone's location or pick an Indonesian city.
+• Six calculation methods: Kemenag RI, Muslim World League, ISNA, Umm al-Qura, Egyptian and Singapore. Asr follows the Shafi'i, Maliki, Hanbali or Hanafi view.
+• Adjust each prayer by up to 30 minutes and the Hijri date by up to 2 days, so the times match your local mosque.
+• Adhan notifications with a "Prayed" button right in the notification.
+
+Mutabaah yaumiyah
+• A checklist with the five daily prayers (on time, in congregation, made up), rawatib, dhuha, tahajjud, Qur'an recitation with a page count, morning and evening dhikr, charity and voluntary fasting.
+• Add your own practices, or hide the ones you don't use.
+• A consistency streak with grace days, so one missed day does not erase your run. You can pause it during illness or travel.
+• A weekly review: days recorded, prayers on time and in congregation, pages recited and your most frequent practices.
+• Everything is stored on your phone. Signing in is optional and only needed for sync.
+
+Ramadan
+• The Ramadan tab appears a week before and during Ramadan. The rest of the year you can still open it from Settings.
+• A countdown to imsak and iftar, with a lock screen countdown on devices that support it.
+• A full-month imsakiyah timetable you can share as an image.
+• Daily records for fasting, tarawih, tadarus and i'tikaf, plus a marker for the last 10 nights.
+• A khatam plan whose daily target adjusts if you fall behind.
+• A make-up fast (qadha) tracker and a zakat al-fitr calculator.
+
+Free and Premium
+Prayer times, adhan notifications and the basic mutabaah checklist are free with no time limit and no ads. Waqtu Premium (monthly or yearly subscription) adds sync across devices including the Mac app, Halaqah as asynchronous study circles with other people, and extra Ramadan features.
+
+Halaqah circles
+Small circles with anonymous handles, separate for brothers (ikhwan) and sisters (akhwat). Post a reflection or a voice note whenever you have a minute. You can pause or leave without anyone being told. Other members never see your name or email. Circles need an account and Premium.
+
+Privacy and open source
+Your location stays on your phone. There are no ads and no third-party trackers. If you sign in to sync, your mutabaah records are stored on our server so they can appear on your other devices. Waqtu's source code is open: github.com/dzulfikar08/waqtu
+
+Subscriptions renew automatically unless cancelled at least 24 hours before the period ends. Payment is charged to your Google Play account and can be managed in Play Store > Payments & subscriptions.
+Terms of use: https://getwaqtu.com/terms
+Privacy policy: https://getwaqtu.com/privacy

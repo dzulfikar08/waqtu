@@ -1,0 +1,94 @@
+# Captures the store screenshots of one language on an already-booted device with the demo build installed
+# (EXPO_PUBLIC_DEMO_MODE=1, see .github/workflows/store-screenshots.yml).
+#
+#   maestro test --test-output-dir <dir> -e APP_ID=dat.waqtu.app -e LOCALE=id store/maestro/screens.yaml
+#
+# Each `waqtu://demo?lang=..&to=..` link reloads the same fixed demo data (Jakarta, 12 Feb 2027 17:00 WIB, day 5 of
+# Ramadan 1448H) in the given language and opens one tab, so the text checks below wait for text that only exists once the demo data is loaded (iOS also lists off-screen text, so the
+# checklist rows are no proof).
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+    permissions:
+      all: allow
+# A link that arrives while the app is still starting can be lost on Android, so wait for the first screen.
+# The slow CI emulator sometimes shows "Pixel Launcher isn't responding" over the app; wait it out.
+- extendedWaitUntil:
+    visible: ".*(Hari ini|Today|isn't responding).*"
+    timeout: 60000
+- tapOn:
+    text: Wait
+    optional: true
+- extendedWaitUntil:
+    visible: ".*(Hari ini|Today).*"
+    timeout: 60000
+- waitForAnimationToEnd
+
+- openLink: waqtu://demo?lang=${LOCALE}&to=today
+# iOS asks "Open in Waqtu?" a moment after the link; wait for either that dialog or the screen itself.
+- extendedWaitUntil:
+    visible: ".*(Next prayer|Sholat berikutnya|Open in.*).*"
+    timeout: 60000
+- tapOn:
+    text: Open
+    optional: true
+- extendedWaitUntil:
+    visible: ".*(Next prayer|Sholat berikutnya).*"
+    timeout: 60000
+- waitForAnimationToEnd
+- assertNotVisible: ".*isn't responding.*"
+- takeScreenshot: ${LOCALE}-01-today
+- scroll
+- waitForAnimationToEnd
+- assertNotVisible: ".*isn't responding.*"
+- takeScreenshot: ${LOCALE}-02-checklist
+
+- openLink: waqtu://demo?lang=${LOCALE}&to=week
+# iOS asks "Open in Waqtu?" a moment after the link; wait for either that dialog or the screen itself.
+- extendedWaitUntil:
+    visible: ".*(Ulasan pekan ini|This week|Open in.*).*"
+    timeout: 30000
+- tapOn:
+    text: Open
+    optional: true
+- extendedWaitUntil:
+    visible: ".*(Ulasan pekan ini|This week).*"
+    timeout: 30000
+- waitForAnimationToEnd
+- assertNotVisible: ".*isn't responding.*"
+- takeScreenshot: ${LOCALE}-03-week
+
+- openLink: waqtu://demo?lang=${LOCALE}&to=ramadhan
+# iOS asks "Open in Waqtu?" a moment after the link; wait for either that dialog or the screen itself.
+- extendedWaitUntil:
+    visible: ".*(Maghrib at|Maghrib pukul|Open in.*).*"
+    timeout: 30000
+- tapOn:
+    text: Open
+    optional: true
+- extendedWaitUntil:
+    visible: ".*(Maghrib at|Maghrib pukul).*"
+    timeout: 30000
+- waitForAnimationToEnd
+- assertNotVisible: ".*isn't responding.*"
+- takeScreenshot: ${LOCALE}-04-ramadhan
+- scroll
+- waitForAnimationToEnd
+- assertNotVisible: ".*isn't responding.*"
+- takeScreenshot: ${LOCALE}-05-ramadhan-khatam
+
+- openLink: waqtu://demo?lang=${LOCALE}&to=settings
+# iOS asks "Open in Waqtu?" a moment after the link; wait for either that dialog or the screen itself.
+- extendedWaitUntil:
+    visible: ".*(Bahasa|Language|Open in.*).*"
+    timeout: 30000
+- tapOn:
+    text: Open
+    optional: true
+- extendedWaitUntil:
+    visible: ".*(Bahasa|Language).*"
+    timeout: 30000
+- waitForAnimationToEnd
+- assertNotVisible: ".*isn't responding.*"
+- takeScreenshot: ${LOCALE}-06-settings
