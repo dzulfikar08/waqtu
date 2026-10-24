@@ -1,14 +1,25 @@
 import { describe, expect, test } from "bun:test";
 import { calculatePrayerTimes, hijriDate, type MethodId } from "../src/index";
-import jakarta from "./fixtures/jakarta-2026-03.json";
-import malang from "./fixtures/malang-2026-03.json";
+import jakartaFeb from "./fixtures/jakarta-2026-02.json";
+import jakartaMar from "./fixtures/jakarta-2026-03.json";
+import jakartaAug from "./fixtures/jakarta-2026-08.json";
+import malangFeb from "./fixtures/malang-2026-02.json";
+import malangMar from "./fixtures/malang-2026-03.json";
+import malangAug from "./fixtures/malang-2026-08.json";
+import bandaAcehMar from "./fixtures/banda-aceh-2026-03.json";
+import meraukeMar from "./fixtures/merauke-2026-03.json";
 
 /**
- * Published Kemenag RI jadwal, March 2026 (Bimas Islam, https://bimasislam.kemenag.go.id/jadwalshalat).
- * Fixtures are fetched from the MyQuran open API, which republishes the Kemenag tables per city id:
+ * Published Kemenag RI jadwal, 2026 (Bimas Islam, https://bimasislam.kemenag.go.id/jadwalshalat).
+ * Fixtures are fetched from the MyQuran open API, which republishes the Kemenag tables per city id
+ * (each fixture's `source` field has its exact URL), e.g.:
  *   https://api.myquran.com/v2/sholat/jadwal/1301/2026/03   (Kota Jakarta)
  *   https://api.myquran.com/v2/sholat/jadwal/1634/2026/03   (Kota Malang)
- * City centroids below are approximate; Kemenag uses its own per-city coordinates.
+ *   https://api.myquran.com/v2/sholat/jadwal/0119/2026/03   (Kota Banda Aceh, 5.5°N)
+ *   https://api.myquran.com/v2/sholat/jadwal/3315/2026/03   (Kab. Merauke, WIT zone)
+ * The method was calibrated on Jakarta/Malang March only; Feb (Ramadhan season), Aug, Banda Aceh and
+ * Merauke are out-of-sample. City centroids are approximate; Kemenag uses its own coordinates.
+ * Observed max error is 1 min for every prayer; the test allows 2.
  */
 const TOLERANCE_MIN = 2;
 
@@ -17,15 +28,68 @@ const toMin = (hhmm: string) => {
   return h * 60 + m;
 };
 
-const cities = [
-  { name: "Jakarta", fixture: jakarta, latitude: -6.2088, longitude: 106.8456 },
-  { name: "Malang", fixture: malang, latitude: -7.9797, longitude: 112.6304 },
+const cases = [
+  {
+    name: "Jakarta Feb",
+    fixture: jakartaFeb,
+    latitude: -6.2088,
+    longitude: 106.8456,
+    timeZone: "Asia/Jakarta",
+  },
+  {
+    name: "Jakarta Mar",
+    fixture: jakartaMar,
+    latitude: -6.2088,
+    longitude: 106.8456,
+    timeZone: "Asia/Jakarta",
+  },
+  {
+    name: "Jakarta Aug",
+    fixture: jakartaAug,
+    latitude: -6.2088,
+    longitude: 106.8456,
+    timeZone: "Asia/Jakarta",
+  },
+  {
+    name: "Malang Feb",
+    fixture: malangFeb,
+    latitude: -7.9797,
+    longitude: 112.6304,
+    timeZone: "Asia/Jakarta",
+  },
+  {
+    name: "Malang Mar",
+    fixture: malangMar,
+    latitude: -7.9797,
+    longitude: 112.6304,
+    timeZone: "Asia/Jakarta",
+  },
+  {
+    name: "Malang Aug",
+    fixture: malangAug,
+    latitude: -7.9797,
+    longitude: 112.6304,
+    timeZone: "Asia/Jakarta",
+  },
+  {
+    name: "Banda Aceh Mar",
+    fixture: bandaAcehMar,
+    latitude: 5.5483,
+    longitude: 95.3238,
+    timeZone: "Asia/Jakarta",
+  },
+  {
+    name: "Merauke Mar",
+    fixture: meraukeMar,
+    latitude: -8.4932,
+    longitude: 140.4018,
+    timeZone: "Asia/Jayapura",
+  },
 ];
 
 describe("Kemenag method vs published jadwal (±2 min)", () => {
-  for (const city of cities) {
-    test(`${city.name} March 2026`, () => {
-      expect(city.fixture.jadwal.length).toBe(31);
+  for (const c of cases) {
+    test(c.name, () => {
       const fields = [
         ["imsak", "imsak"],
         ["fajr", "subuh"],
@@ -35,20 +99,21 @@ describe("Kemenag method vs published jadwal (±2 min)", () => {
         ["maghrib", "maghrib"],
         ["isha", "isya"],
       ] as const;
-      for (const row of city.fixture.jadwal) {
+      expect(c.fixture.jadwal.length).toBeGreaterThanOrEqual(28);
+      for (const row of c.fixture.jadwal) {
         const [year, month, day] = row.date.split("-").map(Number);
         const r = calculatePrayerTimes({
-          latitude: city.latitude,
-          longitude: city.longitude,
+          latitude: c.latitude,
+          longitude: c.longitude,
           date: { year, month, day },
-          timeZone: "Asia/Jakarta",
+          timeZone: c.timeZone,
           method: "kemenag",
         });
         for (const [ours, theirs] of fields) {
           const diff = Math.abs(toMin(r.local[ours]) - toMin(row[theirs]));
           if (diff > TOLERANCE_MIN) {
             throw new Error(
-              `${city.name} ${row.date} ${ours}: got ${r.local[ours]} want ${row[theirs]}`,
+              `${c.name} ${row.date} ${ours}: got ${r.local[ours]} want ${row[theirs]}`,
             );
           }
         }
