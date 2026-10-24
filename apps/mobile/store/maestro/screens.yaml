@@ -12,6 +12,13 @@ appId: ${APP_ID}
     permissions:
       all: allow
 # A link that arrives while the app is still starting can be lost on Android, so wait for the first screen.
+# The slow CI emulator sometimes shows "Pixel Launcher isn't responding" over the app; wait it out.
+- extendedWaitUntil:
+    visible: ".*(Hari ini|Today|isn't responding).*"
+    timeout: 60000
+- tapOn:
+    text: Wait
+    optional: true
 - extendedWaitUntil:
     visible: ".*(Hari ini|Today).*"
     timeout: 60000
@@ -29,9 +36,11 @@ appId: ${APP_ID}
     visible: ".*Maghrib.*"
     timeout: 60000
 - waitForAnimationToEnd
+- assertNotVisible: ".*isn't responding.*"
 - takeScreenshot: ${LOCALE}-01-today
 - scroll
 - waitForAnimationToEnd
+- assertNotVisible: ".*isn't responding.*"
 - takeScreenshot: ${LOCALE}-02-checklist
 
 - openLink: waqtu://demo?lang=${LOCALE}&to=week
@@ -46,6 +55,7 @@ appId: ${APP_ID}
     visible: ".*(Ulasan pekan ini|This week).*"
     timeout: 30000
 - waitForAnimationToEnd
+- assertNotVisible: ".*isn't responding.*"
 - takeScreenshot: ${LOCALE}-03-week
 
 - openLink: waqtu://demo?lang=${LOCALE}&to=ramadhan
@@ -60,9 +70,11 @@ appId: ${APP_ID}
     visible: ".*(Hari ke-5|Day 5).*"
     timeout: 30000
 - waitForAnimationToEnd
+- assertNotVisible: ".*isn't responding.*"
 - takeScreenshot: ${LOCALE}-04-ramadhan
 - scroll
 - waitForAnimationToEnd
+- assertNotVisible: ".*isn't responding.*"
 - takeScreenshot: ${LOCALE}-05-ramadhan-khatam
 
 - openLink: waqtu://demo?lang=${LOCALE}&to=settings
@@ -77,4 +89,5 @@ appId: ${APP_ID}
     visible: ".*(Bahasa|Language).*"
     timeout: 30000
 - waitForAnimationToEnd
+- assertNotVisible: ".*isn't responding.*"
 - takeScreenshot: ${LOCALE}-06-settings

@@ -30,7 +30,9 @@ function DemoSeed() {
   useEffect(() => {
     const locale = isLocale(lang) ? lang : "id";
     const target = TARGETS[to as keyof typeof TARGETS] ?? "/";
-    void seedDemo(db, locale).then(() => router.replace(target));
+    void seedDemo(db, locale)
+      .catch((error: unknown) => console.error("demo seed failed", error))
+      .then(() => router.replace(target));
   }, [db, router, lang, to]);
 
   return null;

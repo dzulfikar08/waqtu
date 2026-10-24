@@ -1,7 +1,7 @@
 import type { SQLiteDatabase } from "expo-sqlite";
 
 import { emitDataChanged } from "@/db/events";
-import { setLocalePref, setSettings } from "@/db/settings";
+import { setLocalePref } from "@/db/settings";
 import type { Locale } from "@/i18n/locale";
 import { addDays, dayKeyInZone, type DayKey } from "@/mutabaah/dates";
 import { PRAYER_KEYS } from "@/prayer/config";
@@ -105,7 +105,16 @@ export async function seedDemo(db: SQLiteDatabase, locale: Locale): Promise<void
   if (!jakarta) throw new Error("Jakarta missing from CITIES");
   const today = dayKeyInZone(new Date(DEMO_NOW_MS), DEMO_TIME_ZONE);
 
-  await db.withTransactionAsync(async () => {
+  const settings: Record<string, string> = {
+    [PRAYER_KEYS.lat]: String(jakarta.latitude),
+    [PRAYER_KEYS.lon]: String(jakarta.longitude),
+    [PRAYER_KEYS.tz]: jakarta.timeZone,
+    [PRAYER_KEYS.locationName]: jakarta.name,
+    [PRAYER_KEYS.locationAt]: String(DEMO_NOW_MS),
+    [PRAYER_KEYS.method]: "kemenag",
+    locationSource: "manual",
+  };
+  await db.withExclusiveTransactionAsync(async (tx) => {
     for (const table of [
       "entries",
       "settings",
@@ -114,11 +123,11 @@ export async function seedDemo(db: SQLiteDatabase, locale: Locale): Promise<void
       "ramadhan_khatam_log",
       "ramadhan_qadha",
     ]) {
-      await db.runAsync(`DELETE FROM ${table}`);
+      await tx.runAsync(`DELETE FROM ${table}`);
     }
 
     const put = async (day: DayKey, itemId: string, value: number) =>
-      db.runAsync(
+      tx.runAsync(
         "INSERT INTO entries (date, item_id, value, updated_at, dirty) VALUES (?, ?, ?, ?, 0)",
         day,
         itemId,
@@ -134,42 +143,41 @@ export async function seedDemo(db: SQLiteDatabase, locale: Locale): Promise<void
     for (let i = 0; i < 5; i++) {
       const day = addDays(RAMADHAN_1448_START, i);
       const past = day !== today;
-      await db.runAsync(
+      await tx.runAsync(
         "INSERT INTO ramadhan_daily (date, puasa, tarawih, tadarus, itikaf) VALUES (?, 1, ?, ?, 0)",
         day,
         past && i !== 2 ? 1 : 0,
         past || i === 4 ? 1 : 0,
       );
     }
-    await db.runAsync(
+    await tx.runAsync(
       "INSERT INTO ramadhan_khatam (hijri_year, target, start_date) VALUES (?, 1, ?)",
       HIJRI_YEAR,
       RAMADHAN_1448_START,
     );
     for (const [i, pages] of KHATAM_PAGES.entries()) {
-      await db.runAsync(
+      await tx.runAsync(
         "INSERT INTO ramadhan_khatam_log (date, pages) VALUES (?, ?)",
         addDays(RAMADHAN_1448_START, i),
         pages,
       );
     }
-    await db.runAsync(
+    await tx.runAsync(
       "INSERT INTO ramadhan_qadha (kind, count, date) VALUES ('owed', 3, '2027-01-20')",
     );
-    await db.runAsync(
+    await tx.runAsync(
       "INSERT INTO ramadhan_qadha (kind, count, date) VALUES ('made_up', 1, '2027-01-28')",
     );
+    for (const [key, value] of Object.entries(settings)) {
+      await tx.runAsync(
+        "INSERT INTO settings (key, value, updated_at, dirty) VALUES (?, ?, ?, 0)",
+        key,
+        value,
+        DEMO_NOW_MS,
+      );
+    }
   });
 
-  await setSettings(db, {
-    [PRAYER_KEYS.lat]: String(jakarta.latitude),
-    [PRAYER_KEYS.lon]: String(jakarta.longitude),
-    [PRAYER_KEYS.tz]: jakarta.timeZone,
-    [PRAYER_KEYS.locationName]: jakarta.name,
-    [PRAYER_KEYS.locationAt]: String(DEMO_NOW_MS),
-    [PRAYER_KEYS.method]: "kemenag",
-    locationSource: "manual",
-  });
   await setLocalePref(db, locale);
   emitDataChanged();
 }

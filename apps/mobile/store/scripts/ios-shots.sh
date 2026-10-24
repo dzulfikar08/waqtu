@@ -23,9 +23,16 @@ mkdir -p "$out"
 out=$(cd "$out" && pwd)
 cd "$out"
 for locale in id en; do
-  maestro --device "$udid" test -e APP_ID="$app_id" -e LOCALE="$locale" --test-output-dir "$out/maestro-$locale" "$flow"
-  # Maestro writes screenshots into its artifact folder; collect them next to each other.
-  find "$out/maestro-$locale" -name "$locale-*.png" -exec cp {} "$out/" \;
+  # Up to three tries per language: a stuck emulator or a lost deep link should not sink the run.
+  # Each try keeps its own output folder (logs and failure screenshots); screenshots are collected from the one that passed.
+  for attempt in 1 2 3; do
+    dir="$out/maestro-$locale-$attempt"
+    if maestro --device "$udid" test -e APP_ID="$app_id" -e LOCALE="$locale" --test-output-dir "$dir" "$flow"; then
+      find "$dir" -name "$locale-*.png" -exec cp {} "$out/" \;
+      break
+    fi
+    [ "$attempt" -lt 3 ] || exit 1
+  done
 done
 xcrun simctl list devices | grep "$udid" | tee device.txt
 ls -l
