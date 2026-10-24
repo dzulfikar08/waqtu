@@ -1,4 +1,4 @@
-import { errorKey, type ErrorKey } from "./logic";
+import { clampVoiceSeconds, errorKey, type ErrorKey } from "./logic";
 import type {
   Block,
   Circle,
@@ -143,7 +143,7 @@ export function createCirclesApi(options: CirclesApiOptions) {
       const res = await send("PUT", `/${segment(id)}/media`, {
         headers: await headers({
           "content-type": mime,
-          "x-duration-seconds": String(Math.max(1, Math.round(durationSeconds))),
+          "x-duration-seconds": String(clampVoiceSeconds(durationSeconds)),
         }),
         body,
       });

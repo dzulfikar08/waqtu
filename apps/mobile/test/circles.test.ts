@@ -5,6 +5,7 @@ import {
   appendPage,
   canPost,
   circleLanguage,
+  clampVoiceSeconds,
   displayInviteCode,
   errorKey,
   formatDuration,
@@ -167,6 +168,17 @@ describe("feed merging", () => {
 });
 
 describe("small helpers", () => {
+  test("recorded duration is clamped to what the server accepts", () => {
+    expect(clampVoiceSeconds(0)).toBe(1);
+    expect(clampVoiceSeconds(0.4)).toBe(1);
+    expect(clampVoiceSeconds(12.6)).toBe(13);
+    expect(clampVoiceSeconds(180)).toBe(180);
+    expect(clampVoiceSeconds(181)).toBe(180);
+    expect(clampVoiceSeconds(9999)).toBe(180);
+    expect(clampVoiceSeconds(-5)).toBe(1);
+    expect(clampVoiceSeconds(Number.NaN)).toBe(1);
+  });
+
   test("formatDuration", () => {
     expect(formatDuration(0)).toBe("0:00");
     expect(formatDuration(5)).toBe("0:05");
@@ -310,6 +322,8 @@ describe("api client", () => {
     expect(calls[0]!.init.method).toBe("PUT");
     expect(headers["content-type"]).toBe("audio/mp4");
     expect(headers["x-duration-seconds"]).toBe("12");
+    await api.uploadVoice("c1", "file:///a.m4a", "audio/mp4", 4000);
+    expect((calls[1]!.init.headers as Record<string, string>)["x-duration-seconds"]).toBe("180");
     expect(calls[0]!.url).toBe("https://api.example.test/v1/circles/c1/media");
   });
 

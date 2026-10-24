@@ -1,6 +1,7 @@
 import { env } from "cloudflare:workers";
 import { beforeEach, describe, expect, test } from "vitest";
 
+import { sweepOrphanUploads } from "../src/circles/cleanup";
 import { api, createUser, type TestUser } from "./helpers";
 
 const WIPE = [
@@ -948,5 +949,156 @@ describe("routing", () => {
     expect(res.status).toBe(405);
     expect(res.headers.get("allow")).toBe("GET, PUT");
     expect((await call(user, "GET", "/not-a-circle-%20id")).status).toBe(404);
+  });
+});
+
+describe("summary replacement", () => {
+  const week = () => ({
+    weekEnd: new Date().toISOString().slice(0, 10),
+    countedDays: 4,
+    fardhOnTime: 20,
+    fardhJamaah: 5,
+    pages: 10,
+  });
+
+  test("never rewrites a summary that is hidden or removed", async () => {
+    const user = await member("akhwat");
+    const circle = await privateCircle(user);
+    await call(user, "PUT", "/profile", {
+      handle: `hamba${counter}`,
+      language: "id",
+      tzOffsetHours: 7,
+      summaryOptIn: true,
+    });
+    const shared = await call(user, "POST", `/${circle.id}/summary`, week());
+    expect(shared.status).toBe(201);
+    const postId = shared.body.post.id as string;
+
+    for (const status of ["hidden", "removed"]) {
+      await env.APP_DB.prepare("UPDATE circle_post SET status = ?2 WHERE id = ?1")
+        .bind(postId, status)
+        .run();
+      const again = await call(user, "POST", `/${circle.id}/summary`, { ...week(), pages: 99 });
+      expect(again.status).toBe(409);
+      expect(again.body.error).toBe("summary_unavailable");
+      const row = await env.APP_DB.prepare(
+        "SELECT status, summary_json FROM circle_post WHERE id = ?1",
+      )
+        .bind(postId)
+        .first<{ status: string; summary_json: string }>();
+      expect(row?.status).toBe(status);
+      expect(JSON.parse(row!.summary_json).pages).toBe(10);
+    }
+    const count = await env.APP_DB.prepare("SELECT COUNT(*) AS n FROM circle_post").first<{
+      n: number;
+    }>();
+    expect(count?.n).toBe(1);
+  });
+});
+
+describe("media cleanup", () => {
+  const upload = async (user: TestUser, circleId: string, size = 30) => {
+    const res = await api(`/v1/circles/${circleId}/media`, {
+      user,
+      method: "PUT",
+      body: new Uint8Array(size).fill(1),
+      headers: { "content-type": "audio/mp4", "x-duration-seconds": "5" },
+    });
+    expect(res.status).toBe(201);
+    const { mediaId } = (await res.json()) as { mediaId: string };
+    return { mediaId, key: `circle/${circleId}/${mediaId}` };
+  };
+
+  test("deleting the account removes every voice note object, posted or not", async () => {
+    const user = await createUser(`leaver${++counter}`);
+    expect(
+      (
+        await call(user, "PUT", "/profile", {
+          handle: `leaver${counter}`,
+          gender: "ikhwan",
+          language: "id",
+          tzOffsetHours: 7,
+        })
+      ).status,
+    ).toBe(200);
+    const bystander = await member("ikhwan");
+    const circle = await privateCircle(user);
+    const other = await privateCircle(bystander);
+
+    const posted = await upload(user, circle.id);
+    await call(user, "POST", `/${circle.id}/posts`, { mediaId: posted.mediaId });
+    const unposted = await upload(user, circle.id);
+    const others = await upload(bystander, other.id);
+    for (const { key } of [posted, unposted, others]) {
+      expect(await env.CIRCLE_MEDIA.head(key)).not.toBeNull();
+    }
+
+    const res = await api("/api/auth/delete-user", {
+      user,
+      json: {},
+      headers: { origin: "http://localhost" },
+    });
+    expect(res.status).toBe(200);
+
+    expect(await env.CIRCLE_MEDIA.head(posted.key)).toBeNull();
+    expect(await env.CIRCLE_MEDIA.head(unposted.key)).toBeNull();
+    expect(await env.CIRCLE_MEDIA.head(others.key)).not.toBeNull();
+    const rows = await env.APP_DB.prepare(
+      "SELECT COUNT(*) AS n FROM circle_media WHERE user_id = ?1",
+    )
+      .bind(user.id)
+      .first<{ n: number }>();
+    expect(rows?.n).toBe(0);
+  });
+
+  test("the sweep removes uploads never posted after 24h and nothing else", async () => {
+    const user = await member("akhwat");
+    const circle = await privateCircle(user);
+    const HOUR = 3_600_000;
+    const staleOrphan = await upload(user, circle.id);
+    const freshOrphan = await upload(user, circle.id);
+    const oldPosted = await upload(user, circle.id);
+    await call(user, "POST", `/${circle.id}/posts`, { mediaId: oldPosted.mediaId });
+    const age = (mediaId: string, hours: number) =>
+      env.APP_DB.prepare("UPDATE circle_media SET created_at = ?2 WHERE id = ?1")
+        .bind(mediaId, Date.now() - hours * HOUR)
+        .run();
+    await age(staleOrphan.mediaId, 25);
+    await age(freshOrphan.mediaId, 23);
+    await age(oldPosted.mediaId, 48);
+
+    expect(await sweepOrphanUploads(env, Date.now())).toBe(1);
+    expect(await env.CIRCLE_MEDIA.head(staleOrphan.key)).toBeNull();
+    expect(await env.CIRCLE_MEDIA.head(freshOrphan.key)).not.toBeNull();
+    expect(await env.CIRCLE_MEDIA.head(oldPosted.key)).not.toBeNull();
+    expect(await sweepOrphanUploads(env, Date.now())).toBe(0);
+
+    const left = await env.APP_DB.prepare("SELECT id FROM circle_media ORDER BY id").all<{
+      id: string;
+    }>();
+    expect(left.results.map((r) => r.id).sort()).toEqual(
+      [freshOrphan.mediaId, oldPosted.mediaId].sort(),
+    );
+  });
+
+  test("the worker's scheduled handler runs the sweep", async () => {
+    const user = await member("ikhwan");
+    const circle = await privateCircle(user);
+    const stale = await upload(user, circle.id);
+    await env.APP_DB.prepare("UPDATE circle_media SET created_at = ?2 WHERE id = ?1")
+      .bind(stale.mediaId, Date.now() - 30 * 3_600_000)
+      .run();
+    const worker = (await import("../worker")).default;
+    const waits: Promise<unknown>[] = [];
+    await worker.scheduled(
+      { scheduledTime: Date.now(), cron: "17 * * * *", noRetry() {} } as ScheduledController,
+      env,
+      {
+        waitUntil: (p: Promise<unknown>) => void waits.push(p),
+        passThroughOnException() {},
+      } as ExecutionContext,
+    );
+    await Promise.all(waits);
+    expect(await env.CIRCLE_MEDIA.head(stale.key)).toBeNull();
   });
 });

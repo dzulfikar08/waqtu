@@ -5,6 +5,14 @@ import type { Circle, CircleLanguage, Post, WeeklySummary } from "./types";
 const HANDLE_RE = /^[\p{L}\p{N}][\p{L}\p{N}_.-]{2,23}$/u;
 
 export const MAX_VOICE_SECONDS = 120;
+/** Server limit on a voice note's declared length (services/api MAX_AUDIO_SECONDS). */
+export const SERVER_MAX_VOICE_SECONDS = 180;
+
+/** Whole seconds within what the server accepts, whatever the recorder reported. */
+export function clampVoiceSeconds(seconds: number): number {
+  const whole = Math.round(Number.isFinite(seconds) ? seconds : 1);
+  return Math.max(1, Math.min(SERVER_MAX_VOICE_SECONDS, whole));
+}
 
 export type HandleProblem = "short" | "long" | "chars";
 

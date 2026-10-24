@@ -7,6 +7,8 @@ import {
 } from "expo-audio";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { clampVoiceSeconds } from "./logic";
+
 export interface VoiceDraft {
   uri: string;
   seconds: number;
@@ -50,7 +52,7 @@ export function useVoiceRecorder(maxSeconds: number) {
     if (stopping.current) return;
     stopping.current = true;
     try {
-      const seconds = Math.max(1, Math.round(recorder.getStatus().durationMillis / 1000));
+      const seconds = clampVoiceSeconds(recorder.getStatus().durationMillis / 1000);
       await recorder.stop();
       await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true });
       if (recorder.uri) setDraft({ uri: recorder.uri, seconds });

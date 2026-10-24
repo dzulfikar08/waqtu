@@ -214,12 +214,14 @@ export async function shareSummary(
   now: number,
 ): Promise<PostView> {
   const { weekEnd, ...counts } = input;
-  await db
+  // Only a visible summary is replaced: a post hidden by reports or removed stays untouched.
+  const res = await db
     .prepare(
       `INSERT INTO circle_post (id, circle_id, user_id, kind, summary_json, week_end, created_at)
        VALUES (?1, ?2, ?3, 'summary', ?4, ?5, ?6)
        ON CONFLICT (circle_id, user_id, week_end) WHERE kind = 'summary' DO UPDATE SET
-         summary_json = excluded.summary_json`,
+         summary_json = excluded.summary_json
+       WHERE circle_post.status = 'visible'`,
     )
     .bind(
       crypto.randomUUID(),
@@ -230,6 +232,7 @@ export async function shareSummary(
       now,
     )
     .run();
+  if (res.meta.changes === 0) throw new HttpError(409, "summary_unavailable");
   const row = await db
     .prepare(
       "SELECT id FROM circle_post WHERE circle_id = ?1 AND user_id = ?2 AND week_end = ?3 AND kind = 'summary'",
