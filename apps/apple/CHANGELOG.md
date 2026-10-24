@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Waqtu account and sync (DEV-13, Mac parity with the mobile app)
+
+- **Waqtu account** — Settings → Account: Sign in with Google (system browser session) and, in the Mac App Store build, native Sign in with Apple. The session token lives in the Keychain; sign out ends it on the server too.
+- **Sync** — The prayer log (five fardhu) and the prayer settings (calculation method, madhab, time adjustments) sync with the mobile app over `/v1/sync`, last-write-wins. Location is never uploaded.
+- **Menu bar checklist** — "Today's prayers" shows the five fardhu; click one to mark it prayed (click again to undo). Edits sync in the background.
+- **Ramadhan** — During Ramadhan the menu bar title counts down to iftar, or to imsak (fajr − 10 min) outside fasting hours. Follows the moon-sighting correction (`hijriOffset`) set on the phone. Can be turned off in Settings → Account.
+- **License** — Direct-download build: "Link license to account" attaches the Polar license to the signed-in account (hidden until the server offers it).
+- Unit tests for the sync merge, mapping, settings whitelist and Ramadhan countdown run in CI (`xcodebuild test`, scheme `waqtu`).
+
 ## 1.1.0 (May 2026)
 
 ### New Features

@@ -18,8 +18,13 @@ set -euo pipefail
 # Env vars:
 #   NOTARIZE=1                    Enable Apple notarization (requires credentials)
 #   CODESIGN_IDENTITY=SHA1        Override signing identity
+#   PROVISIONING_PROFILE_PATH=... Developer ID provisioning profile for dat.waqtu (embedded in the app; required for
+#                                 Sign in with Apple, a restricted entitlement). Without it the restricted entitlements are dropped.
+#   WIDGET_PROVISIONING_PROFILE_PATH=...  Same for the widget extension dat.waqtu.mac-widget (optional)
 #   RELEASE_UPLOAD_TOKEN=...      Bearer token for the updates worker's /releases API (required unless SKIP_UPLOAD=1)
 #   RELEASE_API_URL=...           Updates worker base URL (default https://dl.getwaqtu.com)
+#   BUILD=N                       CFBundleVersion of this release (integer, required; must be greater than the newest
+#                                 sparkle:version in the appcast, or Sparkle never offers the update)
 #   SKIP_BUILD=1                  Skip xcodebuild (reuse existing .app)
 #   SKIP_UPLOAD=1                 Skip R2/D1 (dry-run Sparkle signing only)
 #   SPARKLE_ED_KEY_FILE=path      Sign with this EdDSA private key file instead of the login keychain (CI)
@@ -92,6 +97,21 @@ if [[ "$SKIP_UPLOAD" == "0" ]] && [[ -z "${RELEASE_UPLOAD_TOKEN:-}" ]]; then
   exit 1
 fi
 
+# Sparkle compares CFBundleVersion, so the build number must increase with every release.
+if [[ ! "${BUILD:-}" =~ ^[0-9]+$ ]]; then
+  err "BUILD must be an integer (CFBundleVersion), got '${BUILD:-}'."
+  exit 1
+fi
+APPCAST_URL="${RELEASE_API_URL:-https://dl.getwaqtu.com}/appcast.xml"
+APPCAST="$(curl -fsS "$APPCAST_URL")" || { err "Could not fetch $APPCAST_URL to check the build number."; exit 1; }
+LAST_BUILD="$(printf '%s' "$APPCAST" | sed -n 's|.*<sparkle:version>\([0-9][0-9]*\)</sparkle:version>.*|\1|p' | sort -n | tail -1)"
+LAST_BUILD="${LAST_BUILD:-0}"
+if (( BUILD <= LAST_BUILD )); then
+  err "BUILD $BUILD must be greater than the newest appcast build ($LAST_BUILD)."
+  exit 1
+fi
+ok "Build number $BUILD > last published build $LAST_BUILD"
+
 # Check Sparkle sign_update
 SPARKLE_BIN="$BUILD_DIR/DerivedData/SourcePackages/artifacts/sparkle/Sparkle/bin/sign_update"
 if [[ ! -f "$SPARKLE_BIN" ]]; then
@@ -161,10 +181,14 @@ if [[ "$SKIP_BUILD" == "1" ]]; then
 else
   info "Running xcodebuild (this may take a few minutes)..."
   cd "$PROJECT_DIR"
+  # Built unsigned: signing (entitlements, embedded provisioning profile, Sparkle's nested code)
+  # happens in step 2 so the widget and the app each get their own profile.
   xcodebuild \
     -scheme waqtu \
     -configuration Release \
     -derivedDataPath "$BUILD_DIR/DerivedData" \
+    MARKETING_VERSION="$VERSION" CURRENT_PROJECT_VERSION="$BUILD" \
+    CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
     clean build 2>&1 | tail -20
 
   if [[ ! -d "$APP_PATH" ]]; then
@@ -197,11 +221,7 @@ if [[ -z "${CODESIGN_IDENTITY:-}" ]]; then
 fi
 
 info "Signing with: $(security find-identity -v -p codesigning 2>/dev/null | grep "$CODESIGN_IDENTITY" | head -1)"
-codesign --deep --force --verify --verbose \
-  --sign "$CODESIGN_IDENTITY" \
-  --options runtime \
-  --preserve-metadata=entitlements \
-  "$APP_PATH"
+"$SCRIPT_DIR/sign-app.sh" "$APP_PATH" "$CODESIGN_IDENTITY"
 ok "Signed successfully"
 
 # Notarize

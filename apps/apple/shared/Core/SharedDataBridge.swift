@@ -6,7 +6,7 @@ import Foundation
 /// Call this from AppViewModel whenever prayers are calculated or streaks change.
 @Observable
 public final class SharedDataBridge {
-    private let defaults = UserDefaults(suiteName: "group.com.waqtu.shared") ?? UserDefaults.standard
+    private let defaults = UserDefaults(suiteName: AppGroup.id) ?? UserDefaults.standard
 
     public init() {}
 

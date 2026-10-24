@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import { describe, expect, it } from "vitest";
-import { APPLE_BUNDLE_ID, createAuth } from "../src/auth";
+import { APPLE_BUNDLE_ID, APPLE_MAC_BUNDLE_ID, createAuth } from "../src/auth";
 
 async function providers(overrides: Partial<typeof env> = {}) {
   const context = await createAuth({ ...env, ...overrides }).$context;
@@ -8,15 +8,16 @@ async function providers(overrides: Partial<typeof env> = {}) {
 }
 
 describe("social providers", () => {
-  it("registers Apple with only APPLE_CLIENT_ID and verifies id tokens against the bundle id", async () => {
+  it("registers Apple with only APPLE_CLIENT_ID and verifies id tokens against the iOS and Mac bundle ids", async () => {
     const apple = (await providers()).get("apple");
     expect(apple).toBeDefined();
     expect(apple?.options?.clientSecret).toBeUndefined();
     expect(apple?.idToken).toMatchObject({
       issuer: "https://appleid.apple.com",
-      audience: APPLE_BUNDLE_ID,
+      audience: [APPLE_BUNDLE_ID, APPLE_MAC_BUNDLE_ID],
     });
     expect(APPLE_BUNDLE_ID).toBe("dat.waqtu.ios");
+    expect(APPLE_MAC_BUNDLE_ID).toBe("dat.waqtu");
   });
 
   it("accepts the web, Android and iOS Google client ids as id-token audiences", async () => {

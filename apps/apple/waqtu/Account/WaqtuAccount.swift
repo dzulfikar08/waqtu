@@ -1,0 +1,180 @@
+//
+//  WaqtuAccount.swift
+//  waqtu
+//
+//  The Waqtu account on the Mac: Sign in with Apple (native identity token) and Google (system
+//  browser session), with the better-auth bearer token kept in the Keychain.
+//  State is only touched on the main thread; the async entry points are main-actor.
+//
+
+import Foundation
+import AppKit
+import AuthenticationServices
+import CryptoKit
+
+@Observable
+final class WaqtuAccount {
+    private(set) var user: AccountUser?
+    private(set) var isBusy = false
+    private(set) var errorMessage: String?
+    /// Bearer session token; nil when signed out.
+    private(set) var token: String?
+
+    /// Called after sign-in, sign-out and when the server rejects the session.
+    @ObservationIgnored var onSessionChange: (() -> Void)?
+
+    let api: WaqtuAPIClient
+    private let keychain: KeychainStore
+    private static let tokenAccount = "sessionToken"
+    private static let userAccount = "user"
+
+    var isSignedIn: Bool { token != nil && user != nil }
+
+    init(api: WaqtuAPIClient = WaqtuAPIClient(), keychain: KeychainStore = KeychainStore()) {
+        self.api = api
+        self.keychain = keychain
+        if let stored = keychain.read(Self.tokenAccount),
+           let json = keychain.read(Self.userAccount)?.data(using: .utf8),
+           let user = try? JSONDecoder().decode(AccountUser.self, from: json) {
+            self.token = stored
+            self.user = user
+        }
+    }
+
+    // MARK: - Apple
+
+    /// Random nonce for one Apple sign-in; the hash goes to Apple, the raw value to the server.
+    static func makeNonce() -> (raw: String, hashed: String) {
+        var bytes = [UInt8](repeating: 0, count: 32)
+        let status = SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes)
+        let raw = status == errSecSuccess
+            ? bytes.map { String(format: "%02x", $0) }.joined()
+            : UUID().uuidString
+        let hashed = SHA256.hash(data: Data(raw.utf8)).map { String(format: "%02x", $0) }.joined()
+        return (raw, hashed)
+    }
+
+    @MainActor
+    func completeAppleSignIn(_ result: Result<ASAuthorization, Error>, rawNonce: String?) async {
+        guard !isBusy else { return }
+        errorMessage = nil
+        switch result {
+        case .failure(let error):
+            if (error as? ASAuthorizationError)?.code != .canceled {
+                errorMessage = error.localizedDescription
+            }
+        case .success(let authorization):
+            guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential,
+                  let tokenData = credential.identityToken,
+                  let idToken = String(data: tokenData, encoding: .utf8),
+                  let rawNonce else {
+                errorMessage = "Apple did not return an identity token."
+                return
+            }
+            isBusy = true
+            defer { isBusy = false }
+            do {
+                let session = try await api.signInWithApple(
+                    idToken: idToken,
+                    nonce: rawNonce,
+                    givenName: credential.fullName?.givenName,
+                    familyName: credential.fullName?.familyName
+                )
+                try await finishSignIn(token: session)
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+        }
+    }
+
+    // MARK: - Google
+
+    @MainActor
+    func signInWithGoogle() async {
+        guard !isBusy else { return }
+        errorMessage = nil
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            let start = try await api.startGoogleSignIn()
+            let runner = WebAuthRunner()
+            let callback = try await runner.run(url: start, callbackScheme: WaqtuAPI.callbackScheme)
+            let session = try WaqtuAPIClient.sessionToken(fromCallback: callback)
+            try await finishSignIn(token: session)
+        } catch is CancellationError {
+            // The browser sheet was closed.
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    // MARK: - Session
+
+    @MainActor
+    private func finishSignIn(token: String) async throws {
+        let user = try await api.me(token: token)
+        keychain.write(Self.tokenAccount, value: token)
+        if let data = try? JSONEncoder().encode(user), let json = String(data: data, encoding: .utf8) {
+            keychain.write(Self.userAccount, value: json)
+        }
+        self.token = token
+        self.user = user
+        onSessionChange?()
+    }
+
+    @MainActor
+    func signOut() async {
+        let current = token
+        forgetSession()
+        errorMessage = nil
+        onSessionChange?()
+        if let current { await api.signOut(token: current) }
+    }
+
+    /// The server rejected the token: drop it and ask for a new sign-in.
+    func sessionExpired() {
+        guard token != nil else { return }
+        forgetSession()
+        errorMessage = "Your session expired. Sign in again to keep syncing."
+        onSessionChange?()
+    }
+
+    private func forgetSession() {
+        keychain.delete(Self.tokenAccount)
+        keychain.delete(Self.userAccount)
+        token = nil
+        user = nil
+    }
+}
+
+/// Runs one `ASWebAuthenticationSession` and returns the URL it was redirected to.
+final class WebAuthRunner: NSObject, ASWebAuthenticationPresentationContextProviding {
+    private var session: ASWebAuthenticationSession?
+
+    @MainActor
+    func run(url: URL, callbackScheme: String) async throws -> URL {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<URL, Error>) in
+            let auth = ASWebAuthenticationSession(url: url, callbackURLScheme: callbackScheme) { [weak self] callback, error in
+                self?.session = nil
+                if let callback {
+                    continuation.resume(returning: callback)
+                } else if let error = error as? ASWebAuthenticationSessionError, error.code == .canceledLogin {
+                    continuation.resume(throwing: CancellationError())
+                } else {
+                    continuation.resume(throwing: error ?? WaqtuAPIError.invalidResponse)
+                }
+            }
+            auth.presentationContextProvider = self
+            auth.prefersEphemeralWebBrowserSession = false
+            session = auth
+            if !auth.start() {
+                session = nil
+                continuation.resume(throwing: WaqtuAPIError.invalidResponse)
+            }
+        }
+    }
+
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        NSApp.keyWindow ?? NSApp.windows.first ?? ASPresentationAnchor()
+    }
+}

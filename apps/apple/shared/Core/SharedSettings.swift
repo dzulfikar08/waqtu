@@ -5,7 +5,7 @@ import Foundation
 @Observable
 public final class SharedSettings {
     private let store = NSUbiquitousKeyValueStore.default
-    private let defaults = UserDefaults(suiteName: "group.com.waqtu.shared") ?? UserDefaults.standard
+    private let defaults = UserDefaults(suiteName: AppGroup.id) ?? UserDefaults.standard
 
     // MARK: - Calculation Settings
 

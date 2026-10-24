@@ -4,7 +4,7 @@ import SwiftUI
 @Observable
 final class AppSettings {
     /// Shared app-group container for widget/watch/iOS sync.
-    private let sharedDefaults = UserDefaults(suiteName: "group.com.waqtu.shared") ?? UserDefaults.standard
+    private let sharedDefaults = UserDefaults(suiteName: AppGroup.id) ?? UserDefaults.standard
     private let cloudStore = NSUbiquitousKeyValueStore.default
     // Overlay settings
     var overlayEnabled: Bool {
@@ -120,6 +120,12 @@ final class AppSettings {
     var slackStatusEmoji: String {
         get { UserDefaults.standard.string(forKey: "slackStatusEmoji") ?? ":pray:" }
         set { UserDefaults.standard.set(newValue, forKey: "slackStatusEmoji") }
+    }
+
+    /// Show the iftar/imsak countdown in the menu bar title during Ramadhan. On unless turned off.
+    var showFastingCountdown: Bool {
+        get { (UserDefaults.standard.object(forKey: "showFastingCountdown") as? Bool) ?? true }
+        set { UserDefaults.standard.set(newValue, forKey: "showFastingCountdown") }
     }
 
     /// Whether the first-run onboarding has been completed.

@@ -69,6 +69,8 @@ jobs:
         include:
           - scheme: waqtu
             destination: generic/platform=macOS
+          - scheme: waqtu-mas
+            destination: generic/platform=macOS
           - scheme: waqtu-ios
             destination: generic/platform=iOS
     steps:
@@ -85,6 +87,17 @@ jobs:
             -project waqt.xcodeproj \
             -scheme "${{ matrix.scheme }}" \
             -destination "${{ matrix.destination }}" \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+      - name: xcodebuild test waqtu (sync, mapping and Ramadhan unit tests)
+        if: matrix.scheme == 'waqtu'
+        working-directory: apps/apple
+        run: |
+          xcodebuild test \
+            -project waqt.xcodeproj \
+            -scheme waqtu \
+            -destination "platform=macOS" \
+            -only-testing:waqtuTests \
             -derivedDataPath build/DerivedData \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
 

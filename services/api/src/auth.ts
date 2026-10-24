@@ -5,6 +5,8 @@ import { deleteUserMedia } from "./circles/cleanup";
 import type { AppEnv } from "./env";
 
 export const APPLE_BUNDLE_ID = "dat.waqtu.ios";
+/** Bundle id of the Mac app (direct download and Mac App Store builds share it). */
+export const APPLE_MAC_BUNDLE_ID = "dat.waqtu";
 
 const splitIds = (raw: string | undefined): string[] =>
   (raw ?? "")
@@ -15,10 +17,15 @@ const splitIds = (raw: string | undefined): string[] =>
 export function createAuth(env: AppEnv) {
   const isProduction = env.ENVIRONMENT === "production";
 
-  // Native id-token sign-in only verifies the token against the bundle id, so no client secret is
-  // needed; the secret is only used by Apple's web redirect flow, which the app does not use.
+  // Native id-token sign-in only verifies the token against the app bundle ids (iOS and Mac), so
+  // no client secret is needed; the secret is only used by Apple's web redirect flow, which the
+  // apps do not use.
   const apple = env.APPLE_CLIENT_ID
-    ? { clientId: env.APPLE_CLIENT_ID, appBundleIdentifier: APPLE_BUNDLE_ID }
+    ? {
+        clientId: env.APPLE_CLIENT_ID,
+        appBundleIdentifier: APPLE_BUNDLE_ID,
+        audience: [APPLE_BUNDLE_ID, APPLE_MAC_BUNDLE_ID],
+      }
     : undefined;
 
   // The first id is the web client (redirect flow, token exchange); every id is an accepted
