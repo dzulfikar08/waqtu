@@ -31,11 +31,15 @@ export const BUILTIN_ITEMS: readonly ItemDef[] = [
   { id: "puasa", kind: "check" },
   // Recorded when a halaqah session is finished. Not in the default checklist (Ramadhan only); users add it from the item manager.
   { id: "halaqah", kind: "check" },
+  // Recorded when a day's hafalan list (new portion and murojaah) is cleared. Not in the default checklist; users add it from the item manager.
+  { id: "murojaah", kind: "check" },
 ];
 
-/** What a fresh install shows: every built-in except the seasonal `halaqah`. */
+const OPT_IN_IDS: readonly string[] = ["halaqah", "murojaah"];
+
+/** What a fresh install shows: every built-in except the opt-in ones (`halaqah`, `murojaah`). */
 export const DEFAULT_ITEMS: readonly ItemDef[] = BUILTIN_ITEMS.filter(
-  (item) => item.id !== "halaqah",
+  (item) => !OPT_IN_IDS.includes(item.id),
 );
 
 export const MAX_LABEL = 40;

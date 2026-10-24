@@ -1,5 +1,6 @@
 import type { SQLiteDatabase } from "expo-sqlite";
 
+import { HAFALAN_MIGRATION } from "@/hafalan/migrations";
 import { HALAQAH_MIGRATION } from "@/halaqah/migrations";
 import { RAMADHAN_MIGRATION } from "@/ramadhan/migrations";
 
@@ -31,6 +32,8 @@ export const MIGRATIONS: readonly (readonly string[])[] = [
   RAMADHAN_MIGRATION,
   // 4: halaqah program progress and private reflections.
   HALAQAH_MIGRATION,
+  // 5: hafalan plan, per-unit spaced-repetition state and self-listen recordings.
+  HAFALAN_MIGRATION,
 ];
 
 export async function migrate(db: SQLiteDatabase): Promise<void> {

@@ -1,5 +1,6 @@
 import { circlesId } from "@/circles/strings";
 import { premiumId } from "@/premium/strings";
+import { hafalanId } from "@/hafalan/strings";
 import { halaqahId } from "@/halaqah/strings";
 import { ramadhanId } from "@/ramadhan/strings";
 
@@ -39,6 +40,7 @@ export const id = {
     sedekah: "Sedekah",
     puasa: "Puasa sunnah",
     halaqah: "Halaqah Ramadhan",
+    murojaah: "Murojaah hafalan",
     title: "Atur amalan",
     manage: "Atur daftar amalan",
     active: "Daftar saya",
@@ -154,4 +156,5 @@ export const id = {
   circles: circlesId,
   premium: premiumId,
   halaqah: halaqahId,
+  hafalan: hafalanId,
 } as const;
