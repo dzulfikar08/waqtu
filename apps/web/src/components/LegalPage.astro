@@ -165,6 +165,20 @@ const links = [
     min-height: 44px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    list-style: none;
+  }
+  .prose-waqtu .faq-list summary::-webkit-details-marker {
+    display: none;
+  }
+  .prose-waqtu .faq-list summary::after {
+    content: "+";
+    color: var(--waqtu-muted);
+    font-size: 1.25rem;
+  }
+  .prose-waqtu .faq-list details[open] summary::after {
+    content: "\2212";
   }
   .prose-waqtu .faq-list details p {
     margin-top: 0.5rem;
