@@ -7,12 +7,10 @@
  */
 
 const DOWNLOAD_URL =
-  import.meta.env.PUBLIC_DOWNLOAD_URL ||
-  "https://waqt-updates.dzulfikar-at.workers.dev/latest";
+  import.meta.env.PUBLIC_DOWNLOAD_URL || "https://waqt-updates.dzulfikar-at.workers.dev/latest";
 
 type Stonks = { event: (name: string, properties?: Record<string, unknown>) => void };
-const stonks = (): Stonks | undefined =>
-  (window as unknown as { Stonks?: Stonks }).Stonks;
+const stonks = (): Stonks | undefined => (window as unknown as { Stonks?: Stonks }).Stonks;
 
 // ---------- header scroll state ----------
 function initHeader() {
@@ -129,7 +127,7 @@ function initCheckout() {
       stonks()?.event("checkout_start", { tier });
       btn.dataset.loading = "true";
       const text = btn.querySelector<HTMLElement>("[data-checkout-text]");
-      const original = text?.textContent;
+      const original = text?.textContent ?? "";
       if (text) text.textContent = "Redirecting...";
 
       try {

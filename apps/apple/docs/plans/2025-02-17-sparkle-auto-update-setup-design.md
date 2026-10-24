@@ -39,14 +39,15 @@ Set up server-side components for Sparkle auto-updates in the Waqt macOS prayer 
 
 Build settings/Info.plist entries:
 
-| Setting | Value |
-|---------|-------|
-| `SUFeedURL` | Cloudflare Worker URL (e.g., `https://waqt-updates.workers.dev/appcast.xml`) |
-| `SUPublicEDKey` | Base64-encoded EdDSA public key |
+| Setting         | Value                                                                        |
+| --------------- | ---------------------------------------------------------------------------- |
+| `SUFeedURL`     | Cloudflare Worker URL (e.g., `https://waqt-updates.workers.dev/appcast.xml`) |
+| `SUPublicEDKey` | Base64-encoded EdDSA public key                                              |
 
 ### 3. Cloudflare Worker
 
 Serves the `appcast.xml` feed with responsibilities:
+
 - Return properly formatted XML appcast
 - Handle HTTPS (automatic)
 - Support CORS if needed
@@ -67,13 +68,13 @@ Hosts the signed `.dmg` update files for download.
 
 ## Files to Create/Modify
 
-| File | Action |
-|------|--------|
-| `waqtu/Resources/public_ed25519.pem` | Create - add public key to Xcode resources |
-| `waqt.xcodeproj` | Modify - add SUFeedURL and SUPublicEDKey build settings |
-| `scripts/release.sh` | Create - automate build, sign, upload steps |
-| `cloudflare-worker/worker.ts` | Create - Worker code for appcast |
-| `cloudflare-worker/wrangler.toml` | Create - Worker config |
+| File                                 | Action                                                  |
+| ------------------------------------ | ------------------------------------------------------- |
+| `waqtu/Resources/public_ed25519.pem` | Create - add public key to Xcode resources              |
+| `waqt.xcodeproj`                     | Modify - add SUFeedURL and SUPublicEDKey build settings |
+| `scripts/release.sh`                 | Create - automate build, sign, upload steps             |
+| `cloudflare-worker/worker.ts`        | Create - Worker code for appcast                        |
+| `cloudflare-worker/wrangler.toml`    | Create - Worker config                                  |
 
 ## Appcast XML Format
 
@@ -97,6 +98,7 @@ Hosts the signed `.dmg` update files for download.
 ## Existing Code Integration
 
 The following Sparkle code is already in place:
+
 - `AppDelegate.swift`: `SPUStandardUpdaterController` initialized
 - `waqtuApp.swift`: `CheckForUpdatesView` for "Check for Updates" menu item
 - Package dependency: Sparkle 2.8.1

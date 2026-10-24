@@ -3,11 +3,11 @@
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"],
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
     "jsx": "preserve",
+    "types": ["@cloudflare/workers-types"],
     "verbatimModuleSyntax": true
   }
 }

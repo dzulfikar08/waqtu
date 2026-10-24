@@ -1,0 +1,24 @@
+{
+  "name": "waqtu",
+  "private": true,
+  "workspaces": [
+    "apps/web",
+    "services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "bun --filter @waqtu/web dev",
+    "dev:api": "bun --filter @waqtu/api dev",
+    "build": "bun --filter @waqtu/web build",
+    "deploy:web": "bun --filter @waqtu/web deploy",
+    "deploy:api": "bun --filter @waqtu/api deploy",
+    "typecheck": "bun --filter @waqtu/web typecheck && bun --filter @waqtu/api typecheck",
+    "fmt:check": "oxfmt --check .",
+    "lint": "oxlint .",
+    "fmt": "oxfmt ."
+  },
+  "devDependencies": {
+    "oxfmt": "^0.62.0",
+    "oxlint": "^1.77.0"
+  }
+}

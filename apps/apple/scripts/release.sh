@@ -21,11 +21,13 @@ set -euo pipefail
 #   R2_PUBLIC_BASE_URL=...        R2 public URL for downloads
 #   SKIP_BUILD=1                  Skip xcodebuild (reuse existing .app)
 #   SKIP_UPLOAD=1                 Skip R2/D1 (dry-run Sparkle signing only)
+#   SPARKLE_ED_KEY_FILE=path      Sign with this EdDSA private key file instead of the login keychain (CI)
+#   NOTARY_KEYCHAIN=path          Keychain holding the notarytool profile (CI; default: login keychain)
 # ============================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-WORKER_DIR="$PROJECT_DIR/cloudflare-worker"
+WORKER_DIR="$(cd "$PROJECT_DIR/../../services/api" && pwd)"
 BUILD_DIR="$PROJECT_DIR/build"
 
 # ---- Parse args ----
@@ -222,7 +224,9 @@ else
     ditto -c -k --keepParent "$APP_PATH" "$ZIP_PATH"
 
     NOTARY_PROFILE="${NOTARY_KEYCHAIN_PROFILE:-waqtu-notary}"
-    xcrun notarytool submit "$ZIP_PATH" --keychain-profile "$NOTARY_PROFILE" --wait
+    NOTARY_ARGS=(--keychain-profile "$NOTARY_PROFILE")
+    [[ -n "${NOTARY_KEYCHAIN:-}" ]] && NOTARY_ARGS+=(--keychain "$NOTARY_KEYCHAIN")
+    xcrun notarytool submit "$ZIP_PATH" "${NOTARY_ARGS[@]}" --wait
     xcrun stapler staple "$APP_PATH"
     spctl --assess --verbose "$APP_PATH"
     ok "Notarized and stapled"
@@ -276,7 +280,11 @@ if [[ ! -f "$SPARKLE_BIN" ]]; then
   exit 1
 fi
 
-SIGNATURE=$("$SPARKLE_BIN" "$DMG_PATH")
+if [[ -n "${SPARKLE_ED_KEY_FILE:-}" ]]; then
+  SIGNATURE=$("$SPARKLE_BIN" --ed-key-file "$SPARKLE_ED_KEY_FILE" "$DMG_PATH")
+else
+  SIGNATURE=$("$SPARKLE_BIN" "$DMG_PATH")
+fi
 ok "Sparkle signature: ${SIGNATURE:0:40}..."
 
 # Get Sparkle version (CFBundleVersion)

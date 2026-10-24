@@ -2,6 +2,6 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "vars": {
     "POLAR_PRODUCT_PRO_LIFETIME": "85947e3a-6eab-4057-950e-dbb7f4f0d34d",
-    "POLAR_PRODUCT_PRO_MONTHLY": ""
-  }
+    "POLAR_PRODUCT_PRO_MONTHLY": "",
+  },
 }

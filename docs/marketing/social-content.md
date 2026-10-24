@@ -3,6 +3,7 @@
 ## Twitter/X Posts (English)
 
 ### Post 1 - Problem/Solution Hook
+
 ```
 You check your calendar, see a meeting at 1:15 PM.
 
@@ -27,6 +28,7 @@ Try free: waqtu.sh
 ```
 
 ### Post 2 - Short & Punchy
+
 ```
 Built this for my prayers, sharing for yours.
 
@@ -42,6 +44,7 @@ waqtu.sh
 ```
 
 ### Post 3 - Story Format
+
 ```
 Last year I missed Dhuhr again. Back-to-back meetings, mental note to "make it up later" (again).
 
@@ -62,6 +65,7 @@ waqtu.sh
 ```
 
 ### Post 4 - Feature Focus
+
 ```
 Your calendar doesn't know about your prayers. Your colleagues don't either.
 
@@ -81,6 +85,7 @@ waqtu.sh
 ```
 
 ### Post 5 - Emotional/Value Hook
+
 ```
 "Indeed, prayer is obligatory on the believers at specified times." — Quran 4:103
 
@@ -103,6 +108,7 @@ Try free: waqtu.sh
 ## LinkedIn Posts (English)
 
 ### Post 1 - Professional Problem/Solution
+
 ```
 I stepped away for Dhuhr prayer. Returned to a Slack message: "Where were you? We started without you."
 
@@ -122,6 +128,7 @@ Free to try. $9.99 lifetime: waqtu.sh
 ```
 
 ### Post 2 - Founder Story
+
 ```
 As a Muslim professional, I've struggled with the same dilemma for years:
 
@@ -151,6 +158,7 @@ Try free: waqtu.sh
 ```
 
 ### Post 3 - DEI & Inclusion Angle
+
 ```
 Diversity, Equity, and Inclusion isn't just about hiring diverse talent.
 
@@ -172,6 +180,7 @@ Free to try: waqtu.sh
 ```
 
 ### Post 4 - Short & Professional
+
 ```
 Your calendar doesn't know about your prayers. Your colleagues don't either.
 
@@ -191,6 +200,7 @@ waqtu.sh
 ```
 
 ### Post 5 - Value-Driven
+
 ```
 The most successful professionals I know have something in common:
 
@@ -210,6 +220,7 @@ Try free: waqtu.sh
 ```
 
 ### Post 6 - Behind the Build
+
 ```
 Why I built Waqtu:
 
@@ -239,6 +250,7 @@ waqtu.sh
 ## LinkedIn Posts (Indonesian)
 
 ### Post 1 - Problem/Solution Profesional
+
 ```
 Aku pergi sholat Dhuhr. Kembali ke pesan Slack: "Kemana? Kita mulai tanpamu."
 
@@ -258,6 +270,7 @@ Gratis dicoba. $9.99 seumur hidup: waqtu.sh
 ```
 
 ### Post 2 - Cerita Founder
+
 ```
 Sebagai profesional Muslim, aku menghadapi dilema yang sama selama bertahun-tahun:
 
@@ -287,6 +300,7 @@ Coba gratis: waqtu.sh
 ```
 
 ### Post 3 - Sudut Pandang DEI & Inklusi
+
 ```
 Keragaman, Ekuitas, dan Inklusi bukan hanya tentang merekrut bakat beragam.
 
@@ -308,6 +322,7 @@ Gratis dicoba: waqtu.sh
 ```
 
 ### Post 4 - Pendek & Profesional
+
 ```
 Kalendermu tak tahu tentang sholatmu. Rekan kerjamu juga tidak.
 
@@ -327,6 +342,7 @@ waqtu.sh
 ```
 
 ### Post 5 - Berbasis Nilai
+
 ```
 Profesional paling sukses yang kuketahui punya satu kesamaan:
 
@@ -346,6 +362,7 @@ Coba gratis: waqtu.sh
 ```
 
 ### Post 6 - Di Balik Build
+
 ```
 Kenapa aku buat Waqtu:
 
@@ -377,6 +394,7 @@ waqtu.sh
 ### English - Pre-Ramadan Series
 
 ### Post 7 - Ramadan Preparation (LinkedIn Style)
+
 ```
 Ramadan 2026 begins February 17th.
 
@@ -402,6 +420,7 @@ Prepare early: waqtu.sh
 ```
 
 ### Post 8 - Iftar Protection Focus
+
 ```
 The most anticipated moment of your fasting day: Maghrib.
 
@@ -423,6 +442,7 @@ Try free: waqtu.sh
 ```
 
 ### Post 9 - Manager/Leader Perspective
+
 ```
 To my fellow managers and leaders:
 
@@ -446,6 +466,7 @@ Support your team. Share this with them: waqtu.sh
 ```
 
 ### Post 10 - Spiritual + Professional
+
 ```
 Ramadan is about presence.
 
@@ -473,6 +494,7 @@ waqtu.sh
 ### Indonesian - Serie Khusus Ramadhan
 
 ### Post 7 - Persiapan Ramadhan (Gaya LinkedIn)
+
 ```
 Ramadhan 2026 mulai 17 Februari.
 
@@ -498,6 +520,7 @@ Siap sejak awal: waqtu.sh
 ```
 
 ### Post 8 - Fokus Perlindungan Buka
+
 ```
 Momen paling dinanti sepanjang harimu puasa: Maghrib.
 
@@ -519,6 +542,7 @@ Coba gratis: waqtu.sh
 ```
 
 ### Post 9 - Perspektif Manager/Pemimpin
+
 ```
 Untuk rekan manager dan pemimpin:
 
@@ -542,6 +566,7 @@ Dukung timmu. Bagikan ini dengan mereka: waqtu.sh
 ```
 
 ### Post 10 - Spiritual + Profesional
+
 ```
 Ramadhan tentang kehadiran.
 
@@ -569,6 +594,7 @@ waqtu.sh
 ## Twitter/X Posts (Indonesian)
 
 ### Post 1 - Problem/Solution Hook
+
 ```
 Cek kalender, meeting jam 1:15 siang.
 
@@ -593,6 +619,7 @@ Coba gratis: waqtu.sh
 ```
 
 ### Post 2 - Short & Punchy
+
 ```
 Buat ini untuk ibadahku, bagikan untuk ibadahmu.
 
@@ -608,6 +635,7 @@ waqtu.sh
 ```
 
 ### Post 3 - Story Format
+
 ```
 Tahun lalu aku melewat Dhuhr lagi. Meeting bertubi-tubi, ingatan "nanti diqodlo" lagi.
 
@@ -628,6 +656,7 @@ waqtu.sh
 ```
 
 ### Post 4 - Feature Focus
+
 ```
 Kalendermu tak tahu tentang sholatmu. Rekan kerjamu juga tidak.
 
@@ -647,6 +676,7 @@ waqtu.sh
 ```
 
 ### Post 5 - Emotional/Value Hook
+
 ```
 "Sesungguhnya sholat itu adalah fardhu yang ditentukan waktunya atas orang-orang yang beriman." — QS An-Nisa: 103
 
@@ -669,6 +699,7 @@ Coba gratis: waqtu.sh
 ## Threads Posts (English)
 
 ### Post 1 - Narrative Thread
+
 ```
 Your calendar doesn't respect your prayers. But what if it did?
 
@@ -734,6 +765,7 @@ Your calendar should respect that.
 ```
 
 ### Post 2 - Feature Showcase Thread
+
 ```
 Built a Mac app for Muslims who work 🕌
 
@@ -795,6 +827,7 @@ waqtu.sh
 ## Threads Posts (Indonesian)
 
 ### Post 1 - Narrative Thread
+
 ```
 Kalendermu tidak menghormati sholatmu. Bagaimana kalau ia menghormati?
 
@@ -860,6 +893,7 @@ Kalendermu harus menghormati itu.
 ```
 
 ### Post 2 - Feature Showcase Thread
+
 ```
 Buat aplikasi Mac untuk Muslim yang bekerja 🕌
 
@@ -973,6 +1007,7 @@ waqtu.sh
 ## Posting Schedule Recommendations
 
 ### Twitter/X
+
 - **Frequency**: 2-3 posts per day
 - **Best times**: 8-10 AM, 12-2 PM, 6-8 PM (local audience timezone)
 - **Mix**:
@@ -982,11 +1017,13 @@ waqtu.sh
   - 10% Direct Promo
 
 ### Threads
+
 - **Frequency**: 2-3 threads per week
 - **Best times**: 9-11 AM, 7-9 PM
 - **Format**: Narrative threads work best for storytelling
 
 ### General Tips
+
 - Reply to every comment within first hour
 - Use relevant hashtags: #MuslimTech #MacOS #PrayerTimes #IndieDev
 - Tag relevant accounts when sharing
@@ -998,12 +1035,15 @@ waqtu.sh
 ## Hashtag Strategy
 
 ### Primary Tags (English)
+
 #MuslimTech #MacOS #PrayerTimes #IndieDev #Productivity #MuslimUmmah #Faith #WorkLifeBalance #MacApp #PrivacyFirst
 
 ### Primary Tags (Indonesian)
+
 #MuslimTech #MacOS #WaktuSholat #IndieDev #Produktivitas #MuslimUmmah #Iman #KeseimbanganKerja #MacApp #PrivasiPertama
 
 ### Niche Tags
+
 #BuildInPublic #SoloDev #MacAppDev #MuslimPro #TechForGood #FaithAndWork
 
 ---
@@ -1023,6 +1063,7 @@ waqtu.sh
 ---
 
 ## Link Shortening
+
 Primary: waqtu.sh (create if not exists)
 Backup: Link in bio on profile
 
@@ -1044,6 +1085,7 @@ Backup: Link in bio on profile
 ### Twitter/X Posts (English)
 
 ### Post 6 - Ramadan Countdown
+
 ```
 Ramadan 2026 is coming 🌙
 
@@ -1064,6 +1106,7 @@ Prepare early: waqtu.sh
 ```
 
 ### Post 7 - Working Professional Focus
+
 ```
 Fasting Ramadan while working full-time is a different kind of challenge.
 
@@ -1085,6 +1128,7 @@ waqtu.sh
 ```
 
 ### Post 8 - Iftar Focus
+
 ```
 Maghrib during Ramadan. The most anticipated moment of the day.
 
@@ -1102,6 +1146,7 @@ waqtu.sh
 ```
 
 ### Post 9 - Spiritual Focus
+
 ```
 Ramadan is the month of Quran. The month of qiyam. The month we strive to be our best selves.
 
@@ -1122,6 +1167,7 @@ Get ready for Ramadan: waqtu.sh
 ```
 
 ### Post 10 - Early Bird Appeal
+
 ```
 Ramadan 2026 starts February 17th.
 
@@ -1145,6 +1191,7 @@ waqtu.sh
 ### Twitter/X Posts (Indonesian)
 
 ### Post 6 - Countdown Ramadhan
+
 ```
 Ramadhan 2026 akan tiba 🌙
 
@@ -1165,6 +1212,7 @@ Siap sejak awal: waqtu.sh
 ```
 
 ### Post 7 - Fokus Profesional
+
 ```
 Puasa Ramadhan sambil kerja full-time adalah tantangan tersendiri.
 
@@ -1186,6 +1234,7 @@ waqtu.sh
 ```
 
 ### Post 8 - Fokus Buka Puasa
+
 ```
 Maghrib selama Ramadhan. Momen paling dinantikan sepanjang hari.
 
@@ -1203,6 +1252,7 @@ waqtu.sh
 ```
 
 ### Post 9 - Fokus Spiritual
+
 ```
 Ramadhan adalah bulan Quran. Bulan qiyam. Bulan kita berusaha menjadi diri terbaik.
 
@@ -1223,6 +1273,7 @@ Siap sambut Ramadhan: waqtu.sh
 ```
 
 ### Post 10 - Ajak Early Bird
+
 ```
 Ramadhan 2026 mulai 17 Februari.
 
@@ -1246,6 +1297,7 @@ waqtu.sh
 ## Threads - Ramadan Special (English)
 
 ### Post 3 - Ramadan Preparation Thread
+
 ```
 How to prepare your calendar for Ramadan 2026 🌙
 
@@ -1339,6 +1391,7 @@ Preparing our calendars is one small way we honor what matters.
 ## Threads - Ramadhan Khusus (Indonesian)
 
 ### Post 3 - Thread Persiapan Ramadhan
+
 ```
 Cara siapkan kalender untuk Ramadhan 2026 🌙
 
@@ -1473,11 +1526,13 @@ Menyiapkan kalender kita satu cara kecil kita hormati yang penting.
 ## Ramadan Posting Schedule
 
 ### Pre-Ramadan (Feb 1-16)
+
 - **Daily posts**: 2-3 per day
 - **Focus**: Preparation, early adoption
 - **Key message**: "Get ready before the month begins"
 
 ### During Ramadan (Feb 17 - Mar 19)
+
 - **Daily posts**: 1-2 per day
 - **Focus**: Support, encouragement
 - **Key message**: "Protect what matters this blessed month"
@@ -1487,6 +1542,7 @@ Menyiapkan kalender kita satu cara kecil kita hormati yang penting.
   - Eid preparation
 
 ### Post-Ramadan (Mar 20+)
+
 - **Follow-up**: How did it help?
 - **Testimonial collection**: User stories
 - **Transition**: Habit maintenance beyond Ramadan
@@ -1496,9 +1552,11 @@ Menyiapkan kalender kita satu cara kecil kita hormati yang penting.
 ## Ramadan-Specific Hashtags
 
 ### English
+
 #Ramadan2026 #RamadanPrep #RamadanMubarak #Fasting #Iftar #Suhoor #Taraweeh #LaylatulQadr #Eid2026 #ReadyForRamadan
 
 ### Indonesian
+
 #Ramadhan2026 #PersiapanRamadhan #RamadhanMubarak #Puasa #BukaPuasa #Sahur #Tarawih #LailatulQadar #Lebaran2026 #SiapRamadhan
 
 ---

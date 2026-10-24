@@ -75,7 +75,7 @@ Want the full feature-by-feature table? [See the complete comparison here](/comp
 
 ## 1. Waqtu — best overall for Muslim professionals
 
-[Waqtu](/) is the only native Mac app that puts a prayer countdown in your menu bar *and* blocks your calendar during every salah. For anyone who schedules meetings in Outlook or Teams, that combination is the whole point.
+[Waqtu](/) is the only native Mac app that puts a prayer countdown in your menu bar _and_ blocks your calendar during every salah. For anyone who schedules meetings in Outlook or Teams, that combination is the whole point.
 
 **Best for:** Muslim professionals who use a Mac at work and want their calendar protected automatically.
 
@@ -93,7 +93,7 @@ Want the full feature-by-feature table? [See the complete comparison here](/comp
 
 - macOS only (an iOS companion is planned)
 
-*Verdict:* If you miss prayers because of meetings, Waqtu is built for exactly that problem. Read more in our guide on [why you need a prayer times app on your Mac](/blog/why-mac-prayer-times-app).
+_Verdict:_ If you miss prayers because of meetings, Waqtu is built for exactly that problem. Read more in our guide on [why you need a prayer times app on your Mac](/blog/why-mac-prayer-times-app).
 
 ## 2. Sajda — best open-source option
 

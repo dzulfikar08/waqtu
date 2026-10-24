@@ -7,7 +7,7 @@ Serves the Sparkle appcast from D1 and serves DMG files from R2. No need to edit
 ### 1. Create D1 database
 
 ```bash
-cd cloudflare-worker
+cd services/api   # from the repo root
 npx wrangler d1 create waqt-releases-db
 ```
 
@@ -42,7 +42,7 @@ npx wrangler deploy
 
 ## Releasing a new version
 
-From the **project root** (not cloudflare-worker):
+From **`apps/apple`**:
 
 1. In Xcode, set **CURRENT_PROJECT_VERSION** (build number) and **MARKETING_VERSION** (e.g. 1.0.1).
 2. Run (from project root). R2 public base URL defaults to `https://waqt-r2-release.dzulfikar.com`:

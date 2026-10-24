@@ -18,11 +18,13 @@ Emotional connection through relatable pain points → Narrative solution → Tr
 ### 1. Hero Section
 
 **Headline:** Problem-first hook
+
 ```
 "You check your calendar, see a meeting at 1:15 PM. But Dhuhr is at 1:00 PM."
 ```
 
 **Subheadline:**
+
 ```
 Time for prayer, without the awkward calendar conflicts.
 
@@ -30,6 +32,7 @@ Waqtu sits in your menu bar and blocks your calendar during prayer times—so Ou
 ```
 
 **Elements:**
+
 - Problem-first opening (1:00 PM / 1:15 PM dilemma)
 - Understanding tone (not judgmental)
 - Clear value proposition
@@ -62,6 +65,7 @@ Waqtu is a small app that lives in your Mac's menu bar. It knows when it's time 
 ```
 
 **Three cards:**
+
 - ○ Always there — Next prayer & countdown
 - ◇ Calm reminders — Full-screen overlay
 - ▷ Calendar protection — Shows "busy" in Outlook & Teams
@@ -104,11 +108,11 @@ Thoughtfully designed for your prayer life
 
 **Cards with benefit-led copy:**
 
-| Feature | Benefit Copy |
-|---------|-------------|
-| Next prayer & countdown | "Never wonder when the next prayer is. A quick glance at your menu bar tells you." |
-| Full-screen reminder | "Calm, not alarming. A peaceful overlay appears when it's time. Dismiss when you're ready." |
-| Calendar protection | "Your faith on your calendar. Waqtu creates busy blocks in your calendar—Exchange, iCloud, or default. Outlook & Teams show you as busy." |
+| Feature                 | Benefit Copy                                                                                                                              |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Next prayer & countdown | "Never wonder when the next prayer is. A quick glance at your menu bar tells you."                                                        |
+| Full-screen reminder    | "Calm, not alarming. A peaceful overlay appears when it's time. Dismiss when you're ready."                                               |
+| Calendar protection     | "Your faith on your calendar. Waqtu creates busy blocks in your calendar—Exchange, iCloud, or default. Outlook & Teams show you as busy." |
 
 ---
 
@@ -119,6 +123,7 @@ Join Muslims who've made prayer part of their work day
 ```
 
 **Testimonials:**
+
 - Ahmed, Software Engineer, London — "Waqtu solved the 'where were you?' problem at work."
 - Fatima, Product Manager, Toronto — "I used to feel guilty choosing between meetings and prayer."
 - Yusuf, Remote Designer, NYC — "Finally, an app that doesn't feel like it's judging me."
@@ -137,6 +142,7 @@ Simple pricing, no surprises
 "Everything you need to protect your prayer times. Forever."
 
 **Features:**
+
 - Menu bar prayer times & countdown
 - Full-screen reminders (calm, not alarming)
 - Calendar protection (Exchange, iCloud, or default)
@@ -168,6 +174,7 @@ Your prayers deserve a place on your calendar.
 ### 9. FAQ Section (UPDATED)
 
 Add new question:
+
 ```
 Q: Is there a free trial?
 A: Yes. Download Waqtu and try it free. When you're ready, purchase the lifetime license for $9.99. No subscriptions, no recurring fees.
@@ -178,19 +185,23 @@ A: Yes. Download Waqtu and try it free. When you're ready, purchase the lifetime
 ## Design Specifications
 
 **Colors:** Keep existing palette
+
 - `--waqtu-bg`: #0f1914
 - `--waqtu-primary`: #4a8b6f
 - `--waqtu-gold`: #d4a574
 
 **Typography:** Keep existing fonts
+
 - Font-display for headlines
 - System font for body
 
 **Animations:**
+
 - Keep fade-up, fade-in, shimmer
 - Add subtle timeline animations for "Your day" section
 
 **Components to create:**
+
 - Timeline component for day walkthrough
 - Updated testimonial cards (hide initially if no real testimonials)
 - Updated pricing card with guarantee badge

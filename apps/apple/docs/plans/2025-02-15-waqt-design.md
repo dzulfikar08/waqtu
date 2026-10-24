@@ -10,12 +10,14 @@ A minimal macOS menu bar application that displays Islamic prayer times and show
 ## Requirements
 
 ### Core Features
+
 1. **Menu Bar App** - MenuBarExtra with next prayer countdown
 2. **Prayer Time Calculation** - Local calculation using Adhan library (MWL method)
 3. **Full-Screen Overlay** - Blocking overlay at prayer time
 4. **Settings** - Simple configuration panel
 
 ### Design Decisions
+
 - **Calculation Method:** Muslim World League (MWL) only
 - **Asr Method:** Shafi (standard)
 - **Overlay Dismissal:** User button OR auto-dismiss after timeout (5-15 min)
@@ -51,16 +53,19 @@ waqt/
 ### Component Responsibilities
 
 **PrayerTimeCalculator**
+
 - Wraps Adhan library's `PrayerTimes`
 - Input: coordinates, date
 - Output: array of PrayerTime objects
 
 **LocationManager**
+
 - CoreLocation delegate
 - Publishes: coordinates, permission status
 - Manual location fallback
 
 **AppViewModel**
+
 - ObservableObject, central coordinator
 - Calculates next prayer time
 - Triggers overlay at prayer time
@@ -68,12 +73,14 @@ waqt/
 - Manages menu bar countdown timer
 
 **OverlayWindow**
+
 - NSWindow subclass
 - Window level: .screenSaver
 - Borderless, not closable via standard shortcuts
 - Covers all screens
 
 **AppSettings**
+
 - @AppStorage wrapper
 - Toggle: overlay enabled
 - Slider: overlay duration (5-15 min)
@@ -120,6 +127,7 @@ Schedule next prayer
 ## UI Design
 
 ### Menu Bar
+
 - Icon: simple crescent moon (SF Symbol)
 - Title: "Maghrib 12:34" (next prayer + time)
 - Dropdown:
@@ -129,6 +137,7 @@ Schedule next prayer
   - Quit
 
 ### Overlay
+
 - Full screen, dark background (#1a1a1a)
 - Large prayer name (60pt)
 - Current time
@@ -137,6 +146,7 @@ Schedule next prayer
 - Button: "I am going to pray" (prominent, green)
 
 ### Settings
+
 - Toggle: Enable overlay enforcement
 - Slider: Overlay duration (5-15 minutes)
 - Toggle: Auto-detect location
@@ -147,10 +157,12 @@ Schedule next prayer
 ## Technical Specifications
 
 ### Dependencies
+
 - **Adhan** (Swift Package Manager) - Prayer time calculations
 - No other third-party dependencies
 
 ### macOS API Usage
+
 - **MenuBarExtra** - Menu bar presence
 - **CoreLocation** - Geolocation
 - **NSWindow** - Overlay window
@@ -159,6 +171,7 @@ Schedule next prayer
 - **Combine** - Reactive updates
 
 ### Deployment
+
 - **Target:** macOS 14.0+
 - **Architecture:** MVVM
 - **Language:** Swift 5.9+
@@ -166,12 +179,12 @@ Schedule next prayer
 
 ## Error Handling
 
-| Scenario | Handling |
-|----------|----------|
+| Scenario                   | Handling                                          |
+| -------------------------- | ------------------------------------------------- |
 | Location permission denied | Show settings, manual location fields highlighted |
-| Calculation fails | Fallback to hardcoded reference times |
-| Timer drift | Recalculate every minute |
-| No internet | No impact - local calculation only |
+| Calculation fails          | Fallback to hardcoded reference times             |
+| Timer drift                | Recalculate every minute                          |
+| No internet                | No impact - local calculation only                |
 
 ## Security & Privacy
 

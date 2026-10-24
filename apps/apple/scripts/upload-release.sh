@@ -13,7 +13,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-WORKER_DIR="$PROJECT_DIR/cloudflare-worker"
+WORKER_DIR="$(cd "$PROJECT_DIR/../../services/api" && pwd)"
 BUILD_DIR="$PROJECT_DIR/build"
 SHORT_VERSION="${1:?Usage: ./scripts/upload-release.sh SHORT_VERSION [DESCRIPTION]}"
 DESCRIPTION="${2:-Update with prayer times and calendar protection.}"

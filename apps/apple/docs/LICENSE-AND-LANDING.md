@@ -36,7 +36,7 @@
 Set these so the app can call `/license/activate` and `/license/validate`:
 
 ```bash
-cd cloudflare-worker
+cd services/api   # from the repo root
 npx wrangler secret put POLAR_ACCESS_TOKEN   # Polar API token (dashboard)
 npx wrangler secret put POLAR_ORG_ID         # Polar organization ID (settings)
 ```

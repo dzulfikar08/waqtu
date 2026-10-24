@@ -61,7 +61,7 @@ Push MAS metadata (from fastlane/metadata/macos)
 
 Tag current HEAD as a release (pass version: e.g. fastlane tag version:2.0.0)
 
-----
+---
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
 

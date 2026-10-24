@@ -21,6 +21,7 @@
 ### Task 1: Generate EdDSA Signing Keys
 
 **Files:**
+
 - Create: `~/PrivateKeys/sparkle_private_key` (local only, never commit)
 - Create: `waqtu/Resources/public_ed25519.pem`
 
@@ -62,6 +63,7 @@ cp public_key waqtu/Resources/public_ed25519.pem
 **Step 6: Add public key file to Xcode project**
 
 Open Xcode:
+
 1. Select `waqtu` project
 2. Select `waqtu` target
 3. Go to "Build Phases" → "Copy Bundle Resources"
@@ -85,6 +87,7 @@ git commit -m "feat: add Sparkle public key for update verification"
 ### Task 2: Configure Xcode Build Settings
 
 **Files:**
+
 - Modify: `waqt.xcodeproj/project.pbxproj`
 
 **Step 1: Get the base64-encoded public key**
@@ -98,6 +101,7 @@ Expected output: Base64 string (keep for next step)
 **Step 2: Open Xcode and add SUFeedURL build setting**
 
 In Xcode:
+
 1. Select `waqtu` project → `waqtu` target
 2. Go to "Build Settings" tab
 3. Click "+" → "Add User-Defined Setting"
@@ -108,6 +112,7 @@ In Xcode:
 **Step 3: Add SUPublicEDKey build setting**
 
 In Xcode (same location):
+
 1. Click "+" → "Add User-Defined Setting"
 2. Name: `SUPublicEDKey`
 3. Value: [paste base64 string from Step 1]
@@ -115,6 +120,7 @@ In Xcode (same location):
 **Step 4: Verify Info.plist includes these values**
 
 In Xcode:
+
 1. Select `waqtu/Info.plist`
 2. Add entries if not present:
    - Key: `SUFeedURL`, Type: String, Value: $(SUFeedURL)
@@ -132,6 +138,7 @@ git commit -m "feat: configure Sparkle feed URL and public key in build settings
 ### Task 3: Create Cloudflare Worker
 
 **Files:**
+
 - Create: `cloudflare-worker/worker.ts`
 - Create: `cloudflare-worker/wrangler.toml`
 - Create: `cloudflare-worker/package.json`
@@ -175,7 +182,9 @@ interface AppcastItem {
 }
 
 function generateAppcast(items: AppcastItem[]): string {
-  const itemsXml = items.map(item => `
+  const itemsXml = items
+    .map(
+      (item) => `
     <item>
       <title>${item.title}</title>
       <sparkle:version>${item.version}</sparkle:version>
@@ -189,7 +198,9 @@ function generateAppcast(items: AppcastItem[]): string {
         length="${item.length}"
         type="application/octet-stream"
       />
-    </item>`).join('');
+    </item>`,
+    )
+    .join("");
 
   return `<?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -208,29 +219,31 @@ export default {
     const url = new URL(request.url);
 
     // Serve appcast.xml at root or /appcast path
-    if (url.pathname === '/' || url.pathname === '/appcast.xml') {
+    if (url.pathname === "/" || url.pathname === "/appcast.xml") {
       // For now, return a placeholder - will be replaced with KV/R2 binding
-      const appcast = generateAppcast([{
-        title: "Version 1.0.0",
-        version: "1.0.0",
-        shortVersionString: "1.0.0",
-        description: "Initial release with prayer time notifications.",
-        pubDate: new Date().toUTCString(),
-        enclosureUrl: "https://YOUR_R2_BUCKET.r2.dev/Waqt-1.0.0.dmg",
-        edSignature: "PLACEHOLDER_SIGNATURE",
-        length: 0
-      }]);
+      const appcast = generateAppcast([
+        {
+          title: "Version 1.0.0",
+          version: "1.0.0",
+          shortVersionString: "1.0.0",
+          description: "Initial release with prayer time notifications.",
+          pubDate: new Date().toUTCString(),
+          enclosureUrl: "https://YOUR_R2_BUCKET.r2.dev/Waqt-1.0.0.dmg",
+          edSignature: "PLACEHOLDER_SIGNATURE",
+          length: 0,
+        },
+      ]);
 
       return new Response(appcast, {
         headers: {
-          'Content-Type': 'application/xml; charset=utf-8',
-          'Cache-Control': 'public, max-age=600'
-        }
+          "Content-Type": "application/xml; charset=utf-8",
+          "Cache-Control": "public, max-age=600",
+        },
       });
     }
 
-    return new Response('Not found', { status: 404 });
-  }
+    return new Response("Not found", { status: 404 });
+  },
 };
 ```
 
@@ -289,6 +302,7 @@ git commit -m "feat: add Cloudflare Worker for Sparkle appcast feed"
 ### Task 4: Deploy Cloudflare Worker
 
 **Files:**
+
 - None (deployment only)
 
 **Step 1: Authenticate with Cloudflare**
@@ -338,6 +352,7 @@ git commit -m "chore: update Worker URL in wrangler.toml" || echo "No changes to
 ### Task 5: Set Up Cloudflare R2 Bucket
 
 **Files:**
+
 - None (R2 setup only)
 
 **Step 1: Create R2 bucket**
@@ -361,6 +376,7 @@ Expected: `waqt-releases` in list
 ### Task 6: Create Release Automation Script
 
 **Files:**
+
 - Create: `scripts/release.sh`
 
 **Step 1: Create scripts directory**
@@ -448,11 +464,13 @@ git commit -m "feat: add release automation script for Sparkle updates"
 ### Task 7: Create First Release
 
 **Files:**
+
 - None (execution only)
 
 **Step 1: Update appcast.xml with real values**
 
 Edit `cloudflare-worker/worker.ts`:
+
 - Replace `YOUR_SUBDOMAIN` with actual Worker subdomain
 - Replace `YOUR_R2_BUCKET` with actual R2 public URL
 - Set appropriate version info
@@ -499,11 +517,13 @@ git commit -m "chore: update Worker URLs for production"
 ### Task 8: Test Update Flow (End-to-End)
 
 **Files:**
+
 - Modify: `waqtu/Resources/public_ed25519.pem` (temporarily for testing)
 
 **Step 1: Increment version for testing**
 
 In Xcode:
+
 1. Select `waqtu` project → `waqtu` target
 2. Set "Marketing Version" to `1.0.1`
 

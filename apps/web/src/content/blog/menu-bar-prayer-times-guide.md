@@ -12,7 +12,7 @@ You check your menu bar dozens of times a day — for the time, your WiFi, your 
 
 Most Muslims use their phone to check prayer times. But at work, pulling out your phone every hour is (a) distracting, (b) looks unprofessional, and (c) means you might forget to check entirely.
 
-A phone app requires you to *remember* to open it. A menu bar app shows you the time *without you remembering*.
+A phone app requires you to _remember_ to open it. A menu bar app shows you the time _without you remembering_.
 
 ## Why the menu bar works
 

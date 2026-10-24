@@ -73,7 +73,8 @@ function ok() {
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.text();
-    if (!body) return new Response(JSON.stringify({ error: "Invalid webhook request" }), { status: 400 });
+    if (!body)
+      return new Response(JSON.stringify({ error: "Invalid webhook request" }), { status: 400 });
 
     const POLAR_ACCESS_TOKEN = env.POLAR_ACCESS_TOKEN ?? "";
     const POLAR_WEBHOOK_SECRET = env.POLAR_WEBHOOK_SECRET ?? "";
@@ -84,14 +85,27 @@ export const POST: APIRoute = async ({ request }) => {
 
     if (POLAR_WEBHOOK_SECRET) {
       if (!webhookId || !webhookSignature || !webhookTimestamp) {
-        return new Response(JSON.stringify({ error: "Missing signature headers" }), { status: 401 });
+        return new Response(JSON.stringify({ error: "Missing signature headers" }), {
+          status: 401,
+        });
       }
-      const isValid = await verifyPolarSignature(body, webhookId, webhookSignature, webhookTimestamp, POLAR_WEBHOOK_SECRET);
-      if (!isValid) return new Response(JSON.stringify({ error: "Invalid signature" }), { status: 401 });
+      const isValid = await verifyPolarSignature(
+        body,
+        webhookId,
+        webhookSignature,
+        webhookTimestamp,
+        POLAR_WEBHOOK_SECRET,
+      );
+      if (!isValid)
+        return new Response(JSON.stringify({ error: "Invalid signature" }), { status: 401 });
     } else {
-      console.warn("[WEBHOOK] POLAR_WEBHOOK_SECRET not configured - accepting all webhooks (dev only)");
+      console.warn(
+        "[WEBHOOK] POLAR_WEBHOOK_SECRET not configured - accepting all webhooks (dev only)",
+      );
       if (process.env.NODE_ENV === "production") {
-        return new Response(JSON.stringify({ error: "Webhook secret not configured" }), { status: 500 });
+        return new Response(JSON.stringify({ error: "Webhook secret not configured" }), {
+          status: 500,
+        });
       }
     }
 
@@ -103,13 +117,21 @@ export const POST: APIRoute = async ({ request }) => {
         return ok();
 
       case "checkout.updated": {
-        const checkout = event.data as { id: string; status?: string; product_id?: string; customer_email?: string };
+        const checkout = event.data as {
+          id: string;
+          status?: string;
+          product_id?: string;
+          customer_email?: string;
+        };
         if (checkout.status === "completed" || checkout.status === "paid") {
           if (checkout.product_id) {
             try {
-              const productResponse = await fetch(`${POLAR_API_BASE}/products/${checkout.product_id}`, {
-                headers: { Authorization: `Bearer ${POLAR_ACCESS_TOKEN}` },
-              });
+              const productResponse = await fetch(
+                `${POLAR_API_BASE}/products/${checkout.product_id}`,
+                {
+                  headers: { Authorization: `Bearer ${POLAR_ACCESS_TOKEN}` },
+                },
+              );
               if (productResponse.ok) {
                 const product = (await productResponse.json()) as { type?: string };
                 if (product.type === "one_time") {
@@ -127,20 +149,46 @@ export const POST: APIRoute = async ({ request }) => {
 
       case "subscription.created":
       case "subscription.updated": {
-        const subscription = event.data as { id: string; status: string; customer?: { email?: string } };
-        console.log("Subscription", event.type, subscription.status, "for:", subscription.customer?.email);
+        const subscription = event.data as {
+          id: string;
+          status: string;
+          customer?: { email?: string };
+        };
+        console.log(
+          "Subscription",
+          event.type,
+          subscription.status,
+          "for:",
+          subscription.customer?.email,
+        );
         return ok();
       }
 
       case "order.paid": {
         const order = event.data as { id: string; product_id?: string; customer_email?: string };
-        console.log("Order paid:", order.id, "for product:", order.product_id, "by:", order.customer_email);
+        console.log(
+          "Order paid:",
+          order.id,
+          "for product:",
+          order.product_id,
+          "by:",
+          order.customer_email,
+        );
         return ok();
       }
 
       case "subscription.canceled": {
-        const subscription = event.data as { id: string; current_period_end?: number; customer?: { email?: string } };
-        console.log("Subscription canceled:", subscription.id, "expires at:", subscription.current_period_end);
+        const subscription = event.data as {
+          id: string;
+          current_period_end?: number;
+          customer?: { email?: string };
+        };
+        console.log(
+          "Subscription canceled:",
+          subscription.id,
+          "expires at:",
+          subscription.current_period_end,
+        );
         return ok();
       }
 

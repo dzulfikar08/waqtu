@@ -13,7 +13,6 @@ export default defineConfig({
   output: "static",
   adapter: cloudflare({
     imageService: "passthrough",
-    platformProxy: { enabled: true },
     configPath: "./wrangler.jsonc",
   }),
   integrations: [mdx(), sitemap()],

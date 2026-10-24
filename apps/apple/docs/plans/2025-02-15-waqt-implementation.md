@@ -13,11 +13,13 @@
 ## Task 1: Add Adhan Package Dependency
 
 **Files:**
+
 - Modify: `waqt.xcodeproj/project.pbxproj` (via Xcode or manually)
 
 **Step 1: Add Adhan Swift Package**
 
 In Xcode:
+
 1. File → Add Package Dependencies
 2. URL: `https://github.com/azan/azan`
 3. Or use: `https://github.com/batoulapps/Adhan-Swift`
@@ -41,6 +43,7 @@ git commit -m "deps: add Adhan Swift package for prayer time calculations"
 ## Task 2: Create Data Models
 
 **Files:**
+
 - Create: `waqt/Models/PrayerTime.swift`
 - Create: `waqt/Models/PrayerName.swift`
 
@@ -110,6 +113,7 @@ git commit -m "feat: add PrayerTime and PrayerName models"
 ## Task 3: Create AppSettings
 
 **Files:**
+
 - Create: `waqt/Core/AppSettings.swift`
 
 **Step 1: Create AppSettings class**
@@ -190,6 +194,7 @@ git commit -m "feat: add AppSettings with UserDefaults persistence"
 ## Task 4: Create PrayerTimeCalculator
 
 **Files:**
+
 - Create: `waqt/Core/PrayerTimeCalculator.swift`
 
 **Step 1: Create PrayerTimeCalculator**
@@ -276,6 +281,7 @@ git commit -m "feat: add PrayerTimeCalculator using Adhan library"
 ## Task 5: Create LocationManager
 
 **Files:**
+
 - Create: `waqt/Core/LocationManager.swift`
 
 **Step 1: Create LocationManager**
@@ -378,6 +384,7 @@ git commit -m "feat: add LocationManager with CoreLocation"
 ## Task 6: Create OverlayWindow
 
 **Files:**
+
 - Create: `waqt/UI/OverlayWindow.swift`
 - Create: `waqt/UI/OverlayView.swift`
 
@@ -593,6 +600,7 @@ git commit -m "feat: add full-screen overlay window and view"
 ## Task 7: Create MenuBarView
 
 **Files:**
+
 - Create: `waqt/UI/MenuBarView.swift`
 
 **Step 1: Create MenuBarView**
@@ -693,6 +701,7 @@ git commit -m "feat: add MenuBarView with prayer times and controls"
 ## Task 8: Create SettingsView
 
 **Files:**
+
 - Create: `waqt/UI/SettingsView.swift`
 
 **Step 1: Create SettingsView**
@@ -803,6 +812,7 @@ git commit -m "feat: add SettingsView with overlay and location options"
 ## Task 9: Create AppViewModel
 
 **Files:**
+
 - Create: `waqt/ViewModels/AppViewModel.swift`
 
 **Step 1: Create ViewModels directory**
@@ -943,6 +953,7 @@ git commit -m "feat: add AppViewModel with prayer tracking and overlay logic"
 ## Task 10: Update WaqtApp
 
 **Files:**
+
 - Modify: `waqt/waqtApp.swift`
 
 **Step 1: Replace waqtApp.swift content**
@@ -1032,6 +1043,7 @@ git commit -m "feat: convert to MenuBarExtra app with dock icon hidden"
 ## Task 11: Delete unused files
 
 **Files:**
+
 - Delete: `waqt/ContentView.swift`
 
 **Step 1: Remove ContentView**
@@ -1052,11 +1064,13 @@ git commit -m "chore: remove unused ContentView"
 ## Task 12: Update Info.plist for Location Permissions
 
 **Files:**
+
 - Modify: `waqt/Info.plist` (via Xcode target settings)
 
 **Step 1: Add location usage descriptions**
 
 In Xcode:
+
 1. Select waqt target
 2. Info tab
 3. Add:
@@ -1075,6 +1089,7 @@ git commit -m "feat: add location permission description"
 ## Task 13: Build and Test
 
 **Files:**
+
 - None (testing)
 
 **Step 1: Build the project**
@@ -1086,6 +1101,7 @@ Expected: Build succeeds with no errors
 
 Run: `Cmd+R` in Xcode
 Expected:
+
 - Menu bar icon appears
 - Dropdown shows prayer times
 - Settings can be opened
@@ -1094,6 +1110,7 @@ Expected:
 
 Add a test button or modify next prayer time to trigger overlay
 Expected:
+
 - Full screen overlay appears
 - Cannot be dismissed with standard shortcuts
 - Button dismisses overlay
@@ -1111,11 +1128,13 @@ git commit -m "feat: complete Waqt prayer reminder app implementation"
 ## Task 14: Code Review and Cleanup
 
 **Files:**
+
 - All files
 
 **Step 1: Review for issues**
 
 Check:
+
 - Memory leaks (weak self usage)
 - Proper error handling
 - Edge cases (midnight recalculation, etc.)

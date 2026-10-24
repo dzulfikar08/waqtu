@@ -1,5 +1,5 @@
 {
-  "name": "waqtu-landing-astro",
+  "name": "@waqtu/web",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -8,9 +8,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "check": "astro check",
+    "cf-typegen": "wrangler types",
     "deploy": "astro build && wrangler deploy --config dist/server/wrangler.json",
-    "cf-typegen": "wrangler types"
+    "typecheck": "astro sync && tsc --noEmit -p ."
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.1.5",
@@ -25,6 +25,7 @@
     "typescript": "^7.0.2"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261024.1",
     "wrangler": "^4.114.0"
   }
 }

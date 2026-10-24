@@ -1,0 +1,8 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Public values that look like keys"
+# Sparkle EdDSA *public* key, embedded in Info.plist by design.
+regexTarget = "line"
+regexes = ['''SUPublicEDKey = "[A-Za-z0-9+/=]+"''']
