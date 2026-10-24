@@ -1,4 +1,5 @@
 import { circlesId } from "@/circles/strings";
+import { premiumId } from "@/premium/strings";
 import { ramadhanId } from "@/ramadhan/strings";
 
 export const id = {
@@ -149,4 +150,5 @@ export const id = {
   },
   ramadhan: ramadhanId,
   circles: circlesId,
+  premium: premiumId,
 } as const;

@@ -10,6 +10,7 @@ import { DATABASE_NAME, migrate } from "@/db/migrations";
 import { useTranslation } from "@/i18n";
 import { PrayerNotificationController } from "@/notifications/PrayerNotificationController";
 import { setupNotificationChannels } from "@/notifications/setup";
+import { PremiumController } from "@/premium/PremiumController";
 import { SyncController } from "@/sync/SyncController";
 import { useTheme } from "@/theme";
 import "@/i18n";
@@ -62,6 +63,7 @@ export default function RootLayout() {
       </Stack>
       <PrayerNotificationController />
       {authClient ? <SyncController client={authClient} /> : null}
+      {authClient ? <PremiumController client={authClient} /> : null}
     </SQLiteProvider>
   );
 }

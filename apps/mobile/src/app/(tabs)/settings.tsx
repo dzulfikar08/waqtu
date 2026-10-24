@@ -6,6 +6,7 @@ import { Linking, ScrollView, StyleSheet } from "react-native";
 import { AccountSection } from "@/components/AccountSection";
 import { PrayerSettingsSection } from "@/components/PrayerSettingsSection";
 import { StreakSettingsSection } from "@/components/StreakSettingsSection";
+import { PremiumSection } from "@/premium/PremiumSection";
 import { Row, Section } from "@/components/ui";
 import { authClient } from "@/auth/client";
 import { getLocalePref, setLocalePref } from "@/db/settings";
@@ -90,6 +91,7 @@ export default function SettingsScreen() {
       <Section title={t("ramadhan.tab")}>
         <Row label={t("ramadhan.settingsRow")} onPress={() => router.push("/ramadhan")} />
       </Section>
+      {authClient ? <PremiumSection /> : null}
       {authClient ? <AccountSection client={authClient} /> : null}
     </ScrollView>
   );

@@ -1,3 +1,4 @@
+import { handleBilling } from "./billing/routes";
 import { getAuth } from "./auth";
 import { handleCircles, isCirclesPath } from "./circles/router";
 import type { AppEnv } from "./env";
@@ -106,6 +107,8 @@ export async function handleApp(
   if (url.pathname === "/api/auth" || url.pathname.startsWith("/api/auth/")) {
     return getAuth(env).handler(request);
   }
+  const billing = await handleBilling(request, env);
+  if (billing) return billing;
   if (url.pathname === "/v1" || url.pathname.startsWith("/v1/")) {
     return handleV1(request, env, url);
   }

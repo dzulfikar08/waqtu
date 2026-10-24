@@ -59,7 +59,7 @@ The same worker also serves the Waqtu mobile app. `src/app.ts` exports `handleAp
 
 ### Database
 
-A second D1 binding, `APP_DB` (`waqtu-db`), holds the app data. The existing `DB` binding stays for releases. Migrations live in `migrations/` (`0001_auth.sql` for better-auth, `0002_sync.sql` for sync data):
+A second D1 binding, `APP_DB` (`waqtu-db`), holds the app data. The existing `DB` binding stays for releases. Migrations live in `migrations/` (`0001_auth.sql` for better-auth, `0002_sync.sql` for sync data, `0003_circles.sql` for halaqah circles, `0004_entitlement.sql` for premium entitlements):
 
 ```bash
 npx wrangler d1 migrations apply waqtu-db --remote   # production
@@ -120,6 +120,39 @@ All `/v1/*` routes need a better-auth session (cookie from the Expo client, or a
 - `POST /v1/sync` with `{ entries?, settings? }` (max 500 entries, 100 settings, body at most 1,000,000 bytes: larger requests get `413 {"error":"payload_too_large"}`; unknown fields get 400) upserts last-write-wins and returns `{ applied: { entries, settings }, cursor }`. A write applies only if its `updatedAt` is newer, or equal with a greater value. Identical re-pushes change nothing and leave the cursor alone.
 - `GET /v1/sync?since=<cursor>&limit=<1..500>` returns `{ entries, settings, cursor, hasMore }` ordered by revision. Settings are `{ key, value, updatedAt }`; there is no deletion, set a key to an empty string instead. Loop while `hasMore`, passing the returned `cursor` as `since`.
 - Account deletion is `POST /api/auth/delete-user`; foreign keys cascade and remove the user's synced rows.
+
+### Premium (`/v1/entitlement`, `/v1/billing/*`)
+
+Code: `src/billing/`. Setup of the stores and secrets: "Store setup" in the root README. Every source writes
+rows into `entitlement` (`source`, `external_id`, `user_id`, `expires_at`; `expires_at` null = lifetime);
+a row only moves forward by its `signed_at`, so late notifications and old receipt replays cannot undo a
+newer state, and a subscription held by one account is refused for another (409).
+
+- `GET /v1/entitlement` (session) returns `{ premium, source, expiresAt }`. Lifetime outranks dated periods,
+  otherwise the latest expiry wins; when not premium, `source`/`expiresAt` describe the most recent lapsed
+  period (both null if the user never held premium).
+- `POST /v1/entitlement/link-license` `{ key }` (session) validates a Mac license key with Polar (granted,
+  not expired) and grants lifetime premium; one key links to one account. 400 `invalid_license`, 502
+  `license_unreachable`, 409 `linked_to_other_account`.
+- `POST /v1/billing/apple` `{ signedTransaction }` (session): StoreKit 2 JWS verified to Apple Root CA G3
+  (bundle `dat.waqtu.ios`, products `dat.waqtu.premium.monthly|yearly`), granted until the store's
+  `expiresDate`. Returns the entitlement.
+- `POST /v1/billing/apple/notifications` `{ signedPayload }`: App Store Server Notifications V2 (Production and
+  Sandbox), verified like receipts; renewals, expiry, grace period and refunds rewrite the row.
+- `POST /v1/billing/google` `{ purchaseToken }` (session): re-read from the Android Publisher API
+  (`premium`, base plan `monthly|yearly`), granted until Google's expiry, then acknowledged. Returns the
+  entitlement plus `pending` (cash payments are granted only once Play charges them).
+- `POST /v1/billing/google/rtdn`: Pub/Sub push of real-time developer notifications, authenticated by the
+  Google-signed push JWT (`GOOGLE_PLAY_RTDN_PUSH_EMAIL`) or `?token=` (`GOOGLE_PLAY_RTDN_TOKEN`).
+- `POST /v1/billing/polar/checkout` `{ plan: "monthly" | "yearly" }` (session) returns a hosted checkout
+  `{ url }`; 409 `already_premium` if the account already has premium. `POST /v1/billing/polar/portal`
+  returns the customer portal `{ url }`.
+- `POST /v1/billing/polar/webhook`: Polar `subscription.*` events (Standard Webhooks signature).
+
+Secrets: `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`, `GOOGLE_PLAY_RTDN_PUSH_EMAIL` or `GOOGLE_PLAY_RTDN_TOKEN`,
+`GOOGLE_PLAY_PACKAGE_NAME` (optional, default `dat.waqtu.app`), `POLAR_ACCESS_TOKEN`, `POLAR_ORG_ID`,
+`POLAR_WEBHOOK_SECRET`, `POLAR_PRODUCT_MONTHLY_ID`, `POLAR_PRODUCT_YEARLY_ID`, `POLAR_SERVER` and
+`POLAR_SUCCESS_URL` (optional). `APPLE_APP_ID` is a plain var in `wrangler.toml`.
 
 ### Tests
 

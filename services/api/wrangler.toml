@@ -8,6 +8,8 @@ compatibility_flags = ["nodejs_compat"]
 crons = ["17 * * * *"]
 
 [vars]
+# App Store numeric app id of Waqtu (not a secret): Production server notifications must carry it.
+APPLE_APP_ID = "6826628861"
 ENVIRONMENT = "production"
 # Tells the app circles are a premium feature. DEV-12 flips this once entitlements exist.
 CIRCLES_REQUIRES_PREMIUM = "false"

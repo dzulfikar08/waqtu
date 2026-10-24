@@ -24,6 +24,7 @@
     "expo-constants": "~57.0.21",
     "expo-crypto": "~57.0.4",
     "expo-dev-client": "~57.0.20",
+    "expo-iap": "6.2.0",
     "expo-linking": "~57.0.12",
     "expo-live-activity": "0.4.2",
     "expo-location": "~57.0.22",
