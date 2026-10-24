@@ -83,7 +83,7 @@ jobs:
       - run: bun install --frozen-lockfile
       - name: Adhan-Swift pin matches the app
         run: |
-          app=$(grep -A4 '"adhan-swift"' apps/apple/waqt.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved | sed -n 's/.*"version" : "\(.*\)".*/\1/p')
+          app=$(grep -A8 '"adhan-swift"' apps/apple/waqt.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved | sed -n 's/.*"version" : "\(.*\)".*/\1/p')
           pkg=$(sed -n 's/.*exact: "\(.*\)".*/\1/p' apps/apple/parity/Package.swift)
           echo "app=$app parity=$pkg"
           test -n "$app" && test "$app" = "$pkg"
