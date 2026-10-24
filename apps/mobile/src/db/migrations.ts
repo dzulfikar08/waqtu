@@ -1,5 +1,6 @@
 import type { SQLiteDatabase } from "expo-sqlite";
 
+import { HALAQAH_MIGRATION } from "@/halaqah/migrations";
 import { RAMADHAN_MIGRATION } from "@/ramadhan/migrations";
 
 export const DATABASE_NAME = "waqtu.db";
@@ -28,6 +29,8 @@ export const MIGRATIONS: readonly (readonly string[])[] = [
   ],
   // 3: Ramadhan daily checks, khatam plan and log, qadha ledger.
   RAMADHAN_MIGRATION,
+  // 4: halaqah program progress and private reflections.
+  HALAQAH_MIGRATION,
 ];
 
 export async function migrate(db: SQLiteDatabase): Promise<void> {

@@ -1,5 +1,6 @@
 import { circlesEn } from "@/circles/strings";
 import { premiumEn } from "@/premium/strings";
+import { halaqahEn } from "@/halaqah/strings";
 import { ramadhanEn } from "@/ramadhan/strings";
 import type { id } from "./id";
 
@@ -40,6 +41,7 @@ export const en: Widen<typeof id> = {
     dzikir_petang: "Evening dhikr",
     sedekah: "Charity",
     puasa: "Voluntary fasting",
+    halaqah: "Ramadan halaqah",
     title: "Manage practices",
     manage: "Manage checklist",
     active: "My list",
@@ -154,4 +156,5 @@ export const en: Widen<typeof id> = {
   ramadhan: ramadhanEn,
   circles: circlesEn,
   premium: premiumEn,
+  halaqah: halaqahEn,
 };

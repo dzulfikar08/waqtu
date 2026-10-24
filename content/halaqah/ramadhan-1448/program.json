@@ -1,0 +1,888 @@
+{
+  "program": {
+    "id": "ramadhan-1448",
+    "title_id": "Halaqah Ramadhan 1448 H — 30 Hari, 30 Kajian",
+    "title_en": "Ramadan 1448 AH Halaqah — 30 Days, 30 Talks",
+    "hijri_year": 1448,
+    "total_days": 30,
+    "status": "draft-pending-owner-approval",
+    "content_language": "id",
+    "editorial_line_id": "Titik temu yang diterima empat mazhab. Tidak memuat konten yang memihak pada polemik internal umat (manhaj, takfir, politik praktis). Pada topik fiqh yang diperselisihkan, ditampilkan posisi mazhab (field madhhab_note_id), bukan memilih satu.",
+    "video_policy_id": "Semua video hanya di-embed (YouTube IFrame) dari kanal resmi pembicara atau lembaganya; tidak diunduh, tidak diunggah ulang.",
+    "verification": {
+      "method": "YouTube oEmbed (https://www.youtube.com/oembed?url=<watch-url>&format=json)",
+      "verified_on": "2026-10-24",
+      "note": "verified_title dan channel_name disalin persis dari respons oEmbed; duration_min dibulatkan dari metadata YouTube; summary_id disusun dari transkrip otomatis (auto-caption) + judul, bukan dari subtitel resmi."
+    },
+    "phases": [
+      {
+        "id": "niat-fiqh-puasa",
+        "title_id": "Pekan 1 — Niat dan Dasar Fiqh Puasa",
+        "title_en": "Week 1 — Intention and Fasting Fiqh Basics",
+        "days": [1, 7]
+      },
+      {
+        "id": "quran-tilawah",
+        "title_id": "Pekan 2 — Al-Quran dan Kebiasaan Tilawah",
+        "title_en": "Week 2 — The Quran and Tilawah Habits",
+        "days": [8, 14]
+      },
+      {
+        "id": "akhlaq-tazkiyah",
+        "title_id": "Pekan 3 — Akhlaq dan Tazkiyatun Nafs",
+        "title_en": "Week 3 — Character and Purification of the Soul",
+        "days": [15, 19]
+      },
+      {
+        "id": "sepuluh-malam-terakhir",
+        "title_id": "Sepuluh Malam Terakhir — I'tikaf dan Lailatul Qadar",
+        "title_en": "The Last Ten Nights — I'tikaf and Laylat al-Qadr",
+        "days": [20, 25]
+      },
+      {
+        "id": "zakat-fitrah-syawal",
+        "title_id": "Zakat Fitrah dan Menyambut Syawal",
+        "title_en": "Zakat al-Fitr and Preparing for Shawwal",
+        "days": [26, 30]
+      }
+    ]
+  },
+  "days": [
+    {
+      "day": 1,
+      "phase": "niat-fiqh-puasa",
+      "theme_id": "tujuan-puasa-takwa",
+      "title_id": "Mengapa Kita Berpuasa? Takwa sebagai Tujuan",
+      "title_en": "Why We Fast: Taqwa as the Goal",
+      "topic": "tazkiyah",
+      "video": {
+        "youtube_id": "m97SDRxy8GM",
+        "verified_title": "[AKUSUKA Eps 1] Mengapa Kita Berpuasa? - Ustadz Adi Hidayat",
+        "channel_name": "Adi Hidayat Official",
+        "channel_url": "https://www.youtube.com/@AdiHidayatOfficiaI",
+        "speaker": "Ust. Adi Hidayat, Lc., MA",
+        "duration_min": 15,
+        "language": "id"
+      },
+      "summary_id": "Ustadz Adi Hidayat membuka Ramadhan dengan pertanyaan paling mendasar: untuk apa kita berpuasa. Merujuk ayat puasa dalam Al-Baqarah, ia menegaskan tujuannya adalah takwa, bukan sekadar menahan lapar dan haus. Takwa dijelaskan sebagai kemampuan mengarahkan seluruh anggota diri — mata, telinga, lisan, pikiran — ke arah yang baik, sehingga sifat-sifat baik dalam diri makin tumbuh dan jiwa naik derajatnya. Ia menutup dengan ajakan bersyukur karena masih diberi kesempatan berpuasa.",
+      "reflection_prompt_id": "Kalau puasa tahun ini benar-benar membuahkan takwa, satu kebiasaan apa — di mata, lisan, atau pikiran — yang akan berubah dalam diri saya?",
+      "amalan_id": "Tulis satu perubahan akhlak (bukan target ibadah) yang ingin kamu capai selama Ramadhan, simpan di tempat yang terlihat.",
+      "sources": ["QS Al-Baqarah 2:183", "QS Asy-Syams 91:7-10"],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 2,
+      "phase": "niat-fiqh-puasa",
+      "theme_id": "niat-puasa",
+      "title_id": "Niat Puasa: Kapan, Bagaimana, dan Perbedaan Mazhab",
+      "title_en": "Fasting Intention: When, How, and Madhhab Differences",
+      "topic": "fiqh-puasa",
+      "video": {
+        "youtube_id": "cuKJ0qrQ8fo",
+        "verified_title": "PENJELASAN NIAT PUASA RAMADHAN ( Niat langsung 1 bulan, Niat Pakai Bahasa Indonesia ) - Buya Yahya",
+        "channel_name": "Buya Yahya",
+        "channel_url": "https://www.youtube.com/@buyayahyaofficial",
+        "speaker": "Buya Yahya",
+        "duration_min": 16,
+        "language": "id"
+      },
+      "summary_id": "Buya Yahya menjelaskan bahwa niat puasa wajib dilakukan pada malam hari — sejak masuk Maghrib sampai sebelum Subuh — dan cukup di dalam hati, tanpa harus melafazkan kalimat panjang atau menunggu tarawih. Niat puasa Ramadhan tidak bisa digabung dengan puasa wajib lain seperti qadha atau nazar, sedangkan puasa sunnah boleh digabung dengan sunnah lain. Bagi yang khawatir lupa berniat di malam hari, ia menyebut pendapat mazhab Maliki: berniat sekali di awal Ramadhan untuk sebulan penuh, sebagai cadangan di samping niat harian.",
+      "reflection_prompt_id": "Apa yang biasanya membuat niat saya terlewat, dan rutinitas apa setelah berbuka yang bisa menjadi pengingat?",
+      "amalan_id": "Setiap selesai berbuka, niatkan puasa esok hari dalam hati — tanpa menunggu tarawih.",
+      "sources": ["HR. Bukhari-Muslim: innamal a'malu bin-niyyat (rujukan tema)"],
+      "madhhab_note_id": "Syafi'i, Maliki, dan Hanbali: niat puasa wajib harus dilakukan pada malam sebelum Subuh (Maliki juga membolehkan niat sekali untuk sebulan penuh sebagai cadangan). Hanafi: puasa Ramadhan sah dengan niat sampai menjelang tengah hari selama belum makan/minum (catatan editor, tidak berasal dari video)."
+    },
+    {
+      "day": 3,
+      "phase": "niat-fiqh-puasa",
+      "theme_id": "empat-mazhab",
+      "title_id": "Mengapa Ada Empat Mazhab? Bekal Menyikapi Perbedaan",
+      "title_en": "Why Four Madhhabs? Handling Differences",
+      "topic": "fiqh-puasa",
+      "video": {
+        "youtube_id": "6OcMZ82xC04",
+        "verified_title": "Fiqih 4 Madzhab - Ust Ahmad Sarwat, Lc,. MA.",
+        "channel_name": "Rumah Fiqih",
+        "channel_url": "https://www.youtube.com/@RumahFiqihIndonesia",
+        "speaker": "Ust. Ahmad Sarwat, Lc., MA",
+        "duration_min": 38,
+        "language": "id"
+      },
+      "summary_id": "Ustadz Ahmad Sarwat dari Rumah Fiqih menjelaskan bagaimana perbedaan mazhab muncul, dimulai dari kisah Muadz bin Jabal yang diizinkan Nabi berijtihad ketika dalil tidak ditemukan secara langsung. Ia menyebut bahwa dahulu ada belasan mazhab yang timbul dan tenggelam, dan yang bertahan sampai hari ini tinggal empat: Syafi'i yang paling banyak diikuti, disusul Hanafi, lalu Maliki dan Hambali. Sebaran mazhab mengikuti wilayah dan sejarah — orang Indonesia umumnya bermazhab Syafi'i. Kajian ini menjadi bekal untuk 30 hari ke depan: ketika ada perbedaan cara berpuasa, itu hasil ijtihad yang punya dasar, bukan perpecahan.",
+      "reflection_prompt_id": "Pernahkah saya menghakimi orang karena cara ibadahnya berbeda? Bagaimana sikap saya setelah tahu perbedaan itu punya dasar?",
+      "amalan_id": "Catat satu kebiasaan ibadah keluarga atau teman yang berbeda dengan kebiasaanmu, lalu doakan dia — tanpa mengoreksi.",
+      "sources": ["Hadis Muadz bin Jabal tentang ijtihad (disebut di video)"],
+      "madhhab_note_id": "Sesi ini membahas latar sejarah dan sebaran empat mazhab (Hanafi, Maliki, Syafi'i, Hanbali) tanpa memihak salah satunya."
+    },
+    {
+      "day": 4,
+      "phase": "niat-fiqh-puasa",
+      "theme_id": "makna-ramadhan-iman-ihtisab",
+      "title_id": "Makna Ramadhan: Iman, Ihtisab, dan Terhapusnya Dosa",
+      "title_en": "The Meaning of Ramadan: Faith, Self-Accounting, and Forgiveness",
+      "topic": "tazkiyah",
+      "video": {
+        "youtube_id": "hvDePKNlC2M",
+        "verified_title": "Program Madrasah Ramadhan Eps 15: Makna Ramadhan - Ustadz Adi Hidayat",
+        "channel_name": "Adi Hidayat Official",
+        "channel_url": "https://www.youtube.com/@AdiHidayatOfficiaI",
+        "speaker": "Ust. Adi Hidayat, Lc., MA",
+        "duration_min": 21,
+        "language": "id"
+      },
+      "summary_id": "Ustadz Adi Hidayat membedah hadis tentang orang yang berpuasa Ramadhan dengan iman dan ihtisab (mengharap pahala dari Allah) lalu diampuni dosa-dosanya yang lalu. Ia menjelaskan makna kata Ramadhan yang berkaitan dengan 'membakar' — bulan ketika dosa dibakar bagi yang berpuasa disertai istighfar dan amal saleh. Ia juga mengingatkan agar puasa dipakai untuk mengukur diri: meninggalkan maksiat, merenungi kesalahan, dan kembali kepada Allah.",
+      "reflection_prompt_id": "Dosa atau kebiasaan buruk apa yang ingin saya 'bakar' bulan ini, dan apa langkah kecil pertama untuk meninggalkannya?",
+      "amalan_id": "Sebelum tidur, ucapkan istighfar sambil menyebut satu kesalahan hari ini yang ingin kamu tinggalkan.",
+      "sources": [
+        "HR. Bukhari-Muslim: man shama Ramadhana imanan wahtisaban (rujukan tema)",
+        "QS Ali Imran 3:133-134 (disebut di video)"
+      ],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 5,
+      "phase": "niat-fiqh-puasa",
+      "theme_id": "qadha-fidyah-uzur",
+      "title_id": "Uzur Puasa, Qadha, dan Fidyah",
+      "title_en": "Valid Excuses, Make-up Fasts, and Fidyah",
+      "topic": "fiqh-puasa",
+      "video": {
+        "youtube_id": "fmoYpPyC-zs",
+        "verified_title": "Kumpulan Tanya Jawab tentang Qodho dan Fidyah Puasa Ramadhan Bersama Buya Yahya",
+        "channel_name": "Buya Yahya",
+        "channel_url": "https://www.youtube.com/@buyayahyaofficial",
+        "speaker": "Buya Yahya",
+        "duration_min": 27,
+        "language": "id"
+      },
+      "summary_id": "Dalam sesi tanya jawab ini Buya Yahya merinci siapa saja yang boleh tidak berpuasa dan konsekuensinya: ada yang cukup mengqadha, ada yang cukup membayar fidyah, dan ada yang keduanya. Fidyah adalah satu mud makanan pokok per hari yang tidak dipenuhi, diberikan kepada orang fakir dalam bentuk bahan mentah. Ia juga membahas hal praktis, seperti berapa lama waktu mengqadha dan apakah boleh lebih dulu mengerjakan puasa sunnah sebelum qadha. Intinya: jangan meninggalkan puasa tanpa uzur, dan jangan mempersulit diri dengan hal yang sebenarnya sudah ada keringanannya.",
+      "reflection_prompt_id": "Adakah utang puasa atau kewajiban lain yang masih tertunda pada saya, dan kapan saya akan melunasinya?",
+      "amalan_id": "Cek kalender: tulis jumlah hari utang puasa (jika ada) dan tentukan hari-hari pelunasannya.",
+      "sources": ["QS Al-Baqarah 2:184-185 (rujukan tema)"],
+      "madhhab_note_id": "Fidyah: satu mud makanan pokok per hari (ukuran mud diperselisihkan, video menyebut sekitar 6–7 ons beras). Mengganti fidyah dengan uang: boleh menurut mazhab Hanafi; Syafi'i, Maliki, dan Hanbali mensyaratkan makanan pokok. Mendahulukan puasa sunnah sebelum qadha: dibolehkan menurut jumhur, tetapi yang lebih utama adalah melunasi qadha terlebih dahulu."
+    },
+    {
+      "day": 6,
+      "phase": "niat-fiqh-puasa",
+      "theme_id": "pembatal-puasa",
+      "title_id": "Sembilan Hal yang Membatalkan Puasa",
+      "title_en": "Nine Things That Break the Fast",
+      "topic": "fiqh-puasa",
+      "video": {
+        "youtube_id": "5C9EXa1lvG8",
+        "verified_title": "9 Hal yang Akan Membatalkan Puasa, WAJIB SIMAK ❗- Buya Yahya",
+        "channel_name": "Buya Yahya",
+        "channel_url": "https://www.youtube.com/@buyayahyaofficial",
+        "speaker": "Buya Yahya",
+        "duration_min": 24,
+        "language": "id"
+      },
+      "summary_id": "Buya Yahya merangkum hal-hal yang membatalkan puasa dengan gaya fikih praktis. Ia mulai dari memasukkan sesuatu ke salah satu dari lima lubang — mulut, hidung, telinga bagian dalam, serta dua lubang pembuangan — lalu menjelaskan batas-batas praktisnya, misalnya bedanya telinga bagian luar dan dalam. Ia juga membahas hilangnya akal dan pingsan: puasa tetap sah bila sempat sadar sebentar di siang hari, sementara tidur tidak membatalkan puasa. Contoh-contoh kehidupan sehari-hari membantu pendengar membedakan mana yang membatalkan dan mana yang tidak.",
+      "reflection_prompt_id": "Hal apa yang selama ini saya kira membatalkan atau tidak membatalkan puasa, ternyata keliru atau saya ragukan?",
+      "amalan_id": "Tulis satu pertanyaan tentang pembatal puasa yang masih meragukan, lalu tanyakan kepada ustadz/ustadzah di masjid terdekat.",
+      "sources": ["QS Al-Baqarah 2:187 (rujukan tema)"],
+      "madhhab_note_id": "Video mengikuti rincian fikih mazhab Syafi'i. Sebagian rincian (misalnya hukum suntik, tetes mata/telinga, atau mencicipi makanan) dapat berbeda antarmazhab dan ulama kontemporer; tanyakan kepada ulama setempat bila ragu."
+    },
+    {
+      "day": 7,
+      "phase": "niat-fiqh-puasa",
+      "theme_id": "sahur-adab",
+      "title_id": "Rahasia Waktu Sahur",
+      "title_en": "The Secret of Suhoor",
+      "topic": "fiqh-puasa",
+      "video": {
+        "youtube_id": "GQnVpeWZnao",
+        "verified_title": "Aku suka 16 Ramadhan 1442H: Rahasia Waktu Sahur - Ustadz Adi Hidayat",
+        "channel_name": "Adi Hidayat Official",
+        "channel_url": "https://www.youtube.com/@AdiHidayatOfficiaI",
+        "speaker": "Ust. Adi Hidayat, Lc., MA",
+        "duration_min": 28,
+        "language": "id"
+      },
+      "summary_id": "Ustadz Adi Hidayat mengajak melihat sahur bukan hanya soal makan, tetapi soal waktu yang dimuliakan: saat singkat menjelang Fajar, kurang lebih 15–30 menit. Ia menjelaskan sabda Nabi bahwa dalam sahur ada keberkahan, dan mengartikan berkah sebagai bertambahnya nilai kebaikan — sedikit terlihat, tetapi besar manfaatnya. Makan sahur disarankan singkat, sekitar seperempat jam, lalu sisa waktu dipakai untuk istighfar, berdoa, dan bermunajat karena ini waktu ketika Allah menjanjikan pengabulan doa dan ampunan.",
+      "reflection_prompt_id": "Apakah sahur saya selama ini hanya soal mengisi perut, atau juga soal waktu bersama Allah?",
+      "amalan_id": "Sahur secukupnya, lalu sisakan 10–15 menit sebelum Subuh untuk istighfar dan satu doa pribadi.",
+      "sources": [
+        "HR. Bukhari-Muslim: tasahharu fa inna fis-sahuri barakah (disebut di video)",
+        "QS Ali Imran 3:17 (disebut di video)"
+      ],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 8,
+      "phase": "quran-tilawah",
+      "theme_id": "ramadhan-bulan-quran",
+      "title_id": "Ramadhan, Bulan Al-Quran: Dari Membaca ke Berdialog",
+      "title_en": "Ramadan, the Month of the Quran",
+      "topic": "quran",
+      "video": {
+        "youtube_id": "VnHZ98jKFuA",
+        "verified_title": "Ramadan Bulan Al-Quran | Tafsir Al-Mishbah: Hidup Bersama Al-Quran Episode 1",
+        "channel_name": "Quraish Shihab",
+        "channel_url": "https://www.youtube.com/@QuraishShihabMuhammad",
+        "speaker": "Prof. Dr. M. Quraish Shihab",
+        "duration_min": 19,
+        "language": "id"
+      },
+      "summary_id": "Dalam obrolan keluarga di meja sahur, Prof. Quraish Shihab bersama putrinya dan putranya membahas hubungan Ramadhan dan Al-Quran. Ia menjelaskan arti tadarus yang sebenarnya: bukan membaca sendiri-sendiri dengan keras, tetapi saling belajar — ada yang membaca, menerjemahkan, bertanya, dan menjawab, agar makna makin mantap di pikiran. Ramadhan disebut menjadi waktu 'mengisi daya' dan menahan hawa nafsu, dan lingkungan yang mendukung sangat membantu. Kesimpulan dari anaknya: membaca Al-Quran di Ramadhan bukan soal kuantitas atau target khatam cepat, tetapi mencoba memahami dan berdialog dengan ayat per ayat.",
+      "reflection_prompt_id": "Selama ini saya mengejar jumlah halaman atau juz, atau benar-benar berhenti pada makna satu ayat?",
+      "amalan_id": "Setelah sahur atau Subuh, baca satu ayat beserta terjemahannya, lalu tulis satu kalimat tentang apa yang ayat itu minta dari kamu.",
+      "sources": [
+        "QS Al-Baqarah 2:183 (disebut di video)",
+        "QS Al-Baqarah 2:185-186 (disebut di video)"
+      ],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 9,
+      "phase": "quran-tilawah",
+      "theme_id": "amalan-nabi-tadarus-jibril",
+      "title_id": "Amalan Nabi di Ramadhan: Tadarus bersama Jibril",
+      "title_en": "The Prophet's Ramadan: Studying the Quran with Jibril",
+      "topic": "sirah",
+      "video": {
+        "youtube_id": "e1RA5KWIr3U",
+        "verified_title": "[Akusuka Eps. 5] Amalan Penting Nabi Di Bulan Ramadhan - Ustadz Adi Hidayat",
+        "channel_name": "Adi Hidayat Official",
+        "channel_url": "https://www.youtube.com/@AdiHidayatOfficiaI",
+        "speaker": "Ust. Adi Hidayat, Lc., MA",
+        "duration_min": 16,
+        "language": "id"
+      },
+      "summary_id": "Ustadz Adi Hidayat mengajak meneladani amalan Nabi di bulan Ramadhan, terutama kebiasaan beliau mengulang dan mempelajari Al-Quran bersama Malaikat Jibril setiap malam Ramadhan. Ia membedakan tiga bentuk interaksi dengan Al-Quran: qira'ah (membaca), tilawah (membaca disertai pemahaman dan kajian), dan tahfidz (menghafal). Ia memberi contoh jadwal membaca yang bisa membuat seseorang khatam beberapa kali di Ramadhan, dengan penekanan pada kualitas bacaan dan membaca di hadapan guru. Semua itu dikaitkan dengan niat mengikuti sunnah Nabi agar bernilai pahala.",
+      "reflection_prompt_id": "Dari tiga bentuk interaksi dengan Al-Quran — membaca, memahami, menghafal — mana yang paling sering saya tinggalkan?",
+      "amalan_id": "Pilih satu bentuk (baca, pahami, atau hafal) dan tentukan porsi kecil yang pasti kamu kerjakan setiap hari sampai akhir Ramadhan.",
+      "sources": [
+        "HR. Bukhari: Jibril menemui Nabi setiap malam Ramadhan untuk tadarus (disebut di video)",
+        "QS Al-Baqarah 2:185 (disebut di video)"
+      ],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 10,
+      "phase": "quran-tilawah",
+      "theme_id": "ramadhan-menang-banyak",
+      "title_id": "Ramadhan Menang Banyak: Niat, Khatam, dan Dzikir",
+      "title_en": "Winning Big in Ramadan: Intention, Khatam, and Dhikr",
+      "topic": "quran",
+      "video": {
+        "youtube_id": "aaGStWKziUA",
+        "verified_title": "Ramadhan Menang Banyak Nih!",
+        "channel_name": "Hanan Attaki",
+        "channel_url": "https://www.youtube.com/@HananAttaki",
+        "speaker": "Ust. Hanan Attaki",
+        "duration_min": 25,
+        "language": "id"
+      },
+      "summary_id": "Ustadz Hanan Attaki menjawab pertanyaan pemirsa tentang cara memaksimalkan Ramadhan agar tidak termasuk orang yang berpuasa tetapi hanya mendapat lapar dan haus. Ia menekankan niat dan memperbanyak niat baik, karena niat saja sudah dicatat sebagai ibadah. Untuk khatam Al-Quran, ia menyarankan mencicil minimal satu juz per hari sejak awal, dan menambah jumlahnya bila sudah terlambat. Ia juga menyebut amalan ringan seperti membasahi lisan dengan dzikir yang disukai Allah.",
+      "reflection_prompt_id": "Berapa halaman Al-Quran yang realistis saya baca setiap hari tanpa membuat saya lelah dan menyerah di tengah bulan?",
+      "amalan_id": "Tentukan target baca harian yang kecil (mis. 4–5 halaman setelah shalat) dan tandai di kalender setiap hari kamu berhasil.",
+      "sources": [
+        "HR. Bukhari-Muslim: innamal a'malu bin-niyyat (disebut di video)",
+        "HR. Bukhari-Muslim: dua kalimat ringan di lisan, berat di timbangan — subhanallahi wa bihamdihi, subhanallahil 'azhim (disebut di video)"
+      ],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 11,
+      "phase": "quran-tilawah",
+      "theme_id": "tiga-pokok-kandungan-quran",
+      "title_id": "Tiga Pokok Kandungan Al-Quran",
+      "title_en": "The Three Main Contents of the Quran",
+      "topic": "quran",
+      "video": {
+        "youtube_id": "k6W0J9yy4Ss",
+        "verified_title": "Tiga Pokok Kandungan Al-Quran | M. Quraish Shihab Podcast",
+        "channel_name": "Quraish Shihab",
+        "channel_url": "https://www.youtube.com/@QuraishShihabMuhammad",
+        "speaker": "Prof. Dr. M. Quraish Shihab",
+        "duration_min": 25,
+        "language": "id"
+      },
+      "summary_id": "Prof. Quraish Shihab mengajak kita mengenal Al-Quran lewat apa yang dikandungnya, dimulai dari keyakinan bahwa Al-Quran bersumber dari Allah, baik makna maupun redaksinya, dan dijaga kelestariannya. Ia menjelaskan bahwa ada ayat yang maknanya pasti dan ada yang membuka beberapa kemungkinan makna. Kandungan Al-Quran dibagi tiga: tujuan kehadirannya, cara mencapai tujuan itu, dan bukti kebenarannya (mukjizat). Tujuannya sendiri terdiri dari akidah, syariat (hubungan dengan Allah dan sesama), dan akhlak, sehingga Al-Quran yang tidak diamalkan berarti tujuan kehadirannya belum tercapai.",
+      "reflection_prompt_id": "Dari tiga tujuan Al-Quran — akidah, syariat, akhlak — mana yang paling sering saya baca tetapi jarang saya amalkan?",
+      "amalan_id": "Setelah membaca hari ini, pilih satu ayat tentang akhlak dan tulis satu tindakan kecil yang akan kamu lakukan hari ini karenanya.",
+      "sources": ["QS Al-Hijr 15:9 (disebut di video)", "QS Al-Baqarah 2:1-2 (disebut di video)"],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 12,
+      "phase": "quran-tilawah",
+      "theme_id": "tuntunan-memahami-quran",
+      "title_id": "Tuntunan Memahami Al-Quran: Semangat Perlu Panduan",
+      "title_en": "Guidance for Understanding the Quran",
+      "topic": "quran",
+      "video": {
+        "youtube_id": "szw85eYaqrw",
+        "verified_title": "Tuntunan Memahami Al-Quran │ Ngaji Bareng Gus Baha & M. Quraish Shihab (Part 1)",
+        "channel_name": "Pusat Studi Al-Quran",
+        "channel_url": "https://www.youtube.com/@PusatStudiAlQuran",
+        "speaker": "Gus Baha & Prof. Dr. M. Quraish Shihab",
+        "duration_min": 28,
+        "language": "id"
+      },
+      "summary_id": "Dalam kajian bersama ini Gus Baha dan Prof. Quraish Shihab menanggapi tingginya minat masyarakat untuk kembali kepada Al-Quran dan sunnah — semangat yang baik tetapi bisa 'liar' bila tidak disertai pedoman tentang bagaimana dan mengapa. Dibahas bahwa menafsirkan dan mentakwil Al-Quran menuntut banyak disiplin ilmu sehingga cenderung elitis, namun tadabbur (merenungi Al-Quran) terbuka untuk setiap muslim. Gus Baha juga bercerita tentang cara belajar para ulama pesantren: belajar mandiri, mendengarkan guru, lalu berdiskusi dengan teman, serta pentingnya memahami kaidah ilmu Al-Quran agar tidak asal berbicara.",
+      "reflection_prompt_id": "Saat saya membaca Al-Quran, apakah saya sedang bertadabbur dengan rendah hati, atau sudah terburu-buru menyimpulkan makna?",
+      "amalan_id": "Bacalah satu ayat bersama terjemahan dan satu tafsir ringkas yang terpercaya, lalu catat satu pelajaran — dan tahan diri untuk tidak menyimpulkan hukum sendiri.",
+      "sources": [
+        "QS Shad 38:29 (kitab yang diberkahi untuk ditadabburi; disebut di video)",
+        "QS Al-Isra 17:23 (disebut di video)"
+      ],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 13,
+      "phase": "quran-tilawah",
+      "theme_id": "tarawih-bilangan-rakaat",
+      "title_id": "Bilangan Rakaat Tarawih: Memahami Perbedaan Ulama",
+      "title_en": "How Many Rak'ahs for Tarawih? Understanding Scholars' Differences",
+      "topic": "fiqh-puasa",
+      "video": {
+        "youtube_id": "DXrv1Crhua0",
+        "verified_title": "Kitab Indahnya Memahami Perbedaan Para Ulama : Bilangan Shalat Tarawih Nabi SAW | 29 Maret 2023 M",
+        "channel_name": "Buya Yahya",
+        "channel_url": "https://www.youtube.com/@buyayahyaofficial",
+        "speaker": "Buya Yahya",
+        "duration_min": 32,
+        "language": "id"
+      },
+      "summary_id": "Buya Yahya menelusuri riwayat awal qiyam Ramadhan: Nabi shalat malam bersama para sahabat, lalu tidak keluar pada malam berikutnya karena khawatir shalat itu diwajibkan. Ia menyatakan Nabi tidak menetapkan bilangan rakaat tertentu, lalu pada masa Umar bin Khattab jamaah dikumpulkan dalam satu imam (Ubay bin Ka'ab) dengan 20 rakaat tanpa ada yang mengingkari. Ia juga menelaah hadis Aisyah tentang 11 rakaat. Pesan utamanya: 20 rakaat bukan bid'ah dan 8 rakaat juga bukan bid'ah, sehingga yang satu tidak boleh menghujat yang lain.",
+      "reflection_prompt_id": "Bagaimana sikap saya ketika melihat jamaah lain shalat tarawih dengan jumlah rakaat yang berbeda dari kebiasaan saya?",
+      "amalan_id": "Malam ini ikuti tarawih di masjid pilihanmu dengan khusyuk, dan jangan komentari jumlah rakaat jamaah lain.",
+      "sources": [
+        "Hadis Aisyah tentang shalat malam Nabi 11 rakaat (disebut di video)",
+        "Hadis Nabi tentang kekhawatiran qiyam Ramadhan menjadi wajib (disebut di video)",
+        "Atsar Umar bin Khattab mengumpulkan jamaah tarawih di bawah satu imam (disebut di video)"
+      ],
+      "madhhab_note_id": "Hanafi, Syafi'i, dan Hanbali: 20 rakaat (mengikuti praktik zaman Umar). Maliki: dikenal praktik hingga 36 rakaat di Madinah (catatan editor, tidak dari video). Sebagian ulama dan jamaah memilih 8 rakaat + 3 witir berdasarkan hadis Aisyah. Pembicara cenderung memperkuat 20 rakaat sambil menegaskan 8 rakaat bukan bid'ah."
+    },
+    {
+      "day": 14,
+      "phase": "quran-tilawah",
+      "theme_id": "adab-berdoa",
+      "title_id": "Adab dan Etika Berdoa",
+      "title_en": "The Etiquette of Making Du'a",
+      "topic": "dua",
+      "video": {
+        "youtube_id": "LVzTX9Pdeu0",
+        "verified_title": "[Kajian Musawarah] Adab & Etika Berdoa agar Cepat Dikabulkan - Ustadz Adi Hidayat",
+        "channel_name": "Adi Hidayat Official",
+        "channel_url": "https://www.youtube.com/@AdiHidayatOfficiaI",
+        "speaker": "Ust. Adi Hidayat, Lc., MA",
+        "duration_min": 17,
+        "language": "id"
+      },
+      "summary_id": "Ustadz Adi Hidayat menjelaskan bahwa doa adalah pengakuan atas kelemahan diri dan kebutuhan kepada Allah, sehingga hamba yang enggan berdoa adalah hamba yang merasa cukup dengan dirinya sendiri. Ia menunjuk waktu sahar menjelang Subuh sebagai waktu terbaik untuk istighfar dan berdoa, dengan contoh kebiasaan sederhana: dua rakaat tahajud lalu witir satu rakaat. Tanda taubat diterima adalah berhentinya keburukan dan munculnya kebaikan. Ia juga mengajak mengisi perjalanan dan peralihan harian dengan doa, misalnya singgah shalat dua rakaat sebelum pulang agar membawa ketenangan ke rumah.",
+      "reflection_prompt_id": "Apa satu hal yang selama ini saya pendam sendiri dan belum pernah benar-benar saya mintakan kepada Allah?",
+      "amalan_id": "Bangun sekitar 15 menit sebelum Subuh: dua rakaat ringan, istighfar, lalu satu doa yang spesifik dan jujur.",
+      "sources": [
+        "QS Adz-Dzariyat 51:18 (disebut di video)",
+        "QS Ali Imran 3:37 (disebut di video)"
+      ],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 15,
+      "phase": "akhlaq-tazkiyah",
+      "theme_id": "menjaga-lisan",
+      "title_id": "Larangan-larangan dalam Lisan",
+      "title_en": "Guarding the Tongue",
+      "topic": "akhlaq",
+      "video": {
+        "youtube_id": "p1I2ZO7dXaw",
+        "verified_title": "LARANGAN LARANGAN DALAM LISAN",
+        "channel_name": "Aagym Official",
+        "channel_url": "https://www.youtube.com/@AaGymOfficial",
+        "speaker": "Aa Gym (KH. Abdullah Gymnastiar)",
+        "duration_min": 18,
+        "language": "id"
+      },
+      "summary_id": "Aa Gym membuka dengan hadis bahwa muslim yang baik adalah yang orang lain selamat dari gangguan lisan dan tangannya, lalu menawarkan tiga ukuran: aman bagi orang lain, bermanfaat, dan menyenangkan. Fungsi lisan, katanya, adalah berbicara baik atau diam; ia mengajak meninggalkan debat, tidak berbohong atau melebih-lebihkan, tidak mencari-cari aib, serta tidak menggunjing, dengan merujuk Al-Hujurat ayat 12. Ia mengingatkan bahwa menyakiti orang lain — termasuk lewat media sosial — akan ditagih di akhirat dengan pahala, sehingga amal bisa habis bagi yang suka mencela.",
+      "reflection_prompt_id": "Kata-kata apa yang paling sering saya sesali setelah diucapkan atau diketik, dan apa pemicunya?",
+      "amalan_id": "Hari ini, sebelum bicara atau mengirim pesan, tanyakan: benar? bermanfaat? menyakiti? — kalau ragu, diam.",
+      "sources": [
+        "HR. Bukhari-Muslim: al-muslimu man salimal muslimuna min lisanihi wa yadihi (disebut di video)",
+        "QS Al-Hujurat 49:11-12 (disebut di video)"
+      ],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 16,
+      "phase": "akhlaq-tazkiyah",
+      "theme_id": "menahan-marah",
+      "title_id": "Marah dan Batasnya",
+      "title_en": "Anger and Its Limits",
+      "topic": "akhlaq",
+      "video": {
+        "youtube_id": "wNMflmuZ_vg",
+        "verified_title": "Marah dan Batasnya | Tafsir Al-Mishbah: Hidup Bersama Al-Quran Episode 7",
+        "channel_name": "Quraish Shihab",
+        "channel_url": "https://www.youtube.com/@QuraishShihabMuhammad",
+        "speaker": "Prof. Dr. M. Quraish Shihab",
+        "duration_min": 20,
+        "language": "id"
+      },
+      "summary_id": "Prof. Quraish Shihab bersama putri dan putranya membahas kapan marah itu terpuji dan kapan tercela. Ia membedakan amarah Allah yang disertai sifat halim (menahan diri demi manfaat) dari amarah manusia: boleh menyatakan ketidaksetujuan, bahkan menegur, tetapi tidak merusak, merendahkan, atau menimbulkan keburukan yang lebih besar dari yang ditegur. Disampaikan pula perbedaan menghukum — melampiaskan emosi — dengan mendidik yang bertujuan memberi pelajaran. Tips praktis yang dibagikan antara lain introspeksi, berwudhu, berpindah tempat, dan aturan keluarga 'tanpa sarkasme'.",
+      "reflection_prompt_id": "Pada situasi apa saya paling mudah marah, dan apakah kemarahan saya biasanya menegur untuk mendidik atau sekadar melampiaskan?",
+      "amalan_id": "Saat emosi naik hari ini, berhenti 10 detik, tarik napas, dan berwudhu atau pindah tempat sebelum merespons.",
+      "sources": ["Hadis: la taghdab wa lakal jannah (disebut di video)"],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 17,
+      "phase": "akhlaq-tazkiyah",
+      "theme_id": "sabar-dan-syukur",
+      "title_id": "Sabar Tanpa Tepi, Syukur Tanpa Tapi",
+      "title_en": "Limitless Patience, Unconditional Gratitude",
+      "topic": "tazkiyah",
+      "video": {
+        "youtube_id": "M-1c9y6QaUs",
+        "verified_title": "Sabar Tanpa Tepi dan Syukur Tanpa Tapi - Buya Yahya",
+        "channel_name": "Buya Yahya",
+        "channel_url": "https://www.youtube.com/@buyayahyaofficial",
+        "speaker": "Buya Yahya",
+        "duration_min": 26,
+        "language": "id"
+      },
+      "summary_id": "Buya Yahya menjelaskan bahwa nilai sebuah nikmat sering baru terasa ketika kita melihat lawannya — sehat terasa mahal saat melihat orang sakit. Karena itu bersyukur dimulai dengan mencermati nikmat dan memperhatikan orang yang lebih sulit, tanpa menyukurin penderitaan orang lain. Ia mengaitkannya dengan janji Allah menambah nikmat bagi yang bersyukur, lalu beralih ke sabar atas musibah: musibah bagi orang beriman bisa menjadi tanda cinta Allah dan jalan terangkatnya derajat. Karena itu orang yang sedang diuji dianjurkan berhusnuzan dan tidak berucap seolah marah kepada Allah.",
+      "reflection_prompt_id": "Nikmat apa yang selama ini terasa biasa saja bagi saya, dan ujian apa yang sedang saya hadapi yang bisa saya sikapi dengan sabar?",
+      "amalan_id": "Tulis tiga nikmat yang sering terlupakan, lalu ucapkan terima kasih kepada satu orang yang terkait dengan salah satunya.",
+      "sources": ["QS Ibrahim 14:7 (disebut di video; janji menambah nikmat bagi yang bersyukur)"],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 18,
+      "phase": "akhlaq-tazkiyah",
+      "theme_id": "taubat-di-bulan-ramadhan",
+      "title_id": "Cara Taubat di Bulan Ramadhan",
+      "title_en": "How to Repent in Ramadan",
+      "topic": "tazkiyah",
+      "video": {
+        "youtube_id": "8p_QF2LpaCs",
+        "verified_title": "[Akusuka Eps. 9] Cara Taubat Di Bulan Ramadhan - Ustadz Adi Hidayat",
+        "channel_name": "Adi Hidayat Official",
+        "channel_url": "https://www.youtube.com/@AdiHidayatOfficiaI",
+        "speaker": "Ust. Adi Hidayat, Lc., MA",
+        "duration_min": 16,
+        "language": "id"
+      },
+      "summary_id": "Ustadz Adi Hidayat membagi dosa menjadi dua: dosa kepada Allah dan dosa yang menyangkut hak orang lain. Untuk dosa kepada Allah, taubat bisa diwujudkan lewat shalat dan istighfar — bahkan dalam ruku, sujud, duduk di antara dua sujud, dan doa iftitah ada permohonan ampun — serta ia mengingatkan bahwa Allah menyeru hamba yang merasa dosanya terlalu banyak agar tidak putus asa. Untuk dosa terkait manusia, seperti utang yang belum dibayar atau nama baik yang dirusak, urusannya belum selesai sebelum diselesaikan dengan orangnya, dan kelalaian itu bisa membuat seseorang 'bangkrut' di akhirat.",
+      "reflection_prompt_id": "Adakah hak orang lain — utang, maaf, atau kata-kata yang menyakitkan — yang belum saya selesaikan?",
+      "amalan_id": "Hubungi satu orang yang pernah kamu sakiti atau lalai kamu penuhi haknya, minta maaf atau lunasi satu bagian kewajiban hari ini.",
+      "sources": [
+        "QS Hud 11:114 (disebut di video)",
+        "QS Az-Zumar 39:53 (disebut di video)",
+        "HR. Muslim: hadis orang yang bangkrut (al-muflis) (disebut di video)"
+      ],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 19,
+      "phase": "akhlaq-tazkiyah",
+      "theme_id": "belajar-ikhlas",
+      "title_id": "Belajar Ikhlas agar Hati Tenang",
+      "title_en": "Learning Sincerity for a Peaceful Heart",
+      "topic": "tazkiyah",
+      "video": {
+        "youtube_id": "r1GQwM3hU9g",
+        "verified_title": "BELAJAR IKHLAS AGAR HATI TENANG DAN TIDAK SAKIT HATI",
+        "channel_name": "Aagym Official",
+        "channel_url": "https://www.youtube.com/@AaGymOfficial",
+        "speaker": "Aa Gym (KH. Abdullah Gymnastiar)",
+        "duration_min": 34,
+        "language": "id"
+      },
+      "summary_id": "Aa Gym membawakan hadis tentang tiga golongan yang pertama kali diadili di akhirat — pejuang, orang berilmu, dan dermawan — yang amalnya besar tetapi niatnya sibuk mencari pujian manusia. Dari situ ia mengurai bahaya riya: semakin ingin dipuji dan dikagumi, semakin sering hati sakit, karena tidak ada yang lebih pahit daripada berharap kepada manusia. Ia mengajak menyeimbangkan amal yang tampak dengan amal sunnah yang tidak diketahui orang, merapikan diri untuk menghormati orang lain bukan demi pujian, dan menumbuhkan keyakinan bahwa Allah cukup menjadi saksi.",
+      "reflection_prompt_id": "Amal mana yang saya kerjakan paling semangat ketika ada yang melihat, dan seperti apa jadinya bila tak ada seorang pun yang tahu?",
+      "amalan_id": "Kerjakan satu amal sunnah atau kebaikan hari ini secara diam-diam, tanpa cerita kepada siapa pun.",
+      "sources": [
+        "HR. Muslim & Tirmidzi: tiga orang yang pertama kali diadili di akhirat (disebut di video)",
+        "QS Az-Zalzalah 99:7-8 (disebut di video)"
+      ],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 20,
+      "phase": "sepuluh-malam-terakhir",
+      "theme_id": "persiapan-itikaf",
+      "title_id": "Persiapan I'tikaf 10 Hari Terakhir",
+      "title_en": "Preparing for I'tikaf in the Last Ten Days",
+      "topic": "fiqh-puasa",
+      "video": {
+        "youtube_id": "p1X4sNMAodc",
+        "verified_title": "PERSIAPAN I’TIKAF 10 HARI TERAKHIR RAMADHAN | TATA CARA I’TIKAF | Ustadz Abdul Somad",
+        "channel_name": "Ustadz Abdul Somad Official",
+        "channel_url": "https://www.youtube.com/@ustadzabdulsomadofficial",
+        "speaker": "Ust. Abdul Somad",
+        "duration_min": 34,
+        "language": "id"
+      },
+      "summary_id": "Ustadz Abdul Somad merekam kajian ini pada sore menjelang malam ke-21 sehingga cocok sebagai persiapan memasuki sepuluh malam terakhir. Ia menjelaskan i'tikaf secara bahasa sebagai berdiam di suatu tempat, lalu membahas batas minimal lamanya menurut pandangan mazhab yang berbeda dan hal-hal yang membatalkannya, misalnya keluar masjid tanpa keperluan mendesak. Ia memberi gambaran amalan selama i'tikaf, mulai dari shalat sunnah dan membaca Al-Quran hingga dzikir bagi yang tidak sanggup membaca, dan mengingatkan agar waktu tidak habis oleh urusan dunia seperti memikirkan baju Lebaran.",
+      "reflection_prompt_id": "Kalau saya tidak bisa beri'tikaf penuh sepuluh hari, berapa jam dalam sepuluh malam ini yang bisa benar-benar saya sisihkan khusus untuk Allah?",
+      "amalan_id": "Tentukan satu jadwal i'tikaf pendek di masjid (walau satu atau dua jam) pada salah satu malam ganjil dan masukkan ke kalender.",
+      "sources": [
+        "HR. Bukhari-Muslim: Nabi beri'tikaf di sepuluh hari terakhir Ramadhan (disebut di video)"
+      ],
+      "madhhab_note_id": "Batas minimal i'tikaf: Maliki mensyaratkan sehari semalam penuh (24 jam, menurut video); Syafi'i cukup berdiam sejenak sedikit lebih lama dari ruku' dan sujud dengan niat i'tikaf (menurut video). Hanafi dan Hanbali memiliki rincian sendiri (catatan editor). Video juga menyebut pendapat Syafi'i bahwa perempuan yang sedang haid tidak masuk masjid."
+    },
+    {
+      "day": 21,
+      "phase": "sepuluh-malam-terakhir",
+      "theme_id": "makna-lailatul-qadar",
+      "title_id": "Rahasia Lailatul Qadar: Al-Quran dan Takdir",
+      "title_en": "The Secret of Laylat al-Qadr",
+      "topic": "quran",
+      "video": {
+        "youtube_id": "fioT2GhmrXo",
+        "verified_title": "RAHASIA LAILATUL QADR - AKU SUKA 18 RAMADHAN 1441H - Ustadz Adi  Hidayat",
+        "channel_name": "Adi Hidayat Official",
+        "channel_url": "https://www.youtube.com/@AdiHidayatOfficiaI",
+        "speaker": "Ust. Adi Hidayat, Lc., MA",
+        "duration_min": 36,
+        "language": "id"
+      },
+      "summary_id": "Ustadz Adi Hidayat membedah Surah Al-Qadr untuk memahami mengapa malam ini istimewa: malam turunnya Al-Quran yang nilainya lebih baik dari seribu bulan, sekitar 83 tahun lebih. Ia menjelaskan makna 'qadar' sebagai ketetapan Allah atas perjalanan hidup — rezeki, ajal, dan arah kehidupan — yang dicatat sejak janin berusia empat bulan, sehingga malam ini menjadi momentum meminta petunjuk dan memperbaiki arah. Ia juga mengajak menilai usia bukan dari jumlah tahun tetapi dari manfaat dan amal baik yang dihasilkan, dan meminta petunjuk kepada Allah dalam urusan karier dan hidup.",
+      "reflection_prompt_id": "Jika usia saya diukur dari manfaat yang saya hasilkan, bukan dari jumlah tahun, apa yang ingin saya perbaiki di sisa usia ini?",
+      "amalan_id": "Bacalah Surah Al-Qadr dengan terjemahannya, lalu tuliskan satu 'arah hidup' yang ingin kamu mintakan petunjuk kepada Allah.",
+      "sources": [
+        "QS Al-Qadr 97:1-5 (disebut di video)",
+        "QS Al-Baqarah 2:185 (disebut di video)",
+        "HR. Bukhari-Muslim: penulisan rezeki, ajal, amal, dan nasib janin (disebut di video)"
+      ],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 22,
+      "phase": "sepuluh-malam-terakhir",
+      "theme_id": "waktu-dan-tanda-lailatul-qadar",
+      "title_id": "Kapan Lailatul Qadar Tiba? Waktu, Tanda, dan Sikap",
+      "title_en": "When Does Laylat al-Qadr Come? Timing, Signs, and Attitude",
+      "topic": "fiqh-puasa",
+      "video": {
+        "youtube_id": "IhCGgFQ-9Bg",
+        "verified_title": "Kapan Tepatnya Malam Lailatul Qadar Tiba❓| Buya Yahya Jelaskan Secara Detail Disini❗",
+        "channel_name": "Al-Bahjah TV",
+        "channel_url": "https://www.youtube.com/@albahjah-tv",
+        "speaker": "Buya Yahya",
+        "duration_min": 35,
+        "language": "id"
+      },
+      "summary_id": "Buya Yahya menceritakan hadis ketika beberapa sahabat bermimpi melihat Lailatul Qadar di tujuh malam terakhir, dan bahwa Nabi sendiri sempat diperlihatkan lalu dilupakan tanggalnya — hikmahnya agar umat bersemangat mencari di banyak malam, tidak hanya satu. Ia menyebut tanda-tanda yang diriwayatkan, seperti matahari pagi yang putih tanpa sinar menyilaukan, tetapi menegaskan tanda itu bisa tidak muncul dan ibadah tidak boleh bergantung padanya. Ia juga mengingatkan agar jangan hanya menghidupkan satu malam saja, minimal menjaga shalat Isya dan Subuh berjamaah, serta menyertai doa dengan tafakur.",
+      "reflection_prompt_id": "Apakah semangat ibadah saya hanya naik pada satu malam yang saya yakini sebagai Lailatul Qadar, atau stabil di semua malam?",
+      "amalan_id": "Malam ini jaga shalat Isya dan Subuh berjamaah, dan sisihkan 5 menit untuk tafakur sebelum berdoa.",
+      "sources": [
+        "HR. Bukhari-Muslim (Ibnu Umar): sahabat bermimpi Lailatul Qadar di tujuh malam terakhir (disebut di video)",
+        "HR. Muslim (Ubay bin Ka'ab): tanda matahari pagi putih tanpa sinar menyilaukan (disebut di video)",
+        "QS Al-Qadr 97:3"
+      ],
+      "madhhab_note_id": "Tanggal pasti Lailatul Qadar tidak ditetapkan; para ulama berbeda pendapat, dengan pandangan yang paling banyak dikutip malam-malam ganjil sepuluh terakhir, khususnya malam ke-27. Video ini menekankan menghidupkan seluruh malam, bukan satu tanggal."
+    },
+    {
+      "day": 23,
+      "phase": "sepuluh-malam-terakhir",
+      "theme_id": "amalan-dan-doa-lailatul-qadar",
+      "title_id": "Amalan Malam Al-Qadr dan Doa Aisyah",
+      "title_en": "Night of Al-Qadr Practices and Aisha's Du'a",
+      "topic": "dua",
+      "video": {
+        "youtube_id": "tuJBglPWTmI",
+        "verified_title": "AMALAN MALAM AL-QADR - AKU SUKA 20 RAMADHAN 1441H - USTADZ ADI HIDAYAT",
+        "channel_name": "Adi Hidayat Official",
+        "channel_url": "https://www.youtube.com/@AdiHidayatOfficiaI",
+        "speaker": "Ust. Adi Hidayat, Lc., MA",
+        "duration_min": 37,
+        "language": "id"
+      },
+      "summary_id": "Ustadz Adi Hidayat melanjutkan kajian Lailatul Qadar dengan amalan praktis, dimulai dari doa yang Nabi ajarkan kepada Aisyah: Allahumma innaka 'afuwwun tuhibbul 'afwa fa'fu 'anni. Ia menjelaskan bahwa ibadah di malam itu — shalat dan doa yang tulus — dapat meraih ampunan yang luas, dan menggambarkan cara memaafkan yang disertai cinta, bukan sekadar basa-basi. Ia mengingatkan agar malam ini dihidupkan dengan niat yang benar, mengajak keluarga, dan menyiapkan tempat serta kondisi agar bisa fokus, sebagaimana makna kata i'tikaf.",
+      "reflection_prompt_id": "Doa Aisyah ini meminta dimaafkan oleh Allah — bagaimana sikap saya terhadap orang yang perlu saya maafkan?",
+      "amalan_id": "Hafalkan doa 'Allahumma innaka afuwwun tuhibbul afwa fa'fu anni' dan baca setiap kali selesai shalat malam ini.",
+      "sources": [
+        "HR. Tirmidzi no. 3513 & Ibnu Majah: doa Aisyah di Lailatul Qadar (disebut di video)",
+        "QS Al-Qadr 97:3",
+        "QS Al-Baqarah 2:125 (disebut di video)"
+      ],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 24,
+      "phase": "sepuluh-malam-terakhir",
+      "theme_id": "empat-tingkatan-qiyamul-lail",
+      "title_id": "Empat Tingkatan Qiyamul Lail di Sepuluh Malam Terakhir",
+      "title_en": "Four Levels of Night Prayer in the Last Ten Nights",
+      "topic": "tazkiyah",
+      "video": {
+        "youtube_id": "kHmlHfqP8gE",
+        "verified_title": "18. EMPAT TINGKATAN QIYAM LAYLATUL QADR | Serial Ramadhan | Ustadz Muhammad Nuzul Dzikri",
+        "channel_name": "Muhammad Nuzul Dzikri",
+        "channel_url": "https://www.youtube.com/@MuhammadNuzulDzikri",
+        "speaker": "Ust. Muhammad Nuzul Dzikri",
+        "duration_min": 23,
+        "language": "id"
+      },
+      "summary_id": "Ustadz Nuzul Dzikri menjelaskan bahwa amalan terbaik di sepuluh malam terakhir adalah qiyamul lail, dengan empat tingkatan menurut penjelasan para ulama: menghidupkan malam dari Isya hingga akhir malam; shalat di awal lalu beristirahat dan bangun lagi di tengah atau akhir malam; satu kali saja di tengah atau akhir malam; dan tingkat terakhir shalat di awal malam seperti tarawih. Ia mengutip pesan Jibril kepada Nabi bahwa kemuliaan seorang mukmin ada pada qiyamul lail dan bahwa kita akan dibalas sesuai amal. Ia menutup dengan pesan merasa cukup dengan apa yang Allah beri dan tidak menggantungkan harapan kepada manusia.",
+      "reflection_prompt_id": "Dari empat tingkatan qiyamul lail, tingkatan mana yang realistis bagi saya malam ini, dan apa yang perlu saya atur agar bisa bangun?",
+      "amalan_id": "Pilih tingkatan yang paling mungkin malam ini, setel alarm, dan tidur lebih awal sebagai persiapan.",
+      "sources": [
+        "HR. Thabrani: pesan Jibril — ‘isy ma syi'ta fa innaka mayyit… wa'lam anna syarafal mu'min qiyamul lail (disebut di video)",
+        "QS Az-Zalzalah 99:7-8 (disebut di video)",
+        "QS Al-Qadr 97:3"
+      ],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 25,
+      "phase": "sepuluh-malam-terakhir",
+      "theme_id": "ikhtiar-meraih-lailatul-qadar",
+      "title_id": "Ikhtiar Meraih Lailatul Qadar dengan Keterbatasan Kita",
+      "title_en": "Striving for Laylat al-Qadr Within Our Limits",
+      "topic": "tazkiyah",
+      "video": {
+        "youtube_id": "h5s9ZDe-ipY",
+        "verified_title": "Ikhtiar Agar Allah Memilih Kita Mendapat Lailatul Qadar - Kajian 10 Hari Terakhir Ramadhan",
+        "channel_name": "Aagym Official",
+        "channel_url": "https://www.youtube.com/@AaGymOfficial",
+        "speaker": "Aa Gym (KH. Abdullah Gymnastiar)",
+        "duration_min": 33,
+        "language": "id"
+      },
+      "summary_id": "Aa Gym memberi panduan praktis sepuluh malam terakhir bagi orang awam dengan banyak keterbatasan. Ia menjelaskan tingkatan upaya — mulai dari i'tikaf penuh sepuluh hari bila mampu, hingga sekadar menghidupkan malam ganjil — dan menekankan menjaga shalat berjamaah, qiyamul lail, membangunkan keluarga, serta membaca Al-Quran (minimal 100 ayat, dan surah-surah seperti Al-Baqarah dan Al-Mulk). Ia mengajak memperbanyak doa 'afwu, memohon takdir terbaik bagi keluarga, dan di atas semua itu membersihkan hati dari benci, dengki, dan dendam serta menjaga keikhlasan dari penilaian makhluk.",
+      "reflection_prompt_id": "Dengan kondisi saya malam ini, versi 'ikhtiar' mana yang paling mungkin saya jalani sampai akhir Ramadhan?",
+      "amalan_id": "Bangunkan satu anggota keluarga atau teman untuk shalat malam bersama, dan baca minimal satu halaman Al-Quran sebelum tidur.",
+      "sources": [
+        "HR. Bukhari-Muslim: Nabi mengencangkan ikat pinggang dan membangunkan keluarga di sepuluh malam terakhir (disebut di video)",
+        "QS Al-Qadr 97:3",
+        "Hadis keutamaan Surah Al-Mulk (disebut di video)"
+      ],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 26,
+      "phase": "zakat-fitrah-syawal",
+      "theme_id": "zakat-fitrah-panduan",
+      "title_id": "Panduan Zakat Fitrah: Waktu, Siapa, dan Penyalurannya",
+      "title_en": "A Practical Guide to Zakat al-Fitr",
+      "topic": "fiqh-puasa",
+      "video": {
+        "youtube_id": "GBJs-bIrYLA",
+        "verified_title": "PANDUAN LENGKAP ZAKAT FITRAH‼️ Hukum, Syarat, & Cara yang Benar | Buya Yahya",
+        "channel_name": "Al-Bahjah TV",
+        "channel_url": "https://www.youtube.com/@albahjah-tv",
+        "speaker": "Buya Yahya",
+        "duration_min": 22,
+        "language": "id"
+      },
+      "summary_id": "Buya Yahya menjelaskan zakat fitrah sebagai penyuci bagi orang yang berpuasa dari kelalaian dan sebagai makanan bagi orang miskin agar tidak meminta-minta di hari raya. Ia memaparkan perbedaan mazhab tentang kapan zakat fitrah wajib (Subuh 1 Syawal atau terbenam matahari akhir Ramadhan), akibat praktisnya pada bayi yang lahir atau orang yang wafat di sekitar malam Id, kapan boleh dikeluarkan lebih awal, dan kepada siapa disalurkan. Ia juga menyebut takaran satu sha' sekitar 2,4–2,8 kg makanan pokok per orang, serta bahwa mengganti dengan uang adalah pendapat mazhab Hanafi.",
+      "reflection_prompt_id": "Apakah zakat fitrah keluarga saya sudah dihitung per orang, dan apakah penyalurannya mencukupi kebutuhan penerima di hari raya?",
+      "amalan_id": "Hitung jumlah anggota keluarga yang wajib dizakati, tentukan bentuknya (beras atau uang sesuai mazhab yang kamu ikuti), dan jadwalkan penyalurannya.",
+      "sources": [
+        "HR. Abu Dawud & Ibnu Majah: zakat fitrah sebagai pensuci orang berpuasa dan makanan bagi orang miskin (disebut di video)",
+        "HR. Bukhari-Muslim: Nabi memerintahkan zakat fitrah dikeluarkan sebelum orang keluar ke shalat Id (disebut di video)",
+        "QS At-Taubah 9:60 (delapan asnaf; disebut di video)"
+      ],
+      "madhhab_note_id": "Waktu wajib: Hanafi (dan satu riwayat Maliki) sejak terbit fajar 1 Syawal; jumhur (Syafi'i, Hanbali, Maliki) sejak terbenam matahari akhir Ramadhan — sehingga bayi yang lahir setelah Maghrib malam Id wajib dizakati menurut Hanafi tetapi tidak menurut Syafi'i. Bentuk: Syafi'i, Maliki, dan Hanbali mensyaratkan makanan pokok; Hanafi membolehkan uang. Penerima: jumhur menyamakan dengan delapan asnaf, sedangkan mazhab Maliki membatasi pada fakir dan miskin. Dikeluarkan lebih awal: Hanafi membolehkan bahkan sebelum Ramadhan; Syafi'i sejak awal Ramadhan."
+    },
+    {
+      "day": 27,
+      "phase": "zakat-fitrah-syawal",
+      "theme_id": "zakat-sedekah-infak",
+      "title_id": "Zakat, Sedekah, dan Infak: Menyucikan Jiwa dan Harta",
+      "title_en": "Zakat, Sadaqah, and Infaq: Purifying Soul and Wealth",
+      "topic": "tazkiyah",
+      "video": {
+        "youtube_id": "ZaDr3fxaCOU",
+        "verified_title": "Cara Menyucikan Jiwa dan Harta | M. Quraish Shihab Podcast",
+        "channel_name": "Quraish Shihab",
+        "channel_url": "https://www.youtube.com/@QuraishShihabMuhammad",
+        "speaker": "Prof. Dr. M. Quraish Shihab",
+        "duration_min": 19,
+        "language": "id"
+      },
+      "summary_id": "Prof. Quraish Shihab menjelaskan perbedaan istilah: zakat adalah harta tertentu dengan jenis, kadar, waktu, dan penerima yang ditetapkan, sedangkan sedekah dan infak bermakna lebih luas. Kata 'zakat' sendiri mengandung tiga makna: berkembang, suci, dan berkah — zakat membersihkan harta dan jiwa pemberinya, tetapi hanya bernilai bila disertai keikhlasan, dan berbeda dari pajak yang merupakan kewajiban negara. Ia mengajak mengantar zakat kepada penerimanya, bukan menjadikan Ramadhan pameran kemiskinan, dan mengingatkan bahwa dalam sabda Nabi bentuk sedekah sangat luas, termasuk zikir dan amar makruf.",
+      "reflection_prompt_id": "Apakah pemberian saya selama ini lebih sering karena ditagih atau karena rasa persaudaraan, dan siapa orang terdekat yang sebenarnya membutuhkan?",
+      "amalan_id": "Berikan satu sedekah kecil hari ini secara langsung kepada orang yang kamu kenal membutuhkan, tanpa diumumkan.",
+      "sources": [
+        "QS At-Taubah 9:103 (disebut di video)",
+        "QS At-Taubah 9:60 (disebut di video)",
+        "QS Al-Baqarah 2:177 (disebut di video)",
+        "HR. Muslim: setiap tasbih, takbir, tahmid adalah sedekah (disebut di video)"
+      ],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 28,
+      "phase": "zakat-fitrah-syawal",
+      "theme_id": "hari-raya-berdamai",
+      "title_id": "Hari Raya Momen Berdamai",
+      "title_en": "Eid as a Moment for Reconciliation",
+      "topic": "akhlaq",
+      "video": {
+        "youtube_id": "tVf8mSBeo8c",
+        "verified_title": "Hari Raya Momen Berdamai | TANYA BUYA | Buya Yahya | 1 Syawal 1443H / 2 Mei 2022",
+        "channel_name": "Al-Bahjah TV",
+        "channel_url": "https://www.youtube.com/@albahjah-tv",
+        "speaker": "Buya Yahya",
+        "duration_min": 22,
+        "language": "id"
+      },
+      "summary_id": "Dalam program tanya jawab menyambut Idul Fitri ini, Buya Yahya mengajak melihat Syawal sebagai bulan berdamai dengan sesama, dan bahwa damai yang sesungguhnya berangkat dari hati yang saling mencintai. Tipsnya sederhana: saling mendoakan kebaikan, terutama bagi orang yang berselisih dengan kita, karena malaikat akan mendoakan hal serupa bagi si pendoa; kata-kata buruk dan caci maki diganti dengan doa. Dibahas pula bahwa silaturahim punya sisi lahir dan batin, dan bagaimana agar maaf-maafan tidak berhenti menjadi ritual sementara dendam masih tersisa.",
+      "reflection_prompt_id": "Siapa satu orang yang hatinya masih belum damai dengan saya, dan doa apa yang bisa saya ucapkan untuknya malam ini?",
+      "amalan_id": "Berdoalah dengan menyebut nama satu orang yang pernah menyakitimu, mendoakan kebaikan untuknya; lalu kirim satu pesan maaf yang tulus.",
+      "sources": [
+        "HR. Muslim: doa untuk saudara tanpa sepengetahuannya diaminkan malaikat (disebut di video)"
+      ],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 29,
+      "phase": "zakat-fitrah-syawal",
+      "theme_id": "setelah-ramadhan-istiqamah",
+      "title_id": "Setelah Ramadhan Berakhir: Jangan Turun Lagi",
+      "title_en": "After Ramadan Ends: Do Not Go Back Down",
+      "topic": "tazkiyah",
+      "video": {
+        "youtube_id": "fBFMfoaA8AA",
+        "verified_title": "Setelah Ramadhan Berakhir | M. Quraish Shihab Podcast",
+        "channel_name": "Quraish Shihab",
+        "channel_url": "https://www.youtube.com/@QuraishShihabMuhammad",
+        "speaker": "Prof. Dr. M. Quraish Shihab",
+        "duration_min": 18,
+        "language": "id"
+      },
+      "summary_id": "Prof. Quraish Shihab mengingatkan bahwa setelah Ramadhan yang penting bukan sekadar mempertahankan apa yang diraih, tetapi meningkatkannya, karena takwa dan hidayah itu bertingkat. Ia mengutip ayat tentang perempuan yang mengurai kembali kain tenunannya sehelai demi sehelai sebagai perumpamaan orang yang membongkar amal setelah menyusunnya. Ia menasihati agar kita tidak mengandalkan amal sendiri dan khawatir ada riya yang tersembunyi, tetapi tetap optimis amal yang sedikit diterima Allah, serta menyebut pakaian Lebaran yang terbaik adalah pakaian takwa.",
+      "reflection_prompt_id": "Satu kebiasaan baik Ramadhan apa yang paling saya takutkan hilang setelah Lebaran, dan bagaimana menjaganya tetap ada dalam versi yang lebih kecil?",
+      "amalan_id": "Tulis tiga kebiasaan Ramadhan yang akan kamu pertahankan di bulan Syawal, masing-masing dalam porsi yang paling kecil dan pasti dijalankan.",
+      "sources": [
+        "QS An-Nahl 16:92 (disebut di video)",
+        "QS Al-A'raf 7:26 (pakaian takwa; disebut di video)",
+        "QS Asy-Syams 91:7-10 (disebut di video)"
+      ],
+      "madhhab_note_id": null
+    },
+    {
+      "day": 30,
+      "phase": "zakat-fitrah-syawal",
+      "theme_id": "puasa-syawal",
+      "title_id": "Puasa Enam Hari Syawal: Hitungan Pahala dan Pandangan Mazhab",
+      "title_en": "Six Days of Shawwal: How the Reward Adds Up, and the Madhhab Views",
+      "topic": "fiqh-puasa",
+      "video": {
+        "youtube_id": "pn6aMJdZHQQ",
+        "verified_title": "Puasa 6 Hari Mendapatkan Pahala Puasa Satu Tahun? Itungannya Bagaimana? - Ustadz Ahmad Zarkasih, Lc.",
+        "channel_name": "Rumah Fiqih",
+        "channel_url": "https://www.youtube.com/@RumahFiqihIndonesia",
+        "speaker": "Ust. Ahmad Zarkasih, Lc.",
+        "duration_min": 18,
+        "language": "id"
+      },
+      "summary_id": "Ustadz Ahmad Zarkasih dari Rumah Fiqih menjelaskan hadis Abu Ayyub al-Anshari bahwa orang yang berpuasa Ramadhan lalu menambah enam hari di bulan Syawal akan mendapat pahala seperti puasa setahun. Ia menghitungnya dengan kaidah kebaikan dilipatgandakan sepuluh kali: tiga puluh hari Ramadhan menjadi 300 hari dan enam hari Syawal menjadi 60 hari, sehingga genap 360 hari. Lalu ia menyampaikan bahwa jumhur ulama menghukuminya sunnah, sementara Imam Malik memakruhkannya karena tidak mendapati penduduk Madinah mengamalkannya dan mengutamakan amal penduduk Madinah sebagai pertimbangan hukum. Ia mengajak mengusahakan sebanyak mungkin hari Syawal meski belum bisa enam hari penuh.",
+      "reflection_prompt_id": "Setelah sebulan penuh berpuasa, apa satu cara yang membuat saya tetap berpuasa walau sedikit di bulan Syawal?",
+      "amalan_id": "Pilih tiga hari di Syawal (mis. Senin, Kamis, atau hari putih) untuk puasa dan masukkan ke kalender sekarang.",
+      "sources": [
+        "HR. Muslim: man shama Ramadhana tsumma atba'ahu sittan min Syawwal (Abu Ayyub al-Anshari; disebut di video)",
+        "QS Al-An'am 6:160 (kebaikan dilipatgandakan sepuluh kali; disebut di video)"
+      ],
+      "madhhab_note_id": "Jumhur ulama: puasa enam hari Syawal hukumnya sunnah. Mazhab Maliki (Imam Malik): makruh, dengan alasan amalan ini tidak dikenal di kalangan penduduk Madinah dan metode beliau yang mempertimbangkan amal ahli Madinah (dijelaskan di video)."
+    }
+  ],
+  "alternates": [
+    {
+      "youtube_id": "uMtNTeZL_aM",
+      "verified_title": "Apa saja yang Dilakukan saat Iktikaf? | Buya Yahya",
+      "channel_name": "Al-Bahjah TV",
+      "channel_url": "https://www.youtube.com/@albahjah-tv",
+      "speaker": "Buya Yahya",
+      "duration_min": 24,
+      "language": "id",
+      "alternative_for_day": 20,
+      "note_id": "Alternatif bila owner ingin menghindari satu-satunya video Ust. Abdul Somad: panduan praktis amalan saat i'tikaf (transkrip diperiksa, tanpa penanda kontroversial)."
+    },
+    {
+      "youtube_id": "qRvBz4oscdg",
+      "verified_title": "Menyambut Malam Lailatul Qadar I KH. Muhammad Nur Hayid, S.Th.I, MM",
+      "channel_name": "NU Online",
+      "channel_url": "https://www.youtube.com/@NUOnlineID",
+      "speaker": "KH. Muhammad Nur Hayid",
+      "duration_min": 32,
+      "language": "id",
+      "alternative_for_day": 21,
+      "note_id": "Menambah suara NU Online, tetapi memuat beberapa riwayat yang kekuatannya perlu dicek (mis. anak yang lahir di malam Lailatul Qadar, malaikat meminta maaf kepada manusia) dan sudut pandang tasawuf (Lailatul Qadar bagi kalangan khusus setiap malam)."
+    },
+    {
+      "youtube_id": "nB-4Tx5ii7I",
+      "verified_title": "Hanan Attaki - Menjaga Amarah (Ramadhan)",
+      "channel_name": "Hanan Attaki",
+      "channel_url": "https://www.youtube.com/@HananAttaki",
+      "speaker": "Ust. Hanan Attaki",
+      "duration_min": 19,
+      "language": "id",
+      "alternative_for_day": 16,
+      "note_id": "Puasa Nabi yang produktif dan menahan emosi; lebih ringan dan bergaya anak muda. Menyebut klaim sejarah (mis. kemenangan di bulan Ramadhan) dan tips pola hidup yang perlu dicek bila dipakai."
+    },
+    {
+      "youtube_id": "j0B63VjdJzo",
+      "verified_title": "Miracle alQuran",
+      "channel_name": "Hanan Attaki",
+      "channel_url": "https://www.youtube.com/@HananAttaki",
+      "speaker": "Ust. Hanan Attaki",
+      "duration_min": 15,
+      "language": "id",
+      "alternative_for_day": 10,
+      "note_id": "Tafsir singkat Surah Al-Ashr (iman, amal saleh, saling menasihati) — cocok sebagai konten ringan 15 menit."
+    },
+    {
+      "youtube_id": "vKlPneUmZfI",
+      "verified_title": "[Kitabus Shaum] Eps. 17: Essensi Nuzul Al-Qur'an - Ustadz Adi Hidayat",
+      "channel_name": "Adi Hidayat Official",
+      "channel_url": "https://www.youtube.com/@AdiHidayatOfficiaI",
+      "speaker": "Ust. Adi Hidayat",
+      "duration_min": 28,
+      "language": "id",
+      "alternative_for_day": 9,
+      "note_id": "Hakikat Nuzulul Quran bila owner ingin tema nuzul lebih kuat daripada tema tadarus bersama Jibril."
+    },
+    {
+      "youtube_id": "E1aAo--iySs",
+      "verified_title": "Bab Puasa: Orang yang Wajib Berpuasa | Mukhtasor Abi Suja (Taqrib) | Buya Yahya | 20 September 2021",
+      "channel_name": "Buya Yahya",
+      "channel_url": "https://www.youtube.com/@buyayahyaofficial",
+      "speaker": "Buya Yahya",
+      "duration_min": 15,
+      "language": "id",
+      "alternative_for_day": 4,
+      "note_id": "Syarat wajib puasa (Islam, baligh, berakal, mampu) dari Matan Abu Syuja' — fikih Syafi'i; cocok bila owner ingin satu hari khusus rukun/syarat."
+    },
+    {
+      "youtube_id": "g38mpJSsHj8",
+      "verified_title": "Bayar Zakat, untuk Diri Sendiri & Masyarakat | Tafsir Al-Mishbah: Hidup Bersama Al-Quran Episode 25",
+      "channel_name": "Quraish Shihab",
+      "channel_url": "https://www.youtube.com/@QuraishShihabMuhammad",
+      "speaker": "Prof. M. Quraish Shihab",
+      "duration_min": 15,
+      "language": "id",
+      "alternative_for_day": 27,
+      "note_id": "Zakat profesi; topik ini termasuk ijtihad kontemporer (tidak ada kategori terpisah dalam kitab mazhab klasik), sehingga sengaja tidak dipilih sebagai utama."
+    },
+    {
+      "youtube_id": "wXp8oJ3PRfI",
+      "verified_title": "Bulan Syawal Sebagai Penyempurna Ibadah Ramadhan | Penjabaran Mutiara Hikmah ke-73 | Buya Yahya",
+      "channel_name": "Al-Bahjah TV",
+      "channel_url": "https://www.youtube.com/@albahjah-tv",
+      "speaker": "Buya Yahya",
+      "duration_min": 25,
+      "language": "id",
+      "alternative_for_day": 30,
+      "note_id": "Syawal sebagai bulan berdamai dengan manusia setelah berdamai dengan Allah di Ramadhan; tidak membahas puasa Syawal."
+    },
+    {
+      "youtube_id": "3GKJ3p0r_R0",
+      "verified_title": "Ikhlas yang Sering Disalahpahami | Tafsir Al-Mishbah: Hidup Bersama Al-Quran Episode 2",
+      "channel_name": "Quraish Shihab",
+      "channel_url": "https://www.youtube.com/@QuraishShihabMuhammad",
+      "speaker": "Prof. M. Quraish Shihab",
+      "duration_min": 19,
+      "language": "id",
+      "alternative_for_day": 19,
+      "note_id": "Ikhlas dalam format obrolan keluarga (Tafsir Al-Mishbah eps. 2); bisa menggantikan Aa Gym bila ingin menyeimbangkan pembicara."
+    }
+  ]
+}
