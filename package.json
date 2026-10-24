@@ -12,10 +12,11 @@
     "build": "bun --filter @waqtu/web build",
     "deploy:web": "bun --filter @waqtu/web deploy",
     "deploy:api": "bun --filter @waqtu/api deploy",
-    "typecheck": "bun --filter @waqtu/web typecheck && bun --filter @waqtu/api typecheck",
+    "typecheck": "bun --filter @waqtu/web typecheck && bun --filter @waqtu/api typecheck && bun --filter @waqtu/core typecheck",
     "fmt:check": "oxfmt --check .",
     "lint": "oxlint .",
-    "fmt": "oxfmt ."
+    "fmt": "oxfmt .",
+    "test": "bun --filter @waqtu/core test"
   },
   "devDependencies": {
     "oxfmt": "^0.62.0",

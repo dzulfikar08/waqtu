@@ -1,0 +1,17 @@
+[
+  { "id": "jakarta", "latitude": -6.2088, "longitude": 106.8456, "timeZone": "Asia/Jakarta" },
+  { "id": "malang", "latitude": -7.9797, "longitude": 112.6304, "timeZone": "Asia/Jakarta" },
+  { "id": "makkah", "latitude": 21.3891, "longitude": 39.8579, "timeZone": "Asia/Riyadh" },
+  {
+    "id": "kuala-lumpur",
+    "latitude": 3.139,
+    "longitude": 101.6869,
+    "timeZone": "Asia/Kuala_Lumpur"
+  },
+  { "id": "singapore", "latitude": 1.3521, "longitude": 103.8198, "timeZone": "Asia/Singapore" },
+  { "id": "karachi", "latitude": 24.8607, "longitude": 67.0011, "timeZone": "Asia/Karachi" },
+  { "id": "cairo", "latitude": 30.0444, "longitude": 31.2357, "timeZone": "Africa/Cairo" },
+  { "id": "istanbul", "latitude": 41.0082, "longitude": 28.9784, "timeZone": "Europe/Istanbul" },
+  { "id": "london", "latitude": 51.5074, "longitude": -0.1278, "timeZone": "Europe/London" },
+  { "id": "new-york", "latitude": 40.7128, "longitude": -74.006, "timeZone": "America/New_York" }
+]
