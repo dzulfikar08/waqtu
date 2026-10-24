@@ -3,7 +3,7 @@ import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 
 import { readHijriOffset } from "./prayerConfig";
-import { getSetting } from "./settings";
+import { getSetting } from "@/db/settings";
 import { useNow } from "./useNow";
 
 const LEAD_DAYS = 7;

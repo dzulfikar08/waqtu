@@ -10,7 +10,8 @@ import { requestNotificationPermission } from "@/notifications/setup";
 import { radius, spacing, useTheme } from "@/theme";
 import { formatCountdown } from "../dates";
 import { hideLiveCountdown, showLiveCountdown } from "../liveCountdown";
-import { getSetting, KEYS, setSetting } from "../settings";
+import { KEYS } from "../settings";
+import { getSetting, setSetting } from "@/db/settings";
 import { Hint, Panel, ToggleRow } from "./fields";
 
 export function CountdownCard({

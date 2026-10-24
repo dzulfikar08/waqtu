@@ -14,6 +14,17 @@ export async function getSetting(db: SQLiteDatabase, key: string): Promise<strin
   return row?.value ?? null;
 }
 
+/** One device-local setting; null deletes the key. Never uploaded. */
+export async function setSetting(
+  db: SQLiteDatabase,
+  key: string,
+  value: string | null,
+): Promise<void> {
+  if (value === null) await db.runAsync("DELETE FROM settings WHERE key = ?", key);
+  else await setSettings(db, { [key]: value });
+  if (value === null) emitDataChanged();
+}
+
 /** Device-local settings (location, time zone, ...) written together. Never uploaded. */
 export async function setSettings(
   db: SQLiteDatabase,
