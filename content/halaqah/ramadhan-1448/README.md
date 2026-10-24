@@ -4,10 +4,10 @@ Status: **DRAFT, belum disetujui owner. Tidak ada kode aplikasi di folder ini.**
 
 Isi: 30 hari, satu kajian per hari (video YouTube resmi yang di-embed) + ringkasan, pertanyaan refleksi, dan satu amalan kecil, semuanya berbahasa Indonesia.
 
-| File | Fungsi |
-|---|---|
+| File           | Fungsi                                                                                                                                                                                           |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `program.json` | Program 30 hari (`days`), definisi pekan (`program.phases`), dan `alternates` — video cadangan yang juga sudah diverifikasi lewat oEmbed untuk dipakai bila owner ingin mengganti hari tertentu. |
-| `README.md` | Dokumen ini. |
+| `README.md`    | Dokumen ini.                                                                                                                                                                                     |
 
 ## Garis editorial
 
@@ -21,66 +21,66 @@ Titik temu yang diterima empat mazhab. Program ini **tidak** memuat konten yang 
 
 Perkiraan 1 Ramadhan 1448 H ada di sekitar 8 Februari 2027; tanggal resmi mengikuti penetapan pemerintah.
 
-| Pekan | Hari | Tema |
-|---|---|---|
-| 1 | 1–7 | Niat dan dasar fiqh puasa (tujuan puasa, niat, empat mazhab, makna Ramadhan, uzur/qadha/fidyah, pembatal, sahur) |
-| 2 | 8–14 | Al-Quran dan kebiasaan tilawah (bulan Al-Quran, tadarus Nabi bersama Jibril, target khatam, isi Al-Quran, cara memahami, tarawih, adab doa) |
-| 3 | 15–19 | Akhlaq dan tazkiyah (lisan, marah, sabar-syukur, taubat, ikhlas). Pekan ini 5 hari karena malam ke-21 sudah dimulai Maghrib hari ke-20. |
-| 10 malam terakhir | 20–25 | I'tikaf (hari 20, pas sore sebelum malam ke-21), Lailatul Qadar (makna, waktu/tanda, amalan dan doa), qiyamul lail |
-| Penutup | 26–30 | Zakat fitrah, zakat/sedekah, berdamai di hari raya, istiqamah setelah Ramadhan, puasa enam hari Syawal |
+| Pekan             | Hari  | Tema                                                                                                                                        |
+| ----------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1                 | 1–7   | Niat dan dasar fiqh puasa (tujuan puasa, niat, empat mazhab, makna Ramadhan, uzur/qadha/fidyah, pembatal, sahur)                            |
+| 2                 | 8–14  | Al-Quran dan kebiasaan tilawah (bulan Al-Quran, tadarus Nabi bersama Jibril, target khatam, isi Al-Quran, cara memahami, tarawih, adab doa) |
+| 3                 | 15–19 | Akhlaq dan tazkiyah (lisan, marah, sabar-syukur, taubat, ikhlas). Pekan ini 5 hari karena malam ke-21 sudah dimulai Maghrib hari ke-20.     |
+| 10 malam terakhir | 20–25 | I'tikaf (hari 20, pas sore sebelum malam ke-21), Lailatul Qadar (makna, waktu/tanda, amalan dan doa), qiyamul lail                          |
+| Penutup           | 26–30 | Zakat fitrah, zakat/sedekah, berdamai di hari raya, istiqamah setelah Ramadhan, puasa enam hari Syawal                                      |
 
 Catatan pemakaian: kajian hari ke-N sebaiknya dibuka **sebelum Maghrib hari ke-N** karena malamnya dihitung sebagai malam ke-(N+1).
 
 ## Daftar 30 hari
 
-| Hari | Topik | Judul | Pembicara | Kanal | Menit | Video |
-|---|---|---|---|---|---|---|
-| 1 | tazkiyah | Mengapa Kita Berpuasa? Takwa sebagai Tujuan | Ust. Adi Hidayat, Lc., MA | [Adi Hidayat Official](https://www.youtube.com/@AdiHidayatOfficiaI) | 15 | [`m97SDRxy8GM`](https://www.youtube.com/watch?v=m97SDRxy8GM) |
-| 2 | fiqh-puasa | Niat Puasa: Kapan, Bagaimana, dan Perbedaan Mazhab | Buya Yahya | [Buya Yahya](https://www.youtube.com/@buyayahyaofficial) | 16 | [`cuKJ0qrQ8fo`](https://www.youtube.com/watch?v=cuKJ0qrQ8fo) |
-| 3 | fiqh-puasa | Mengapa Ada Empat Mazhab? Bekal Menyikapi Perbedaan | Ust. Ahmad Sarwat, Lc., MA | [Rumah Fiqih](https://www.youtube.com/@RumahFiqihIndonesia) | 38 | [`6OcMZ82xC04`](https://www.youtube.com/watch?v=6OcMZ82xC04) |
-| 4 | tazkiyah | Makna Ramadhan: Iman, Ihtisab, dan Terhapusnya Dosa | Ust. Adi Hidayat, Lc., MA | [Adi Hidayat Official](https://www.youtube.com/@AdiHidayatOfficiaI) | 21 | [`hvDePKNlC2M`](https://www.youtube.com/watch?v=hvDePKNlC2M) |
-| 5 | fiqh-puasa | Uzur Puasa, Qadha, dan Fidyah | Buya Yahya | [Buya Yahya](https://www.youtube.com/@buyayahyaofficial) | 27 | [`fmoYpPyC-zs`](https://www.youtube.com/watch?v=fmoYpPyC-zs) |
-| 6 | fiqh-puasa | Sembilan Hal yang Membatalkan Puasa | Buya Yahya | [Buya Yahya](https://www.youtube.com/@buyayahyaofficial) | 24 | [`5C9EXa1lvG8`](https://www.youtube.com/watch?v=5C9EXa1lvG8) |
-| 7 | fiqh-puasa | Rahasia Waktu Sahur | Ust. Adi Hidayat, Lc., MA | [Adi Hidayat Official](https://www.youtube.com/@AdiHidayatOfficiaI) | 28 | [`GQnVpeWZnao`](https://www.youtube.com/watch?v=GQnVpeWZnao) |
-| 8 | quran | Ramadhan, Bulan Al-Quran: Dari Membaca ke Berdialog | Prof. Dr. M. Quraish Shihab | [Quraish Shihab](https://www.youtube.com/@QuraishShihabMuhammad) | 19 | [`VnHZ98jKFuA`](https://www.youtube.com/watch?v=VnHZ98jKFuA) |
-| 9 | sirah | Amalan Nabi di Ramadhan: Tadarus bersama Jibril | Ust. Adi Hidayat, Lc., MA | [Adi Hidayat Official](https://www.youtube.com/@AdiHidayatOfficiaI) | 16 | [`e1RA5KWIr3U`](https://www.youtube.com/watch?v=e1RA5KWIr3U) |
-| 10 | quran | Ramadhan Menang Banyak: Niat, Khatam, dan Dzikir | Ust. Hanan Attaki | [Hanan Attaki](https://www.youtube.com/@HananAttaki) | 25 | [`aaGStWKziUA`](https://www.youtube.com/watch?v=aaGStWKziUA) |
-| 11 | quran | Tiga Pokok Kandungan Al-Quran | Prof. Dr. M. Quraish Shihab | [Quraish Shihab](https://www.youtube.com/@QuraishShihabMuhammad) | 25 | [`k6W0J9yy4Ss`](https://www.youtube.com/watch?v=k6W0J9yy4Ss) |
-| 12 | quran | Tuntunan Memahami Al-Quran: Semangat Perlu Panduan | Gus Baha & Prof. Dr. M. Quraish Shihab | [Pusat Studi Al-Quran](https://www.youtube.com/@PusatStudiAlQuran) | 28 | [`szw85eYaqrw`](https://www.youtube.com/watch?v=szw85eYaqrw) |
-| 13 | fiqh-puasa | Bilangan Rakaat Tarawih: Memahami Perbedaan Ulama | Buya Yahya | [Buya Yahya](https://www.youtube.com/@buyayahyaofficial) | 32 | [`DXrv1Crhua0`](https://www.youtube.com/watch?v=DXrv1Crhua0) |
-| 14 | dua | Adab dan Etika Berdoa | Ust. Adi Hidayat, Lc., MA | [Adi Hidayat Official](https://www.youtube.com/@AdiHidayatOfficiaI) | 17 | [`LVzTX9Pdeu0`](https://www.youtube.com/watch?v=LVzTX9Pdeu0) |
-| 15 | akhlaq | Larangan-larangan dalam Lisan | Aa Gym (KH. Abdullah Gymnastiar) | [Aagym Official](https://www.youtube.com/@AaGymOfficial) | 18 | [`p1I2ZO7dXaw`](https://www.youtube.com/watch?v=p1I2ZO7dXaw) |
-| 16 | akhlaq | Marah dan Batasnya | Prof. Dr. M. Quraish Shihab | [Quraish Shihab](https://www.youtube.com/@QuraishShihabMuhammad) | 20 | [`wNMflmuZ_vg`](https://www.youtube.com/watch?v=wNMflmuZ_vg) |
-| 17 | tazkiyah | Sabar Tanpa Tepi, Syukur Tanpa Tapi | Buya Yahya | [Buya Yahya](https://www.youtube.com/@buyayahyaofficial) | 26 | [`M-1c9y6QaUs`](https://www.youtube.com/watch?v=M-1c9y6QaUs) |
-| 18 | tazkiyah | Cara Taubat di Bulan Ramadhan | Ust. Adi Hidayat, Lc., MA | [Adi Hidayat Official](https://www.youtube.com/@AdiHidayatOfficiaI) | 16 | [`8p_QF2LpaCs`](https://www.youtube.com/watch?v=8p_QF2LpaCs) |
-| 19 | tazkiyah | Belajar Ikhlas agar Hati Tenang | Aa Gym (KH. Abdullah Gymnastiar) | [Aagym Official](https://www.youtube.com/@AaGymOfficial) | 34 | [`r1GQwM3hU9g`](https://www.youtube.com/watch?v=r1GQwM3hU9g) |
-| 20 | fiqh-puasa | Persiapan I'tikaf 10 Hari Terakhir | Ust. Abdul Somad | [Ustadz Abdul Somad Official](https://www.youtube.com/@ustadzabdulsomadofficial) | 34 | [`p1X4sNMAodc`](https://www.youtube.com/watch?v=p1X4sNMAodc) |
-| 21 | quran | Rahasia Lailatul Qadar: Al-Quran dan Takdir | Ust. Adi Hidayat, Lc., MA | [Adi Hidayat Official](https://www.youtube.com/@AdiHidayatOfficiaI) | 36 | [`fioT2GhmrXo`](https://www.youtube.com/watch?v=fioT2GhmrXo) |
-| 22 | fiqh-puasa | Kapan Lailatul Qadar Tiba? Waktu, Tanda, dan Sikap | Buya Yahya | [Al-Bahjah TV](https://www.youtube.com/@albahjah-tv) | 35 | [`IhCGgFQ-9Bg`](https://www.youtube.com/watch?v=IhCGgFQ-9Bg) |
-| 23 | dua | Amalan Malam Al-Qadr dan Doa Aisyah | Ust. Adi Hidayat, Lc., MA | [Adi Hidayat Official](https://www.youtube.com/@AdiHidayatOfficiaI) | 37 | [`tuJBglPWTmI`](https://www.youtube.com/watch?v=tuJBglPWTmI) |
-| 24 | tazkiyah | Empat Tingkatan Qiyamul Lail di Sepuluh Malam Terakhir | Ust. Muhammad Nuzul Dzikri | [Muhammad Nuzul Dzikri](https://www.youtube.com/@MuhammadNuzulDzikri) | 23 | [`kHmlHfqP8gE`](https://www.youtube.com/watch?v=kHmlHfqP8gE) |
-| 25 | tazkiyah | Ikhtiar Meraih Lailatul Qadar dengan Keterbatasan Kita | Aa Gym (KH. Abdullah Gymnastiar) | [Aagym Official](https://www.youtube.com/@AaGymOfficial) | 33 | [`h5s9ZDe-ipY`](https://www.youtube.com/watch?v=h5s9ZDe-ipY) |
-| 26 | fiqh-puasa | Panduan Zakat Fitrah: Waktu, Siapa, dan Penyalurannya | Buya Yahya | [Al-Bahjah TV](https://www.youtube.com/@albahjah-tv) | 22 | [`GBJs-bIrYLA`](https://www.youtube.com/watch?v=GBJs-bIrYLA) |
-| 27 | tazkiyah | Zakat, Sedekah, dan Infak: Menyucikan Jiwa dan Harta | Prof. Dr. M. Quraish Shihab | [Quraish Shihab](https://www.youtube.com/@QuraishShihabMuhammad) | 19 | [`ZaDr3fxaCOU`](https://www.youtube.com/watch?v=ZaDr3fxaCOU) |
-| 28 | akhlaq | Hari Raya Momen Berdamai | Buya Yahya | [Al-Bahjah TV](https://www.youtube.com/@albahjah-tv) | 22 | [`tVf8mSBeo8c`](https://www.youtube.com/watch?v=tVf8mSBeo8c) |
-| 29 | tazkiyah | Setelah Ramadhan Berakhir: Jangan Turun Lagi | Prof. Dr. M. Quraish Shihab | [Quraish Shihab](https://www.youtube.com/@QuraishShihabMuhammad) | 18 | [`fBFMfoaA8AA`](https://www.youtube.com/watch?v=fBFMfoaA8AA) |
-| 30 | fiqh-puasa | Puasa Enam Hari Syawal: Hitungan Pahala dan Pandangan Mazhab | Ust. Ahmad Zarkasih, Lc. | [Rumah Fiqih](https://www.youtube.com/@RumahFiqihIndonesia) | 18 | [`pn6aMJdZHQQ`](https://www.youtube.com/watch?v=pn6aMJdZHQQ) |
+| Hari | Topik      | Judul                                                        | Pembicara                              | Kanal                                                                            | Menit | Video                                                        |
+| ---- | ---------- | ------------------------------------------------------------ | -------------------------------------- | -------------------------------------------------------------------------------- | ----- | ------------------------------------------------------------ |
+| 1    | tazkiyah   | Mengapa Kita Berpuasa? Takwa sebagai Tujuan                  | Ust. Adi Hidayat, Lc., MA              | [Adi Hidayat Official](https://www.youtube.com/@AdiHidayatOfficiaI)              | 15    | [`m97SDRxy8GM`](https://www.youtube.com/watch?v=m97SDRxy8GM) |
+| 2    | fiqh-puasa | Niat Puasa: Kapan, Bagaimana, dan Perbedaan Mazhab           | Buya Yahya                             | [Buya Yahya](https://www.youtube.com/@buyayahyaofficial)                         | 16    | [`cuKJ0qrQ8fo`](https://www.youtube.com/watch?v=cuKJ0qrQ8fo) |
+| 3    | fiqh-puasa | Mengapa Ada Empat Mazhab? Bekal Menyikapi Perbedaan          | Ust. Ahmad Sarwat, Lc., MA             | [Rumah Fiqih](https://www.youtube.com/@RumahFiqihIndonesia)                      | 38    | [`6OcMZ82xC04`](https://www.youtube.com/watch?v=6OcMZ82xC04) |
+| 4    | tazkiyah   | Makna Ramadhan: Iman, Ihtisab, dan Terhapusnya Dosa          | Ust. Adi Hidayat, Lc., MA              | [Adi Hidayat Official](https://www.youtube.com/@AdiHidayatOfficiaI)              | 21    | [`hvDePKNlC2M`](https://www.youtube.com/watch?v=hvDePKNlC2M) |
+| 5    | fiqh-puasa | Uzur Puasa, Qadha, dan Fidyah                                | Buya Yahya                             | [Buya Yahya](https://www.youtube.com/@buyayahyaofficial)                         | 27    | [`fmoYpPyC-zs`](https://www.youtube.com/watch?v=fmoYpPyC-zs) |
+| 6    | fiqh-puasa | Sembilan Hal yang Membatalkan Puasa                          | Buya Yahya                             | [Buya Yahya](https://www.youtube.com/@buyayahyaofficial)                         | 24    | [`5C9EXa1lvG8`](https://www.youtube.com/watch?v=5C9EXa1lvG8) |
+| 7    | fiqh-puasa | Rahasia Waktu Sahur                                          | Ust. Adi Hidayat, Lc., MA              | [Adi Hidayat Official](https://www.youtube.com/@AdiHidayatOfficiaI)              | 28    | [`GQnVpeWZnao`](https://www.youtube.com/watch?v=GQnVpeWZnao) |
+| 8    | quran      | Ramadhan, Bulan Al-Quran: Dari Membaca ke Berdialog          | Prof. Dr. M. Quraish Shihab            | [Quraish Shihab](https://www.youtube.com/@QuraishShihabMuhammad)                 | 19    | [`VnHZ98jKFuA`](https://www.youtube.com/watch?v=VnHZ98jKFuA) |
+| 9    | sirah      | Amalan Nabi di Ramadhan: Tadarus bersama Jibril              | Ust. Adi Hidayat, Lc., MA              | [Adi Hidayat Official](https://www.youtube.com/@AdiHidayatOfficiaI)              | 16    | [`e1RA5KWIr3U`](https://www.youtube.com/watch?v=e1RA5KWIr3U) |
+| 10   | quran      | Ramadhan Menang Banyak: Niat, Khatam, dan Dzikir             | Ust. Hanan Attaki                      | [Hanan Attaki](https://www.youtube.com/@HananAttaki)                             | 25    | [`aaGStWKziUA`](https://www.youtube.com/watch?v=aaGStWKziUA) |
+| 11   | quran      | Tiga Pokok Kandungan Al-Quran                                | Prof. Dr. M. Quraish Shihab            | [Quraish Shihab](https://www.youtube.com/@QuraishShihabMuhammad)                 | 25    | [`k6W0J9yy4Ss`](https://www.youtube.com/watch?v=k6W0J9yy4Ss) |
+| 12   | quran      | Tuntunan Memahami Al-Quran: Semangat Perlu Panduan           | Gus Baha & Prof. Dr. M. Quraish Shihab | [Pusat Studi Al-Quran](https://www.youtube.com/@PusatStudiAlQuran)               | 28    | [`szw85eYaqrw`](https://www.youtube.com/watch?v=szw85eYaqrw) |
+| 13   | fiqh-puasa | Bilangan Rakaat Tarawih: Memahami Perbedaan Ulama            | Buya Yahya                             | [Buya Yahya](https://www.youtube.com/@buyayahyaofficial)                         | 32    | [`DXrv1Crhua0`](https://www.youtube.com/watch?v=DXrv1Crhua0) |
+| 14   | dua        | Adab dan Etika Berdoa                                        | Ust. Adi Hidayat, Lc., MA              | [Adi Hidayat Official](https://www.youtube.com/@AdiHidayatOfficiaI)              | 17    | [`LVzTX9Pdeu0`](https://www.youtube.com/watch?v=LVzTX9Pdeu0) |
+| 15   | akhlaq     | Larangan-larangan dalam Lisan                                | Aa Gym (KH. Abdullah Gymnastiar)       | [Aagym Official](https://www.youtube.com/@AaGymOfficial)                         | 18    | [`p1I2ZO7dXaw`](https://www.youtube.com/watch?v=p1I2ZO7dXaw) |
+| 16   | akhlaq     | Marah dan Batasnya                                           | Prof. Dr. M. Quraish Shihab            | [Quraish Shihab](https://www.youtube.com/@QuraishShihabMuhammad)                 | 20    | [`wNMflmuZ_vg`](https://www.youtube.com/watch?v=wNMflmuZ_vg) |
+| 17   | tazkiyah   | Sabar Tanpa Tepi, Syukur Tanpa Tapi                          | Buya Yahya                             | [Buya Yahya](https://www.youtube.com/@buyayahyaofficial)                         | 26    | [`M-1c9y6QaUs`](https://www.youtube.com/watch?v=M-1c9y6QaUs) |
+| 18   | tazkiyah   | Cara Taubat di Bulan Ramadhan                                | Ust. Adi Hidayat, Lc., MA              | [Adi Hidayat Official](https://www.youtube.com/@AdiHidayatOfficiaI)              | 16    | [`8p_QF2LpaCs`](https://www.youtube.com/watch?v=8p_QF2LpaCs) |
+| 19   | tazkiyah   | Belajar Ikhlas agar Hati Tenang                              | Aa Gym (KH. Abdullah Gymnastiar)       | [Aagym Official](https://www.youtube.com/@AaGymOfficial)                         | 34    | [`r1GQwM3hU9g`](https://www.youtube.com/watch?v=r1GQwM3hU9g) |
+| 20   | fiqh-puasa | Persiapan I'tikaf 10 Hari Terakhir                           | Ust. Abdul Somad                       | [Ustadz Abdul Somad Official](https://www.youtube.com/@ustadzabdulsomadofficial) | 34    | [`p1X4sNMAodc`](https://www.youtube.com/watch?v=p1X4sNMAodc) |
+| 21   | quran      | Rahasia Lailatul Qadar: Al-Quran dan Takdir                  | Ust. Adi Hidayat, Lc., MA              | [Adi Hidayat Official](https://www.youtube.com/@AdiHidayatOfficiaI)              | 36    | [`fioT2GhmrXo`](https://www.youtube.com/watch?v=fioT2GhmrXo) |
+| 22   | fiqh-puasa | Kapan Lailatul Qadar Tiba? Waktu, Tanda, dan Sikap           | Buya Yahya                             | [Al-Bahjah TV](https://www.youtube.com/@albahjah-tv)                             | 35    | [`IhCGgFQ-9Bg`](https://www.youtube.com/watch?v=IhCGgFQ-9Bg) |
+| 23   | dua        | Amalan Malam Al-Qadr dan Doa Aisyah                          | Ust. Adi Hidayat, Lc., MA              | [Adi Hidayat Official](https://www.youtube.com/@AdiHidayatOfficiaI)              | 37    | [`tuJBglPWTmI`](https://www.youtube.com/watch?v=tuJBglPWTmI) |
+| 24   | tazkiyah   | Empat Tingkatan Qiyamul Lail di Sepuluh Malam Terakhir       | Ust. Muhammad Nuzul Dzikri             | [Muhammad Nuzul Dzikri](https://www.youtube.com/@MuhammadNuzulDzikri)            | 23    | [`kHmlHfqP8gE`](https://www.youtube.com/watch?v=kHmlHfqP8gE) |
+| 25   | tazkiyah   | Ikhtiar Meraih Lailatul Qadar dengan Keterbatasan Kita       | Aa Gym (KH. Abdullah Gymnastiar)       | [Aagym Official](https://www.youtube.com/@AaGymOfficial)                         | 33    | [`h5s9ZDe-ipY`](https://www.youtube.com/watch?v=h5s9ZDe-ipY) |
+| 26   | fiqh-puasa | Panduan Zakat Fitrah: Waktu, Siapa, dan Penyalurannya        | Buya Yahya                             | [Al-Bahjah TV](https://www.youtube.com/@albahjah-tv)                             | 22    | [`GBJs-bIrYLA`](https://www.youtube.com/watch?v=GBJs-bIrYLA) |
+| 27   | tazkiyah   | Zakat, Sedekah, dan Infak: Menyucikan Jiwa dan Harta         | Prof. Dr. M. Quraish Shihab            | [Quraish Shihab](https://www.youtube.com/@QuraishShihabMuhammad)                 | 19    | [`ZaDr3fxaCOU`](https://www.youtube.com/watch?v=ZaDr3fxaCOU) |
+| 28   | akhlaq     | Hari Raya Momen Berdamai                                     | Buya Yahya                             | [Al-Bahjah TV](https://www.youtube.com/@albahjah-tv)                             | 22    | [`tVf8mSBeo8c`](https://www.youtube.com/watch?v=tVf8mSBeo8c) |
+| 29   | tazkiyah   | Setelah Ramadhan Berakhir: Jangan Turun Lagi                 | Prof. Dr. M. Quraish Shihab            | [Quraish Shihab](https://www.youtube.com/@QuraishShihabMuhammad)                 | 18    | [`fBFMfoaA8AA`](https://www.youtube.com/watch?v=fBFMfoaA8AA) |
+| 30   | fiqh-puasa | Puasa Enam Hari Syawal: Hitungan Pahala dan Pandangan Mazhab | Ust. Ahmad Zarkasih, Lc.               | [Rumah Fiqih](https://www.youtube.com/@RumahFiqihIndonesia)                      | 18    | [`pn6aMJdZHQQ`](https://www.youtube.com/watch?v=pn6aMJdZHQQ) |
 
 Distribusi topik: fiqh-puasa 10, tazkiyah 9, quran 5, akhlaq 3, dua 2, sirah 1. Topik 'fiqh-puasa' juga dipakai untuk fiqh ibadah Ramadhan lain (tarawih, i'tikaf, zakat fitrah, tanda dan waktu Lailatul Qadar, puasa Syawal) karena enum topik tidak punya kategori terpisah.
 
 ## Pembicara dan alasan dipilih
 
-| Pembicara | Hari | Kenapa cocok |
-|---|---|---|
-| Ust. Adi Hidayat (Adi Hidayat Official) | 1, 4, 7, 9, 14, 18, 21, 23 | Sangat luas jangkauannya; kajian sistematis berbasis Al-Quran dan hadis (Kitabush Shaum Sahih Bukhari, Akusuka); gaya runtut untuk penonton umum. |
-| Buya Yahya (Buya Yahya dan Al-Bahjah TV) | 2, 5, 6, 13, 17, 22, 26, 28 | Fikih mazhab Syafi'i yang rapi dan sering menyebut pendapat mazhab lain (niat sebulan Maliki, zakat fitrah dengan uang Hanafi, perbedaan jumlah rakaat tarawih). Dipakai hanya untuk fiqh dan akhlaq, bukan konten polemik. |
-| Prof. Dr. M. Quraish Shihab (Quraish Shihab, Pusat Studi Al-Quran) | 8, 11, 12, 16, 27, 29 | Mufasir Indonesia yang paling diterima lintas kelompok (Tafsir Al-Mishbah); nada moderat dan mendidik; cocok untuk tema Al-Quran dan akhlaq. |
-| Gus Baha (bersama Prof. Quraish, kanal Pusat Studi Al-Quran) | 12 | Ulama pesantren yang luas penerimaannya; memberi sudut pandang tradisi ilmu tafsir. |
-| Aa Gym (Aagym Official) | 15, 19, 25 | Akhlaq dan tazkiyah dengan bahasa sehari-hari; sudah lama menjadi rujukan tema lisan, hati, dan ikhlas. |
-| Ust. Hanan Attaki (Hanan Attaki) | 10 | Gaya anak muda; menjangkau pengguna yang lebih muda dengan tips praktis menjaga target Ramadhan. |
-| Rumah Fiqih (Ust. Ahmad Sarwat, Ust. Ahmad Zarkasih) | 3, 30 | Lembaga kajian fiqh perbandingan mazhab; paling tepat untuk menampilkan posisi empat mazhab tanpa memihak. |
-| Ust. Abdul Somad (Ustadz Abdul Somad Official) | 20 | Populer luas; membahas i'tikaf dengan rujukan Syafi'i dan Maliki serta praktik langsung. Lihat catatan kekhawatiran di bawah. |
-| Ust. Muhammad Nuzul Dzikri (Muhammad Nuzul Dzikri) | 24 | Kajian hadis (Riyadhush Shalihin) dengan penonton luas dan berusia muda; membawa penjelasan qiyamul lail praktis. |
+| Pembicara                                                          | Hari                        | Kenapa cocok                                                                                                                                                                                                                |
+| ------------------------------------------------------------------ | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ust. Adi Hidayat (Adi Hidayat Official)                            | 1, 4, 7, 9, 14, 18, 21, 23  | Sangat luas jangkauannya; kajian sistematis berbasis Al-Quran dan hadis (Kitabush Shaum Sahih Bukhari, Akusuka); gaya runtut untuk penonton umum.                                                                           |
+| Buya Yahya (Buya Yahya dan Al-Bahjah TV)                           | 2, 5, 6, 13, 17, 22, 26, 28 | Fikih mazhab Syafi'i yang rapi dan sering menyebut pendapat mazhab lain (niat sebulan Maliki, zakat fitrah dengan uang Hanafi, perbedaan jumlah rakaat tarawih). Dipakai hanya untuk fiqh dan akhlaq, bukan konten polemik. |
+| Prof. Dr. M. Quraish Shihab (Quraish Shihab, Pusat Studi Al-Quran) | 8, 11, 12, 16, 27, 29       | Mufasir Indonesia yang paling diterima lintas kelompok (Tafsir Al-Mishbah); nada moderat dan mendidik; cocok untuk tema Al-Quran dan akhlaq.                                                                                |
+| Gus Baha (bersama Prof. Quraish, kanal Pusat Studi Al-Quran)       | 12                          | Ulama pesantren yang luas penerimaannya; memberi sudut pandang tradisi ilmu tafsir.                                                                                                                                         |
+| Aa Gym (Aagym Official)                                            | 15, 19, 25                  | Akhlaq dan tazkiyah dengan bahasa sehari-hari; sudah lama menjadi rujukan tema lisan, hati, dan ikhlas.                                                                                                                     |
+| Ust. Hanan Attaki (Hanan Attaki)                                   | 10                          | Gaya anak muda; menjangkau pengguna yang lebih muda dengan tips praktis menjaga target Ramadhan.                                                                                                                            |
+| Rumah Fiqih (Ust. Ahmad Sarwat, Ust. Ahmad Zarkasih)               | 3, 30                       | Lembaga kajian fiqh perbandingan mazhab; paling tepat untuk menampilkan posisi empat mazhab tanpa memihak.                                                                                                                  |
+| Ust. Abdul Somad (Ustadz Abdul Somad Official)                     | 20                          | Populer luas; membahas i'tikaf dengan rujukan Syafi'i dan Maliki serta praktik langsung. Lihat catatan kekhawatiran di bawah.                                                                                               |
+| Ust. Muhammad Nuzul Dzikri (Muhammad Nuzul Dzikri)                 | 24                          | Kajian hadis (Riyadhush Shalihin) dengan penonton luas dan berusia muda; membawa penjelasan qiyamul lail praktis.                                                                                                           |
 
 Sepuluh kanal berbeda tampil di 30 hari, tetapi Adi Hidayat (8) dan Buya Yahya (8) memegang 16 dari 30 hari. Pembagian ini sengaja karena keduanya paling konsisten bergaya fiqh/ibadah, namun owner bisa memakai `alternates` untuk meratakannya.
 

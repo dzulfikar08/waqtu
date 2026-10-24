@@ -19,46 +19,31 @@
         "id": "niat-fiqh-puasa",
         "title_id": "Pekan 1 — Niat dan Dasar Fiqh Puasa",
         "title_en": "Week 1 — Intention and Fasting Fiqh Basics",
-        "days": [
-          1,
-          7
-        ]
+        "days": [1, 7]
       },
       {
         "id": "quran-tilawah",
         "title_id": "Pekan 2 — Al-Quran dan Kebiasaan Tilawah",
         "title_en": "Week 2 — The Quran and Tilawah Habits",
-        "days": [
-          8,
-          14
-        ]
+        "days": [8, 14]
       },
       {
         "id": "akhlaq-tazkiyah",
         "title_id": "Pekan 3 — Akhlaq dan Tazkiyatun Nafs",
         "title_en": "Week 3 — Character and Purification of the Soul",
-        "days": [
-          15,
-          19
-        ]
+        "days": [15, 19]
       },
       {
         "id": "sepuluh-malam-terakhir",
         "title_id": "Sepuluh Malam Terakhir — I'tikaf dan Lailatul Qadar",
         "title_en": "The Last Ten Nights — I'tikaf and Laylat al-Qadr",
-        "days": [
-          20,
-          25
-        ]
+        "days": [20, 25]
       },
       {
         "id": "zakat-fitrah-syawal",
         "title_id": "Zakat Fitrah dan Menyambut Syawal",
         "title_en": "Zakat al-Fitr and Preparing for Shawwal",
-        "days": [
-          26,
-          30
-        ]
+        "days": [26, 30]
       }
     ]
   },
@@ -82,10 +67,7 @@
       "summary_id": "Ustadz Adi Hidayat membuka Ramadhan dengan pertanyaan paling mendasar: untuk apa kita berpuasa. Merujuk ayat puasa dalam Al-Baqarah, ia menegaskan tujuannya adalah takwa, bukan sekadar menahan lapar dan haus. Takwa dijelaskan sebagai kemampuan mengarahkan seluruh anggota diri — mata, telinga, lisan, pikiran — ke arah yang baik, sehingga sifat-sifat baik dalam diri makin tumbuh dan jiwa naik derajatnya. Ia menutup dengan ajakan bersyukur karena masih diberi kesempatan berpuasa.",
       "reflection_prompt_id": "Kalau puasa tahun ini benar-benar membuahkan takwa, satu kebiasaan apa — di mata, lisan, atau pikiran — yang akan berubah dalam diri saya?",
       "amalan_id": "Tulis satu perubahan akhlak (bukan target ibadah) yang ingin kamu capai selama Ramadhan, simpan di tempat yang terlihat.",
-      "sources": [
-        "QS Al-Baqarah 2:183",
-        "QS Asy-Syams 91:7-10"
-      ],
+      "sources": ["QS Al-Baqarah 2:183", "QS Asy-Syams 91:7-10"],
       "madhhab_note_id": null
     },
     {
@@ -107,9 +89,7 @@
       "summary_id": "Buya Yahya menjelaskan bahwa niat puasa wajib dilakukan pada malam hari — sejak masuk Maghrib sampai sebelum Subuh — dan cukup di dalam hati, tanpa harus melafazkan kalimat panjang atau menunggu tarawih. Niat puasa Ramadhan tidak bisa digabung dengan puasa wajib lain seperti qadha atau nazar, sedangkan puasa sunnah boleh digabung dengan sunnah lain. Bagi yang khawatir lupa berniat di malam hari, ia menyebut pendapat mazhab Maliki: berniat sekali di awal Ramadhan untuk sebulan penuh, sebagai cadangan di samping niat harian.",
       "reflection_prompt_id": "Apa yang biasanya membuat niat saya terlewat, dan rutinitas apa setelah berbuka yang bisa menjadi pengingat?",
       "amalan_id": "Setiap selesai berbuka, niatkan puasa esok hari dalam hati — tanpa menunggu tarawih.",
-      "sources": [
-        "HR. Bukhari-Muslim: innamal a'malu bin-niyyat (rujukan tema)"
-      ],
+      "sources": ["HR. Bukhari-Muslim: innamal a'malu bin-niyyat (rujukan tema)"],
       "madhhab_note_id": "Syafi'i, Maliki, dan Hanbali: niat puasa wajib harus dilakukan pada malam sebelum Subuh (Maliki juga membolehkan niat sekali untuk sebulan penuh sebagai cadangan). Hanafi: puasa Ramadhan sah dengan niat sampai menjelang tengah hari selama belum makan/minum (catatan editor, tidak berasal dari video)."
     },
     {
@@ -131,9 +111,7 @@
       "summary_id": "Ustadz Ahmad Sarwat dari Rumah Fiqih menjelaskan bagaimana perbedaan mazhab muncul, dimulai dari kisah Muadz bin Jabal yang diizinkan Nabi berijtihad ketika dalil tidak ditemukan secara langsung. Ia menyebut bahwa dahulu ada belasan mazhab yang timbul dan tenggelam, dan yang bertahan sampai hari ini tinggal empat: Syafi'i yang paling banyak diikuti, disusul Hanafi, lalu Maliki dan Hambali. Sebaran mazhab mengikuti wilayah dan sejarah — orang Indonesia umumnya bermazhab Syafi'i. Kajian ini menjadi bekal untuk 30 hari ke depan: ketika ada perbedaan cara berpuasa, itu hasil ijtihad yang punya dasar, bukan perpecahan.",
       "reflection_prompt_id": "Pernahkah saya menghakimi orang karena cara ibadahnya berbeda? Bagaimana sikap saya setelah tahu perbedaan itu punya dasar?",
       "amalan_id": "Catat satu kebiasaan ibadah keluarga atau teman yang berbeda dengan kebiasaanmu, lalu doakan dia — tanpa mengoreksi.",
-      "sources": [
-        "Hadis Muadz bin Jabal tentang ijtihad (disebut di video)"
-      ],
+      "sources": ["Hadis Muadz bin Jabal tentang ijtihad (disebut di video)"],
       "madhhab_note_id": "Sesi ini membahas latar sejarah dan sebaran empat mazhab (Hanafi, Maliki, Syafi'i, Hanbali) tanpa memihak salah satunya."
     },
     {
@@ -180,9 +158,7 @@
       "summary_id": "Dalam sesi tanya jawab ini Buya Yahya merinci siapa saja yang boleh tidak berpuasa dan konsekuensinya: ada yang cukup mengqadha, ada yang cukup membayar fidyah, dan ada yang keduanya. Fidyah adalah satu mud makanan pokok per hari yang tidak dipenuhi, diberikan kepada orang fakir dalam bentuk bahan mentah. Ia juga membahas hal praktis, seperti berapa lama waktu mengqadha dan apakah boleh lebih dulu mengerjakan puasa sunnah sebelum qadha. Intinya: jangan meninggalkan puasa tanpa uzur, dan jangan mempersulit diri dengan hal yang sebenarnya sudah ada keringanannya.",
       "reflection_prompt_id": "Adakah utang puasa atau kewajiban lain yang masih tertunda pada saya, dan kapan saya akan melunasinya?",
       "amalan_id": "Cek kalender: tulis jumlah hari utang puasa (jika ada) dan tentukan hari-hari pelunasannya.",
-      "sources": [
-        "QS Al-Baqarah 2:184-185 (rujukan tema)"
-      ],
+      "sources": ["QS Al-Baqarah 2:184-185 (rujukan tema)"],
       "madhhab_note_id": "Fidyah: satu mud makanan pokok per hari (ukuran mud diperselisihkan, video menyebut sekitar 6–7 ons beras). Mengganti fidyah dengan uang: boleh menurut mazhab Hanafi; Syafi'i, Maliki, dan Hanbali mensyaratkan makanan pokok. Mendahulukan puasa sunnah sebelum qadha: dibolehkan menurut jumhur, tetapi yang lebih utama adalah melunasi qadha terlebih dahulu."
     },
     {
@@ -204,9 +180,7 @@
       "summary_id": "Buya Yahya merangkum hal-hal yang membatalkan puasa dengan gaya fikih praktis. Ia mulai dari memasukkan sesuatu ke salah satu dari lima lubang — mulut, hidung, telinga bagian dalam, serta dua lubang pembuangan — lalu menjelaskan batas-batas praktisnya, misalnya bedanya telinga bagian luar dan dalam. Ia juga membahas hilangnya akal dan pingsan: puasa tetap sah bila sempat sadar sebentar di siang hari, sementara tidur tidak membatalkan puasa. Contoh-contoh kehidupan sehari-hari membantu pendengar membedakan mana yang membatalkan dan mana yang tidak.",
       "reflection_prompt_id": "Hal apa yang selama ini saya kira membatalkan atau tidak membatalkan puasa, ternyata keliru atau saya ragukan?",
       "amalan_id": "Tulis satu pertanyaan tentang pembatal puasa yang masih meragukan, lalu tanyakan kepada ustadz/ustadzah di masjid terdekat.",
-      "sources": [
-        "QS Al-Baqarah 2:187 (rujukan tema)"
-      ],
+      "sources": ["QS Al-Baqarah 2:187 (rujukan tema)"],
       "madhhab_note_id": "Video mengikuti rincian fikih mazhab Syafi'i. Sebagian rincian (misalnya hukum suntik, tetes mata/telinga, atau mencicipi makanan) dapat berbeda antarmazhab dan ulama kontemporer; tanyakan kepada ulama setempat bila ragu."
     },
     {
@@ -328,10 +302,7 @@
       "summary_id": "Prof. Quraish Shihab mengajak kita mengenal Al-Quran lewat apa yang dikandungnya, dimulai dari keyakinan bahwa Al-Quran bersumber dari Allah, baik makna maupun redaksinya, dan dijaga kelestariannya. Ia menjelaskan bahwa ada ayat yang maknanya pasti dan ada yang membuka beberapa kemungkinan makna. Kandungan Al-Quran dibagi tiga: tujuan kehadirannya, cara mencapai tujuan itu, dan bukti kebenarannya (mukjizat). Tujuannya sendiri terdiri dari akidah, syariat (hubungan dengan Allah dan sesama), dan akhlak, sehingga Al-Quran yang tidak diamalkan berarti tujuan kehadirannya belum tercapai.",
       "reflection_prompt_id": "Dari tiga tujuan Al-Quran — akidah, syariat, akhlak — mana yang paling sering saya baca tetapi jarang saya amalkan?",
       "amalan_id": "Setelah membaca hari ini, pilih satu ayat tentang akhlak dan tulis satu tindakan kecil yang akan kamu lakukan hari ini karenanya.",
-      "sources": [
-        "QS Al-Hijr 15:9 (disebut di video)",
-        "QS Al-Baqarah 2:1-2 (disebut di video)"
-      ],
+      "sources": ["QS Al-Hijr 15:9 (disebut di video)", "QS Al-Baqarah 2:1-2 (disebut di video)"],
       "madhhab_note_id": null
     },
     {
@@ -454,9 +425,7 @@
       "summary_id": "Prof. Quraish Shihab bersama putri dan putranya membahas kapan marah itu terpuji dan kapan tercela. Ia membedakan amarah Allah yang disertai sifat halim (menahan diri demi manfaat) dari amarah manusia: boleh menyatakan ketidaksetujuan, bahkan menegur, tetapi tidak merusak, merendahkan, atau menimbulkan keburukan yang lebih besar dari yang ditegur. Disampaikan pula perbedaan menghukum — melampiaskan emosi — dengan mendidik yang bertujuan memberi pelajaran. Tips praktis yang dibagikan antara lain introspeksi, berwudhu, berpindah tempat, dan aturan keluarga 'tanpa sarkasme'.",
       "reflection_prompt_id": "Pada situasi apa saya paling mudah marah, dan apakah kemarahan saya biasanya menegur untuk mendidik atau sekadar melampiaskan?",
       "amalan_id": "Saat emosi naik hari ini, berhenti 10 detik, tarik napas, dan berwudhu atau pindah tempat sebelum merespons.",
-      "sources": [
-        "Hadis: la taghdab wa lakal jannah (disebut di video)"
-      ],
+      "sources": ["Hadis: la taghdab wa lakal jannah (disebut di video)"],
       "madhhab_note_id": null
     },
     {
@@ -478,9 +447,7 @@
       "summary_id": "Buya Yahya menjelaskan bahwa nilai sebuah nikmat sering baru terasa ketika kita melihat lawannya — sehat terasa mahal saat melihat orang sakit. Karena itu bersyukur dimulai dengan mencermati nikmat dan memperhatikan orang yang lebih sulit, tanpa menyukurin penderitaan orang lain. Ia mengaitkannya dengan janji Allah menambah nikmat bagi yang bersyukur, lalu beralih ke sabar atas musibah: musibah bagi orang beriman bisa menjadi tanda cinta Allah dan jalan terangkatnya derajat. Karena itu orang yang sedang diuji dianjurkan berhusnuzan dan tidak berucap seolah marah kepada Allah.",
       "reflection_prompt_id": "Nikmat apa yang selama ini terasa biasa saja bagi saya, dan ujian apa yang sedang saya hadapi yang bisa saya sikapi dengan sabar?",
       "amalan_id": "Tulis tiga nikmat yang sering terlupakan, lalu ucapkan terima kasih kepada satu orang yang terkait dengan salah satunya.",
-      "sources": [
-        "QS Ibrahim 14:7 (disebut di video; janji menambah nikmat bagi yang bersyukur)"
-      ],
+      "sources": ["QS Ibrahim 14:7 (disebut di video; janji menambah nikmat bagi yang bersyukur)"],
       "madhhab_note_id": null
     },
     {
