@@ -14,8 +14,9 @@ import subprocess
 import sys
 
 TEAM = "F6Q6UFUK69"
+# Team-prefixed app groups (F6Q6UFUK69.com.waqtu.shared) are valid on macOS without a provisioned
+# App Group, so application-groups is deliberately not checked against the profile.
 RESTRICTED = {
-    "com.apple.security.application-groups",
     "com.apple.developer.ubiquity-kvstore-identifier",
     "com.apple.developer.applesignin",
     "com.apple.developer.icloud-container-identifiers",
@@ -28,6 +29,8 @@ def expand(value, prefix):
         return value.replace("$(TeamIdentifierPrefix)", prefix)
     if isinstance(value, list):
         return [expand(v, prefix) for v in value]
+    if isinstance(value, dict):
+        return {k: expand(v, prefix) for k, v in value.items()}
     return value
 
 
