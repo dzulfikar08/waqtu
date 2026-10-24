@@ -11,6 +11,9 @@ flow="$(cd "$(dirname "$0")/.." && pwd)/maestro/screens.yaml"
 adb wait-for-device
 adb install -r "$apk"
 
+# A slow CI emulator can trip "Pixel Launcher isn't responding"; never let a system dialog cover a screenshot.
+adb shell settings put global hide_error_dialogs 1
+
 # Clean status bar: 9:41, full battery and signal, no notifications.
 adb shell settings put global sysui_demo_allowed 1
 adb shell am broadcast -a com.android.systemui.demo -e command enter

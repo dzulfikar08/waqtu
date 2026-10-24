@@ -18,6 +18,10 @@ appId: ${APP_ID}
 - waitForAnimationToEnd
 
 - openLink: waqtu://demo?lang=${LOCALE}&to=today
+# iOS asks "Open in Waqtu?" a moment after the link; wait for either that dialog or the screen itself.
+- extendedWaitUntil:
+    visible: ".*(Maghrib|Open in.*).*"
+    timeout: 60000
 - tapOn:
     text: Open
     optional: true
@@ -31,6 +35,10 @@ appId: ${APP_ID}
 - takeScreenshot: ${LOCALE}-02-checklist
 
 - openLink: waqtu://demo?lang=${LOCALE}&to=week
+# iOS asks "Open in Waqtu?" a moment after the link; wait for either that dialog or the screen itself.
+- extendedWaitUntil:
+    visible: ".*(Ulasan pekan ini|This week|Open in.*).*"
+    timeout: 30000
 - tapOn:
     text: Open
     optional: true
@@ -41,6 +49,10 @@ appId: ${APP_ID}
 - takeScreenshot: ${LOCALE}-03-week
 
 - openLink: waqtu://demo?lang=${LOCALE}&to=ramadhan
+# iOS asks "Open in Waqtu?" a moment after the link; wait for either that dialog or the screen itself.
+- extendedWaitUntil:
+    visible: ".*(Hari ke-5|Day 5|Open in.*).*"
+    timeout: 30000
 - tapOn:
     text: Open
     optional: true
@@ -54,6 +66,10 @@ appId: ${APP_ID}
 - takeScreenshot: ${LOCALE}-05-ramadhan-khatam
 
 - openLink: waqtu://demo?lang=${LOCALE}&to=settings
+# iOS asks "Open in Waqtu?" a moment after the link; wait for either that dialog or the screen itself.
+- extendedWaitUntil:
+    visible: ".*(Bahasa|Language|Open in.*).*"
+    timeout: 30000
 - tapOn:
     text: Open
     optional: true
