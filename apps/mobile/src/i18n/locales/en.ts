@@ -1,4 +1,5 @@
 import { circlesEn } from "@/circles/strings";
+import { premiumEn } from "@/premium/strings";
 import { ramadhanEn } from "@/ramadhan/strings";
 import type { id } from "./id";
 
@@ -152,4 +153,5 @@ export const en: Widen<typeof id> = {
   },
   ramadhan: ramadhanEn,
   circles: circlesEn,
+  premium: premiumEn,
 };

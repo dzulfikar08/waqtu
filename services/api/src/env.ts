@@ -1,4 +1,8 @@
-export interface AppEnv {
+import type { GooglePlayEnv } from "./billing/google";
+import type { LicenseEnv } from "./billing/license";
+import type { PolarEnv } from "./billing/polar";
+
+export interface AppEnv extends GooglePlayEnv, PolarEnv, LicenseEnv {
   APP_DB: D1Database;
   /** R2 bucket `waqtu-circle-media`: circle voice notes. */
   CIRCLE_MEDIA: R2Bucket;
@@ -11,6 +15,8 @@ export interface AppEnv {
   BETTER_AUTH_URL?: string;
   /** Enables native Sign in with Apple. The id-token audience is APPLE_BUNDLE_ID, not this value. */
   APPLE_CLIENT_ID?: string;
+  /** App Store numeric app id (6826628861); Production server notifications must carry it. */
+  APPLE_APP_ID?: string;
   /** Web client id: primary client for the OAuth redirect flow and an accepted id-token audience. */
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
