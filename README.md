@@ -9,6 +9,7 @@ source. Website: [getwaqtu.com](https://getwaqtu.com).
 | -------------- | ------------------------------------------------------------------------ | --------------------------- |
 | `apps/web`     | getwaqtu.com landing, blog, Polar checkout + webhook                     | Astro on Cloudflare Workers |
 | `apps/apple`   | macOS menu-bar companion (direct + Mac App Store), iOS, watchOS, widgets | Swift / SwiftUI, Xcode      |
+| `apps/mobile`  | iOS + Android phone app: Today, settings, offline-first SQLite           | Expo / React Native, EAS    |
 | `services/api` | Sparkle appcast, DMG download, license activate/validate                 | Cloudflare Worker, D1, R2   |
 
 Prayer-time math runs on the device; location never leaves it.
@@ -19,6 +20,7 @@ Prayer-time math runs on the device; location never leaves it.
 bun install
 bun run dev:web        # landing page
 bun run dev:api        # updates/license worker
+bun run dev:mobile     # Expo dev server (phone app)
 open apps/apple/waqt.xcodeproj   # Apple apps (Xcode, macOS only)
 ```
 
