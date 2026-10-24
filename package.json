@@ -3,6 +3,7 @@
   "private": true,
   "workspaces": [
     "apps/web",
+    "apps/mobile",
     "services/*",
     "packages/*"
   ],
@@ -10,9 +11,10 @@
     "dev:web": "bun --filter @waqtu/web dev",
     "dev:api": "bun --filter @waqtu/api dev",
     "build": "bun --filter @waqtu/web build",
+    "dev:mobile": "bun --filter @waqtu/mobile start",
     "deploy:web": "bun --filter @waqtu/web deploy",
     "deploy:api": "bun --filter @waqtu/api deploy",
-    "typecheck": "bun --filter @waqtu/web typecheck && bun --filter @waqtu/api typecheck",
+    "typecheck": "bun --filter @waqtu/web typecheck && bun --filter @waqtu/api typecheck && bun --filter @waqtu/mobile typecheck",
     "fmt:check": "oxfmt --check .",
     "lint": "oxlint .",
     "fmt": "oxfmt ."
