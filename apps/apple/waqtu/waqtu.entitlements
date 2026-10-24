@@ -10,10 +10,6 @@
 	<array>
 		<string>$(TeamIdentifierPrefix)com.waqtu.shared</string>
 	</array>
-	<key>com.apple.developer.applesignin</key>
-	<array>
-		<string>Default</string>
-	</array>
 	<key>com.apple.developer.ubiquity-kvstore-identifier</key>
 	<string>$(TeamIdentifierPrefix)dat.waqtu</string>
 </dict>

@@ -17,6 +17,10 @@ on:
         description: "Marketing version, e.g. 1.11.0"
         type: string
         required: true
+      build:
+        description: "Build number (CFBundleVersion), an integer greater than the newest sparkle:version in the appcast"
+        type: string
+        required: true
       description:
         description: "Release notes shown in the Sparkle update dialog"
         type: string
@@ -110,6 +114,7 @@ jobs:
           NOTARIZE: "1"
           NOTARY_KEYCHAIN: ${{ runner.temp }}/release.keychain-db
           VERSION: ${{ inputs.version }}
+          BUILD: ${{ inputs.build }}
           NOTES: ${{ inputs.description }}
           SKIP_UPLOAD: ${{ inputs.dry_run && '1' || '0' }}
         run: ./scripts/release.sh "$VERSION" "$NOTES"

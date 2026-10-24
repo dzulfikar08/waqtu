@@ -61,7 +61,9 @@ struct AccountSettingsTab: View {
             Text("Sign in to sync your prayer checklist and prayer settings with Waqtu on your iPhone or Android. Your location is never uploaded.")
                 .font(.caption)
                 .foregroundColor(.waqtuMuted)
-
+            // Native Sign in with Apple needs the entitlement, which Apple grants to Mac App Store
+            // profiles only (not Developer ID); the direct-download build offers Google instead.
+            #if MAS
             SignInWithAppleButton(.signIn) { request in
                 let nonce = WaqtuAccount.makeNonce()
                 appleNonce = nonce.raw
@@ -76,6 +78,7 @@ struct AccountSettingsTab: View {
             .signInWithAppleButtonStyle(.white)
             .frame(height: 32)
             .disabled(account.isBusy)
+            #endif
 
             Button {
                 Task { @MainActor in await account.signInWithGoogle() }
