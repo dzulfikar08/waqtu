@@ -1,0 +1,317 @@
+{
+  "source": "https://api.myquran.com/v2/sholat/jadwal/1301/2026/03 (mirror of Kemenag Bimas Islam, https://bimasislam.kemenag.go.id/jadwalshalat)",
+  "lokasi": "KOTA JAKARTA",
+  "daerah": "DKI JAKARTA",
+  "jadwal": [
+    {
+      "date": "2026-03-01",
+      "imsak": "04:33",
+      "subuh": "04:43",
+      "terbit": "05:55",
+      "dzuhur": "12:09",
+      "ashar": "15:12",
+      "maghrib": "18:15",
+      "isya": "19:24"
+    },
+    {
+      "date": "2026-03-02",
+      "imsak": "04:33",
+      "subuh": "04:43",
+      "terbit": "05:55",
+      "dzuhur": "12:08",
+      "ashar": "15:11",
+      "maghrib": "18:14",
+      "isya": "19:24"
+    },
+    {
+      "date": "2026-03-03",
+      "imsak": "04:33",
+      "subuh": "04:43",
+      "terbit": "05:55",
+      "dzuhur": "12:08",
+      "ashar": "15:10",
+      "maghrib": "18:14",
+      "isya": "19:23"
+    },
+    {
+      "date": "2026-03-04",
+      "imsak": "04:33",
+      "subuh": "04:43",
+      "terbit": "05:55",
+      "dzuhur": "12:08",
+      "ashar": "15:09",
+      "maghrib": "18:14",
+      "isya": "19:23"
+    },
+    {
+      "date": "2026-03-05",
+      "imsak": "04:33",
+      "subuh": "04:43",
+      "terbit": "05:55",
+      "dzuhur": "12:08",
+      "ashar": "15:08",
+      "maghrib": "18:13",
+      "isya": "19:22"
+    },
+    {
+      "date": "2026-03-06",
+      "imsak": "04:33",
+      "subuh": "04:43",
+      "terbit": "05:55",
+      "dzuhur": "12:07",
+      "ashar": "15:08",
+      "maghrib": "18:13",
+      "isya": "19:22"
+    },
+    {
+      "date": "2026-03-07",
+      "imsak": "04:33",
+      "subuh": "04:43",
+      "terbit": "05:55",
+      "dzuhur": "12:07",
+      "ashar": "15:09",
+      "maghrib": "18:12",
+      "isya": "19:21"
+    },
+    {
+      "date": "2026-03-08",
+      "imsak": "04:33",
+      "subuh": "04:43",
+      "terbit": "05:55",
+      "dzuhur": "12:07",
+      "ashar": "15:09",
+      "maghrib": "18:12",
+      "isya": "19:21"
+    },
+    {
+      "date": "2026-03-09",
+      "imsak": "04:33",
+      "subuh": "04:43",
+      "terbit": "05:55",
+      "dzuhur": "12:07",
+      "ashar": "15:10",
+      "maghrib": "18:12",
+      "isya": "19:20"
+    },
+    {
+      "date": "2026-03-10",
+      "imsak": "04:33",
+      "subuh": "04:43",
+      "terbit": "05:55",
+      "dzuhur": "12:06",
+      "ashar": "15:10",
+      "maghrib": "18:11",
+      "isya": "19:20"
+    },
+    {
+      "date": "2026-03-11",
+      "imsak": "04:33",
+      "subuh": "04:43",
+      "terbit": "05:55",
+      "dzuhur": "12:06",
+      "ashar": "15:10",
+      "maghrib": "18:11",
+      "isya": "19:19"
+    },
+    {
+      "date": "2026-03-12",
+      "imsak": "04:33",
+      "subuh": "04:43",
+      "terbit": "05:55",
+      "dzuhur": "12:06",
+      "ashar": "15:11",
+      "maghrib": "18:10",
+      "isya": "19:19"
+    },
+    {
+      "date": "2026-03-13",
+      "imsak": "04:33",
+      "subuh": "04:43",
+      "terbit": "05:54",
+      "dzuhur": "12:06",
+      "ashar": "15:11",
+      "maghrib": "18:10",
+      "isya": "19:18"
+    },
+    {
+      "date": "2026-03-14",
+      "imsak": "04:33",
+      "subuh": "04:43",
+      "terbit": "05:54",
+      "dzuhur": "12:05",
+      "ashar": "15:11",
+      "maghrib": "18:09",
+      "isya": "19:18"
+    },
+    {
+      "date": "2026-03-15",
+      "imsak": "04:33",
+      "subuh": "04:43",
+      "terbit": "05:54",
+      "dzuhur": "12:05",
+      "ashar": "15:12",
+      "maghrib": "18:09",
+      "isya": "19:17"
+    },
+    {
+      "date": "2026-03-16",
+      "imsak": "04:33",
+      "subuh": "04:43",
+      "terbit": "05:54",
+      "dzuhur": "12:05",
+      "ashar": "15:12",
+      "maghrib": "18:09",
+      "isya": "19:17"
+    },
+    {
+      "date": "2026-03-17",
+      "imsak": "04:32",
+      "subuh": "04:42",
+      "terbit": "05:54",
+      "dzuhur": "12:05",
+      "ashar": "15:12",
+      "maghrib": "18:08",
+      "isya": "19:16"
+    },
+    {
+      "date": "2026-03-18",
+      "imsak": "04:32",
+      "subuh": "04:42",
+      "terbit": "05:54",
+      "dzuhur": "12:04",
+      "ashar": "15:12",
+      "maghrib": "18:08",
+      "isya": "19:16"
+    },
+    {
+      "date": "2026-03-19",
+      "imsak": "04:32",
+      "subuh": "04:42",
+      "terbit": "05:54",
+      "dzuhur": "12:04",
+      "ashar": "15:13",
+      "maghrib": "18:07",
+      "isya": "19:16"
+    },
+    {
+      "date": "2026-03-20",
+      "imsak": "04:32",
+      "subuh": "04:42",
+      "terbit": "05:54",
+      "dzuhur": "12:04",
+      "ashar": "15:13",
+      "maghrib": "18:07",
+      "isya": "19:15"
+    },
+    {
+      "date": "2026-03-21",
+      "imsak": "04:32",
+      "subuh": "04:42",
+      "terbit": "05:54",
+      "dzuhur": "12:04",
+      "ashar": "15:14",
+      "maghrib": "18:07",
+      "isya": "19:15"
+    },
+    {
+      "date": "2026-03-22",
+      "imsak": "04:32",
+      "subuh": "04:42",
+      "terbit": "05:54",
+      "dzuhur": "12:03",
+      "ashar": "15:14",
+      "maghrib": "18:06",
+      "isya": "19:15"
+    },
+    {
+      "date": "2026-03-23",
+      "imsak": "04:32",
+      "subuh": "04:42",
+      "terbit": "05:53",
+      "dzuhur": "12:03",
+      "ashar": "15:13",
+      "maghrib": "18:05",
+      "isya": "19:14"
+    },
+    {
+      "date": "2026-03-24",
+      "imsak": "04:32",
+      "subuh": "04:42",
+      "terbit": "05:53",
+      "dzuhur": "12:03",
+      "ashar": "15:14",
+      "maghrib": "18:05",
+      "isya": "19:13"
+    },
+    {
+      "date": "2026-03-25",
+      "imsak": "04:32",
+      "subuh": "04:42",
+      "terbit": "05:53",
+      "dzuhur": "12:02",
+      "ashar": "15:14",
+      "maghrib": "18:04",
+      "isya": "19:13"
+    },
+    {
+      "date": "2026-03-26",
+      "imsak": "04:31",
+      "subuh": "04:41",
+      "terbit": "05:53",
+      "dzuhur": "12:02",
+      "ashar": "15:14",
+      "maghrib": "18:04",
+      "isya": "19:12"
+    },
+    {
+      "date": "2026-03-27",
+      "imsak": "04:31",
+      "subuh": "04:41",
+      "terbit": "05:53",
+      "dzuhur": "12:02",
+      "ashar": "15:14",
+      "maghrib": "18:03",
+      "isya": "19:12"
+    },
+    {
+      "date": "2026-03-28",
+      "imsak": "04:31",
+      "subuh": "04:41",
+      "terbit": "05:53",
+      "dzuhur": "12:01",
+      "ashar": "15:14",
+      "maghrib": "18:03",
+      "isya": "19:11"
+    },
+    {
+      "date": "2026-03-29",
+      "imsak": "04:31",
+      "subuh": "04:41",
+      "terbit": "05:52",
+      "dzuhur": "12:01",
+      "ashar": "15:14",
+      "maghrib": "18:02",
+      "isya": "19:11"
+    },
+    {
+      "date": "2026-03-30",
+      "imsak": "04:31",
+      "subuh": "04:41",
+      "terbit": "05:52",
+      "dzuhur": "12:01",
+      "ashar": "15:14",
+      "maghrib": "18:02",
+      "isya": "19:10"
+    },
+    {
+      "date": "2026-03-31",
+      "imsak": "04:31",
+      "subuh": "04:41",
+      "terbit": "05:52",
+      "dzuhur": "12:00",
+      "ashar": "15:14",
+      "maghrib": "18:02",
+      "isya": "19:10"
+    }
+  ]
+}

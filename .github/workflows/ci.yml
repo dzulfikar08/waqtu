@@ -38,6 +38,7 @@ jobs:
       - run: bun run fmt:check
       - run: bun run typecheck
       - run: bun run build
+      - run: bun run test
 
   mobile:
     # Bundles the Expo app for both platforms and checks the Android native project generates.
@@ -86,3 +87,27 @@ jobs:
             -destination "${{ matrix.destination }}" \
             -derivedDataPath build/DerivedData \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+
+  prayer-parity:
+    # Adhan-Swift (same pin as the app) vs @waqtu/core: 10 cities x 365 days, MWL + Kemenag, ±1 min.
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.4
+      - run: bun install --frozen-lockfile
+      - name: Adhan-Swift pin matches the app
+        run: |
+          app=$(grep -A8 '"adhan-swift"' apps/apple/waqt.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved | sed -n 's/.*"version" : "\(.*\)".*/\1/p')
+          pkg=$(sed -n 's/.*exact: "\(.*\)".*/\1/p' apps/apple/parity/Package.swift)
+          echo "app=$app parity=$pkg"
+          test -n "$app" && test "$app" = "$pkg"
+      - name: Emit Adhan-Swift times
+        working-directory: apps/apple/parity
+        run: swift run -c release parity ../../../packages/core/parity/cities.json 2026 > "$RUNNER_TEMP/swift.json"
+      - name: Compare with @waqtu/core
+        run: bun packages/core/parity/compare.ts "$RUNNER_TEMP/swift.json" 2026 1
