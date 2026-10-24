@@ -11,6 +11,11 @@ appId: ${APP_ID}
     clearState: true
     permissions:
       all: allow
+# A link that arrives while the app is still starting can be lost on Android, so wait for the first screen.
+- extendedWaitUntil:
+    visible: ".*(Hari ini|Today).*"
+    timeout: 60000
+- waitForAnimationToEnd
 
 - openLink: waqtu://demo?lang=${LOCALE}&to=today
 - tapOn:
