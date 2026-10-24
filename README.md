@@ -118,9 +118,12 @@ Everything below is a one-time job for the account owner. Nothing here is done b
    (USD 24.99), separate from the Mac lifetime license product. Copy their product ids.
 2. Settings → Webhooks → add endpoint `https://api.getwaqtu.com/v1/billing/polar/webhook`, format
    **Raw**, events `subscription.created`, `subscription.active`, `subscription.updated`,
-   `subscription.canceled`, `subscription.uncanceled`, `subscription.revoked`. Copy the secret.
+   `subscription.canceled`, `subscription.uncanceled`, `subscription.revoked`, plus `benefit_grant.revoked`
+   and `order.refunded` (a refunded Mac license key loses its lifetime premium). Copy the secret.
 3. The access token behind `POLAR_ACCESS_TOKEN` (the one the Mac license routes already use) needs the
-   `checkouts:write` and `customer_sessions:write` scopes besides what licensing needs.
+   `checkouts:write`, `customer_sessions:write` and `license_keys:read` scopes besides what licensing
+   needs. `license_keys:read` lets the worker re-confirm linked Mac keys every 7 days; without it a
+   refund is still caught by the webhook events above.
 
 #### Worker secrets (`waqt-updates`)
 

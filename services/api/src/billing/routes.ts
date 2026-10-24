@@ -20,7 +20,7 @@ import {
   type GooglePlayClient,
 } from "./google";
 import { handleGoogleNotification, syncGooglePurchase } from "./googleBilling";
-import { checkLicenseKey } from "./license";
+import { checkLicenseKey, processLicenseEvent, recheckLicenses } from "./license";
 import {
   createCheckout,
   createPortalSession,
@@ -304,7 +304,9 @@ export function createBillingHandler(options: BillingOptions = {}): BillingHandl
       return json({ error: "invalid_request" }, 400);
     }
     try {
-      const outcome = await processPolarEvent(env.APP_DB, config, payload, now());
+      const outcome =
+        (await processLicenseEvent(env.APP_DB, payload, now())) ??
+        (await processPolarEvent(env.APP_DB, config, payload, now()));
       return json({ received: true, outcome }, 202);
     } catch (error) {
       console.error("polar webhook failed:", error);
@@ -339,6 +341,8 @@ export function createBillingHandler(options: BillingOptions = {}): BillingHandl
         productId: "mac-lifetime",
         environment: null,
         expiresAt: null,
+        customerRef: check.customerId,
+        checkedAt: time,
         signedAt: time,
       },
       time,
@@ -361,7 +365,12 @@ export function createBillingHandler(options: BillingOptions = {}): BillingHandl
         method: "GET",
         run: async () => {
           const user = await sessionUser(env, request);
-          return user ? json(await view(env, user.id)) : unauthorized();
+          if (!user) return unauthorized();
+          // Lifetime keys are re-confirmed with Polar now and then; a Polar problem never blocks the read.
+          await recheckLicenses(env.APP_DB, env, user.id, fetchImpl, now()).catch(
+            (error: unknown) => console.error("license recheck failed:", error),
+          );
+          return json(await view(env, user.id));
         },
       },
       [LINK_LICENSE_PATH]: { method: "POST", run: () => linkLicense(env, request) },

@@ -32,6 +32,7 @@ function toWrite(
     productId: transaction.productId,
     environment: transaction.environment === "Sandbox" ? "sandbox" : "production",
     expiresAt,
+    orderId: transaction.transactionId,
     revokedAt: transaction.revocationDate?.getTime() ?? null,
     signedAt,
   };
@@ -88,6 +89,15 @@ export async function handleAppleNotification(
       `apple notification ${notification.notificationType}/${notification.subtype ?? "-"}: no account holds original transaction ${transaction.originalTransactionId}`,
     );
     return "unmapped";
+  }
+  // A refund of an earlier period must not end access the buyer paid for later: only the refund
+  // of the transaction the stored period came from revokes.
+  if (
+    transaction.revocationDate &&
+    held.order_id !== null &&
+    held.order_id !== transaction.transactionId
+  ) {
+    return "ignored";
   }
   const write = toWrite(
     held.user_id,

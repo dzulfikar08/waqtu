@@ -220,6 +220,41 @@ describe("POST /v1/billing/apple/notifications", () => {
     expect(view.expiresAt).toBe(new Date(revocationDate).toISOString());
   });
 
+  it("keeps access when an earlier period's transaction is refunded, and ends it for the latest", async () => {
+    const { user, tx } = await subscribe("apple-old-refund", "orig-old-refund");
+    const renewedUntil = Date.now() + 60 * DAY;
+    const renewed = { ...tx, transactionId: `${tx.transactionId}-2`, expiresDate: renewedUntil };
+    await post(
+      "/v1/billing/apple/notifications",
+      await notification("DID_RENEW", renewed, { signedDate: Date.now() + 1000 }),
+    );
+
+    // Refund of the first month: the second month was paid and stays.
+    const older = await post(
+      "/v1/billing/apple/notifications",
+      await notification(
+        "REFUND",
+        { ...tx, revocationDate: Date.now() - 1 },
+        { signedDate: Date.now() + 2000 },
+      ),
+    );
+    expect(older!.status).toBe(200);
+    const kept = await entitlementOf(user);
+    expect(kept.premium).toBe(true);
+    expect(kept.expiresAt).toBe(new Date(renewedUntil).toISOString());
+
+    // Refund of the transaction the stored period came from ends it.
+    await post(
+      "/v1/billing/apple/notifications",
+      await notification(
+        "REFUND",
+        { ...renewed, revocationDate: Date.now() - 1 },
+        { signedDate: Date.now() + 3000 },
+      ),
+    );
+    expect((await entitlementOf(user)).premium).toBe(false);
+  });
+
   it("keeps access through the billing grace period, then lets it lapse", async () => {
     const user = await createUser("apple-grace");
     const lapsed = Date.now() - 1000;

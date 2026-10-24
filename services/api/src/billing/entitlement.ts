@@ -60,8 +60,13 @@ export interface EntitlementWrite {
   productId: string | null;
   environment: "production" | "sandbox" | null;
   expiresAt: number | null;
+  /** The transaction/order the current period came from; a refund only ends access when it matches. */
   orderId?: string | null;
   revokedAt?: number | null;
+  /** License rows: the Polar customer, to find a refunded customer's keys. */
+  customerRef?: string | null;
+  /** License rows: when Polar last confirmed the key (0 = check again at the next read). */
+  checkedAt?: number | null;
   /** When the source produced this state (store signing time, event time, or now for a live read). */
   signedAt: number;
 }
@@ -81,14 +86,16 @@ export async function writeEntitlement(
   const result = await db
     .prepare(
       `INSERT INTO entitlement
-         (source, external_id, user_id, product_id, environment, expires_at, order_id, revoked_at, signed_at, created_at, updated_at)
-       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?10)
+         (source, external_id, user_id, product_id, environment, expires_at, order_id, revoked_at, customer_ref, checked_at, signed_at, created_at, updated_at)
+       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?12)
        ON CONFLICT (source, external_id) DO UPDATE SET
          product_id = excluded.product_id,
          environment = excluded.environment,
          expires_at = excluded.expires_at,
          order_id = excluded.order_id,
          revoked_at = excluded.revoked_at,
+         customer_ref = excluded.customer_ref,
+         checked_at = excluded.checked_at,
          signed_at = excluded.signed_at,
          updated_at = excluded.updated_at
        WHERE entitlement.user_id = excluded.user_id AND entitlement.signed_at <= excluded.signed_at`,
@@ -102,6 +109,8 @@ export async function writeEntitlement(
       write.expiresAt,
       write.orderId ?? null,
       write.revokedAt ?? null,
+      write.customerRef ?? null,
+      write.checkedAt ?? null,
       write.signedAt,
       now,
     )
@@ -116,10 +125,13 @@ export async function writeEntitlement(
 
 export interface StoredEntitlement {
   user_id: string;
+  external_id: string;
   product_id: string | null;
   expires_at: number | null;
   order_id: string | null;
   revoked_at: number | null;
+  customer_ref: string | null;
+  checked_at: number | null;
 }
 
 export function findEntitlement(
@@ -129,7 +141,7 @@ export function findEntitlement(
 ): Promise<StoredEntitlement | null> {
   return db
     .prepare(
-      "SELECT user_id, product_id, expires_at, order_id, revoked_at FROM entitlement WHERE source = ?1 AND external_id = ?2",
+      "SELECT user_id, external_id, product_id, expires_at, order_id, revoked_at, customer_ref, checked_at FROM entitlement WHERE source = ?1 AND external_id = ?2",
     )
     .bind(source, externalId)
     .first<StoredEntitlement>();

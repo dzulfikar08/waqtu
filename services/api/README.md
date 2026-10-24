@@ -133,12 +133,18 @@ newer state, and a subscription held by one account is refused for another (409)
   period (both null if the user never held premium).
 - `POST /v1/entitlement/link-license` `{ key }` (session) validates a Mac license key with Polar (granted,
   not expired) and grants lifetime premium; one key links to one account. 400 `invalid_license`, 502
-  `license_unreachable`, 409 `linked_to_other_account`.
+  `license_unreachable`, 409 `linked_to_other_account`. A linked key is re-confirmed with Polar
+  (`GET /v1/license-keys/{id}`, scope `license_keys:read`) on `GET /v1/entitlement` when its last check is
+  older than 7 days or a refund flagged it; a revoked, disabled, expired or deleted key loses premium, a
+  Polar outage never does. Polar `benefit_grant.revoked` (license-keys benefit) revokes the row at once;
+  `order.refunded` flags the customer's keys for that re-check.
 - `POST /v1/billing/apple` `{ signedTransaction }` (session): StoreKit 2 JWS verified to Apple Root CA G3
   (bundle `dat.waqtu.ios`, products `dat.waqtu.premium.monthly|yearly`), granted until the store's
   `expiresDate`. Returns the entitlement.
 - `POST /v1/billing/apple/notifications` `{ signedPayload }`: App Store Server Notifications V2 (Production and
-  Sandbox), verified like receipts; renewals, expiry, grace period and refunds rewrite the row.
+  Sandbox), verified like receipts; renewals, expiry and grace period rewrite the row. A refund/revoke only
+  ends access when it is for the transaction the stored period came from (`order_id`); a refund of an
+  earlier period leaves the paid period alone.
 - `POST /v1/billing/google` `{ purchaseToken }` (session): re-read from the Android Publisher API
   (`premium`, base plan `monthly|yearly`), granted until Google's expiry, then acknowledged. Returns the
   entitlement plus `pending` (cash payments are granted only once Play charges them).
@@ -147,7 +153,8 @@ newer state, and a subscription held by one account is refused for another (409)
 - `POST /v1/billing/polar/checkout` `{ plan: "monthly" | "yearly" }` (session) returns a hosted checkout
   `{ url }`; 409 `already_premium` if the account already has premium. `POST /v1/billing/polar/portal`
   returns the customer portal `{ url }`.
-- `POST /v1/billing/polar/webhook`: Polar `subscription.*` events (Standard Webhooks signature).
+- `POST /v1/billing/polar/webhook`: Polar `subscription.*`, `benefit_grant.revoked` and `order.refunded` events
+  (Standard Webhooks signature).
 
 Secrets: `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`, `GOOGLE_PLAY_RTDN_PUSH_EMAIL` or `GOOGLE_PLAY_RTDN_TOKEN`,
 `GOOGLE_PLAY_PACKAGE_NAME` (optional, default `dat.waqtu.app`), `POLAR_ACCESS_TOKEN`, `POLAR_ORG_ID`,
