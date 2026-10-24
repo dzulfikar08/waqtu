@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 
 import { authClient } from "@/auth/client";
+import { protectExistingRecordings } from "@/hafalan/recordings";
 import { initLocale } from "@/db/settings";
 import { DATABASE_NAME, migrate } from "@/db/migrations";
 import { useTranslation } from "@/i18n";
@@ -30,6 +31,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     void setupNotificationChannels().catch(() => {});
+    protectExistingRecordings();
   }, []);
 
   useEffect(() => {

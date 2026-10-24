@@ -86,7 +86,7 @@ export const hafalanId = {
   back: "Kembali",
   recitation: "Rekam bacaan",
   recitationHint:
-    "Dengarkan bacaanmu sendiri. Rekaman hanya tersimpan di ponsel ini dan tidak diunggah.",
+    "Dengarkan bacaanmu sendiri. Rekaman hanya tersimpan di ponsel ini: tidak diunggah dan tidak ikut cadangan perangkat (iCloud, iTunes).",
   record: "Rekam",
   stop: "Berhenti",
   recording: "Merekam {{time}}",
@@ -188,7 +188,7 @@ export const hafalanEn: Widen<typeof hafalanId> = {
   back: "Back",
   recitation: "Record recitation",
   recitationHint:
-    "Listen to your own recitation. The recording stays on this phone and is never uploaded.",
+    "Listen to your own recitation. The recording stays on this phone: it is never uploaded and is left out of device backups (iCloud, iTunes).",
   record: "Record",
   stop: "Stop",
   recording: "Recording {{time}}",

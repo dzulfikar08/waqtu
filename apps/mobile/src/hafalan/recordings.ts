@@ -1,8 +1,33 @@
 import { Directory, File, Paths } from "expo-file-system";
 
-/** Recitation recordings live in the app's private document folder: never in the gallery, never uploaded. */
+import { excludeFromBackup } from "../../modules/waqtu-backup";
+
+/**
+ * Recitation recordings live in the app's private document folder: never in the gallery, never
+ * uploaded, and kept out of iCloud and iTunes backups (see `prepareRecordingsFolder`).
+ */
 function folder(): Directory {
   return new Directory(Paths.document, "hafalan");
+}
+
+/** Creates the folder if needed and marks it as excluded from backups; the mark covers every recording inside. */
+function prepareRecordingsFolder(): void {
+  const dir = folder();
+  dir.create({ intermediates: true, idempotent: true });
+  excludeFromBackup(dir.uri);
+}
+
+/**
+ * Run at launch: a recordings folder made before the backup mark existed gets it now. Does nothing
+ * when there are no recordings yet.
+ */
+export function protectExistingRecordings(): void {
+  try {
+    const dir = folder();
+    if (dir.exists) excludeFromBackup(dir.uri);
+  } catch {
+    // Without the mark the recordings are merely backed up; the app must still start.
+  }
 }
 
 export function recordingUri(name: string): string {
@@ -11,7 +36,7 @@ export function recordingUri(name: string): string {
 
 /** Moves a fresh recording out of the recorder's cache into the private folder; returns its file name. */
 export async function keepRecording(tempUri: string, unit: number): Promise<string> {
-  folder().create({ intermediates: true, idempotent: true });
+  prepareRecordingsFolder();
   const name = `unit-${unit}-${Date.now()}.m4a`;
   await new File(tempUri).move(new File(folder(), name));
   return name;

@@ -72,3 +72,11 @@ bun content/quran/build.ts /tmp/quran-data.js && bun run fmt
 
 Replacing `quran-uthmani-1.1.txt` with a newer Tanzil release also means updating the SHA-256 in the
 core test. `content/quran/surah/**` is excluded from `oxfmt` so the JSON stays compact.
+
+## Recitation recordings
+
+Recordings made in the hafalan screen are stored in the app's private `Documents/hafalan` folder, which
+is never uploaded. On iOS the folder is marked `NSURLIsExcludedFromBackupKey` (local Expo module
+`apps/mobile/modules/waqtu-backup`, because `expo-file-system` has no API for it), so recordings stay out
+of iCloud and iTunes backups; the mark is applied when a recording is saved and at every launch for a
+folder that already exists. Android backups are off for the whole app (`allowBackup: false`).
