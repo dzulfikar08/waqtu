@@ -67,7 +67,9 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple: -s -k "$kcpass" "$kc" > /dev/null
           security list-keychains -d user -s "$kc" $(security list-keychains -d user | tr -d '"')
           rm -f "$RUNNER_TEMP/devid.p12"
-          echo "CODESIGN_IDENTITY=$(security find-identity -v -p codesigning "$kc" | grep 'Developer ID Application' | head -1 | awk '{print $2}')" >> "$GITHUB_ENV"
+          identity="$(security find-identity -v -p codesigning "$kc" | grep 'Developer ID Application' | head -1 | awk '{print $2}')"
+          if [ -z "$identity" ]; then echo "::error::No Developer ID Application identity in the imported .p12"; exit 1; fi
+          echo "CODESIGN_IDENTITY=$identity" >> "$GITHUB_ENV"
 
       - name: Store notarization credentials
         env:
