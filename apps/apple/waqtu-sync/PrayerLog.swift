@@ -70,6 +70,9 @@ enum FardhMapping {
         return range.contains(d)
     }
 
+    /// Key of a clear mark: day and prayer name as the Mac prayer log spells them.
+    static func clearKey(date: String, prayer: String) -> String { "\(date)|\(prayer)" }
+
     static func millis(_ date: Date) -> Int64 {
         Int64((date.timeIntervalSince1970 * 1000).rounded())
     }
@@ -137,9 +140,30 @@ enum LogSync {
     /// Brings log rows the replica has not seen yet into it: everything logged before the first
     /// sign-in, and edits made while the app could not record them. Rows the replica already has
     /// at a newer timestamp are left alone. Returns how many entries were queued for upload.
+    ///
+    /// `cleared` holds the prayers the user cleared on this Mac, with the time of the clear. A clear
+    /// made while signed out never reached the replica; when the log has no entry for it any more
+    /// and the replica still has the prayer done, a 0 is recorded at the time of the clear. Rows
+    /// missing from the log without such a mark are left alone: they may be rows a pull stored
+    /// that the app was closed before applying to the log.
     @discardableResult
-    static func reconcile(log: [PrayerLogEntry], into replica: MutabaahReplica) -> Int {
+    static func reconcile(
+        log: [PrayerLogEntry],
+        cleared: [String: Date] = [:],
+        into replica: MutabaahReplica
+    ) -> Int {
         var queued = 0
+        var logged = Set<String>()
+        for row in log { logged.insert(FardhMapping.clearKey(date: row.date, prayer: row.prayer)) }
+        for (key, at) in cleared.sorted(by: { $0.key < $1.key }) where !logged.contains(key) {
+            let parts = key.split(separator: "|", maxSplits: 1, omittingEmptySubsequences: false)
+            guard parts.count == 2, let fardh = Fardh(logName: String(parts[1])), FardhMapping.isDayKey(String(parts[0])),
+                  let current = replica.entryValue(date: String(parts[0]), itemId: fardh.rawValue), current != 0
+            else { continue }
+            if replica.recordLocalEntry(date: String(parts[0]), itemId: fardh.rawValue, value: 0, at: FardhMapping.millis(at)) {
+                queued += 1
+            }
+        }
         for row in log {
             guard let entry = FardhMapping.entry(for: row) else { continue }
             if let current = replica.entry(date: entry.date, itemId: entry.itemId) {

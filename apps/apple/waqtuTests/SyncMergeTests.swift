@@ -132,6 +132,25 @@ struct SyncEngineTests {
         #expect(replica.hasDirtyRows)
     }
 
+    @Test func clearMadeWhileSignedOutReachesTheServerOnTheNextSync() async throws {
+        let server = FakeServer()
+        server.seed(fardh("2027-02-08", "fajr", 3, 1000))
+        let replica = MutabaahReplica(fileURL: nil)
+        replica.prepareAccount(userId: "u1")
+        _ = try await runSync(store: replica, transport: server)
+        #expect(server.entry("2027-02-08", "fajr")?.value == 3)
+
+        // Signed out: the user unticks Fajr; the Mac log no longer has it.
+        let cleared = [FardhMapping.clearKey(date: "2027-02-08", prayer: "Fajr"): FardhMapping.date(fromMillis: 5000)]
+        // Signed in again with the same account.
+        #expect(replica.prepareAccount(userId: "u1") == .unchanged)
+        LogSync.reconcile(log: [], cleared: cleared, into: replica)
+        _ = try await runSync(store: replica, transport: server)
+
+        #expect(server.entry("2027-02-08", "fajr") == fardh("2027-02-08", "fajr", 0, 5000))
+        #expect(!replica.hasDirtyRows)
+    }
+
     @Test func settingsOutsideTheWhitelistAreNeverStoredOrPushed() async throws {
         let server = FakeServer()
         server.seed(SyncSetting(key: "lat", value: "-6.2", updatedAt: 1))

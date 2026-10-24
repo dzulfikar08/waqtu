@@ -149,7 +149,8 @@ final class MutabaahSyncController {
                 streakManager.resetAll()
                 onRemoteChanges?(RemoteChanges(prayerLog: true, prayerSettings: false))
             }
-            LogSync.reconcile(log: streakManager.entries, into: replica)
+            LogSync.reconcile(log: streakManager.entries, cleared: streakManager.clearedAt, into: replica)
+            streakManager.clearHandedOverMarks()
 
             let transport = HTTPSyncTransport(client: account.api, token: token)
             var changes = RemoteChanges()

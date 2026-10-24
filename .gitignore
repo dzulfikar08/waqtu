@@ -22,3 +22,7 @@ xcuserdata/
 
 .DS_Store
 .build/
+
+# Python bytecode
+__pycache__/
+*.pyc

@@ -122,6 +122,55 @@ struct LogSyncTests {
         #expect(LogSync.reconcile(log: log, into: replica) == 0)
     }
 
+    @Test func clearMadeWhileSignedOutIsRecordedAtTheTimeOfTheClear() {
+        let replica = MutabaahReplica(fileURL: nil)
+        // Fajr was pulled in an earlier session; the user cleared it on the Mac while signed out.
+        replica.putRemoteEntry(SyncEntry(date: "2027-02-08", itemId: "fajr", value: 3, updatedAt: 1000))
+        let cleared = [FardhMapping.clearKey(date: "2027-02-08", prayer: "Fajr"): FardhMapping.date(fromMillis: 5000)]
+
+        #expect(LogSync.reconcile(log: [], cleared: cleared, into: replica) == 1)
+        #expect(replica.dirtyEntries() == [SyncEntry(date: "2027-02-08", itemId: "fajr", value: 0, updatedAt: 5000)])
+        // Nothing new the second time round.
+        #expect(LogSync.reconcile(log: [], cleared: cleared, into: replica) == 0)
+    }
+
+    @Test func clearBeatsARemoteRowStampedAfterIt() {
+        let replica = MutabaahReplica(fileURL: nil)
+        replica.putRemoteEntry(SyncEntry(date: "2027-02-08", itemId: "isha", value: 3, updatedAt: 9000))
+        let cleared = [FardhMapping.clearKey(date: "2027-02-08", prayer: "Isha"): FardhMapping.date(fromMillis: 5000)]
+
+        #expect(LogSync.reconcile(log: [], cleared: cleared, into: replica) == 1)
+        #expect(replica.dirtyEntries().first?.updatedAt == 9001)
+    }
+
+    @Test func rowsMissingFromTheLogWithoutAClearMarkAreNotZeroed() {
+        let replica = MutabaahReplica(fileURL: nil)
+        // A pull stored this row but the app was closed before it reached the log.
+        replica.putRemoteEntry(SyncEntry(date: "2027-02-08", itemId: "dhuhr", value: 3, updatedAt: 1000))
+
+        #expect(LogSync.reconcile(log: [], into: replica) == 0)
+        #expect(replica.entryValue(date: "2027-02-08", itemId: "dhuhr") == 3)
+        #expect(!replica.hasDirtyRows)
+    }
+
+    @Test func clearMarkIsIgnoredOnceThePrayerIsLoggedAgain() {
+        let replica = MutabaahReplica(fileURL: nil)
+        replica.putRemoteEntry(SyncEntry(date: "2027-02-08", itemId: "asr", value: 3, updatedAt: 1000))
+        let cleared = [FardhMapping.clearKey(date: "2027-02-08", prayer: "Asr"): FardhMapping.date(fromMillis: 5000)]
+        let log = [logEntry("2027-02-08", "Asr", .prayed, at: 6000)]
+
+        #expect(LogSync.reconcile(log: log, cleared: cleared, into: replica) == 0)
+        #expect(replica.entryValue(date: "2027-02-08", itemId: "asr") == 3)
+    }
+
+    @Test func clearMarkForAPrayerTheReplicaNeverHadWritesNothing() {
+        let replica = MutabaahReplica(fileURL: nil)
+        let cleared = [FardhMapping.clearKey(date: "2027-02-08", prayer: "Maghrib"): FardhMapping.date(fromMillis: 5000)]
+
+        #expect(LogSync.reconcile(log: [], cleared: cleared, into: replica) == 0)
+        #expect(!replica.hasDirtyRows)
+    }
+
     @Test func reconcileLeavesNewerReplicaRowsAlone() {
         let replica = MutabaahReplica(fileURL: nil)
         replica.putRemoteEntry(SyncEntry(date: "2027-02-08", itemId: "fajr", value: 0, updatedAt: 9000))
