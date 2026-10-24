@@ -1,0 +1,81 @@
+{
+  "expo": {
+    "name": "Waqtu",
+    "slug": "waqtu",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "waqtu",
+    "userInterfaceStyle": "automatic",
+    "platforms": ["ios", "android"],
+    "ios": {
+      "bundleIdentifier": "dat.waqtu.ios",
+      "buildNumber": "1",
+      "supportsTablet": false,
+      "config": {
+        "usesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "dat.waqtu.app",
+      "versionCode": 1,
+      "allowBackup": false,
+      "adaptiveIcon": {
+        "backgroundColor": "#F7F7FA",
+        "foregroundImage": "./assets/android-icon-foreground.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-secure-store",
+      "expo-apple-authentication",
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "color": "#12877D",
+          "defaultChannel": "adhan"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 29
+          }
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160,
+          "backgroundColor": "#F7F7FA",
+          "dark": {
+            "image": "./assets/splash-icon.png",
+            "backgroundColor": "#1A2E25"
+          }
+        }
+      ]
+    ],
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "enabled": true,
+      "url": "https://u.expo.dev/d57befd1-a15f-4b3f-8359-319985496956"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d57befd1-a15f-4b3f-8359-319985496956"
+      }
+    },
+    "owner": "dzulfikar08"
+  }
+}
