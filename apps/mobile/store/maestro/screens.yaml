@@ -4,7 +4,8 @@
 #   maestro test --test-output-dir <dir> -e APP_ID=dat.waqtu.app -e LOCALE=id store/maestro/screens.yaml
 #
 # Each `waqtu://demo?lang=..&to=..` link reloads the same fixed demo data (Jakarta, 12 Feb 2027 17:00 WIB, day 5 of
-# Ramadan 1448H) in the given language and opens one tab, so the text checks below only wait for the screen to render.
+# Ramadan 1448H) in the given language and opens one tab, so the text checks below wait for text that only exists once the demo data is loaded (iOS also lists off-screen text, so the
+# checklist rows are no proof).
 appId: ${APP_ID}
 ---
 - launchApp:
@@ -27,13 +28,13 @@ appId: ${APP_ID}
 - openLink: waqtu://demo?lang=${LOCALE}&to=today
 # iOS asks "Open in Waqtu?" a moment after the link; wait for either that dialog or the screen itself.
 - extendedWaitUntil:
-    visible: ".*(Maghrib|Open in.*).*"
+    visible: ".*(Next prayer|Sholat berikutnya|Open in.*).*"
     timeout: 60000
 - tapOn:
     text: Open
     optional: true
 - extendedWaitUntil:
-    visible: ".*Maghrib.*"
+    visible: ".*(Next prayer|Sholat berikutnya).*"
     timeout: 60000
 - waitForAnimationToEnd
 - assertNotVisible: ".*isn't responding.*"
@@ -61,13 +62,13 @@ appId: ${APP_ID}
 - openLink: waqtu://demo?lang=${LOCALE}&to=ramadhan
 # iOS asks "Open in Waqtu?" a moment after the link; wait for either that dialog or the screen itself.
 - extendedWaitUntil:
-    visible: ".*(Hari ke-5|Day 5|Open in.*).*"
+    visible: ".*(Maghrib at|Maghrib pukul|Open in.*).*"
     timeout: 30000
 - tapOn:
     text: Open
     optional: true
 - extendedWaitUntil:
-    visible: ".*(Hari ke-5|Day 5).*"
+    visible: ".*(Maghrib at|Maghrib pukul).*"
     timeout: 30000
 - waitForAnimationToEnd
 - assertNotVisible: ".*isn't responding.*"

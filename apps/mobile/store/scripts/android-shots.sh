@@ -36,7 +36,7 @@ for locale in id en; do
       find "$dir" -name "$locale-*.png" -exec cp {} "$out/" \;
       break
     fi
-    [ "$attempt" -lt 3 ] || exit 1
+    [ "$attempt" -lt 3 ] || { adb exec-out screencap -p > "$out/failure.png" || true; exit 1; }
   done
 done
 adb shell wm size | tee size.txt
