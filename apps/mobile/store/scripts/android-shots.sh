@@ -20,9 +20,12 @@ adb shell am broadcast -a com.android.systemui.demo -e command network -e wifi s
 adb shell am broadcast -a com.android.systemui.demo -e command notifications -e visible false
 
 mkdir -p "$out"
+# On failure keep what the screen and the app said, so the artifact explains it.
+trap 'adb exec-out screencap -p > "$out/failure.png" || true; adb logcat -d > "$out/logcat.txt" || true' ERR
+out=$(cd "$out" && pwd)
 cd "$out"
 for locale in id en; do
-  maestro test -e APP_ID="$app_id" -e LOCALE="$locale" "$flow"
+  maestro test -e APP_ID="$app_id" -e LOCALE="$locale" -e OUT_DIR="$out" --debug-output "$out/debug-$locale" --flatten-debug-output "$flow"
 done
 adb shell wm size | tee size.txt
 ls -l

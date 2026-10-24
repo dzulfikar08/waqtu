@@ -1,7 +1,7 @@
 # Captures the store screenshots of one language on an already-booted device with the demo build installed
 # (EXPO_PUBLIC_DEMO_MODE=1, see .github/workflows/store-screenshots.yml).
 #
-#   maestro test -e APP_ID=dat.waqtu.app -e LOCALE=id store/maestro/screens.yaml    # run from the output directory
+#   maestro test -e APP_ID=dat.waqtu.app -e LOCALE=id -e OUT_DIR=/abs/output/dir store/maestro/screens.yaml
 #
 # Each `waqtu://demo?lang=..&to=..` link reloads the same fixed demo data (Jakarta, 12 Feb 2027 17:00 WIB, day 5 of
 # Ramadan 1448H) in the given language and opens one tab, so the text checks below only wait for the screen to render.
@@ -20,10 +20,10 @@ appId: ${APP_ID}
     visible: ".*Maghrib.*"
     timeout: 60000
 - waitForAnimationToEnd
-- takeScreenshot: ${LOCALE}-01-today
+- takeScreenshot: ${OUT_DIR}/${LOCALE}-01-today
 - scroll
 - waitForAnimationToEnd
-- takeScreenshot: ${LOCALE}-02-checklist
+- takeScreenshot: ${OUT_DIR}/${LOCALE}-02-checklist
 
 - openLink: waqtu://demo?lang=${LOCALE}&to=week
 - tapOn:
@@ -33,7 +33,7 @@ appId: ${APP_ID}
     visible: ".*(Ulasan pekan ini|This week).*"
     timeout: 30000
 - waitForAnimationToEnd
-- takeScreenshot: ${LOCALE}-03-week
+- takeScreenshot: ${OUT_DIR}/${LOCALE}-03-week
 
 - openLink: waqtu://demo?lang=${LOCALE}&to=ramadhan
 - tapOn:
@@ -43,10 +43,10 @@ appId: ${APP_ID}
     visible: ".*(Hari ke-5|Day 5).*"
     timeout: 30000
 - waitForAnimationToEnd
-- takeScreenshot: ${LOCALE}-04-ramadhan
+- takeScreenshot: ${OUT_DIR}/${LOCALE}-04-ramadhan
 - scroll
 - waitForAnimationToEnd
-- takeScreenshot: ${LOCALE}-05-ramadhan-khatam
+- takeScreenshot: ${OUT_DIR}/${LOCALE}-05-ramadhan-khatam
 
 - openLink: waqtu://demo?lang=${LOCALE}&to=settings
 - tapOn:
@@ -56,4 +56,4 @@ appId: ${APP_ID}
     visible: ".*(Bahasa|Language).*"
     timeout: 30000
 - waitForAnimationToEnd
-- takeScreenshot: ${LOCALE}-06-settings
+- takeScreenshot: ${OUT_DIR}/${LOCALE}-06-settings
