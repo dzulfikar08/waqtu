@@ -156,7 +156,8 @@ export function calculatePrayerTimes(input: PrayerTimesInput): PrayerTimesResult
   // re-anchor: shift the whole result by whole days until dhuhr falls on the requested day.
   const dayShift = shiftToCivilDay(pt.dhuhr, date, timeZone);
   const shiftMs = dayShift * 86_400_000;
-  const at = (d: Date) => new Date(d.getTime() + shiftMs);
+  // adhan-js leaves sub-second residue after minute rounding; snap to the exact minute.
+  const at = (d: Date) => new Date(Math.round((d.getTime() + shiftMs) / MS_MIN) * MS_MIN);
 
   const imsakMin = input.imsakMinutes ?? DEFAULT_IMSAK_MINUTES;
   const fajr = at(pt.fajr);
