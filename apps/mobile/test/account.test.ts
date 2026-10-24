@@ -7,6 +7,7 @@ import { runSync, type PullPage, type SyncTransport } from "../src/mutabaah/sync
 import {
   createSqliteStore,
   cursorKey,
+  forgetAccount,
   prepareAccount,
   type SqlDb,
   type SqlParam,
@@ -131,6 +132,17 @@ describe("switching accounts", () => {
     const report = await sync(A);
     expect(report).toEqual({ pulled: 0, pushed: 0 });
     expect(cursors()).toEqual([cursorKey(A)]);
+    expect(days()).toHaveLength(2);
+  });
+
+  test("deleting the account keeps local data and uploads it to the next account", async () => {
+    await sync(A);
+    expect(await createSqliteStore(db, A).dirtyEntries()).toHaveLength(0);
+    await forgetAccount(db);
+    expect(cursors()).toEqual([]);
+    expect(days()).toHaveLength(2);
+    const report = await sync("fresh");
+    expect(report.pushed).toBe(2);
     expect(days()).toHaveLength(2);
   });
 

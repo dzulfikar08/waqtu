@@ -20,11 +20,13 @@ export function Row({
   selected,
   onPress,
   disabled,
+  destructive,
 }: {
   label: string;
   selected?: boolean;
   onPress: () => void;
   disabled?: boolean;
+  destructive?: boolean;
 }) {
   const theme = useTheme();
   return (
@@ -35,7 +37,9 @@ export function Row({
       onPress={onPress}
       style={[styles.row, { borderColor: theme.border }]}
     >
-      <Text style={[styles.rowLabel, { color: theme.text }]}>{label}</Text>
+      <Text style={[styles.rowLabel, { color: destructive ? theme.danger : theme.text }]}>
+        {label}
+      </Text>
       {selected ? <Text style={{ color: theme.accent, fontSize: 18 }}>✓</Text> : null}
     </Pressable>
   );

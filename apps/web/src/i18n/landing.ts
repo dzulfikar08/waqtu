@@ -188,7 +188,7 @@ const id: LandingCopy = {
       "Kode aplikasi terbuka di GitHub dengan lisensi MPL-2.0, dan layanan servernya AGPL-3.0. Nama dan logo Waqtu tetap milik kami, jadi fork memakai merek sendiri.",
     ],
     github: "Lihat kode di GitHub",
-    policy: "Kebijakan privasi (bahasa Inggris)",
+    policy: "Kebijakan privasi",
   },
   mac: {
     title: "Pakai Mac? Waqtu sudah ada di sana.",
