@@ -1,0 +1,15 @@
+Waqtu works fully without an account, so there are no demo credentials to give. Open the app and everything in the tabs Today, Week, Ramadan and Settings is available right away.
+
+How to review:
+1. First launch: tap "Pick a city" on the Today tab (or allow location). Prayer times are calculated on the device with no network request.
+2. Today tab: tick practices in the checklist. Week tab: shows the weekly review of what you ticked.
+3. Ramadan tab: it shows during Ramadan and the 7 days before it. At any other time open it from Settings > "Ramadan: imsakiyah, khatam, zakat".
+4. Settings: language (Indonesian or English), calculation method, time adjustments, adhan notifications.
+
+Account: Sign in with Apple and Sign in with Google are optional and only enable sync and the Circles tab. Circles also requires Waqtu Premium, so a reviewer without an active subscription sees the "Circles is a premium feature" message.
+
+In-app purchase: Waqtu Premium auto-renewing subscriptions (group "Waqtu Premium": dat.waqtu.premium.monthly, dat.waqtu.premium.yearly). The paywall is Settings > Waqtu Premium. The subscription is tied to the signed-in account, so the purchase flow asks the reviewer to sign in with Apple first. Restore Purchases is on the same screen. The paywall links the privacy policy and terms.
+
+Location: used only to calculate prayer times and never leaves the device. Microphone: used only when the user records a voice note in a circle. Notifications: adhan reminders.
+
+Contact: dzulfikar.at@gmail.com

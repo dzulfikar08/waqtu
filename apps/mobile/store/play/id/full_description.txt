@@ -1,0 +1,35 @@
+Waqtu menampilkan waktu sholat dan mencatat amalan harianmu (mutabaah yaumiyah). Cocok untuk kamu yang jadwalnya padat dan ingin tetap konsisten tanpa ribet. Waktu sholat dihitung di ponsel, dan lokasimu tidak dikirim ke server.
+
+Waktu sholat
+• Pakai lokasi ponsel atau pilih kota di Indonesia.
+• Enam metode perhitungan: Kemenag RI, Muslim World League, ISNA, Umm al-Qura, Egyptian, dan Singapore. Waktu Ashar bisa mengikuti mazhab Syafi'i, Maliki, Hanbali, atau Hanafi.
+• Koreksi per waktu sholat sampai 30 menit dan koreksi tanggal Hijriah sampai 2 hari, supaya cocok dengan jadwal masjidmu.
+• Notifikasi adzan dengan tombol "Sudah sholat" langsung di notifikasi.
+
+Mutabaah yaumiyah
+• Daftar amalan: lima sholat fardhu (tepat waktu, berjamaah, qadha), rawatib, dhuha, tahajud, tilawah dengan hitungan halaman, dzikir pagi dan petang, sedekah, dan puasa sunnah.
+• Tambah amalanmu sendiri, atau sembunyikan yang tidak kamu pakai.
+• Streak konsistensi dengan hari toleransi, jadi satu hari terlewat tidak langsung memutus rangkaian. Kamu juga bisa menjeda saat sakit atau bepergian.
+• Ulasan pekanan: hari tercatat, sholat tepat waktu dan berjamaah, halaman tilawah, dan amalan yang paling sering.
+• Semua data tersimpan di ponsel. Masuk akun itu opsional dan hanya perlu kalau kamu mau sinkron.
+
+Ramadhan
+• Tab Ramadhan muncul seminggu sebelum dan selama Ramadhan. Di luar waktu itu kamu tetap bisa membukanya dari Pengaturan.
+• Hitung mundur menuju imsak dan iftar, dengan hitung mundur di layar kunci jika perangkatmu mendukung.
+• Jadwal imsakiyah sebulan penuh yang bisa dibagikan sebagai gambar.
+• Catatan harian puasa, tarawih, tadarus, dan i'tikaf, plus penanda 10 malam terakhir.
+• Rencana khatam: target harian menyesuaikan kalau kamu tertinggal.
+• Pelacak qadha puasa dan kalkulator zakat fitrah.
+
+Gratis dan Premium
+Waktu sholat, notifikasi adzan, dan mutabaah dasar gratis tanpa batas waktu, tanpa iklan. Waqtu Premium (berlangganan bulanan atau tahunan) membuka sinkron di semua perangkat termasuk aplikasi Mac, Halaqah berupa lingkaran belajar asinkron bersama orang lain, dan fitur tambahan Ramadhan.
+
+Lingkaran Halaqah
+Lingkaran kecil dengan nama samaran, terpisah untuk ikhwan dan akhwat. Tulis refleksi atau kirim pesan suara kapan saja kamu sempat. Kamu bisa jeda atau keluar tanpa ada yang diberi tahu. Nama dan emailmu tidak pernah terlihat oleh anggota lain. Lingkaran memerlukan akun dan Premium.
+
+Privasi dan sumber terbuka
+Lokasi hanya dipakai di ponselmu. Tidak ada iklan dan tidak ada pelacak pihak ketiga. Kalau kamu masuk akun untuk sinkron, catatan mutabaahmu disimpan di server kami agar bisa muncul di perangkat lain. Kode sumber Waqtu terbuka: github.com/dzulfikar08/waqtu
+
+Langganan diperpanjang otomatis kecuali dibatalkan paling lambat 24 jam sebelum periode berakhir. Pembayaran dibebankan ke akun Google Play dan bisa dikelola di Play Store > Pembayaran dan langganan.
+Syarat layanan: https://getwaqtu.com/terms
+Kebijakan privasi: https://getwaqtu.com/privacy
