@@ -1,5 +1,11 @@
 export interface AppEnv {
   APP_DB: D1Database;
+  /** R2 bucket `waqtu-circle-media`: circle voice notes. */
+  CIRCLE_MEDIA: R2Bucket;
+  /** Comma-separated better-auth user ids allowed to use `/v1/admin/circles/*`. A secret; unset means no admins. */
+  ADMIN_USER_IDS?: string;
+  /** "true" makes `/v1/circles/config` report `requiresPremium: true`. Entitlement checks belong to DEV-12. */
+  CIRCLES_REQUIRES_PREMIUM?: string;
   ENVIRONMENT?: string;
   BETTER_AUTH_SECRET?: string;
   BETTER_AUTH_URL?: string;

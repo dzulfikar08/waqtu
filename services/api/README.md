@@ -127,4 +127,31 @@ All `/v1/*` routes need a better-auth session (cookie from the Expo client, or a
 bun run --filter @waqtu/api test
 ```
 
-Tests run the real worker in miniflare with both D1 databases and the migrations applied.
+Tests run the real worker in miniflare with both D1 databases, the `CIRCLE_MEDIA` R2 bucket and the migrations applied.
+
+## Circles (`/v1/circles/*`, `/v1/admin/circles/*`)
+
+Small anonymous reflection groups, public or private, always gender-separated (ikhwan / akhwat), no DMs. Code lives in `src/circles/`, data in `migrations/0003_circles.sql`.
+
+### Infra to create before deploying
+
+| What                       | How                                                                                                                                                                                                                                                                           |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R2 bucket for voice notes  | `npx wrangler r2 bucket create waqtu-circle-media`. Bound as `CIRCLE_MEDIA` in `wrangler.toml`. Keep it **private** (no public access, no custom domain): notes are only served through the Worker after a membership check. `wrangler deploy` fails until the bucket exists. |
+| D1 migration               | `npx wrangler d1 migrations apply waqtu-db --remote` (applies `0003_circles.sql`).                                                                                                                                                                                            |
+| `ADMIN_USER_IDS` secret    | Comma-separated better-auth user ids that may use the moderation queue: `npx wrangler secret put ADMIN_USER_IDS`. Find an id with `GET /v1/me` while signed in. Unset means nobody is an admin. For `wrangler dev` put it in `.dev.vars`.                                     |
+| `CIRCLES_REQUIRES_PREMIUM` | Plain var in `wrangler.toml`, `"false"` today. `GET /v1/circles/config` reports it as `requiresPremium`; the app then shows a premium notice instead of circles. The server does not enforce entitlements: DEV-12 adds that check where it flips the flag.                    |
+
+No other secrets: voice notes are uploaded through the Worker (5 MB limit, audio mime allowlist), so no R2 S3 credentials are needed.
+
+### Rules the server enforces
+
+- **Gender wall.** Gender is set once on the profile (`PUT /v1/circles/profile`, required) and cannot change. Every `/circles/:id/...` route first loads the circle with a join on `circle_profile.gender = circle.gender`; anything else is `404`, as is an invite code for the other gender. Two SQL triggers back this up: a membership of the other gender and a gender change both abort.
+- **Matching.** `POST /v1/circles/join` picks a public circle with the same gender and language, a UTC offset within 4 hours, no block either way with any member, and one the user never left. It fills the fullest open circle first so circles grow to 12 before another opens (a circle is `ready` from 8 members). Seats are taken in one atomic statement, so concurrent joins cannot exceed 12. At most one public circle per person (a unique index) and 5 private ones.
+- **Private circles.** `POST /v1/circles/private` returns an 8-character invite code (only members see it); `POST /v1/circles/join-private` joins with it.
+- **Pause and leave are silent.** They only touch the caller's membership row: no event, notification or feed entry for anyone else. A paused member keeps the seat and can read but not post or react; leaving frees the seat.
+- **Posts.** Text up to 2000 chars, or a voice note (`PUT /v1/circles/:id/media` raw body, `content-type: audio/*`, `x-duration-seconds`, max 5 MB and 180 s, returns `mediaId` for the post; `GET .../media/:mediaId` streams it with byte ranges), optionally linked to a `halaqahDayId`. Weekly summaries (`POST /v1/circles/:id/summary`) are opt-in on the profile and aggregate only: `countedDays`, `fardhOnTime`, `fardhJamaah`, `pages`. Reactions are one per person from `❤️ 🤲 ✨`.
+- **Moderation.** `POST .../posts/:postId/report` (`target` `post` or `user`) and `POST .../posts/:postId/block`. People are only ever addressed through a post, so user ids never reach clients. A block hides the pair from each other in feeds, reactions and matching. Three distinct pending reporters hide a post for everyone until an admin decides.
+- **Admin.** `GET /v1/admin/circles/queue`, `POST /v1/admin/circles/posts/:postId` (`restore` | `remove`), `POST /v1/admin/circles/users/:userId` (`suspend` | `unsuspend` | `dismiss`). Anyone not in `ADMIN_USER_IDS` gets `403`.
+- **Rate limits.** Per user, fixed one-hour windows, `429` with `Retry-After`: 12 posts or summaries, 12 uploads, 30 joins or invite attempts, 12 reports, 30 blocks, 200 reactions, 60 pause/leave/delete actions, 20 profile saves. Reads are not limited.
+- **Account deletion** cascades every circles row. Voice notes of a deleted account stay in R2 until the object is removed with the post or bucket lifecycle rules are added.

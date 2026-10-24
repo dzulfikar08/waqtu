@@ -39,6 +39,14 @@
       "expo-sharing",
       "expo-live-activity",
       [
+        "expo-audio",
+        {
+          "microphonePermission": "Waqtu memakai mikrofon hanya saat kamu merekam pesan suara untuk lingkaran.",
+          "enableBackgroundRecording": false,
+          "enableBackgroundPlayback": false
+        }
+      ],
+      [
         "expo-location",
         {
           "locationWhenInUsePermission": "Waqtu memakai lokasi untuk menghitung waktu sholat. Lokasi tidak dikirim ke server."

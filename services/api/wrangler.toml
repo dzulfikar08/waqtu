@@ -5,6 +5,8 @@ compatibility_flags = ["nodejs_compat"]
 
 [vars]
 ENVIRONMENT = "production"
+# Tells the app circles are a premium feature. DEV-12 flips this once entitlements exist.
+CIRCLES_REQUIRES_PREMIUM = "false"
 
 [[d1_databases]]
 binding = "DB"
@@ -20,3 +22,8 @@ binding = "APP_DB"
 database_name = "waqtu-db"
 database_id = "ec7bbfbc-9f2c-4a25-a26c-6022d9cd1ebf"
 migrations_dir = "migrations"
+
+# Circle voice notes. Create it first: wrangler r2 bucket create waqtu-circle-media
+[[r2_buckets]]
+binding = "CIRCLE_MEDIA"
+bucket_name = "waqtu-circle-media"

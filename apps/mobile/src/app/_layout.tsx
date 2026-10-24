@@ -50,6 +50,15 @@ export default function RootLayout() {
             headerShadowVisible: false,
           }}
         />
+        <Stack.Screen
+          name="circle/[id]"
+          options={{
+            headerShown: true,
+            headerStyle: { backgroundColor: theme.background },
+            headerTintColor: theme.text,
+            headerShadowVisible: false,
+          }}
+        />
       </Stack>
       <PrayerNotificationController />
       {authClient ? <SyncController client={authClient} /> : null}
