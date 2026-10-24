@@ -1,5 +1,7 @@
 import type { SQLiteDatabase } from "expo-sqlite";
 
+import { RAMADHAN_MIGRATION } from "@/ramadhan/migrations";
+
 export const DATABASE_NAME = "waqtu.db";
 
 /**
@@ -9,6 +11,8 @@ export const DATABASE_NAME = "waqtu.db";
 export const MIGRATIONS: readonly (readonly string[])[] = [
   // 1: app settings (key/value), e.g. the chosen language.
   ["CREATE TABLE settings (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL)"],
+  // 2: Ramadhan daily checks, khatam plan and log, qadha ledger.
+  RAMADHAN_MIGRATION,
 ];
 
 export async function migrate(db: SQLiteDatabase): Promise<void> {

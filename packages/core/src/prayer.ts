@@ -188,7 +188,8 @@ export function calculatePrayerTimes(input: PrayerTimesInput): PrayerTimesResult
   return { date, timeZone, times, local };
 }
 
-function civilParts(instant: Date, timeZone: string): CivilDate {
+/** Civil (calendar) date of an instant in an IANA zone. */
+export function civilParts(instant: Date, timeZone: string): CivilDate {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone,
     year: "numeric",
