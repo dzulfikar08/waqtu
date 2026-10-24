@@ -16,5 +16,8 @@ declare namespace Cloudflare {
     POLAR_PRODUCT_PRO_MONTHLY?: string;
     PUBLIC_CLIENT_URL?: string;
     NEXT_PUBLIC_CLIENT_URL?: string;
+    WAITLIST_DB: D1Database;
+    /** Optional secret mixed into the IP hash used for waitlist rate limiting. */
+    WAITLIST_IP_SALT?: string;
   }
 }

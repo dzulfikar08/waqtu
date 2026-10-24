@@ -46,7 +46,7 @@ Waqtu isn't just a menu bar counter. It also:
   <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
     Free to try. macOS 12+. See your next prayer time without opening a single app.
   </p>
-  <a href="/#download" className="neu-btn mt-4 inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]">
+  <a href="/mac#download" className="neu-btn mt-4 inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]">
     Download Waqtu
   </a>
 </div>

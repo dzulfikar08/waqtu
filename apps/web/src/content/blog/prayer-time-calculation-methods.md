@@ -67,7 +67,7 @@ The minute offsets are the most practical feature — no matter which method you
     Waqtu supports MWL, ISNA, Egyptian, Umm al-Qura, Karachi, Moonsighting Committee,
     Dubai, Kuwait, Qatar, Singapore, Tehran, Turkey, and custom angle settings.
   </p>
-  <a href="/#download" class="neu-btn mt-4 inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]">
+  <a href="/mac#download" class="neu-btn mt-4 inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]">
     Download Waqtu
   </a>
 </div>

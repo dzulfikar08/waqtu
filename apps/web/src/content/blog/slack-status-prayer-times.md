@@ -40,5 +40,5 @@ Your Slack token is stored securely in your Mac's Keychain. Waqtu never sees it,
   <p class="mt-2 text-sm text-[var(--waqtu-muted)]">
     Download Waqtu, connect Slack in Settings, and let your team know when you're praying — without saying a word.
   </p>
-  <a href="/#download" class="neu-btn mt-4 inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]">Download Waqtu</a>
+  <a href="/mac#download" class="neu-btn mt-4 inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]">Download Waqtu</a>
 </div>

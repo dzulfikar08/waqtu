@@ -55,7 +55,7 @@ Waqtu costs $9.99 for lifetime access — less than most apps charge per year. N
   <p className="mt-2 text-sm text-[var(--waqtu-muted)]">
     Download Waqtu free. The trial gives you full access. See how prayer times in your menu bar changes your day.
   </p>
-  <a href="/#download" className="neu-btn mt-4 inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]">
+  <a href="/mac#download" className="neu-btn mt-4 inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]">
     Download Waqtu
   </a>
 </div>
