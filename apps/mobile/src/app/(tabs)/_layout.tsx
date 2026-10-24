@@ -20,6 +20,7 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen name="index" options={{ title: t("tabs.today") }} />
+      <Tabs.Screen name="week" options={{ title: t("tabs.week") }} />
       <Tabs.Screen
         name="ramadhan"
         options={{ title: t("ramadhan.tab"), href: showRamadhan ? undefined : null }}

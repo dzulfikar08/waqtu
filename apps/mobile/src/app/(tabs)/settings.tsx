@@ -4,6 +4,8 @@ import { useRouter } from "expo-router";
 import { Linking, ScrollView, StyleSheet } from "react-native";
 
 import { AccountSection } from "@/components/AccountSection";
+import { PrayerSettingsSection } from "@/components/PrayerSettingsSection";
+import { StreakSettingsSection } from "@/components/StreakSettingsSection";
 import { Row, Section } from "@/components/ui";
 import { authClient } from "@/auth/client";
 import { getLocalePref, setLocalePref } from "@/db/settings";
@@ -13,7 +15,9 @@ import {
   requestNotificationPermission,
   type NotificationStatus,
 } from "@/notifications/setup";
+import { useExactAlarmAllowed } from "@/notifications/useExactAlarm";
 import { spacing, useTheme } from "@/theme";
+import { openExactAlarmSettings } from "../../../modules/exact-alarm";
 
 export default function SettingsScreen() {
   const db = useSQLiteContext();
@@ -21,6 +25,7 @@ export default function SettingsScreen() {
   const { t } = useTranslation();
   const theme = useTheme();
   const [pref, setPref] = useState<LocalePref>("auto");
+  const exactAlarm = useExactAlarmAllowed();
   const [notifications, setNotifications] = useState<NotificationStatus>("undetermined");
 
   useEffect(() => {
@@ -65,6 +70,8 @@ export default function SettingsScreen() {
           />
         ))}
       </Section>
+      <PrayerSettingsSection />
+      <StreakSettingsSection />
       <Section title={t("settings.notifications")}>
         {notifications === "granted" ? (
           <Row label={t("settings.notificationsGranted")} selected onPress={() => {}} disabled />
@@ -75,6 +82,9 @@ export default function SettingsScreen() {
           />
         ) : (
           <Row label={t("settings.notificationsAsk")} onPress={() => void askNotifications()} />
+        )}
+        {exactAlarm ? null : (
+          <Row label={t("settings.exactAlarm")} onPress={openExactAlarmSettings} />
         )}
       </Section>
       <Section title={t("ramadhan.tab")}>

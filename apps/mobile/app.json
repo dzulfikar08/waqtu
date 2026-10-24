@@ -24,7 +24,8 @@
         "backgroundColor": "#F7F7FA",
         "foregroundImage": "./assets/android-icon-foreground.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": ["android.permission.SCHEDULE_EXACT_ALARM"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -37,6 +38,12 @@
       "expo-web-browser",
       "expo-sharing",
       "expo-live-activity",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Waqtu memakai lokasi untuk menghitung waktu sholat. Lokasi tidak dikirim ke server."
+        }
+      ],
       [
         "expo-notifications",
         {

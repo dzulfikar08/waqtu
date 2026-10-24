@@ -1,7 +1,7 @@
 import type { SQLiteDatabase } from "expo-sqlite";
 import { useCallback, useEffect, useState } from "react";
 
-import { getSetting, setSetting } from "./settings";
+import { getSetting, setSetting } from "@/db/settings";
 
 /**
  * A number persisted in the `settings` table. `value` is `fallback` until loaded, and null (unset)

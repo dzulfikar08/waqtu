@@ -3,7 +3,8 @@ import type { SQLiteDatabase } from "expo-sqlite";
 import { Platform } from "react-native";
 
 import WaqtuCountdown from "../../modules/waqtu-countdown";
-import { getSetting, KEYS, setSetting } from "./settings";
+import { KEYS } from "./settings";
+import { getSetting, setSetting } from "@/db/settings";
 
 export interface LiveCountdownCopy {
   /** e.g. "Menuju berbuka". */
