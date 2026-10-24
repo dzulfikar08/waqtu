@@ -4,7 +4,7 @@ import SwiftUI
 @Observable
 final class AppSettings {
     /// Shared app-group container for widget/watch/iOS sync.
-    private let sharedDefaults = UserDefaults(suiteName: "group.com.waqtu.shared") ?? UserDefaults.standard
+    private let sharedDefaults = UserDefaults(suiteName: AppGroup.id) ?? UserDefaults.standard
     private let cloudStore = NSUbiquitousKeyValueStore.default
     // Overlay settings
     var overlayEnabled: Bool {

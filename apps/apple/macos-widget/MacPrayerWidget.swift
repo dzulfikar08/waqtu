@@ -29,7 +29,7 @@ struct DayDotData: Codable {
 // MARK: - Provider
 
 struct MacPrayerTimelineProvider: TimelineProvider {
-    private let defaults = UserDefaults(suiteName: "group.com.waqtu.shared") ?? UserDefaults.standard
+    private let defaults = UserDefaults(suiteName: AppGroup.id) ?? UserDefaults.standard
 
     func placeholder(in context: Context) -> MacPrayerEntry {
         MacPrayerEntry(
@@ -57,7 +57,7 @@ struct MacPrayerTimelineProvider: TimelineProvider {
 
     private func loadEntry() -> MacPrayerEntry {
         // Load from shared container
-        let defaults = UserDefaults(suiteName: "group.com.waqtu.shared") ?? UserDefaults.standard
+        let defaults = UserDefaults(suiteName: AppGroup.id) ?? UserDefaults.standard
 
         let prayersData = defaults.data(forKey: "cachedPrayerPayload")
         let payload = prayersData.flatMap { try? JSONDecoder().decode(PrayerTimesPayload.self, from: $0) }

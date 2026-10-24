@@ -18,6 +18,9 @@ set -euo pipefail
 # Env vars:
 #   NOTARIZE=1                    Enable Apple notarization (requires credentials)
 #   CODESIGN_IDENTITY=SHA1        Override signing identity
+#   PROVISIONING_PROFILE_PATH=... Developer ID provisioning profile for dat.waqtu (embedded in the app; required for
+#                                 Sign in with Apple, a restricted entitlement). Without it the restricted entitlements are dropped.
+#   WIDGET_PROVISIONING_PROFILE_PATH=...  Same for the widget extension dat.waqtu.mac-widget (optional)
 #   RELEASE_UPLOAD_TOKEN=...      Bearer token for the updates worker's /releases API (required unless SKIP_UPLOAD=1)
 #   RELEASE_API_URL=...           Updates worker base URL (default https://dl.getwaqtu.com)
 #   SKIP_BUILD=1                  Skip xcodebuild (reuse existing .app)
@@ -161,10 +164,14 @@ if [[ "$SKIP_BUILD" == "1" ]]; then
 else
   info "Running xcodebuild (this may take a few minutes)..."
   cd "$PROJECT_DIR"
+  # Built unsigned: signing (entitlements, embedded provisioning profile, Sparkle's nested code)
+  # happens in step 2 so the widget and the app each get their own profile.
   xcodebuild \
     -scheme waqtu \
     -configuration Release \
     -derivedDataPath "$BUILD_DIR/DerivedData" \
+    MARKETING_VERSION="$VERSION" \
+    CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
     clean build 2>&1 | tail -20
 
   if [[ ! -d "$APP_PATH" ]]; then
@@ -197,11 +204,7 @@ if [[ -z "${CODESIGN_IDENTITY:-}" ]]; then
 fi
 
 info "Signing with: $(security find-identity -v -p codesigning 2>/dev/null | grep "$CODESIGN_IDENTITY" | head -1)"
-codesign --deep --force --verify --verbose \
-  --sign "$CODESIGN_IDENTITY" \
-  --options runtime \
-  --preserve-metadata=entitlements \
-  "$APP_PATH"
+"$SCRIPT_DIR/sign-app.sh" "$APP_PATH" "$CODESIGN_IDENTITY"
 ok "Signed successfully"
 
 # Notarize
