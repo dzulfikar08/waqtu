@@ -36,6 +36,11 @@ GitHub Actions builds everything; no local Mac is needed.
 
 - **CI** (`.github/workflows/ci.yml`): gitleaks over full history, lint/format/typecheck/build, and an
   unsigned `xcodebuild` of the macOS and iOS apps on `macos-latest`.
+- **Store screenshots** (`store-screenshots.yml`, manual): builds the phone app with `EXPO_PUBLIC_DEMO_MODE=1`
+  (frozen clock, Jakarta, Ramadan day 5, demo data loaded by `waqtu://demo?lang=id|en&to=today|week|ramadhan|settings`),
+  then Maestro (`apps/mobile/store/maestro/screens.yaml`) captures id + en screenshots on Android emulators (Pixel 6,
+  Pixel 7 Pro) and a 6.9" iPhone simulator. Output is the `screenshots-*` artifacts. Store listing text lives in
+  `apps/mobile/store/`. No secrets needed, and no other build sets the demo flag.
 - **Release macOS** (`release-macos.yml`, manual): runs `apps/apple/scripts/release.sh` → Developer ID
   sign, notarize, DMG, Sparkle sign, upload to R2, record in D1. Secrets are listed at the top of the
   workflow and live in the `release` environment.

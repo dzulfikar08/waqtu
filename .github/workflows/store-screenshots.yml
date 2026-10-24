@@ -8,9 +8,6 @@
 name: Store screenshots
 
 on:
-  push:
-    branches: [mar3-store-assets]
-    paths: [.github/workflows/store-screenshots.yml]
   workflow_dispatch:
     inputs:
       platforms:
