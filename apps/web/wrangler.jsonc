@@ -6,4 +6,12 @@
     "POLAR_PRODUCT_PRO_LIFETIME": "85947e3a-6eab-4057-950e-dbb7f4f0d34d",
     "POLAR_PRODUCT_PRO_MONTHLY": "",
   },
+  "d1_databases": [
+    {
+      "binding": "WAITLIST_DB",
+      "database_name": "waqtu-waitlist",
+      "database_id": "36b1972f-7b80-4944-955e-1da2ab0e20e9",
+      "migrations_dir": "migrations",
+    },
+  ],
 }

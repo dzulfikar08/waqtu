@@ -41,7 +41,7 @@ In Outlook, your calendar shows "Prayer – Dhuhr" as busy blocks. Teams automat
   <p class="mt-2 text-sm text-[var(--waqtu-muted)]">
     Download Waqtu, enable calendar protection, and never miss a prayer due to meetings again.
   </p>
-  <a href="/#download" class="neu-btn mt-4 inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]">
+  <a href="/mac#download" class="neu-btn mt-4 inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]">
     Download Waqtu
   </a>
 </div>

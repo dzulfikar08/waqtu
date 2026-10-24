@@ -16,7 +16,7 @@ The macOS menu bar is the most glanceable spot on your computer — it&rsquo;s a
 
 ## Step 1 — Download and install Waqtu
 
-Download the Waqtu installer from the [download page](/#download). Open the `.dmg`, drag Waqtu into your Applications folder, and launch it. The first time you open it, macOS may ask you to confirm — that&rsquo;s normal for any app installed outside the Mac App Store.
+Download the Waqtu installer from the [download page](/mac#download). Open the `.dmg`, drag Waqtu into your Applications folder, and launch it. The first time you open it, macOS may ask you to confirm — that&rsquo;s normal for any app installed outside the Mac App Store.
 
 Once it&rsquo;s running, you&rsquo;ll see the Waqtu icon in your menu bar, already showing a countdown to the next prayer.
 
@@ -65,7 +65,7 @@ That&rsquo;s it. You now have a live prayer countdown in your menu bar, your cal
     countdown in minutes. macOS 12+.
   </p>
   <a
-    href="/#download"
+    href="/mac#download"
     class="neu-btn mt-4 inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]"
   >
     Download Waqtu

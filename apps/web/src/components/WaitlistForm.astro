@@ -1,0 +1,162 @@
+---
+import type { LandingCopy, Locale } from "../i18n/landing";
+
+interface Props {
+  copy: LandingCopy["form"];
+  locale: Locale;
+  /** Anchor id for the form wrapper, and prefix for input ids. */
+  id: string;
+  /** Where the form sits, sent with the waitlist_submit analytics event. */
+  location: string;
+  showHeading?: boolean;
+}
+
+const { copy, locale, id, location, showHeading = true } = Astro.props;
+---
+
+<div id={id} class="waitlist" data-waitlist data-location={location}>
+  {showHeading && <h2 class="font-display text-xl font-semibold text-[var(--waqtu-text)]">{copy.heading}</h2>}
+
+  <form
+    method="post"
+    action="/api/waitlist"
+    data-waitlist-form
+    data-submitting-label={copy.submitting}
+    data-err-invalid_email={copy.errors.invalid_email}
+    data-err-invalid_platform={copy.errors.invalid_platform}
+    data-err-invalid_city={copy.errors.invalid_city}
+    data-err-rate_limited={copy.errors.rate_limited}
+    data-err-generic={copy.errors.generic}
+    class:list={["grid gap-4", showHeading && "mt-5"]}
+    novalidate
+  >
+    <input type="hidden" name="locale" value={locale} />
+
+    <div class="wl-hp" aria-hidden="true">
+      <label for={`${id}-website`}>Website</label>
+      <input id={`${id}-website`} type="text" name="website" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div>
+      <label for={`${id}-email`} class="wl-label">{copy.emailLabel}</label>
+      <input
+        id={`${id}-email`}
+        class="wl-input"
+        type="email"
+        name="email"
+        inputmode="email"
+        autocomplete="email"
+        autocapitalize="off"
+        spellcheck="false"
+        maxlength="254"
+        placeholder={copy.emailPlaceholder}
+        required
+      />
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <label for={`${id}-platform`} class="wl-label">{copy.platformLabel}</label>
+        <select id={`${id}-platform`} class="wl-input" name="platform">
+          <option value="">{copy.platformPlaceholder}</option>
+          <option value="ios">{copy.platforms.ios}</option>
+          <option value="android">{copy.platforms.android}</option>
+          <option value="mac">{copy.platforms.mac}</option>
+        </select>
+      </div>
+      <div>
+        <label for={`${id}-city`} class="wl-label">{copy.cityLabel}</label>
+        <input
+          id={`${id}-city`}
+          class="wl-input"
+          type="text"
+          name="city"
+          autocomplete="address-level2"
+          maxlength="80"
+          placeholder={copy.cityPlaceholder}
+        />
+      </div>
+    </div>
+
+    <p data-waitlist-error role="alert" class="wl-error" hidden></p>
+
+    <button type="submit" class="neu-btn wl-submit" data-submit-label={copy.submit}>
+      {copy.submit}
+    </button>
+
+    <p class="text-sm leading-relaxed text-[var(--waqtu-muted)]">{copy.fine}</p>
+  </form>
+
+  <div data-waitlist-success role="status" tabindex="-1" class="wl-success" hidden>
+    <p class="font-display text-xl font-semibold text-[var(--waqtu-text)]">{copy.successTitle}</p>
+    <p class="mt-2 text-[var(--waqtu-muted)]">{copy.successBody}</p>
+  </div>
+</div>
+
+<style>
+  .wl-label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--waqtu-text);
+  }
+  .wl-input {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    padding: 0 0.875rem;
+    border: 1px solid var(--waqtu-border-strong);
+    border-radius: 10px;
+    background: var(--waqtu-bg-2);
+    color: var(--waqtu-text);
+    /* 16px stops iOS Safari from zooming the page when a field gets focus. */
+    font: inherit;
+    font-size: 16px;
+  }
+  .wl-input::placeholder {
+    color: #7b8982;
+  }
+  .wl-input:focus-visible {
+    outline: 2px solid var(--waqtu-primary);
+    outline-offset: 1px;
+    border-color: var(--waqtu-primary);
+  }
+  .wl-submit {
+    min-height: 52px;
+    padding: 0 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    justify-content: center;
+  }
+  .wl-submit:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+  .wl-error {
+    padding: 0.625rem 0.875rem;
+    border-radius: 10px;
+    background: #fbeceb;
+    color: #8a1f17;
+    font-size: 0.9375rem;
+  }
+  .wl-error[hidden],
+  .wl-success[hidden],
+  form[hidden] {
+    display: none;
+  }
+  .wl-success {
+    padding: 1.25rem;
+    border-radius: 12px;
+    background: rgba(47, 107, 82, 0.09);
+    border: 1px solid rgba(47, 107, 82, 0.25);
+  }
+  /* Honeypot: out of view for people and screen readers, still in the DOM for bots. */
+  .wl-hp {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+</style>

@@ -49,7 +49,7 @@ Your prayer log is stored locally on your Mac in UserDefaults. It never leaves y
   <p class="mt-2 text-sm text-[var(--waqtu-muted)]">
     Download Waqtu, and let every prayer count toward your streak.
   </p>
-  <a href="/#download" class="neu-btn mt-4 inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]">
+  <a href="/mac#download" class="neu-btn mt-4 inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]">
     Download Waqtu
   </a>
 </div>

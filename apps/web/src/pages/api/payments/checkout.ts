@@ -50,8 +50,8 @@ export const POST: APIRoute = async ({ request }) => {
       },
       body: JSON.stringify({
         products: [productId],
-        success_url: `${baseUrl}/?checkout=success`,
-        return_url: `${baseUrl}/?checkout=canceled`,
+        success_url: `${baseUrl}/mac?checkout=success`,
+        return_url: `${baseUrl}/mac?checkout=canceled`,
       }),
     });
 

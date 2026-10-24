@@ -148,7 +148,7 @@ Still deciding? Our [setup guide](/blog/show-prayer-times-menu-bar-mac) walks th
     protection, in minutes. macOS 12+.
   </p>
   <a
-    href="/#download"
+    href="/mac#download"
     class="neu-btn mt-4 inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]"
   >
     Download Waqtu

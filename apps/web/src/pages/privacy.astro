@@ -2,10 +2,10 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import BackLink from "../components/BackLink.astro";
 
-const today = new Date("2026-07-28").toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+const today = new Date("2026-10-24").toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 ---
 
-<BaseLayout title="Privacy Policy — Waqtu" description="Privacy policy for Waqtu prayer times app for Mac." canonical="/privacy">
+<BaseLayout title="Privacy Policy — Waqtu" description="Privacy policy for the Waqtu prayer times apps for Mac, iOS and Android, and the Waqtu waitlist." canonical="/privacy">
   <div class="relative z-10 min-h-screen px-6 py-16 sm:px-10 md:px-14 md:py-24">
     <div class="mx-auto max-w-3xl">
       <BackLink href="/" label="Back to Waqtu" />
@@ -19,7 +19,8 @@ const today = new Date("2026-07-28").toLocaleDateString("en-US", { year: "numeri
           <p>Waqtu is designed to respect your privacy. We collect minimal information necessary to provide the prayer times service:</p>
           <ul>
             <li><strong>Location Data</strong> — Used solely for calculating accurate prayer times. Processed locally on your device and never transmitted to our servers.</li>
-            <li><strong>Email Address</strong> — Collected only when you choose to purchase a license. Used for payment processing and license delivery.</li>
+            <li><strong>Email Address</strong> — Collected when you purchase a license. Used for payment processing and license delivery.</li>
+            <li><strong>Waitlist Signup</strong> — If you join the iOS and Android waitlist, we store your email address and, if you fill them in, your device type, your city, and the page language. We use them only to tell you about the Waqtu release. Your IP address is not stored; a salted hash of it is kept for at most 20 minutes to limit repeated sign-ups.</li>
             <li><strong>License Information</strong> — Stored to validate your purchase and provide updates.</li>
           </ul>
         </section>
@@ -59,6 +60,7 @@ const today = new Date("2026-07-28").toLocaleDateString("en-US", { year: "numeri
         <section>
           <h2>Data Retention</h2>
           <p>You may request deletion of your email and license information at any time by contacting us at <a href="mailto:dzulfikar.at@gmail.com">dzulfikar.at@gmail.com</a>. We will respond within 30 days.</p>
+          <p>You can ask us to remove your waitlist entry the same way, by emailing <a href="mailto:dzulfikar.at@gmail.com">dzulfikar.at@gmail.com</a>.</p>
         </section>
 
         <section>

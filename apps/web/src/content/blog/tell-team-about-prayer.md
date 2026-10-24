@@ -53,7 +53,7 @@ If you're a manager and someone on your team mentions prayer needs:
     Waqtu automatically blocks your calendar during prayer times. Your colleagues see busy
     blocks. No explanations needed.
   </p>
-  <a href="/#download" className="neu-btn mt-4 inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]">
+  <a href="/mac#download" className="neu-btn mt-4 inline-flex items-center gap-2 px-6 py-3 font-medium text-[var(--waqtu-bg)]">
     Download Waqtu
   </a>
 </div>

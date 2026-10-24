@@ -1,0 +1,532 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import WaitlistForm from "./WaitlistForm.astro";
+import { landing, REPO_URL, SUPPORT_EMAIL, type Locale } from "../i18n/landing";
+import { ramadhan1448 } from "../lib/ramadhan";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = landing[locale];
+
+// Computed at build time with Intl (Umm al-Qura). The countdown script only needs the instant.
+const ramadhan = ramadhan1448();
+const dateLabel = new Intl.DateTimeFormat(locale === "id" ? "id-ID" : "en-GB", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+}).format(ramadhan.date);
+const fill = (text: string) => text.replace("{date}", dateLabel);
+
+const alternates = [
+  { hreflang: "id", href: "/" },
+  { hreflang: "en", href: "/en/" },
+  { hreflang: "x-default", href: "/" },
+];
+
+const siteUrl = "https://getwaqtu.com";
+const schema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      name: "Waqtu",
+      operatingSystem: "iOS, Android, macOS",
+      applicationCategory: "LifestyleApplication",
+      description: t.schema.appDescription,
+      inLanguage: t.htmlLang,
+      author: { "@type": "Person", name: "Dzulfikar Ats Tsauri", url: siteUrl },
+      publisher: { "@id": `${siteUrl}/#organization` },
+    },
+    {
+      "@type": "Organization",
+      "@id": `${siteUrl}/#organization`,
+      name: "Waqtu",
+      url: siteUrl,
+      logo: `${siteUrl}/og-image.webp`,
+      sameAs: [REPO_URL],
+      founder: { "@type": "Person", name: "Dzulfikar Ats Tsauri" },
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: t.faq.items.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: { "@type": "Answer", text: fill(item.answer) },
+      })),
+    },
+    { "@type": "WebSite", name: "Waqtu", url: siteUrl, inLanguage: t.htmlLang },
+  ],
+};
+
+const nav = [
+  { href: "#features", label: t.nav.features, id: "features" },
+  { href: "#ramadhan", label: t.nav.ramadhan, id: "ramadhan" },
+  { href: "#privacy", label: t.nav.privacy, id: "privacy" },
+  { href: "#faq", label: t.nav.faq, id: "faq" },
+  { href: "/mac", label: t.nav.mac, id: "mac" },
+];
+---
+
+<BaseLayout
+  title={t.meta.title}
+  description={t.meta.description}
+  keywords={t.meta.keywords}
+  canonical={t.path}
+  lang={t.htmlLang as "id" | "en"}
+  alternates={alternates}
+  ogImageAlt={t.meta.ogImageAlt}
+  defaultJsonLd={false}
+>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(schema)} />
+  {
+    /* The Mac landing used to live here. Old Polar return URLs (/?checkout=...) and links
+       (/#download, /#pricing) are static-page requests, so only the browser can forward them. */
+  }
+  <script slot="head" is:inline>
+    (function () {
+      var l = location;
+      if (/[?&]checkout=/.test(l.search)) l.replace("/mac" + l.search + l.hash);
+      else if (l.hash === "#download" || l.hash === "#pricing") l.replace("/mac" + l.hash);
+    })();
+  </script>
+
+  <a href="#main" class="skip-link">{locale === "id" ? "Lewati ke konten" : "Skip to content"}</a>
+
+  <header class="lp-header px-6 sm:px-10 md:px-14">
+    <div class="mx-auto flex max-w-6xl items-center justify-between gap-4">
+      <a href={t.path} class="font-display text-xl font-semibold tracking-tight text-[var(--waqtu-text)]">Waqtu</a>
+
+      <nav class="hidden items-center gap-7 text-sm md:flex" aria-label="Primary">
+        {
+          nav.map((item) => (
+            <a
+              href={item.href}
+              class="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]"
+              data-s-event="nav_click"
+              data-s-event-props={JSON.stringify({ destination: item.id })}
+            >
+              {item.label}
+            </a>
+          ))
+        }
+        <a
+          href={t.nav.switchHref}
+          hreflang={locale === "id" ? "en" : "id"}
+          lang={locale === "id" ? "en" : "id"}
+          class="font-medium text-[var(--waqtu-text)] underline decoration-[var(--waqtu-border-strong)] underline-offset-4 hover:decoration-[var(--waqtu-primary)]"
+          data-s-event="language_switch"
+          data-s-event-props={JSON.stringify({ to: locale === "id" ? "en" : "id" })}
+        >
+          {t.nav.switchLabel}
+        </a>
+        <a
+          href="#waitlist"
+          class="neu-btn px-5 py-2.5 font-semibold"
+          data-s-event="cta_click"
+          data-s-event-props={JSON.stringify({ location: "header", text: t.nav.cta })}
+        >
+          {t.nav.cta}
+        </a>
+      </nav>
+
+      <details data-menu class="lp-menu md:hidden">
+        <summary class="lp-menu-toggle">{t.nav.menu}</summary>
+        <nav class="lp-menu-panel" aria-label="Primary">
+          {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+          <a href={t.nav.switchHref} hreflang={locale === "id" ? "en" : "id"} lang={locale === "id" ? "en" : "id"}>
+            {t.nav.switchLabel}
+          </a>
+          <a href="#waitlist" class="neu-btn justify-center px-5 py-3 font-semibold">{t.nav.cta}</a>
+        </nav>
+      </details>
+    </div>
+  </header>
+
+  <main id="main" class="relative z-10">
+    <!-- Hero -->
+    <section class="px-6 pb-20 pt-12 sm:px-10 md:px-14 md:pb-28 md:pt-20">
+      <div class="mx-auto grid max-w-6xl items-start gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-20">
+        <div>
+          <p class="text-sm font-semibold text-[var(--waqtu-primary)]">{t.hero.status}</p>
+          <h1 class="font-display mt-4 text-[2.9rem] font-semibold leading-[1.03] tracking-tight text-[var(--waqtu-text)] sm:text-6xl lg:text-[4.75rem]">
+            {t.hero.title}
+          </h1>
+          <p class="mt-6 max-w-xl text-lg leading-relaxed text-[var(--waqtu-text)] sm:text-xl">{t.hero.lede}</p>
+          <p class="mt-4 max-w-xl leading-relaxed text-[var(--waqtu-muted)]">{t.hero.audience}</p>
+          <p class="mt-8 text-sm font-semibold text-[var(--waqtu-gold-dim)]">{t.hero.target}</p>
+        </div>
+
+        <div class="neu-card p-6 sm:p-8">
+          <WaitlistForm copy={t.form} locale={locale} id="waitlist" location="hero" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Halaqah -->
+    <section class="section-tint-1 border-y border-[var(--waqtu-border)] px-6 py-20 sm:px-10 md:px-14 md:py-28">
+      <div class="mx-auto grid max-w-6xl gap-10 md:grid-cols-[0.9fr_1.1fr] md:gap-20">
+        <h2 class="font-display text-3xl font-semibold leading-tight tracking-tight text-[var(--waqtu-text)] sm:text-4xl lg:text-5xl">
+          {t.halaqah.title}
+        </h2>
+        <div>
+          {
+            t.halaqah.paragraphs.map((p) => (
+              <p class="mb-5 max-w-xl text-lg leading-relaxed text-[var(--waqtu-muted)]">{p}</p>
+            ))
+          }
+          <p class="font-display mt-8 text-2xl font-semibold text-[var(--waqtu-primary)]">{t.halaqah.pull}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="px-6 py-20 sm:px-10 md:px-14 md:py-28">
+      <div class="mx-auto max-w-6xl">
+        <h2 class="font-display max-w-2xl text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
+          {t.features.heading}
+        </h2>
+
+        <div class="mt-12 grid gap-8 border-t border-[var(--waqtu-border-strong)] pt-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20">
+          <div>
+            <h3 class="font-display text-2xl font-semibold text-[var(--waqtu-text)] sm:text-3xl">{t.features.prayer.title}</h3>
+            <p class="mt-4 max-w-xl text-lg leading-relaxed text-[var(--waqtu-muted)]">{t.features.prayer.body}</p>
+          </div>
+          <ul class="self-center">
+            {
+              t.features.prayer.details.map((item) => (
+                <li class="border-b border-[var(--waqtu-border)] py-3 text-[var(--waqtu-text)] first:border-t">{item}</li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div class="mt-12 grid gap-10 border-t border-[var(--waqtu-border-strong)] pt-10 md:grid-cols-2 md:gap-20">
+          <div>
+            <h3 class="font-display text-xl font-semibold text-[var(--waqtu-text)] sm:text-2xl">{t.features.mutabaah.title}</h3>
+            <p class="mt-3 leading-relaxed text-[var(--waqtu-muted)]">{t.features.mutabaah.body}</p>
+          </div>
+          <div>
+            <h3 class="font-display text-xl font-semibold text-[var(--waqtu-text)] sm:text-2xl">{t.features.halaqah.title}</h3>
+            <p class="mt-3 leading-relaxed text-[var(--waqtu-muted)]">{t.features.halaqah.body}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ramadhan -->
+    <section id="ramadhan" class="ramadhan px-6 py-20 sm:px-10 md:px-14 md:py-28">
+      <div class="mx-auto grid max-w-6xl gap-14 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20">
+        <div>
+          <p class="text-sm font-semibold text-[var(--rm-gold)]">{t.ramadhan.eyebrow}</p>
+          <h2 class="font-display mt-3 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
+            {t.ramadhan.title}
+          </h2>
+
+          <div
+            class="mt-10"
+            data-countdown
+            data-starts-at={ramadhan.startsAtUtc}
+            role="timer"
+            aria-label={t.ramadhan.countdownLabel}
+          >
+            <dl class="rm-units" data-countdown-units>
+              {
+                (["days", "hours", "minutes", "seconds"] as const).map((unit) => (
+                  <div>
+                    <dd class="rm-num" data-unit={unit}>
+                      --
+                    </dd>
+                    <dt class="rm-label">{t.ramadhan.units[unit]}</dt>
+                  </div>
+                ))
+              }
+            </dl>
+            <p class="font-display text-3xl font-semibold text-[var(--rm-gold)]" data-countdown-started hidden>
+              {t.ramadhan.started}
+            </p>
+          </div>
+
+          <p class="rm-muted mt-8 max-w-xl text-sm leading-relaxed">{fill(t.ramadhan.estimate)}</p>
+        </div>
+
+        <div>
+          <h3 class="font-display text-2xl font-semibold">{t.ramadhan.previewTitle}</h3>
+          <p class="rm-muted mt-2 text-sm">{t.ramadhan.previewNote}</p>
+          <ul class="mt-6">
+            {t.ramadhan.preview.map((item) => <li class="rm-item">{item}</li>)}
+          </ul>
+          <a
+            href="#waitlist-bottom"
+            class="rm-btn mt-8 px-6 py-3 font-semibold"
+            data-s-event="cta_click"
+            data-s-event-props={JSON.stringify({ location: "ramadhan", text: t.ramadhan.cta })}
+          >
+            {t.ramadhan.cta}
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Privacy and open source -->
+    <section id="privacy" class="px-6 py-20 sm:px-10 md:px-14 md:py-28">
+      <div class="mx-auto grid max-w-6xl gap-10 md:grid-cols-[1.1fr_0.9fr] md:gap-20">
+        <div>
+          <h2 class="font-display max-w-xl text-3xl font-semibold leading-tight tracking-tight text-[var(--waqtu-text)] sm:text-4xl">
+            {t.privacy.title}
+          </h2>
+          {
+            t.privacy.paragraphs.map((p) => (
+              <p class="mt-5 max-w-xl text-lg leading-relaxed text-[var(--waqtu-muted)]">{p}</p>
+            ))
+          }
+        </div>
+        <div class="flex flex-col items-start gap-3 self-end">
+          <a
+            href={REPO_URL}
+            rel="noopener"
+            class="neu-btn-secondary px-6 py-3 font-semibold"
+            data-s-event="cta_click"
+            data-s-event-props={JSON.stringify({ location: "privacy", text: "github" })}
+          >
+            {t.privacy.github}
+          </a>
+          <a
+            href="/privacy"
+            class="font-medium text-[var(--waqtu-primary)] underline underline-offset-4"
+            data-s-event="cta_click"
+            data-s-event-props={JSON.stringify({ location: "privacy", text: "policy" })}
+          >
+            {t.privacy.policy}
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mac -->
+    <section class="section-tint-blue border-y border-[var(--waqtu-border)] px-6 py-12 sm:px-10 md:px-14">
+      <div class="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-center md:justify-between md:gap-16">
+        <div class="max-w-2xl">
+          <h2 class="font-display text-xl font-semibold text-[var(--waqtu-text)] sm:text-2xl">{t.mac.title}</h2>
+          <p class="mt-2 leading-relaxed text-[var(--waqtu-muted)]">{t.mac.body}</p>
+        </div>
+        <a
+          href="/mac"
+          class="neu-btn-secondary shrink-0 px-6 py-3 font-semibold"
+          data-s-event="cta_click"
+          data-s-event-props={JSON.stringify({ location: "mac_band", text: "mac" })}
+        >
+          {t.mac.cta}
+        </a>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="px-6 py-20 sm:px-10 md:px-14 md:py-28">
+      <div class="mx-auto max-w-6xl">
+        <h2 class="font-display text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">{t.faq.heading}</h2>
+        <div class="mt-8 max-w-3xl">
+          {
+            t.faq.items.map((faq) => (
+              <div class="faq-item">
+                <button
+                  class="faq-question flex w-full items-center justify-between gap-4 py-5 text-left"
+                  aria-expanded="false"
+                  data-s-event="faq_toggle"
+                >
+                  <span class="font-medium text-[var(--waqtu-text)]">{faq.question}</span>
+                  <svg
+                    class="faq-icon h-5 w-5 shrink-0 text-[var(--waqtu-primary)] transition-transform duration-300"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div class="faq-answer">
+                  <p class="leading-relaxed text-[var(--waqtu-muted)]">{fill(faq.answer)}</p>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Closing waitlist -->
+    <section class="section-tint-1 border-t border-[var(--waqtu-border)] px-6 py-20 sm:px-10 md:px-14 md:py-28">
+      <div class="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
+        <div>
+          <h2 class="font-display text-3xl font-semibold leading-tight tracking-tight text-[var(--waqtu-text)] sm:text-4xl">
+            {t.closing.title}
+          </h2>
+          <p class="mt-4 max-w-md text-lg leading-relaxed text-[var(--waqtu-muted)]">{t.closing.body}</p>
+        </div>
+        <div class="neu-card p-6 sm:p-8">
+          <WaitlistForm copy={t.form} locale={locale} id="waitlist-bottom" location="closing" showHeading={false} />
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-[var(--waqtu-border)] px-6 py-10 sm:px-10 md:px-14">
+    <div class="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
+      <p class="max-w-sm text-sm leading-relaxed text-[var(--waqtu-muted)]">
+        <span class="font-display font-semibold text-[var(--waqtu-text)]">Waqtu.</span>
+        {t.footer.note}
+      </p>
+      <nav class="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm" aria-label="Footer">
+        <a href="/blog" class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.footer.blog}</a>
+        <a href="/resources" class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.footer.resources}</a>
+        <a href="/changelog" class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.footer.changelog}</a>
+        <a href="/mac" class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.nav.mac}</a>
+        <a href="/privacy" class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.footer.privacy}</a>
+        <a href="/terms" class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.footer.terms}</a>
+        <a href={REPO_URL} rel="noopener" class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.footer.github}</a>
+        <a href={`mailto:${SUPPORT_EMAIL}`} class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)]">{t.footer.support}</a>
+      </nav>
+      <p class="text-sm text-[var(--waqtu-muted)]">&copy; 2026 Waqtu</p>
+    </div>
+  </footer>
+</BaseLayout>
+
+<script>
+  import "../scripts/site.ts";
+  import "../scripts/landing.ts";
+</script>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 100;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    background: var(--waqtu-text);
+    color: var(--waqtu-bg);
+  }
+  .skip-link:focus {
+    top: 1rem;
+  }
+
+  .lp-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding-block: 0.5rem;
+    background: var(--waqtu-bg);
+    border-bottom: 1px solid var(--waqtu-border);
+  }
+
+  .lp-menu {
+    position: relative;
+  }
+  .lp-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 1rem;
+    border: 1px solid var(--waqtu-border-strong);
+    border-radius: 10px;
+    font-weight: 600;
+    color: var(--waqtu-text);
+    cursor: pointer;
+    list-style: none;
+  }
+  .lp-menu-toggle::-webkit-details-marker {
+    display: none;
+  }
+  .lp-menu-panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.5rem);
+    display: flex;
+    min-width: 14rem;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    border: 1px solid var(--waqtu-border-strong);
+    border-radius: 12px;
+    background: var(--waqtu-bg-2);
+    box-shadow: 0 10px 30px rgba(22, 32, 28, 0.12);
+  }
+  .lp-menu-panel a:not(.neu-btn) {
+    padding: 0 0.5rem;
+    color: var(--waqtu-text);
+  }
+
+  /* Ramadhan band: the one dark section, so the countdown is the focal point of the page. */
+  .ramadhan {
+    --rm-gold: #d4a574;
+    background: #16201c;
+    color: #f6f5f1;
+  }
+  .rm-muted {
+    color: rgba(246, 245, 241, 0.74);
+  }
+  .rm-units {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: 34rem;
+    margin: 0;
+  }
+  .rm-units > div {
+    padding-left: 1rem;
+    border-left: 1px solid rgba(246, 245, 241, 0.22);
+  }
+  .rm-units > div:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .rm-units[hidden] {
+    display: none;
+  }
+  .rm-num {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 9vw, 4.25rem);
+    font-weight: 600;
+    line-height: 1;
+    color: var(--rm-gold);
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .rm-label {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: rgba(246, 245, 241, 0.74);
+  }
+  .rm-item {
+    padding: 0.875rem 0;
+    border-bottom: 1px solid rgba(246, 245, 241, 0.18);
+  }
+  .rm-item:first-child {
+    border-top: 1px solid rgba(246, 245, 241, 0.18);
+  }
+  .rm-btn {
+    background: #f6f5f1;
+    color: #16201c;
+    border-radius: 12px;
+    transition: background 0.2s ease;
+  }
+  .rm-btn:hover {
+    background: #ffffff;
+  }
+  .rm-btn:focus-visible {
+    outline: 2px solid var(--rm-gold);
+    outline-offset: 3px;
+  }
+
+  :global(a:focus-visible),
+  :global(button:focus-visible),
+  :global(summary:focus-visible) {
+    outline: 2px solid var(--waqtu-primary);
+    outline-offset: 2px;
+  }
+</style>

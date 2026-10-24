@@ -11,6 +11,14 @@ export interface Props {
   ogTitle?: string;
   ogDescription?: string;
   ogImage?: string;
+  ogImageAlt?: string;
+  keywords?: string;
+  /** Page language. Drives <html lang>, og:locale and the default Mac copy. */
+  lang?: "en" | "id";
+  /** hreflang alternates (paths), emitted as <link rel="alternate">. */
+  alternates?: { hreflang: string; href: string }[];
+  /** Set false on pages that ship their own JSON-LD through the "head" slot. */
+  defaultJsonLd?: boolean;
 }
 
 const siteUrl = "https://getwaqtu.com";
@@ -22,14 +30,18 @@ const {
   ogTitle,
   ogDescription,
   ogImage = "/og-image.webp",
+  ogImageAlt = "Waqtu — Prayer times in your Mac menu bar",
+  keywords = "prayer times mac, mac menu bar prayer times, best prayer times app mac, prayer times app macos, salah reminder mac, menu bar prayer times mac, muslim productivity app, calendar prayer blocks, teams busy prayer, slack status prayer, waqtu",
+  lang = "en",
+  alternates = [],
+  defaultJsonLd = true,
 } = Astro.props;
 
 const canonicalUrl = new URL(canonical, siteUrl).href;
 const ogImageUrl = new URL(ogImage, siteUrl).href;
 ---
-
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang={lang} class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -38,17 +50,19 @@ const ogImageUrl = new URL(ogImage, siteUrl).href;
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="canonical" href={canonicalUrl} />
+    {
+      alternates.map((alt) => (
+        <link rel="alternate" hreflang={alt.hreflang} href={new URL(alt.href, siteUrl).href} />
+      ))
+    }
 
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta
-      name="keywords"
-      content="prayer times mac, mac menu bar prayer times, best prayer times app mac, prayer times app macos, salah reminder mac, menu bar prayer times mac, muslim productivity app, calendar prayer blocks, teams busy prayer, slack status prayer, waqtu"
-    />
+    <meta name="keywords" content={keywords} />
     <meta name="author" content="Waqtu" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale" content={lang === "id" ? "id_ID" : "en_US"} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content="Waqtu" />
     <meta property="og:title" content={ogTitle ?? title} />
@@ -56,7 +70,7 @@ const ogImageUrl = new URL(ogImage, siteUrl).href;
     <meta property="og:image" content={ogImageUrl} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Waqtu — Prayer times in your Mac menu bar" />
+    <meta property="og:image:alt" content={ogImageAlt} />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@waqtuapp" />
@@ -67,7 +81,8 @@ const ogImageUrl = new URL(ogImage, siteUrl).href;
 
     <meta name="theme-color" content="#f6f5f1" />
 
-    <JsonLd />
+    {defaultJsonLd && <JsonLd />}
+    <slot name="head" />
 
     <script
       defer
