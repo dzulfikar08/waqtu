@@ -27,11 +27,16 @@ export default function SettingsScreen() {
   }, [db]);
 
   const choose = useCallback(
-    (next: LocalePref) => {
+    async (next: LocalePref) => {
+      const previous = pref;
       setPref(next);
-      void setLocalePref(db, next);
+      try {
+        await setLocalePref(db, next);
+      } catch {
+        setPref(previous);
+      }
     },
-    [db],
+    [db, pref],
   );
 
   const askNotifications = useCallback(async () => {
@@ -54,7 +59,7 @@ export default function SettingsScreen() {
             key={locale}
             label={LOCALE_NAMES[locale]}
             selected={pref === locale}
-            onPress={() => choose(locale)}
+            onPress={() => void choose(locale)}
           />
         ))}
       </Section>
