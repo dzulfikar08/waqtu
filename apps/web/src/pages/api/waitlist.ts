@@ -29,8 +29,8 @@ const json = (status: number, body: Record<string, unknown>) =>
 
 const text = (value: unknown) => (typeof value === "string" ? value : "");
 
-async function hashIp(ip: string): Promise<string> {
-  const data = new TextEncoder().encode(`${env.WAITLIST_IP_SALT ?? ""}:${ip}`);
+async function hashIp(ip: string, salt: string): Promise<string> {
+  const data = new TextEncoder().encode(`${salt}:${ip}`);
   const digest = await crypto.subtle.digest("SHA-256", data);
   return [...new Uint8Array(digest)]
     .slice(0, 16)
@@ -39,9 +39,9 @@ async function hashIp(ip: string): Promise<string> {
 }
 
 /** Counts this request against the caller's window. Returns false once the limit is exceeded. */
-async function underRateLimit(db: D1Database, ip: string): Promise<boolean> {
+async function underRateLimit(db: D1Database, ip: string, salt: string): Promise<boolean> {
   const bucket = Math.floor(Date.now() / 1000 / WINDOW_SECONDS);
-  const ipHash = await hashIp(ip);
+  const ipHash = await hashIp(ip, salt);
   const [, , row] = await db.batch<{ hits: number }>([
     db.prepare("DELETE FROM waitlist_rate WHERE bucket < ?").bind(bucket - 1),
     db
@@ -104,11 +104,18 @@ export const POST: APIRoute = async ({ request }) => {
   // Bots that fill the hidden field get the same answer as everyone else and nothing is stored.
   if (text(input.website).trim() !== "") return respond(200, { ok: true });
 
+  const salt = env.WAITLIST_IP_SALT;
+  if (!salt) {
+    // Refuse to run without the secret rather than store unsalted IP hashes.
+    console.error("WAITLIST_IP_SALT is not configured");
+    return respond(500, { error: "server_error" });
+  }
+
   const db = env.WAITLIST_DB;
   const ip = request.headers.get("cf-connecting-ip") ?? "unknown";
 
   try {
-    if (!(await underRateLimit(db, ip))) return respond(429, { error: "rate_limited" });
+    if (!(await underRateLimit(db, ip, salt))) return respond(429, { error: "rate_limited" });
 
     const email = text(input.email).trim().toLowerCase();
     if (email.length > 254 || !EMAIL_RE.test(email))

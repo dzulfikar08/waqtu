@@ -17,7 +17,7 @@ declare namespace Cloudflare {
     PUBLIC_CLIENT_URL?: string;
     NEXT_PUBLIC_CLIENT_URL?: string;
     WAITLIST_DB: D1Database;
-    /** Optional secret mixed into the IP hash used for waitlist rate limiting. */
+    /** Secret mixed into the IP hash used for waitlist rate limiting. The endpoint refuses to run without it. */
     WAITLIST_IP_SALT?: string;
   }
 }

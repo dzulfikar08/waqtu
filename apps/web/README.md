@@ -32,7 +32,8 @@ To test the built worker the way it runs in production:
 ```bash
 bun run build
 bunx wrangler d1 migrations apply waqtu-waitlist --local --persist-to .wrangler/state
-bunx wrangler dev --config dist/server/wrangler.json --local --persist-to .wrangler/state
+bunx wrangler dev --config dist/server/wrangler.json --local --persist-to .wrangler/state \
+  --var WAITLIST_IP_SALT:dev
 curl -X POST localhost:8787/api/waitlist -H 'Content-Type: application/json' \
   -d '{"email":"you@example.com","platform":"ios","city":"Malang","locale":"id"}'
 ```
@@ -48,8 +49,9 @@ curl -X POST localhost:8787/api/waitlist -H 'Content-Type: application/json' \
 - A filled `website` field (the honeypot) returns `{ "ok": true }` and stores nothing.
 - Rate limit: 5 requests per 10 minutes per IP (`429 rate_limited`). The counter is keyed by a salted SHA-256 of
   the `cf-connecting-ip` header; counter rows older than the previous window are deleted on every request.
-- Set the salt once so hashes cannot be brute-forced from the IPv4 space:
-  `bunx wrangler secret put WAITLIST_IP_SALT`. Without it the hash is unsalted, but still only lives 20 minutes.
+- `WAITLIST_IP_SALT` is required. Set it once in production: `bunx wrangler secret put WAITLIST_IP_SALT`.
+  Without it the endpoint logs the problem and returns `500`; it never stores unsalted IP hashes. For
+  local runs pass `--var WAITLIST_IP_SALT:dev`, or put it in `apps/web/.dev.vars` (git-ignored).
 
 The browser fires the Stonks event `waitlist_submit` (`location`, `locale`, `platform`) on success.
 

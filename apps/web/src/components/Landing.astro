@@ -83,6 +83,17 @@ const nav = [
   defaultJsonLd={false}
 >
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(schema)} />
+  {
+    /* The Mac landing used to live here. Old Polar return URLs (/?checkout=...) and links
+       (/#download, /#pricing) are static-page requests, so only the browser can forward them. */
+  }
+  <script slot="head" is:inline>
+    (function () {
+      var l = location;
+      if (/[?&]checkout=/.test(l.search)) l.replace("/mac" + l.search + l.hash);
+      else if (l.hash === "#download" || l.hash === "#pricing") l.replace("/mac" + l.hash);
+    })();
+  </script>
 
   <a href="#main" class="skip-link">{locale === "id" ? "Lewati ke konten" : "Skip to content"}</a>
 
