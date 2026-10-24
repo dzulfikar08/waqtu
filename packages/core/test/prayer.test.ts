@@ -1,5 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { calculatePrayerTimes, hijriDate, type MethodId } from "../src/index";
+import {
+  calculatePrayerTimes,
+  hijriDate,
+  type MethodId,
+  type PrayerName,
+  type PrayerTimesInput,
+  type PrayerTimesResult,
+} from "../src/index";
 import jakartaFeb from "./fixtures/jakarta-2026-02.json";
 import jakartaMar from "./fixtures/jakarta-2026-03.json";
 import jakartaAug from "./fixtures/jakarta-2026-08.json";
@@ -22,6 +29,20 @@ import meraukeMar from "./fixtures/merauke-2026-03.json";
  * Observed max error is 1 min for every prayer; the test allows 2.
  */
 const TOLERANCE_MIN = 2;
+
+type StrictResult = Omit<PrayerTimesResult, "times" | "local"> & {
+  times: Record<PrayerName, Date>;
+  local: Record<PrayerName, string>;
+};
+
+/** calculatePrayerTimes for locations where every prayer occurs. */
+function calc(input: PrayerTimesInput): StrictResult {
+  const r = calculatePrayerTimes(input);
+  for (const k of Object.keys(r.times) as PrayerName[]) {
+    if (r.times[k] === null) throw new Error(`${k} unexpectedly undefined`);
+  }
+  return r as StrictResult;
+}
 
 const toMin = (hhmm: string) => {
   const [h, m] = hhmm.split(":").map(Number);
@@ -102,7 +123,7 @@ describe("Kemenag method vs published jadwal (±2 min)", () => {
       expect(c.fixture.jadwal.length).toBeGreaterThanOrEqual(28);
       for (const row of c.fixture.jadwal) {
         const [year, month, day] = row.date.split("-").map(Number);
-        const r = calculatePrayerTimes({
+        const r = calc({
           latitude: c.latitude,
           longitude: c.longitude,
           date: { year, month, day },
@@ -131,15 +152,15 @@ const base = {
 
 describe("options", () => {
   test("Hanafi Asr is later than Shafi'i", () => {
-    const s = calculatePrayerTimes({ ...base, asr: "shafii" });
-    const h = calculatePrayerTimes({ ...base, asr: "hanafi" });
+    const s = calc({ ...base, asr: "shafii" });
+    const h = calc({ ...base, asr: "hanafi" });
     expect(h.times.asr.getTime()).toBeGreaterThan(s.times.asr.getTime() + 30 * 60_000);
     expect(h.times.dhuhr.getTime()).toBe(s.times.dhuhr.getTime());
   });
 
   test("per-prayer offsets apply", () => {
-    const a = calculatePrayerTimes(base);
-    const b = calculatePrayerTimes({ ...base, offsets: { fajr: 3, dhuhr: -2, isha: 5 } });
+    const a = calc(base);
+    const b = calc({ ...base, offsets: { fajr: 3, dhuhr: -2, isha: 5 } });
     expect(b.times.fajr.getTime() - a.times.fajr.getTime()).toBe(3 * 60_000);
     expect(b.times.dhuhr.getTime() - a.times.dhuhr.getTime()).toBe(-2 * 60_000);
     expect(b.times.isha.getTime() - a.times.isha.getTime()).toBe(5 * 60_000);
@@ -147,16 +168,16 @@ describe("options", () => {
   });
 
   test("imsak = fajr - N (default 10)", () => {
-    const a = calculatePrayerTimes(base);
+    const a = calc(base);
     expect(a.times.fajr.getTime() - a.times.imsak.getTime()).toBe(10 * 60_000);
-    const b = calculatePrayerTimes({ ...base, imsakMinutes: 15 });
+    const b = calc({ ...base, imsakMinutes: 15 });
     expect(b.times.fajr.getTime() - b.times.imsak.getTime()).toBe(15 * 60_000);
   });
 
   test("every method yields ordered times", () => {
     const methods: MethodId[] = ["kemenag", "mwl", "isna", "ummAlQura", "egyptian", "singapore"];
     for (const method of methods) {
-      const t = calculatePrayerTimes({ ...base, method }).times;
+      const t = calc({ ...base, method }).times;
       const order = [t.imsak, t.fajr, t.sunrise, t.dhuhr, t.asr, t.maghrib, t.isha].map((d) =>
         d.getTime(),
       );
@@ -165,13 +186,13 @@ describe("options", () => {
   });
 
   test("method angles differ: ISNA (15°) Fajr later than MWL (18°)", () => {
-    const mwl = calculatePrayerTimes({ ...base, method: "mwl" });
-    const isna = calculatePrayerTimes({ ...base, method: "isna" });
+    const mwl = calc({ ...base, method: "mwl" });
+    const isna = calc({ ...base, method: "isna" });
     expect(isna.times.fajr.getTime()).toBeGreaterThan(mwl.times.fajr.getTime());
   });
 
   test("Umm al-Qura Isha is Maghrib + 90 min (Makkah)", () => {
-    const r = calculatePrayerTimes({
+    const r = calc({
       latitude: 21.3891,
       longitude: 39.8579,
       date: { year: 2026, month: 5, day: 10 },
@@ -191,8 +212,8 @@ describe("timezones", () => {
   };
 
   test("London spring-forward keeps local clock continuous, UTC jumps 1h", () => {
-    const before = calculatePrayerTimes({ ...london, date: { year: 2026, month: 3, day: 28 } });
-    const after = calculatePrayerTimes({ ...london, date: { year: 2026, month: 3, day: 30 } });
+    const before = calc({ ...london, date: { year: 2026, month: 3, day: 28 } });
+    const after = calc({ ...london, date: { year: 2026, month: 3, day: 30 } });
     // Dhuhr local clock moves ~1h later across the change (GMT -> BST) plus ~2 min solar drift.
     const mins = (s: string) => toMin(s);
     const localDelta = mins(after.local.dhuhr) - mins(before.local.dhuhr);
@@ -205,21 +226,21 @@ describe("timezones", () => {
   });
 
   test("London summer dhuhr ~13:0x BST, winter ~12:0x GMT", () => {
-    const summer = calculatePrayerTimes({ ...london, date: { year: 2026, month: 7, day: 1 } });
-    const winter = calculatePrayerTimes({ ...london, date: { year: 2026, month: 1, day: 1 } });
+    const summer = calc({ ...london, date: { year: 2026, month: 7, day: 1 } });
+    const winter = calc({ ...london, date: { year: 2026, month: 1, day: 1 } });
     expect(summer.local.dhuhr.startsWith("13:")).toBe(true);
     expect(winter.local.dhuhr.startsWith("12:")).toBe(true);
   });
 
   test("same instant formats per requested zone", () => {
-    const jak = calculatePrayerTimes({ ...base });
-    const wita = calculatePrayerTimes({ ...base, timeZone: "Asia/Makassar" });
+    const jak = calc({ ...base });
+    const wita = calc({ ...base, timeZone: "Asia/Makassar" });
     expect(jak.times.dhuhr.getTime()).toBe(wita.times.dhuhr.getTime());
     expect(toMin(wita.local.dhuhr) - toMin(jak.local.dhuhr)).toBe(60);
   });
 
   test("civil date is honoured for far-east zones (Auckland)", () => {
-    const r = calculatePrayerTimes({
+    const r = calc({
       latitude: -36.8485,
       longitude: 174.7633,
       date: { year: 2026, month: 6, day: 15 },
@@ -233,23 +254,39 @@ describe("timezones", () => {
 });
 
 describe("hijri", () => {
-  test("known umalqura date: 2026-03-20 is 1 Shawwal 1447", () => {
-    const h = hijriDate({ year: 2026, month: 3, day: 20 });
-    expect(h.year).toBe(1447);
-    expect(h.month).toBe(10);
+  const nextDay = (a: { year: number; month: number; day: number }, b: typeof a) =>
+    (b.year === a.year && b.month === a.month && b.day === a.day + 1) ||
+    (b.day === 1 &&
+      ((b.year === a.year && b.month === a.month + 1) ||
+        (b.year === a.year + 1 && b.month === 1 && a.month === 12)));
+  const pick = (h: ReturnType<typeof hijriDate>) => ({ year: h.year, month: h.month, day: h.day });
+
+  test("2026-03-20 is exactly 1447-10-01 (umalqura)", () => {
+    expect(pick(hijriDate({ year: 2026, month: 3, day: 20 }))).toEqual({
+      year: 1447,
+      month: 10,
+      day: 1,
+    });
   });
 
-  test("day offset shifts the date", () => {
-    const a = hijriDate({ year: 2026, month: 3, day: 15 });
-    const b = hijriDate({ year: 2026, month: 3, day: 15 }, -1);
-    const c = hijriDate({ year: 2026, month: 3, day: 15 }, 1);
-    expect(a.month === b.month ? a.day - b.day : 1).toBe(1);
-    expect(c.month === a.month ? c.day - a.day : 1).toBe(1);
+  test("offset -1 on 2026-03-20 gives the last day of Ramadan 1447", () => {
+    const h = pick(hijriDate({ year: 2026, month: 3, day: 20 }, -1));
+    expect(h).toMatchObject({ year: 1447, month: 9 });
+    expect(nextDay(h, { year: 1447, month: 10, day: 1 })).toBe(true);
   });
 
-  test("calendar is a Hijri calendar", () => {
-    expect(["islamic-umalqura", "islamic-civil"]).toContain(
-      hijriDate({ year: 2026, month: 1, day: 1 }).calendar,
-    );
+  test("offsets are consecutive days, including across month boundaries", () => {
+    for (const date of [
+      { year: 2026, month: 3, day: 20 },
+      { year: 2026, month: 3, day: 15 },
+      { year: 2026, month: 12, day: 31 },
+    ]) {
+      const prev = pick(hijriDate(date, -1));
+      const cur = pick(hijriDate(date, 0));
+      const next = pick(hijriDate(date, 1));
+      expect(nextDay(prev, cur)).toBe(true);
+      expect(nextDay(cur, next)).toBe(true);
+      expect(hijriDate(date, 2)).toMatchObject(pick(hijriDate({ ...date, day: date.day + 2 })));
+    }
   });
 });

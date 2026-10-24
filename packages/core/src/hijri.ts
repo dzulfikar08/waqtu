@@ -17,9 +17,16 @@ function supports(calendar: string): boolean {
   }
 }
 
-const CALENDAR: HijriDate["calendar"] = supports("islamic-umalqura")
-  ? "islamic-umalqura"
-  : "islamic-civil";
+let calendar: HijriDate["calendar"] | undefined;
+
+function resolveCalendar(): HijriDate["calendar"] {
+  if (!calendar) {
+    const found = (["islamic-umalqura", "islamic-civil"] as const).find(supports);
+    if (!found) throw new Error("Runtime Intl supports neither islamic-umalqura nor islamic-civil");
+    calendar = found;
+  }
+  return calendar;
+}
 
 /**
  * Hijri date for a civil date, shifted by `dayOffset` days (user moon-sighting correction,
@@ -27,6 +34,7 @@ const CALENDAR: HijriDate["calendar"] = supports("islamic-umalqura")
  * to islamic-civil when the runtime lacks it.
  */
 export function hijriDate(date: CivilDate, dayOffset = 0): HijriDate {
+  const CALENDAR = resolveCalendar();
   // Noon UTC avoids any zone edge: only the civil Y-M-D matters.
   const instant = new Date(Date.UTC(date.year, date.month - 1, date.day + dayOffset, 12));
   const fmt = new Intl.DateTimeFormat("en-u-ca-" + CALENDAR, {

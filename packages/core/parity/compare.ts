@@ -42,12 +42,17 @@ for (const city of cities) {
         method,
       });
       for (const n of names) {
-        const diff = Math.abs(ts.times[n].getTime() - (day[n] as number) * 1000);
+        const instant = ts.times[n];
+        if (!instant) {
+          failures.push(`${city.id}/${swiftId}/${day.date}/${n}: ts undefined`);
+          continue;
+        }
+        const diff = Math.abs(instant.getTime() - (day[n] as number) * 1000);
         compared++;
         worst = Math.max(worst, diff);
         if (diff > tolMs) {
           failures.push(
-            `${city.id}/${swiftId}/${day.date}/${n}: ts=${ts.times[n].toISOString()} swift=${new Date((day[n] as number) * 1000).toISOString()}`,
+            `${city.id}/${swiftId}/${day.date}/${n}: ts=${instant.toISOString()} swift=${new Date((day[n] as number) * 1000).toISOString()}`,
           );
         }
       }

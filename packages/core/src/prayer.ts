@@ -44,10 +44,10 @@ export interface PrayerTimesInput {
 export interface PrayerTimesResult {
   date: CivilDate;
   timeZone: string;
-  /** Absolute instants. */
-  times: Record<PrayerName, Date>;
-  /** Wall-clock "HH:mm" in `timeZone`. */
-  local: Record<PrayerName, string>;
+  /** Absolute instants; null when the prayer does not occur (polar day/night). */
+  times: Record<PrayerName, Date | null>;
+  /** Wall-clock "HH:mm" in `timeZone`; null when the prayer does not occur. */
+  local: Record<PrayerName, string | null>;
 }
 
 /**
@@ -148,21 +148,30 @@ export function calculatePrayerTimes(input: PrayerTimesInput): PrayerTimesResult
     isha: o.isha ?? 0,
   };
 
-  // adhan reads the civil date from the Date's local getters, so build it in local fields.
-  const pt = new PrayerTimes(coords, new Date(date.year, date.month - 1, date.day, 12), params);
+  const run = (d: CivilDate) =>
+    // adhan reads the civil date from the Date's local getters, so build it in local fields.
+    new PrayerTimes(coords, new Date(d.year, d.month - 1, d.day, 12), params);
 
-  // adhan computes instants for the civil date at the *location's* solar day and returns UTC
-  // instants; the civil day in `timeZone` may differ by +-1 day from the host-local one, so
-  // re-anchor: shift the whole result by whole days until dhuhr falls on the requested day.
+  // adhan returns UTC instants for the solar day of the date it is given; in zones far from
+  // UTC (e.g. Pacific/Kiritimati) that day is a different civil day in `timeZone`. Find the
+  // shift from a first pass, then recompute for the adjusted date so every astronomical input
+  // (declination, equation of time, night length) belongs to the requested civil day.
+  let pt = run(date);
   const dayShift = shiftToCivilDay(pt.dhuhr, date, timeZone);
-  const shiftMs = dayShift * 86_400_000;
+  if (dayShift !== 0) {
+    const adj = new Date(Date.UTC(date.year, date.month - 1, date.day + dayShift));
+    pt = run({ year: adj.getUTCFullYear(), month: adj.getUTCMonth() + 1, day: adj.getUTCDate() });
+  }
+
   // adhan-js leaves sub-second residue after minute rounding; snap to the exact minute.
-  const at = (d: Date) => new Date(Math.round((d.getTime() + shiftMs) / MS_MIN) * MS_MIN);
+  // Prayers that do not occur (polar day/night) come back as Invalid Date -> null.
+  const at = (d: Date): Date | null =>
+    Number.isNaN(d.getTime()) ? null : new Date(Math.round(d.getTime() / MS_MIN) * MS_MIN);
 
   const imsakMin = input.imsakMinutes ?? DEFAULT_IMSAK_MINUTES;
   const fajr = at(pt.fajr);
-  const times: Record<PrayerName, Date> = {
-    imsak: new Date(fajr.getTime() - imsakMin * MS_MIN + (o.imsak ?? 0) * MS_MIN),
+  const times: Record<PrayerName, Date | null> = {
+    imsak: fajr && new Date(fajr.getTime() + ((o.imsak ?? 0) - imsakMin) * MS_MIN),
     fajr,
     sunrise: at(pt.sunrise),
     dhuhr: at(pt.dhuhr),
@@ -171,8 +180,11 @@ export function calculatePrayerTimes(input: PrayerTimesInput): PrayerTimesResult
     isha: at(pt.isha),
   };
   const local = Object.fromEntries(
-    (Object.keys(times) as PrayerName[]).map((k) => [k, formatLocalTime(times[k], timeZone)]),
-  ) as Record<PrayerName, string>;
+    (Object.keys(times) as PrayerName[]).map((k) => {
+      const t = times[k];
+      return [k, t && formatLocalTime(t, timeZone)];
+    }),
+  ) as Record<PrayerName, string | null>;
   return { date, timeZone, times, local };
 }
 
