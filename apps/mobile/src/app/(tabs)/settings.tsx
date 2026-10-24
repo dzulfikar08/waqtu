@@ -91,6 +91,9 @@ export default function SettingsScreen() {
       <Section title={t("ramadhan.tab")}>
         <Row label={t("ramadhan.settingsRow")} onPress={() => router.push("/ramadhan")} />
       </Section>
+      <Section title={t("hafalan.title")}>
+        <Row label={t("hafalan.settingsRow")} onPress={() => router.push("/hafalan")} />
+      </Section>
       {authClient ? <PremiumSection /> : null}
       {authClient ? <AccountSection client={authClient} /> : null}
     </ScrollView>

@@ -42,7 +42,7 @@
       [
         "expo-audio",
         {
-          "microphonePermission": "Waqtu memakai mikrofon hanya saat kamu merekam pesan suara untuk lingkaran.",
+          "microphonePermission": "Waqtu memakai mikrofon hanya saat kamu merekam: pesan suara untuk lingkaran atau bacaan hafalanmu (rekaman hafalan tetap di ponsel ini).",
           "enableBackgroundRecording": false,
           "enableBackgroundPlayback": false
         }

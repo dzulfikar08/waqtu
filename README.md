@@ -151,6 +151,7 @@ account; link a Mac license key from the paywall.
 
 - `services/api`: [AGPL-3.0-only](services/api/LICENSE). If you run a modified server, publish your changes.
 - Everything else: [MPL-2.0](LICENSE). File-level copyleft, compatible with App Store distribution.
+- `content/quran` and `apps/mobile/assets/fonts`: third-party Quran text and metadata (Tanzil Project, CC BY 3.0, verbatim only) and the Amiri Quran font (SIL OFL 1.1). Terms in [`content/quran/README.md`](content/quran/README.md).
 
 The **Waqtu** name and logo are not covered by these licenses; forks must use their own branding.
 

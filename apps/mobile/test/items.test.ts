@@ -58,12 +58,17 @@ describe("fardh flags", () => {
 });
 
 describe("checklist items", () => {
-  test("defaults to the built-ins without the seasonal halaqah item", () => {
+  test("defaults to the built-ins without the opt-in halaqah and murojaah items", () => {
     expect(parseItems(null)).toEqual([...DEFAULT_ITEMS]);
     expect(parseItems("garbage")).toEqual([...DEFAULT_ITEMS]);
     expect(parseItems("{}")).toEqual([...DEFAULT_ITEMS]);
     expect(DEFAULT_ITEMS.some((i) => i.id === "halaqah")).toBe(false);
     expect(BUILTIN_ITEMS.some((i) => i.id === "halaqah")).toBe(true);
+    expect(DEFAULT_ITEMS.some((i) => i.id === "murojaah")).toBe(false);
+    expect(BUILTIN_ITEMS.find((i) => i.id === "murojaah")).toEqual({
+      id: "murojaah",
+      kind: "check",
+    });
   });
 
   test("add custom, remove, add built-in back, round trip", () => {
@@ -71,7 +76,7 @@ describe("checklist items", () => {
     items = addCustomItem(items, "  Baca Al-Mulk  ", "check", () => "abcd1234");
     expect(items.at(-1)).toEqual({ id: "c.abcd1234", kind: "check", label: "Baca Al-Mulk" });
     items = removeItem(items, "tahajjud");
-    expect(missingBuiltins(items).map((i) => i.id)).toEqual(["tahajjud", "halaqah"]);
+    expect(missingBuiltins(items).map((i) => i.id)).toEqual(["tahajjud", "halaqah", "murojaah"]);
     items = addBuiltinItem(items, "tahajjud");
     expect(items.at(-1)?.id).toBe("tahajjud");
     expect(parseItems(serializeItems(items))).toEqual(items);
