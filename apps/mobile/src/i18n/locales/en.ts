@@ -1,3 +1,4 @@
+import { ramadhanEn } from "@/ramadhan/strings";
 import type { id } from "./id";
 
 type Widen<T> = { [K in keyof T]: T[K] extends string ? string : Widen<T[K]> };
@@ -19,4 +20,5 @@ export const en: Widen<typeof id> = {
     signOut: "Sign out",
     signInFailed: "Sign-in failed. Try again.",
   },
+  ramadhan: ramadhanEn,
 };

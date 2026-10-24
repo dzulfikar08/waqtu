@@ -1,3 +1,5 @@
+import { ramadhanId } from "@/ramadhan/strings";
+
 export const id = {
   tabs: { today: "Hari ini", settings: "Pengaturan" },
   today: { hijri: "Hijriah" },
@@ -15,4 +17,5 @@ export const id = {
     signOut: "Keluar",
     signInFailed: "Gagal masuk. Coba lagi.",
   },
+  ramadhan: ramadhanId,
 } as const;

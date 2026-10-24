@@ -1,5 +1,6 @@
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "expo-router";
 import { Linking, ScrollView, StyleSheet } from "react-native";
 
 import { AccountSection } from "@/components/AccountSection";
@@ -16,6 +17,7 @@ import { spacing, useTheme } from "@/theme";
 
 export default function SettingsScreen() {
   const db = useSQLiteContext();
+  const router = useRouter();
   const { t } = useTranslation();
   const theme = useTheme();
   const [pref, setPref] = useState<LocalePref>("auto");
@@ -74,6 +76,9 @@ export default function SettingsScreen() {
         ) : (
           <Row label={t("settings.notificationsAsk")} onPress={() => void askNotifications()} />
         )}
+      </Section>
+      <Section title={t("ramadhan.tab")}>
+        <Row label={t("ramadhan.settingsRow")} onPress={() => router.push("/ramadhan")} />
       </Section>
       {authClient ? <AccountSection client={authClient} /> : null}
     </ScrollView>
