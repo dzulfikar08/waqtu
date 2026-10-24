@@ -1,3 +1,4 @@
+import { circlesEn } from "@/circles/strings";
 import { ramadhanEn } from "@/ramadhan/strings";
 import type { id } from "./id";
 
@@ -150,4 +151,5 @@ export const en: Widen<typeof id> = {
     signInFailed: "Sign-in failed. Try again.",
   },
   ramadhan: ramadhanEn,
+  circles: circlesEn,
 };

@@ -1,4 +1,5 @@
 import { getAuth } from "./auth";
+import { handleCircles, isCirclesPath } from "./circles/router";
 import type { AppEnv } from "./env";
 import { applyWrites, readChanges } from "./sync";
 import { parseLimit, parseSince, parseSyncBody, ValidationError } from "./validate";
@@ -45,6 +46,11 @@ function json(body: unknown, status = 200): Response {
 
 async function handleV1(request: Request, env: AppEnv, url: URL): Promise<Response> {
   const route = url.pathname;
+  if (isCirclesPath(route)) {
+    const session = await getAuth(env).api.getSession({ headers: request.headers });
+    if (!session) return json({ error: "unauthorized" }, 401);
+    return handleCircles(request, env, session.user.id, url);
+  }
   const isSync = route === "/v1/sync";
   const isMe = route === "/v1/me";
   if (!isSync && !isMe) return json({ error: "not_found" }, 404);

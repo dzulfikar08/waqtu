@@ -9,6 +9,7 @@ export default defineConfig({
       miniflare: {
         bindings: {
           ENVIRONMENT: "test",
+          ADMIN_USER_IDS: "admin-circles-test, someone-else",
           BETTER_AUTH_SECRET: "test-secret-test-secret-test-secret-0123",
           BETTER_AUTH_URL: "http://localhost",
           APPLE_CLIENT_ID: "dat.waqtu.ios",

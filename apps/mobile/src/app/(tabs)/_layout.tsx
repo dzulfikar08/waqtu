@@ -25,6 +25,7 @@ export default function TabsLayout() {
         name="ramadhan"
         options={{ title: t("ramadhan.tab"), href: showRamadhan ? undefined : null }}
       />
+      <Tabs.Screen name="circles" options={{ title: t("circles.tab") }} />
       <Tabs.Screen name="settings" options={{ title: t("tabs.settings") }} />
     </Tabs>
   );

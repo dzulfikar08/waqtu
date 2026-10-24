@@ -1,3 +1,4 @@
+import { circlesId } from "@/circles/strings";
 import { ramadhanId } from "@/ramadhan/strings";
 
 export const id = {
@@ -147,4 +148,5 @@ export const id = {
     signInFailed: "Gagal masuk. Coba lagi.",
   },
   ramadhan: ramadhanId,
+  circles: circlesId,
 } as const;

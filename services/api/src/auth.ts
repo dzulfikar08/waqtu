@@ -1,6 +1,7 @@
 import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
 import { bearer } from "better-auth/plugins";
+import { deleteUserMedia } from "./circles/cleanup";
 import type { AppEnv } from "./env";
 
 export const APPLE_BUNDLE_ID = "dat.waqtu.ios";
@@ -43,7 +44,16 @@ export function createAuth(env: AppEnv) {
       ...(apple ? { apple } : {}),
       ...(google ? { google } : {}),
     },
-    user: { deleteUser: { enabled: true } },
+    user: {
+      deleteUser: {
+        enabled: true,
+        // Voice notes live in R2, outside the foreign-key cascade: remove them while the rows that
+        // name them still exist.
+        beforeDelete: async (user) => {
+          await deleteUserMedia(env, user.id);
+        },
+      },
+    },
     plugins: [expo(), bearer()],
   });
 }

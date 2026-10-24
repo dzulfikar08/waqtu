@@ -1,5 +1,6 @@
 import { handleReleases, type ReleaseBucket } from "./releases";
 import { handleApp } from "./src/app";
+import { sweepOrphanUploads } from "./src/circles/cleanup";
 import type { AppEnv } from "./src/env";
 
 interface D1Database {
@@ -263,5 +264,10 @@ export default {
     }
 
     return new Response("Not found", { status: 404 });
+  },
+
+  /** Hourly cron (wrangler.toml): drops circle voice notes uploaded but never posted. */
+  async scheduled(_controller: ScheduledController, env: AppEnv, ctx: ExecutionContext) {
+    ctx.waitUntil(sweepOrphanUploads(env, Date.now()));
   },
 };

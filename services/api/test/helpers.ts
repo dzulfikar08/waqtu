@@ -21,8 +21,8 @@ export interface TestUser {
 }
 
 /** Inserts a user + session row and returns the cookie better-auth expects. */
-export async function createUser(name: string): Promise<TestUser> {
-  const id = `user-${name}-${crypto.randomUUID()}`;
+export async function createUser(name: string, fixedId?: string): Promise<TestUser> {
+  const id = fixedId ?? `user-${name}-${crypto.randomUUID()}`;
   const email = `${name}@example.test`;
   const token = crypto.randomUUID().replaceAll("-", "");
   const now = new Date().toISOString();
