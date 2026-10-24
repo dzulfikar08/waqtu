@@ -25,7 +25,9 @@ trap 'adb exec-out screencap -p > "$out/failure.png" || true; adb logcat -d > "$
 out=$(cd "$out" && pwd)
 cd "$out"
 for locale in id en; do
-  maestro test -e APP_ID="$app_id" -e LOCALE="$locale" -e OUT_DIR="$out" --debug-output "$out/debug-$locale" --flatten-debug-output "$flow"
+  maestro test -e APP_ID="$app_id" -e LOCALE="$locale" --test-output-dir "$out/maestro-$locale" "$flow"
+  # Maestro writes screenshots into its artifact folder; collect them next to each other.
+  find "$out/maestro-$locale" -name "$locale-*.png" -exec cp {} "$out/" \;
 done
 adb shell wm size | tee size.txt
 ls -l

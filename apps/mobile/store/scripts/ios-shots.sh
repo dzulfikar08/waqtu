@@ -23,7 +23,9 @@ mkdir -p "$out"
 out=$(cd "$out" && pwd)
 cd "$out"
 for locale in id en; do
-  maestro --device "$udid" test -e APP_ID="$app_id" -e LOCALE="$locale" -e OUT_DIR="$out" --debug-output "$out/debug-$locale" --flatten-debug-output "$flow"
+  maestro --device "$udid" test -e APP_ID="$app_id" -e LOCALE="$locale" --test-output-dir "$out/maestro-$locale" "$flow"
+  # Maestro writes screenshots into its artifact folder; collect them next to each other.
+  find "$out/maestro-$locale" -name "$locale-*.png" -exec cp {} "$out/" \;
 done
 xcrun simctl list devices | grep "$udid" | tee device.txt
 ls -l
