@@ -6,6 +6,7 @@ import { Button, Hint, ProgressBar } from "@/ramadhan/components/fields";
 import { spacing, useTheme } from "@/theme";
 import { DayList } from "@/halaqah/components/DayList";
 import { SessionView, useLang } from "@/halaqah/components/SessionView";
+import { halaqahAvailable } from "@/halaqah/bundled";
 import { dayOf } from "@/halaqah/program";
 import { nextUncompletedDay } from "@/halaqah/schedule";
 import { useHalaqahProgress, useHalaqahToday } from "@/halaqah/useHalaqah";
@@ -21,6 +22,10 @@ export default function HalaqahScreen() {
   const lang = useLang();
   const today = useHalaqahToday();
   const done = useHalaqahProgress(today?.program.id ?? "");
+  if (!halaqahAvailable())
+    return (
+      <Text style={[styles.unavailable, { color: theme.muted }]}>{t("halaqah.unavailable")}</Text>
+    );
   if (!today || !done) return null;
 
   const { program, position, todayKey } = today;
@@ -83,6 +88,7 @@ export default function HalaqahScreen() {
 }
 
 const styles = StyleSheet.create({
+  unavailable: { padding: spacing.lg },
   content: { padding: spacing.md, gap: spacing.lg },
   header: { gap: spacing.sm, paddingHorizontal: spacing.sm },
   title: { fontSize: 24, fontWeight: "700" },

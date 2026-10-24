@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, Text } from "react-native";
 import { useTranslation } from "@/i18n";
 import { spacing, useTheme } from "@/theme";
 import { SessionView } from "@/halaqah/components/SessionView";
+import { halaqahAvailable } from "@/halaqah/bundled";
 import { dayOf } from "@/halaqah/program";
 import { useHalaqahProgress, useHalaqahToday } from "@/halaqah/useHalaqah";
 
@@ -14,6 +15,10 @@ export default function HalaqahDayScreen() {
   const theme = useTheme();
   const today = useHalaqahToday();
   const done = useHalaqahProgress(today?.program.id ?? "");
+  if (!halaqahAvailable())
+    return (
+      <Text style={[styles.unavailable, { color: theme.muted }]}>{t("halaqah.unavailable")}</Text>
+    );
   if (!today || !done) return null;
 
   const entry = dayOf(today.program, Number(param));
@@ -38,4 +43,7 @@ export default function HalaqahDayScreen() {
   );
 }
 
-const styles = StyleSheet.create({ content: { padding: spacing.md, gap: spacing.lg } });
+const styles = StyleSheet.create({
+  content: { padding: spacing.md, gap: spacing.lg },
+  unavailable: { padding: spacing.lg },
+});

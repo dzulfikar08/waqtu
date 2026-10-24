@@ -11,7 +11,7 @@ import {
   uncompleteDay,
 } from "../src/halaqah/db";
 import { embedHtml, embedUrl, isEmbedNavigation } from "../src/halaqah/embed";
-import { parseProgram, ProgramError, YOUTUBE_ID } from "../src/halaqah/program";
+import { isReleasable, parseProgram, ProgramError, YOUTUBE_ID } from "../src/halaqah/program";
 import { nextUncompletedDay, programPosition } from "../src/halaqah/schedule";
 import { getEntriesBetween } from "../src/db/entries";
 import { MIGRATIONS } from "../src/db/migrations";
@@ -146,6 +146,19 @@ describe("programPosition", () => {
 
   test("a program shorter than Ramadhan clamps to its last day", () => {
     expect(at(2027, 2, 19, 0, 10)).toEqual({ kind: "during", day: 10 });
+  });
+});
+
+describe("isReleasable", () => {
+  test("only approved content reaches production; anything shows in development", () => {
+    expect(isReleasable({ status: "approved" }, false)).toBe(true);
+    expect(isReleasable({ status: "draft-pending-owner-approval" }, false)).toBe(false);
+    expect(isReleasable({ status: "draft-pending-owner-approval" }, true)).toBe(true);
+    expect(isReleasable({ status: "Approved" }, false)).toBe(false);
+  });
+
+  test("the bundled program is gated by its status", () => {
+    expect(isReleasable(bundledProgram(), false)).toBe(bundledProgram().status === "approved");
   });
 });
 

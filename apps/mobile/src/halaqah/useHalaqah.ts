@@ -7,7 +7,7 @@ import { useNow } from "@/hooks/useMutabaah";
 import { dayKeyInZone, type DayKey } from "@/mutabaah/dates";
 import { readPrayerSettings } from "@/prayer/config";
 import { getProgress } from "./db";
-import { bundledProgram } from "./bundled";
+import { bundledProgram, halaqahAvailable } from "./bundled";
 import type { Program } from "./program";
 import { programPosition, type ProgramPosition } from "./schedule";
 
@@ -37,7 +37,7 @@ export function useHalaqahToday(): HalaqahToday | null {
     };
   }, [db, version]);
 
-  if (!settings) return null;
+  if (!settings || !halaqahAvailable()) return null;
   const program = bundledProgram();
   const zone = settings.zone ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
   const parts: CivilDate = civilParts(now, zone);

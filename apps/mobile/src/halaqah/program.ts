@@ -242,6 +242,14 @@ export function parseProgram(json: unknown): Program {
   return program;
 }
 
+/** The only `status` that may reach users in a production build. */
+export const APPROVED_STATUS = "approved";
+
+/** Unapproved content shows in development builds only; `dev` is `__DEV__`. */
+export function isReleasable(program: Pick<Program, "status">, dev: boolean): boolean {
+  return program.status === APPROVED_STATUS || dev;
+}
+
 export function dayOf(program: Program, day: number): ProgramDay | null {
   return program.days[day - 1] ?? null;
 }

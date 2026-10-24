@@ -35,6 +35,7 @@ export const halaqahId = {
   sources: "Rujukan",
   contentNote: "Kajian, ringkasan, dan catatan berbahasa Indonesia.",
   notFound: "Kajian ini tidak ditemukan.",
+  unavailable: "Program halaqah belum tersedia.",
 } as const;
 
 type Widen<T> = { [K in keyof T]: T[K] extends string ? string : Widen<T[K]> };
@@ -74,4 +75,5 @@ export const halaqahEn: Widen<typeof halaqahId> = {
   sources: "References",
   contentNote: "Talks, summaries, and notes are in Indonesian.",
   notFound: "This talk was not found.",
+  unavailable: "The halaqah program is not available yet.",
 };

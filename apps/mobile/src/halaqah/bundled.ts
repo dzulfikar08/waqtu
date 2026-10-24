@@ -1,5 +1,5 @@
 import programJson from "../../../../content/halaqah/ramadhan-1448/program.json";
-import { parseProgram, type Program } from "./program";
+import { isReleasable, parseProgram, type Program } from "./program";
 
 let cached: Program | undefined;
 
@@ -10,4 +10,9 @@ let cached: Program | undefined;
 export function bundledProgram(): Program {
   cached ??= parseProgram(programJson);
   return cached;
+}
+
+/** Whether the bundled program may be shown in this build: approved content, or any content in `__DEV__`. */
+export function halaqahAvailable(): boolean {
+  return isReleasable(bundledProgram(), __DEV__);
 }
