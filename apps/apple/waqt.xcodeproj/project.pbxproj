@@ -1224,8 +1224,8 @@
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times. Full access is required to add and remove these events.";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqtu needs your location to calculate accurate prayer times.";
-				INFOPLIST_KEY_SUFeedURL = "https://waqt-updates.dzulfikar-at.workers.dev/appcast.xml";
-				INFOPLIST_KEY_SUPublicEDKey = "QjfPsPnJITpL/7c7PFaxPQISzgKHnYn5jm0oXMfPNlU=";
+				INFOPLIST_KEY_SUFeedURL = "https://dl.getwaqtu.com/appcast.xml";
+				INFOPLIST_KEY_SUPublicEDKey = "l6zN4BLoja02J3sqJTs2CQRDWNmUId9ryB0p4P0MwfE=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1257,8 +1257,8 @@
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times. Full access is required to add and remove these events.";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Waqtu needs your location to calculate accurate prayer times.";
-				INFOPLIST_KEY_SUFeedURL = "https://waqt-updates.dzulfikar-at.workers.dev/appcast.xml";
-				INFOPLIST_KEY_SUPublicEDKey = "QjfPsPnJITpL/7c7PFaxPQISzgKHnYn5jm0oXMfPNlU=";
+				INFOPLIST_KEY_SUFeedURL = "https://dl.getwaqtu.com/appcast.xml";
+				INFOPLIST_KEY_SUPublicEDKey = "l6zN4BLoja02J3sqJTs2CQRDWNmUId9ryB0p4P0MwfE=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",

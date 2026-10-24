@@ -4,8 +4,8 @@
 # Manual only. Secrets live in the `release` environment:
 #   DEVELOPER_ID_P12_BASE64, DEVELOPER_ID_P12_PASSWORD   Developer ID Application certificate (.p12)
 #   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_BASE64            App Store Connect API key (.p8) for notarytool
-#   SPARKLE_ED_PRIVATE_KEY                               Sparkle EdDSA private key (`generate_keys -x key.txt`)
-#   CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID          R2 upload + D1 insert
+#   SPARKLE_ED_PRIVATE_KEY                               Sparkle EdDSA private key (base64 seed, as `generate_keys -x` exports)
+#   RELEASE_UPLOAD_TOKEN                                 Bearer token of the updates worker's /releases API (DMG → R2, row → D1)
 name: Release macOS
 
 on:
@@ -35,8 +35,7 @@ jobs:
     env:
       ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
       ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      RELEASE_UPLOAD_TOKEN: ${{ secrets.RELEASE_UPLOAD_TOKEN }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

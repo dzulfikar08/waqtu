@@ -1,6 +1,9 @@
+import { handleReleases, type ReleaseBucket } from "./releases";
+
 interface D1Database {
   prepare(query: string): {
     all<T>(): Promise<{ results: T[] }>;
+    bind(...values: unknown[]): { run(): Promise<unknown> };
   };
 }
 
@@ -116,11 +119,17 @@ export default {
     request: Request,
     env: {
       DB: D1Database;
+      BUCKET: ReleaseBucket;
       POLAR_ACCESS_TOKEN?: string;
       POLAR_ORG_ID?: string;
+      RELEASE_UPLOAD_TOKEN?: string;
+      R2_PUBLIC_BASE_URL?: string;
     },
   ): Promise<Response> {
     const url = new URL(request.url);
+
+    const release = await handleReleases(request, env);
+    if (release) return release;
 
     // Redirect to latest DMG (for landing page "Download for Mac" link)
     if (request.method === "GET" && url.pathname === "/latest") {

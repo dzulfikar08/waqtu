@@ -18,7 +18,8 @@ set -euo pipefail
 # Env vars:
 #   NOTARIZE=1                    Enable Apple notarization (requires credentials)
 #   CODESIGN_IDENTITY=SHA1        Override signing identity
-#   R2_PUBLIC_BASE_URL=...        R2 public URL for downloads
+#   RELEASE_UPLOAD_TOKEN=...      Bearer token for the updates worker's /releases API (required unless SKIP_UPLOAD=1)
+#   RELEASE_API_URL=...           Updates worker base URL (default https://dl.getwaqtu.com)
 #   SKIP_BUILD=1                  Skip xcodebuild (reuse existing .app)
 #   SKIP_UPLOAD=1                 Skip R2/D1 (dry-run Sparkle signing only)
 #   SPARKLE_ED_KEY_FILE=path      Sign with this EdDSA private key file instead of the login keychain (CI)
@@ -27,7 +28,6 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-WORKER_DIR="$(cd "$PROJECT_DIR/../../services/api" && pwd)"
 BUILD_DIR="$PROJECT_DIR/build"
 
 # ---- Parse args ----
@@ -51,8 +51,6 @@ fi
 DMG_NAME="Waqtu-${VERSION}.dmg"
 DMG_PATH="$BUILD_DIR/$DMG_NAME"
 APP_PATH="$BUILD_DIR/DerivedData/Build/Products/Release/waqtu.app"
-R2_BUCKET="waqt-releases"
-R2_PUBLIC_BASE_URL="${R2_PUBLIC_BASE_URL:-https://waqt-r2-release.dzulfikar.com}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
 SKIP_UPLOAD="${SKIP_UPLOAD:-0}"
 
@@ -88,15 +86,10 @@ if [[ ! -d "$PROJECT_DIR/waqt.xcodeproj" ]]; then
 fi
 ok "Project directory: $PROJECT_DIR"
 
-# Check wrangler
-if [[ "$SKIP_UPLOAD" == "0" ]]; then
-  cd "$WORKER_DIR"
-  if ! npx wrangler --version &>/dev/null; then
-    warn "wrangler not available — upload step will fail"
-  else
-    ok "wrangler: $(npx wrangler --version 2>&1 | head -1)"
-  fi
-  cd "$PROJECT_DIR"
+# Check upload credentials
+if [[ "$SKIP_UPLOAD" == "0" ]] && [[ -z "${RELEASE_UPLOAD_TOKEN:-}" ]]; then
+  err "RELEASE_UPLOAD_TOKEN is not set (or pass SKIP_UPLOAD=1)."
+  exit 1
 fi
 
 # Check Sparkle sign_update
@@ -280,10 +273,11 @@ if [[ ! -f "$SPARKLE_BIN" ]]; then
   exit 1
 fi
 
+# -p prints only the base64 signature (without -p it prints `sparkle:edSignature="…" length="…"`).
 if [[ -n "${SPARKLE_ED_KEY_FILE:-}" ]]; then
-  SIGNATURE=$("$SPARKLE_BIN" --ed-key-file "$SPARKLE_ED_KEY_FILE" "$DMG_PATH")
+  SIGNATURE=$("$SPARKLE_BIN" -p --ed-key-file "$SPARKLE_ED_KEY_FILE" "$DMG_PATH")
 else
-  SIGNATURE=$("$SPARKLE_BIN" "$DMG_PATH")
+  SIGNATURE=$("$SPARKLE_BIN" -p "$DMG_PATH")
 fi
 ok "Sparkle signature: ${SIGNATURE:0:40}..."
 
@@ -300,27 +294,25 @@ step "Step 5/5: Uploading"
 if [[ "$SKIP_UPLOAD" == "1" ]]; then
   warn "Skipping upload (SKIP_UPLOAD=1)"
 else
-  info "Uploading to R2 bucket '$R2_BUCKET'..."
-  cd "$WORKER_DIR"
-  npx wrangler r2 object put "$R2_BUCKET/$DMG_NAME" --file="$DMG_PATH" --remote
-  cd "$PROJECT_DIR"
+  RELEASE_API_URL="${RELEASE_API_URL:-https://dl.getwaqtu.com}"
+  info "Uploading $DMG_NAME via $RELEASE_API_URL..."
+  curl -fsS -X PUT "$RELEASE_API_URL/releases/files/$DMG_NAME" \
+    -H "Authorization: Bearer $RELEASE_UPLOAD_TOKEN" \
+    -H "Content-Type: application/x-apple-diskimage" \
+    --data-binary "@$DMG_PATH"
+  echo ""
   ok "Uploaded: $DMG_NAME to R2"
 
-  ENCLOSURE_URL="${R2_PUBLIC_BASE_URL%/}/$DMG_NAME"
-  PUB_DATE=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
-  TITLE="Waqtu $VERSION"
-
-  # Escape single quotes for SQL
-  TITLE_ESC="${TITLE//\'/\'\'}"
-  DESC_ESC="${DESCRIPTION//\'/\'\'}"
-  SIG_ESC="${SIGNATURE//\'/\'\'}"
-
-  info "Inserting release into D1..."
-  cd "$WORKER_DIR"
-  npx wrangler d1 execute waqt-releases-db --remote --command \
-    "INSERT OR REPLACE INTO releases (version, short_version_string, title, description, enclosure_url, ed_signature, length, pub_date) VALUES ($SPARKLE_VERSION, '$VERSION', '$TITLE_ESC', '$DESC_ESC', '$ENCLOSURE_URL', '$SIG_ESC', $FILE_SIZE, '$PUB_DATE');"
-  cd "$PROJECT_DIR"
-  ok "D1 record inserted"
+  info "Recording release in the appcast..."
+  jq -n --argjson version "$SPARKLE_VERSION" --arg short "$VERSION" --arg desc "$DESCRIPTION" \
+    --arg file "$DMG_NAME" --arg sig "$SIGNATURE" --argjson length "$FILE_SIZE" \
+    '{version: $version, short_version_string: $short, description: $desc, file_name: $file, ed_signature: $sig, length: $length}' |
+    curl -fsS -X POST "$RELEASE_API_URL/releases" \
+      -H "Authorization: Bearer $RELEASE_UPLOAD_TOKEN" \
+      -H "Content-Type: application/json" \
+      --data-binary @-
+  echo ""
+  ok "Release recorded"
 fi
 
 # ============================================================
@@ -333,14 +325,8 @@ echo -e "${GREEN}╚════════════════════
 echo ""
 echo -e "  DMG:      ${BLUE}$DMG_PATH${NC}"
 echo -e "  Size:     ${BLUE}${FILE_SIZE_MB} MB${NC}"
-echo -e "  Appcast:  ${BLUE}https://waqt-updates.dzulfikar-at.workers.dev/appcast.xml${NC}"
+echo -e "  Appcast:  ${BLUE}${RELEASE_API_URL:-https://dl.getwaqtu.com}/appcast.xml${NC}"
 echo ""
-
-if [[ "$SKIP_UPLOAD" == "0" ]]; then
-  echo -e "  ${YELLOW}Deploy worker if updated:${NC}"
-  echo -e "    cd $WORKER_DIR && npx wrangler deploy"
-  echo ""
-fi
 
 echo -e "  ${YELLOW}Optional — tag the release:${NC}"
 echo -e "    git tag -a v$VERSION -m 'Release $VERSION'"
