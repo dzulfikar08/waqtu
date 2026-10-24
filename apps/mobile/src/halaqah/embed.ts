@@ -19,9 +19,19 @@ export function embedHtml(youtubeId: string): { html: string; baseUrl: string } 
   return { html, baseUrl: ORIGIN };
 }
 
-/** Whether the WebView may navigate to `url`: only the embed itself, nothing else. */
-export function isEmbedNavigation(url: string): boolean {
-  return url === "about:blank" || url.startsWith(`${ORIGIN}/embed/`);
+/**
+ * Whether the WebView may load `url`. The first load is the page itself (iOS reports it as the
+ * base URL, with or without a trailing slash, or about:blank); after that the top frame may only
+ * go to the embed. Sub-frame loads (the player's own frames) are not restricted.
+ */
+export function isEmbedNavigation(url: string, isTopFrame = true): boolean {
+  if (!isTopFrame) return true;
+  return (
+    url === "about:blank" ||
+    url === ORIGIN ||
+    url === `${ORIGIN}/` ||
+    url.startsWith(`${ORIGIN}/embed/`)
+  );
 }
 
 /** Plain watch link, offered as a fallback when the embed cannot play. */

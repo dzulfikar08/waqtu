@@ -13,7 +13,9 @@ export function VideoEmbed({ youtubeId }: { youtubeId: string }) {
         source={source}
         style={styles.web}
         originWhitelist={["https://www.youtube-nocookie.com", "about:blank"]}
-        onShouldStartLoadWithRequest={(request) => isEmbedNavigation(request.url)}
+        onShouldStartLoadWithRequest={(request) =>
+          isEmbedNavigation(request.url, request.isTopFrame)
+        }
         setSupportMultipleWindows={false}
         allowsInlineMediaPlayback
         allowsFullscreenVideo

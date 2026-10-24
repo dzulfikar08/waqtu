@@ -42,11 +42,15 @@ export default function HalaqahScreen() {
         <Text style={[styles.title, { color: theme.text }]}>{program.title[lang]}</Text>
         {position.kind === "before" ? (
           <Text style={{ color: theme.muted }}>
-            {t("halaqah.beforeRamadhan", { count: position.daysUntil })}
+            {position.daysUntil === null
+              ? t("halaqah.forYear", { year: program.hijriYear })
+              : t("halaqah.beforeRamadhan", { count: position.daysUntil })}
           </Text>
         ) : null}
         {position.kind === "after" ? (
-          <Text style={{ color: theme.muted }}>{t("halaqah.afterRamadhan")}</Text>
+          <Text style={{ color: theme.muted }}>
+            {t("halaqah.afterRamadhan", { year: program.hijriYear })}
+          </Text>
         ) : null}
         <ProgressBar fraction={done.size / program.totalDays} />
         <Hint>{t("halaqah.progress", { done: done.size, total: program.totalDays })}</Hint>

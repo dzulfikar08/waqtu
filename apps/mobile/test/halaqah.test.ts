@@ -112,14 +112,20 @@ describe("parseProgram rejects bad content", () => {
 
 describe("programPosition", () => {
   // Under the app's calendar (Umm al-Qura, offset 0): Ramadhan 1447 = 2026-02-18..03-19 (30 days),
-  // Ramadhan 1448 = 2027-02-08..03-08 (29 days).
-  const at = (year: number, month: number, day: number, offset = 0, total = 30) =>
-    programPosition({ year, month, day }, offset, total);
+  // Ramadhan 1448 = 2027-02-08..03-08 (29 days), Ramadhan 1449 starts 2028-01-28.
+  const at = (
+    year: number,
+    month: number,
+    day: number,
+    offset = 0,
+    totalDays = 30,
+    hijriYear = 1448,
+  ) => programPosition({ year, month, day }, offset, { hijriYear, totalDays });
 
   test("before Ramadhan counts down the days", () => {
     expect(at(2027, 2, 5)).toEqual({ kind: "before", daysUntil: 3 });
     expect(at(2027, 2, 7)).toEqual({ kind: "before", daysUntil: 1 });
-    expect(at(2026, 10, 25).kind).toBe("before");
+    expect(at(2026, 10, 25)).toEqual({ kind: "before", daysUntil: 106 });
   });
 
   test("the first fasting day is day 1, then 2, 3 ...", () => {
@@ -129,8 +135,8 @@ describe("programPosition", () => {
   });
 
   test("day 30 is the last day of a 30-day Ramadhan; the next day is after", () => {
-    expect(at(2026, 3, 19)).toEqual({ kind: "during", day: 30 });
-    expect(at(2026, 3, 20)).toEqual({ kind: "after" });
+    expect(at(2026, 3, 19, 0, 30, 1447)).toEqual({ kind: "during", day: 30 });
+    expect(at(2026, 3, 20, 0, 30, 1447)).toEqual({ kind: "after" });
   });
 
   test("a 29-day Ramadhan ends on day 29", () => {
@@ -146,6 +152,23 @@ describe("programPosition", () => {
 
   test("a program shorter than Ramadhan clamps to its last day", () => {
     expect(at(2027, 2, 19, 0, 10)).toEqual({ kind: "during", day: 10 });
+  });
+
+  test("Ramadhan 1449 is not the 1448 program's Ramadhan: after, never during or a countdown", () => {
+    expect(at(2028, 1, 20)).toEqual({ kind: "after" });
+    expect(at(2028, 1, 28)).toEqual({ kind: "after" });
+    expect(at(2028, 2, 10)).toEqual({ kind: "after" });
+    expect(at(2027, 4, 1)).toEqual({ kind: "after" });
+  });
+
+  test("a 1449 program reads the same dates as before (countdown) and then during", () => {
+    expect(at(2028, 1, 25, 0, 30, 1449)).toEqual({ kind: "before", daysUntil: 3 });
+    expect(at(2028, 1, 28, 0, 30, 1449)).toEqual({ kind: "during", day: 1 });
+  });
+
+  test("an earlier year's Ramadhan is before, with no countdown", () => {
+    expect(at(2026, 2, 18)).toEqual({ kind: "before", daysUntil: null });
+    expect(at(2026, 3, 1)).toEqual({ kind: "before", daysUntil: null });
   });
 });
 
@@ -179,11 +202,28 @@ describe("embed", () => {
     expect(embedHtml("m97SDRxy8GM").baseUrl).toBe("https://www.youtube-nocookie.com");
   });
 
-  test("rejects an invalid id and keeps navigation inside the embed", () => {
+  test("rejects an invalid id", () => {
     expect(() => embedUrl('x"><script>')).toThrow(RangeError);
+  });
+
+  test("isEmbedNavigation allows the initial base-URL load (iOS) and the embed itself", () => {
+    const { baseUrl } = embedHtml("m97SDRxy8GM");
+    expect(isEmbedNavigation(baseUrl)).toBe(true);
+    expect(isEmbedNavigation(`${baseUrl}/`)).toBe(true);
+    expect(isEmbedNavigation("about:blank")).toBe(true);
     expect(isEmbedNavigation(embedUrl("m97SDRxy8GM"))).toBe(true);
+  });
+
+  test("isEmbedNavigation blocks other top-frame navigations", () => {
     expect(isEmbedNavigation("https://www.youtube.com/watch?v=m97SDRxy8GM")).toBe(false);
+    expect(isEmbedNavigation("https://www.youtube-nocookie.com.evil.example/embed/x")).toBe(false);
+    expect(isEmbedNavigation("https://www.youtube-nocookie.com/watch?v=m97SDRxy8GM")).toBe(false);
     expect(isEmbedNavigation("https://evil.example/")).toBe(false);
+    expect(isEmbedNavigation("intent://x#Intent;end")).toBe(false);
+  });
+
+  test("isEmbedNavigation does not restrict sub-frame loads", () => {
+    expect(isEmbedNavigation("https://www.youtube.com/s/player/base.html", false)).toBe(true);
   });
 });
 

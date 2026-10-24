@@ -13,7 +13,9 @@ export const halaqahId = {
   progress: "{{done}} dari {{total}} kajian selesai",
   beforeRamadhan_one: "Ramadhan mulai {{count}} hari lagi. Pratinjau programnya di sini.",
   beforeRamadhan_other: "Ramadhan mulai {{count}} hari lagi. Pratinjau programnya di sini.",
-  afterRamadhan: "Ramadhan sudah berlalu. Kajiannya tetap bisa dibuka kapan saja.",
+  afterRamadhan:
+    "Program ini untuk Ramadhan {{year}}H dan sudah berlalu. Kajiannya tetap bisa dibuka kapan saja.",
+  forYear: "Program ini untuk Ramadhan {{year}}H. Pratinjau programnya di sini.",
   startEarly: "Mulai lebih awal",
   continueFrom: "Lanjutkan dari hari ke-{{day}}",
   openAnyTime: "Buka kapan saja, urutan bebas.",
@@ -54,7 +56,9 @@ export const halaqahEn: Widen<typeof halaqahId> = {
   progress: "{{done}} of {{total}} talks done",
   beforeRamadhan_one: "Ramadan starts in {{count}} day. Preview the program here.",
   beforeRamadhan_other: "Ramadan starts in {{count}} days. Preview the program here.",
-  afterRamadhan: "Ramadan has passed. The talks stay open any time.",
+  afterRamadhan:
+    "This program is for Ramadan {{year}}H, which has passed. The talks stay open any time.",
+  forYear: "This program is for Ramadan {{year}}H. Preview the program here.",
   startEarly: "Start early",
   continueFrom: "Continue from day {{day}}",
   openAnyTime: "Open any time, in any order.",

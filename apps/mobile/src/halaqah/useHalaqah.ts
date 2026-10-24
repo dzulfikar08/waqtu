@@ -44,7 +44,7 @@ export function useHalaqahToday(): HalaqahToday | null {
   return {
     program,
     todayKey: dayKeyInZone(now, zone),
-    position: programPosition(parts, settings.hijriOffset, program.totalDays),
+    position: programPosition(parts, settings.hijriOffset, program),
   };
 }
 
