@@ -64,10 +64,18 @@
       ]
     ],
     "runtimeVersion": {
-      "policy": "appVersion"
+      "policy": "fingerprint"
     },
     "updates": {
-      "enabled": false
-    }
+      "enabled": true,
+      "url": "https://u.expo.dev/d57befd1-a15f-4b3f-8359-319985496956"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d57befd1-a15f-4b3f-8359-319985496956"
+      }
+    },
+    "owner": "dzulfikar08"
   }
 }
