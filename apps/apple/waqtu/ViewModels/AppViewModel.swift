@@ -16,6 +16,8 @@ final class AppViewModel {
     let streakManager: PrayerStreakManager
     let slackManager: SlackManager
     let pomodoroManager: PomodoroManager
+    let account: WaqtuAccount
+    let syncController: MutabaahSyncController
     let audioLibrary = AudioLibraryManager()
     let sharedBridge = SharedDataBridge()
 
@@ -29,6 +31,10 @@ final class AppViewModel {
     var nextPrayer: PrayerTime?
     var countdown: Int = 0
     var overlayWindow: NSWindow?
+
+    /// Menu bar title during Ramadhan ("Iftar 2h 14m"); nil outside Ramadhan or when turned off.
+    var fastingTitle: String?
+    @ObservationIgnored private var fastingInputs: FastingInputs?
 
     /// Human-readable location used for prayer times (city, country or "Manual: Mecca").
     var locationDisplay: String = "Getting location..."
@@ -58,6 +64,20 @@ final class AppViewModel {
         self.streakManager = PrayerStreakManager()
         self.slackManager = SlackManager()
         self.pomodoroManager = PomodoroManager(settings: settings, audioLibrary: audioLibrary)
+        let account = WaqtuAccount()
+        self.account = account
+        self.syncController = MutabaahSyncController(
+            account: account, streakManager: streakManager, settings: settings
+        )
+        syncController.onRemoteChanges = { [weak self] changes in
+            guard let self else { return }
+            if changes.prayerSettings {
+                // Also pushes the log to the shared container.
+                self.calculatePrayers()
+            } else if changes.prayerLog {
+                self.pushToSharedContainer()
+            }
+        }
         setupLocationUpdates()
         calculatePrayers()
         setupTimer()
@@ -179,6 +199,7 @@ final class AppViewModel {
     func calculatePrayers() {
         todayPrayers = calculator.calculatePrayerTimes()
         nextPrayer = calculator.getNextPrayer()
+        refreshFastingInputs()
         updateCountdown()
         // Schedule \"Asr in 5 minutes\"-style notifications
         reminderScheduler.scheduleReminders(for: todayPrayers)
@@ -214,7 +235,57 @@ final class AppViewModel {
         }
     }
 
+    /// Prayer times and Ramadhan membership of today and tomorrow, for the menu bar countdown.
+    private struct FastingInputs {
+        let todayFajr: Date?
+        let todayMaghrib: Date?
+        let tomorrowFajr: Date?
+        let isRamadhanToday: Bool
+        let isRamadhanTomorrow: Bool
+    }
+
+    private func refreshFastingInputs() {
+        let calendar = Calendar.current
+        let now = Date()
+        guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) else {
+            fastingInputs = nil
+            return
+        }
+        let hijriOffset = syncController.hijriOffset
+        let isRamadhanToday = Ramadhan.isRamadhan(on: now, hijriOffset: hijriOffset)
+        let isRamadhanTomorrow = Ramadhan.isRamadhan(on: tomorrow, hijriOffset: hijriOffset)
+        guard isRamadhanToday || isRamadhanTomorrow else {
+            fastingInputs = nil
+            return
+        }
+        let tomorrowPrayers = calculator.calculatePrayerTimes(for: tomorrow)
+        fastingInputs = FastingInputs(
+            todayFajr: todayPrayers.first { $0.name == .fajr }?.time,
+            todayMaghrib: todayPrayers.first { $0.name == .maghrib }?.time,
+            tomorrowFajr: tomorrowPrayers.first { $0.name == .fajr }?.time,
+            isRamadhanToday: isRamadhanToday,
+            isRamadhanTomorrow: isRamadhanTomorrow
+        )
+    }
+
+    private func updateFastingTitle(now: Date) {
+        var title: String?
+        if settings.showFastingCountdown, let inputs = fastingInputs,
+           let countdown = FastingCountdown.compute(
+               now: now,
+               todayFajr: inputs.todayFajr,
+               todayMaghrib: inputs.todayMaghrib,
+               tomorrowFajr: inputs.tomorrowFajr,
+               isRamadhanToday: inputs.isRamadhanToday,
+               isRamadhanTomorrow: inputs.isRamadhanTomorrow
+           ) {
+            title = countdown.title(at: now)
+        }
+        if fastingTitle != title { fastingTitle = title }
+    }
+
     private func updateCountdown() {
+        updateFastingTitle(now: Date())
         guard let next = nextPrayer else {
             countdown = 0
             return
@@ -430,6 +501,19 @@ final class AppViewModel {
             trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
         )
         UNUserNotificationCenter.current().add(request)
+    }
+
+    /// Menu bar checklist tap: marks the prayer prayed, or clears it when it already is.
+    /// The edit reaches the account through `streakManager.onLocalChange`.
+    func toggleFardh(_ fardh: Fardh) {
+        let name = fardh.logName
+        switch streakManager.statusFor(prayer: name) {
+        case .prayed, .late:
+            streakManager.clearPrayer(prayer: name)
+        case .missed, .none:
+            streakManager.markPrayed(prayer: name)
+        }
+        pushToSharedContainer()
     }
 
     func resetShownPrayers() {

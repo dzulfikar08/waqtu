@@ -8,20 +8,7 @@
 
 import Foundation
 
-/// A single prayer log entry for a specific date and prayer.
-struct PrayerLogEntry: Codable, Identifiable {
-    var id: String { "\(date)-\(prayer)" }
-    let date: String       // yyyy-MM-dd
-    let prayer: String     // Fajr, Dhuhr, Asr, Maghrib, Isha
-    let status: Status
-    let loggedAt: Date
-
-    enum Status: String, Codable {
-        case prayed
-        case missed
-        case late  // prayed but late
-    }
-}
+// `PrayerLogEntry` and `PrayerLogChange` live in waqtu-sync/PrayerLog.swift (shared with the sync tests).
 
 @Observable
 final class PrayerStreakManager {
@@ -29,6 +16,9 @@ final class PrayerStreakManager {
     private let logKey = "prayerLogEntries"
 
     private(set) var entries: [PrayerLogEntry] = []
+
+    /// Called after every edit made on this Mac (not for pulled changes), so it can reach the account.
+    @ObservationIgnored var onLocalChange: ((PrayerLogChange) -> Void)?
 
     init() {
         load()
@@ -52,6 +42,7 @@ final class PrayerStreakManager {
         )
         entries.append(entry)
         save()
+        onLocalChange?(PrayerLogChange(date: dateString, prayer: prayer, status: status, at: entry.loggedAt))
     }
 
     func markPrayed(prayer: String, date: Date = Date()) {
@@ -60,6 +51,27 @@ final class PrayerStreakManager {
 
     func markMissed(prayer: String, date: Date = Date()) {
         logPrayer(prayer: prayer, status: .missed, date: date)
+    }
+
+    /// Removes the log entry of a prayer (unticking it in the menu).
+    func clearPrayer(prayer: String, date: Date = Date()) {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let dateString = formatter.string(from: date)
+        let before = entries.count
+        entries.removeAll { $0.date == dateString && $0.prayer == prayer }
+        guard entries.count != before else { return }
+        save()
+        onLocalChange?(PrayerLogChange(date: dateString, prayer: prayer, status: nil, at: Date()))
+    }
+
+    /// Applies a change pulled from the account: stored as-is, without `onLocalChange`.
+    func applyRemote(_ change: PrayerLogChange) {
+        entries.removeAll { $0.date == change.date && $0.prayer == change.prayer }
+        if let status = change.status {
+            entries.append(PrayerLogEntry(date: change.date, prayer: change.prayer, status: status, loggedAt: change.at))
+        }
+        save()
     }
 
     // MARK: - Queries

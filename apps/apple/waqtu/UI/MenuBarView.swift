@@ -62,6 +62,14 @@ struct MenuBarView: View {
 
             Divider()
 
+            // Today's fardhu checklist (marks prayed locally and syncs with the account)
+            FardhChecklistView(
+                streakManager: viewModel.streakManager,
+                onToggle: { viewModel.toggleFardh($0) }
+            )
+
+            Divider()
+
             // Streak report
             StreakReportView(streakManager: viewModel.streakManager)
 
@@ -803,7 +811,7 @@ struct SettingsView: View {
                 settingsTabs
             }
         }
-        .frame(width: 440, height: 520)
+        .frame(width: 520, height: 520)
         .background(Color.waqtuBackground)
         .onAppear {
             NSApp.activate(ignoringOtherApps: true)
@@ -845,6 +853,16 @@ struct SettingsView: View {
                     }
 
                 if let vm = viewModel {
+                    AccountSettingsTab(
+                        account: vm.account,
+                        sync: vm.syncController,
+                        licenseManager: vm.licenseManager,
+                        settings: settings
+                    )
+                    .tabItem {
+                        Label("Account", systemImage: "person.crop.circle.fill")
+                    }
+
                     SlackSettingsTab(settings: settings, slackManager: vm.slackManager)
                         .tabItem {
                             Label("Slack", systemImage: "message.fill")

@@ -201,6 +201,13 @@
 			path = waqtu;
 			sourceTree = "<group>";
 		};
+		7C0A5E1D4F2B4A9C8E3D1B01 /* waqtu-sync */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = "waqtu-sync";
+			sourceTree = "<group>";
+		};
 		AA40DE962F4174E3006EDD6D /* waqtuTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -330,6 +337,7 @@
 			children = (
 				AA2B768E2F440BAE005EC86C /* public_ed25519.pem */,
 				AA40DE882F4174E2006EDD6D /* waqtu */,
+				7C0A5E1D4F2B4A9C8E3D1B01 /* waqtu-sync */,
 				AA40DE962F4174E3006EDD6D /* waqtuTests */,
 				AA40DEA02F4174E3006EDD6D /* waqtuUITests */,
 				AA2B76B92F44177E005EC86C /* Frameworks */,
@@ -398,6 +406,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				AA40DE882F4174E2006EDD6D /* waqtu */,
+				7C0A5E1D4F2B4A9C8E3D1B01 /* waqtu-sync */,
 				C4AF80E4B9C53B3D3F72D0AE /* shared */,
 			);
 			name = "waqtu-mas";
@@ -520,6 +529,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				AA40DE882F4174E2006EDD6D /* waqtu */,
+				7C0A5E1D4F2B4A9C8E3D1B01 /* waqtu-sync */,
 				C4AF80E4B9C53B3D3F72D0AE /* shared */,
 			);
 			name = waqtu;
@@ -546,6 +556,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				AA40DE962F4174E3006EDD6D /* waqtuTests */,
+				7C0A5E1D4F2B4A9C8E3D1B01 /* waqtu-sync */,
 			);
 			name = waqtuTests;
 			productName = waqtuTests;
@@ -1275,7 +1286,6 @@
 		AA40DEAB2F4174E3006EDD6D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
@@ -1286,14 +1296,12 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/waqtu.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/waqt";
 			};
 			name = Debug;
 		};
 		AA40DEAC2F4174E3006EDD6D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = F6Q6UFUK69;
@@ -1304,7 +1312,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/waqtu.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/waqt";
 			};
 			name = Release;
 		};

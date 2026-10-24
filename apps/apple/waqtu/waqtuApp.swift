@@ -72,6 +72,14 @@ struct WaqtuApp: App {
                     Text(viewModel.pomodoroManager.timeText)
                         .monospacedDigit()
                 }
+            } else if let fasting = viewModel.fastingTitle {
+                HStack(spacing: 3) {
+                    if let icon = Self.menuBarIcon {
+                        Image(nsImage: icon)
+                    }
+                    Text(fasting)
+                        .monospacedDigit()
+                }
             } else if let icon = Self.menuBarIcon {
                 Image(nsImage: icon)
             } else {
