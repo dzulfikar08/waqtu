@@ -10,7 +10,7 @@
     "platforms": ["ios", "android"],
     "ios": {
       "bundleIdentifier": "dat.waqtu.ios",
-      "buildNumber": "3",
+      "buildNumber": "4",
       "supportsTablet": false,
       "config": {
         "usesNonExemptEncryption": false
@@ -18,7 +18,7 @@
     },
     "android": {
       "package": "dat.waqtu.app",
-      "versionCode": 5,
+      "versionCode": 6,
       "allowBackup": false,
       "adaptiveIcon": {
         "backgroundColor": "#F7F7FA",
