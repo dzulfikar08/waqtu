@@ -40,7 +40,7 @@ final class AppViewModel {
     @ObservationIgnored private var fastingInputs: FastingInputs?
 
     /// Human-readable location used for prayer times (city, country or "Manual: Mecca").
-    var locationDisplay: String = "Getting location..."
+    var locationDisplay: String = String(localized: "Getting location...")
 
     /// True while a "Locate Me" refresh is in progress.
     var isRefreshingLocation: Bool = false
@@ -165,7 +165,7 @@ final class AppViewModel {
     /// Forces a fresh location fix. Call when user taps "Locate Me".
     func refreshLocation() {
         guard settings.autoDetectLocation else { return }
-        locationDisplay = "Updating..."
+        locationDisplay = String(localized: "Updating...")
         locationManager.refreshLocation()
     }
 
@@ -208,7 +208,7 @@ final class AppViewModel {
                     }
                 } else {
                     self.locationDisplay = self.settings.autoDetectLocation
-                        ? "Location unavailable"
+                        ? String(localized: "Location unavailable")
                         : self.formatCoordinates(lat: lat, lon: lon)
                 }
             }
@@ -514,8 +514,8 @@ final class AppViewModel {
     /// Show a gentle local notification reminding the user they committed to pray.
     private func deliverStillWorkingNotification(for prayer: PrayerName) {
         let content = UNMutableNotificationContent()
-        content.title = "Still at your Mac?"
-        content.body = "You tapped \"I am going to pray\" for \(prayer.displayName) but your Mac is still active. Don't forget your commitment."
+        content.title = String(localized: "Still at your Mac?")
+        content.body = String(localized: "You tapped \"I am going to pray\" for \(prayer.displayName) but your Mac is still active. Don't forget your commitment.")
         content.sound = .default
 
         let request = UNNotificationRequest(

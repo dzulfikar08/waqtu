@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bahasa Indonesia (DEV-13)
+
+- **Indonesian and English** — The Mac app's menu bar, settings, onboarding, overlay and notifications are translated into Indonesian through a String Catalog (`waqtu/Localizable.xcstrings`). Macs set to Indonesian get Indonesian; everything else stays English. Prayer and mutabaah terms match the mobile app (Subuh, Dzuhur, Ashar, Maghrib, Isya; Istiqamah; Berbuka/Imsak).
+
 ### Waqtu Premium subscription replaces lifetime (DEV-12, DEV-13)
 
 - **Mac App Store build** — The lifetime purchase (`dat.waqtu.lifetime`) is replaced by the auto-renewing subscriptions `dat.waqtu.mac.premium.monthly` and `.yearly` (StoreKit 2: purchase, restore, `Transaction.updates`, `currentEntitlements`). Each active subscription is also sent to the signed-in Waqtu account (`POST /v1/billing/apple`), so it unlocks the phone apps too. Settings → Upgrade shows the prices from the App Store, Restore Purchases, Manage Subscription, terms and privacy links.

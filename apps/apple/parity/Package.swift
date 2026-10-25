@@ -5,7 +5,7 @@ import PackageDescription
 // (waqt.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved); CI asserts this.
 let package = Package(
     name: "parity",
-    platforms: [.macOS(.v12)],
+    platforms: [.macOS(.v13)],
     dependencies: [
         .package(url: "https://github.com/batoulapps/Adhan-Swift", exact: "1.4.0"),
     ],

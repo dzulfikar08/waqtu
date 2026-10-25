@@ -115,7 +115,7 @@ struct TrialBannerView: View {
     let daysRemaining: Int
 
     var body: some View {
-        Text("\(daysRemaining) day\(daysRemaining == 1 ? "" : "s") remaining")
+        Text("\(daysRemaining) days remaining")
             .font(.system(size: 11))
             .foregroundColor(.waqtuMuted)
             .frame(maxWidth: .infinity)
@@ -221,9 +221,9 @@ struct NextPrayerHeader: View {
         let hours = countdown / 3600
         let minutes = (countdown % 3600) / 60
         if hours > 0 {
-            return "\(hours)h \(minutes)m"
+            return String(localized: "\(hours)h \(minutes)m")
         }
-        return "\(minutes)m"
+        return String(localized: "\(minutes)m")
     }
 }
 
@@ -239,7 +239,7 @@ struct LocationDisplayView: View {
         let formatter = DateFormatter()
         formatter.calendar = calendar
         formatter.dateFormat = "d MMMM yyyy"
-        formatter.locale = Locale(identifier: "en")
+        formatter.locale = AppLanguage.locale
         return formatter.string(from: Date())
     }
 
@@ -350,7 +350,7 @@ struct StreakReportView: View {
             // Header row — tappable to expand/collapse
             Button(action: { withAnimation(.easeInOut(duration: 0.2)) { isExpanded.toggle() } }) {
                 HStack(spacing: 8) {
-                    Text("🔥")
+                    Text(verbatim: "🔥")
                         .font(.system(size: 13))
                     Text("Streak \(streakManager.currentStreak)d")
                         .font(.system(size: 12, weight: .semibold))
@@ -385,7 +385,7 @@ struct StreakReportView: View {
                     HStack(spacing: 4) {
                         ForEach(streakManager.weeklyGrid, id: \.label) { day in
                             VStack(spacing: 2) {
-                                Text(day.label.prefix(1).uppercased())
+                                Text(AppLanguage.weekdayInitial(englishShortName: day.label))
                                     .font(.system(size: 9))
                                     .foregroundColor(day.isToday ? .waqtuGold : .waqtuMuted)
                                 Text(day.status)
@@ -426,7 +426,7 @@ struct StreakReportView: View {
                 .foregroundColor(status == .prayed ? .waqtuPrimary : .waqtuMuted)
                 .frame(width: 16)
 
-            Text(name)
+            Text(PrayerName(rawValue: name)?.displayName ?? name)
                 .font(.system(size: 12))
                 .foregroundColor(.waqtuText)
 
@@ -455,7 +455,7 @@ struct StreakReportView: View {
                     .foregroundColor(.waqtuGold)
             }
         } else {
-            Text("—")
+            Text(verbatim: "—")
                 .font(.system(size: 10))
                 .foregroundColor(.waqtuMuted)
         }
@@ -593,7 +593,7 @@ struct PomodoroSection: View {
                     Button {
                         pomodoroManager.isPaused ? pomodoroManager.resume() : pomodoroManager.pause()
                     } label: {
-                        Label(pomodoroManager.isPaused ? "Resume" : "Pause",
+                        Label(pomodoroManager.isPaused ? String(localized: "Resume") : String(localized: "Pause"),
                               systemImage: pomodoroManager.isPaused ? "play.fill" : "pause.fill")
                             .font(.system(size: 12, weight: .medium))
                     }
@@ -679,7 +679,7 @@ struct PomodoroSettingsTab: View {
                 HStack {
                     Text("Cycles before long break")
                     Spacer()
-                    Text("\(settings.cyclesBeforeLongBreak)")
+                    Text(verbatim: "\(settings.cyclesBeforeLongBreak)")
                         .foregroundColor(.waqtuPrimary)
                         .monospacedDigit()
                     Slider(value: Binding(
@@ -1134,7 +1134,7 @@ struct SlackSettingsTab: View {
                                 .textFieldStyle(.roundedBorder)
                                 .focused($isTokenFocused)
 
-                            Button(slackManager.isConnected ? "Update" : "Connect") {
+                            Button(slackManager.isConnected ? String(localized: "Update") : String(localized: "Connect")) {
                                 saveToken()
                             }
                             .buttonStyle(.borderedProminent)
@@ -1226,27 +1226,27 @@ struct PrayerTimesSettingsTab: View {
     var viewModel: AppViewModel?
 
     private static let calculationMethods: [(id: String, label: String)] = [
-        ("muslimWorldLeague", "Muslim World League"),
-        ("moonsightingCommittee", "Moonsighting Committee (North America, UK)"),
-        ("northAmerica", "ISNA (North America)"),
-        ("egyptian", "Egyptian General Authority"),
-        ("karachi", "University of Islamic Sciences, Karachi"),
-        ("ummAlQura", "Umm al-Qura (Makkah)"),
-        ("dubai", "Dubai (UAE)"),
-        ("qatar", "Qatar"),
-        ("kuwait", "Kuwait"),
-        ("kemenag", "Kemenag RI (Indonesia)"),
-        ("singapore", "Singapore / Malaysia (MUIS / JAKIM)"),
-        ("tehran", "Tehran"),
-        ("turkey", "Turkey (Diyanet)"),
-        ("other", "Custom (angles)"),
+        ("muslimWorldLeague", String(localized: "Muslim World League")),
+        ("moonsightingCommittee", String(localized: "Moonsighting Committee (North America, UK)")),
+        ("northAmerica", String(localized: "ISNA (North America)")),
+        ("egyptian", String(localized: "Egyptian General Authority")),
+        ("karachi", String(localized: "University of Islamic Sciences, Karachi")),
+        ("ummAlQura", String(localized: "Umm al-Qura (Makkah)")),
+        ("dubai", String(localized: "Dubai (UAE)")),
+        ("qatar", String(localized: "Qatar")),
+        ("kuwait", String(localized: "Kuwait")),
+        ("kemenag", String(localized: "Kemenag RI (Indonesia)")),
+        ("singapore", String(localized: "Singapore / Malaysia (MUIS / JAKIM)")),
+        ("tehran", String(localized: "Tehran")),
+        ("turkey", String(localized: "Turkey (Diyanet)")),
+        ("other", String(localized: "Custom (angles)")),
     ]
 
     private static let highLatitudeRules: [(id: String, label: String)] = [
-        ("auto", "Auto (recommended for location)"),
-        ("middleOfTheNight", "Middle of the night"),
-        ("seventhOfTheNight", "Seventh of the night (above 48° latitude)"),
-        ("twilightAngle", "Twilight angle"),
+        ("auto", String(localized: "Auto (recommended for location)")),
+        ("middleOfTheNight", String(localized: "Middle of the night")),
+        ("seventhOfTheNight", String(localized: "Seventh of the night (above 48° latitude)")),
+        ("twilightAngle", String(localized: "Twilight angle")),
     ]
 
     var body: some View {
@@ -1331,7 +1331,7 @@ struct PrayerTimesSettingsTab: View {
 
 // MARK: - Adjustment Row (stepper for -60 to +60)
 struct AdjustmentRow: View {
-    let label: String
+    let label: LocalizedStringKey
     @Binding var value: Int
     var onChange: (() -> Void)?
 
@@ -1348,7 +1348,7 @@ struct AdjustmentRow: View {
                 .buttonStyle(.bordered)
                 .frame(width: 28)
                 .disabled(value <= -60)
-                Text("\(value >= 0 ? "+" : "")\(value)")
+                Text(verbatim: "\(value >= 0 ? "+" : "")\(value)")
                     .font(.system(.body, design: .monospaced))
                     .foregroundColor(.waqtuPrimary)
                     .frame(width: 36, alignment: .center)
@@ -1554,9 +1554,9 @@ struct CalendarProtectionSection: View {
     let onRemoveAllWaqtuEvents: () -> Void
 
     private var selectedCalendarTitle: String {
-        if settings.calendarProtectionCalendarId.isEmpty { return "Default" }
+        if settings.calendarProtectionCalendarId.isEmpty { return String(localized: "Default") }
         let allCalendars = calendarsGroupedBySource.flatMap(\.calendars)
-        return allCalendars.first(where: { $0.calendarIdentifier == settings.calendarProtectionCalendarId })?.title ?? "Default"
+        return allCalendars.first(where: { $0.calendarIdentifier == settings.calendarProtectionCalendarId })?.title ?? String(localized: "Default")
     }
 
     var body: some View {
@@ -1579,7 +1579,7 @@ struct CalendarProtectionSection: View {
                     Image(systemName: effectiveAccess ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
                         .font(.system(size: 12))
                         .foregroundColor(effectiveAccess ? .waqtuPrimary : .waqtuGold)
-                    Text(effectiveAccess ? "Calendar access granted" : "Calendar access denied — enable in System Settings → Privacy & Security → Calendars")
+                    Text(effectiveAccess ? String(localized: "Calendar access granted") : String(localized: "Calendar access denied — enable in System Settings → Privacy & Security → Calendars"))
                         .font(.caption)
                         .foregroundColor(effectiveAccess ? .waqtuMuted : .waqtuGold)
                 }
@@ -1789,7 +1789,7 @@ struct AboutSettingsTab: View {
     private var versionString: String {
         let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
-        return "Version \(short) (\(build))"
+        return String(localized: "Version \(short) (\(build))")
     }
 
     var body: some View {
@@ -1799,7 +1799,7 @@ struct AboutSettingsTab: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 80, height: 80)
-            Text("Waqtu")
+            Text(verbatim: "Waqtu")
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(.waqtuText)
             Text("Prayer times for your day")
@@ -1823,7 +1823,7 @@ struct AboutSettingsTab: View {
                     NSWorkspace.shared.open(url)
                 }
             } label: {
-                Text("getwaqtu.com")
+                Text(verbatim: "getwaqtu.com")
                     .font(.system(size: 13))
                     .foregroundColor(.waqtuPrimary)
             }
@@ -1913,7 +1913,7 @@ struct AboutSettingsTab: View {
             .background(Color.waqtuDark.opacity(0.6))
             .cornerRadius(8)
         } else if let trial = trialManager, trial.hasAccess, trial.isTrialActive, trial.trialDaysRemaining > 0 {
-            Text("\(trial.trialDaysRemaining) day\(trial.trialDaysRemaining == 1 ? "" : "s") left in trial")
+            Text("\(trial.trialDaysRemaining) days left in trial")
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(.waqtuGold)
                 .padding(.horizontal, 12)

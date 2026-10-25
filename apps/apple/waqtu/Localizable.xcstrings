@@ -1,0 +1,2711 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ %lldh %@m" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$lldj %3$@m"
+          }
+        }
+      }
+    },
+    "%@ %lldm %@s" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$lldm %3$@d"
+          }
+        }
+      }
+    },
+    "%@ in %lld min" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$lld menit lagi"
+          }
+        }
+      }
+    },
+    "%@ soon" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ sebentar lagi"
+          }
+        }
+      }
+    },
+    "%@, not yet prayed" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, belum sholat"
+          }
+        }
+      }
+    },
+    "%@, prayed" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, sudah sholat"
+          }
+        }
+      }
+    },
+    "%lld days left in trial" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld day left in trial"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld days left in trial"
+                }
+              }
+            }
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sisa uji coba %lld hari"
+          }
+        }
+      }
+    },
+    "%lld days left in trial. Subscribe anytime to keep access." : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld day left in trial. Subscribe anytime to keep access."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld days left in trial. Subscribe anytime to keep access."
+                }
+              }
+            }
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sisa uji coba %lld hari. Berlangganan kapan saja agar akses tetap terbuka."
+          }
+        }
+      }
+    },
+    "%lld days remaining" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld day remaining"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld days remaining"
+                }
+              }
+            }
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sisa %lld hari"
+          }
+        }
+      }
+    },
+    "%lld min" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld menit"
+          }
+        }
+      }
+    },
+    "%lldh %lldm" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld j %2$lld mnt"
+          }
+        }
+      }
+    },
+    "%lldm" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld mnt"
+          }
+        }
+      }
+    },
+    "+" : {
+      "shouldTranslate" : false
+    },
+    "-" : {
+      "shouldTranslate" : false
+    },
+    "1. Open the Slack API site and create a new app.\n2. Under OAuth & Permissions, add the scope users.profile:write.\n3. Install to your workspace.\n4. Copy the \"User OAuth Token\" (starts with xoxp-).\n5. Paste it above and click Connect." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1. Buka situs Slack API dan buat aplikasi baru.\n2. Di OAuth & Permissions, tambahkan scope users.profile:write.\n3. Pasang ke workspace-mu.\n4. Salin \"User OAuth Token\" (diawali xoxp-).\n5. Tempel di atas lalu klik Hubungkan."
+          }
+        }
+      }
+    },
+    "1. Quit Waqtu" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1. Keluar dari Waqtu"
+          }
+        }
+      }
+    },
+    "10 minutes" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 menit"
+          }
+        }
+      }
+    },
+    "15 minutes" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "15 menit"
+          }
+        }
+      }
+    },
+    "2. Drag Waqtu from Applications to Trash" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2. Seret Waqtu dari Aplikasi ke Tempat Sampah"
+          }
+        }
+      }
+    },
+    "3. Delete: ~/Library/Preferences/dat.waqtu.plist" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3. Hapus: ~/Library/Preferences/dat.waqtu.plist"
+          }
+        }
+      }
+    },
+    "30 minutes" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 menit"
+          }
+        }
+      }
+    },
+    "4. System Settings → Privacy & Security → Calendars → remove Waqtu" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4. Pengaturan Sistem → Privasi & Keamanan → Kalender → hapus Waqtu"
+          }
+        }
+      }
+    },
+    "5 minutes" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 menit"
+          }
+        }
+      }
+    },
+    "5. Restart Mac (clears calaccessd state)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5. Mulai ulang Mac (membersihkan status calaccessd)"
+          }
+        }
+      }
+    },
+    ":pray:" : {
+      "shouldTranslate" : false
+    },
+    "About" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tentang"
+          }
+        }
+      }
+    },
+    "Account" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akun"
+          }
+        }
+      }
+    },
+    "Add 5 min reminder" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tambah pengingat 5 menit"
+          }
+        }
+      }
+    },
+    "Add or subtract minutes per prayer. Useful if your local times differ slightly from the calculation." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tambah atau kurangi menit per waktu sholat. Berguna jika jadwal setempat sedikit berbeda dari hasil perhitungan."
+          }
+        }
+      }
+    },
+    "Alert 5 minutes before each prayer block." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beri peringatan 5 menit sebelum tiap blok sholat."
+          }
+        }
+      }
+    },
+    "All settings will be reset to defaults, Waqtu events will be removed from your calendar, and the app will quit. Your subscription is not affected. Reopen Waqtu to start fresh." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Semua pengaturan kembali ke bawaan, acara Waqtu dihapus dari kalendermu, lalu aplikasi keluar. Langgananmu tidak terpengaruh. Buka lagi Waqtu untuk memulai dari awal."
+          }
+        }
+      }
+    },
+    "Apply Location" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terapkan Lokasi"
+          }
+        }
+      }
+    },
+    "Asr" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ashar"
+          }
+        }
+      }
+    },
+    "Asr calculation" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waktu Ashar"
+          }
+        }
+      }
+    },
+    "Auto (recommended for location)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otomatis (disarankan untuk lokasi)"
+          }
+        }
+      }
+    },
+    "Auto (rotate)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otomatis (bergantian)"
+          }
+        }
+      }
+    },
+    "Auto-detect Location" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deteksi Lokasi Otomatis"
+          }
+        }
+      }
+    },
+    "Auto-set Slack status" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atur status Slack otomatis"
+          }
+        }
+      }
+    },
+    "Automatically block your calendar during prayer times so colleagues see you as busy in Outlook and Teams." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blokir kalender otomatis selama waktu sholat agar rekan kerja melihatmu sedang sibuk di Outlook dan Teams."
+          }
+        }
+      }
+    },
+    "Back" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kembali"
+          }
+        }
+      }
+    },
+    "Begin with intention. Dedicate this focus to Allah." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Awali dengan niat. Niatkan fokus ini karena Allah."
+          }
+        }
+      }
+    },
+    "Block calendar during prayer" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blokir kalender saat sholat"
+          }
+        }
+      }
+    },
+    "Block duration" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durasi blok"
+          }
+        }
+      }
+    },
+    "Block your calendar this many minutes before each prayer for wudu and preparation." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blokir kalender sekian menit sebelum tiap waktu sholat untuk wudhu dan persiapan."
+          }
+        }
+      }
+    },
+    "Break" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Istirahat"
+          }
+        }
+      }
+    },
+    "Break Audio" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio Istirahat"
+          }
+        }
+      }
+    },
+    "Break audio" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio istirahat"
+          }
+        }
+      }
+    },
+    "Browse & Download…" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jelajahi & Unduh…"
+          }
+        }
+      }
+    },
+    "By time. Indeed, mankind is in loss." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demi masa. Sesungguhnya manusia benar-benar berada dalam kerugian."
+          }
+        }
+      }
+    },
+    "Calculation" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perhitungan"
+          }
+        }
+      }
+    },
+    "Calculation method" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metode perhitungan"
+          }
+        }
+      }
+    },
+    "Calendar" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kalender"
+          }
+        }
+      }
+    },
+    "Calendar Protection" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perlindungan Kalender"
+          }
+        }
+      }
+    },
+    "Calendar access denied — enable in System Settings → Privacy & Security → Calendars" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akses kalender ditolak — aktifkan di Pengaturan Sistem → Privasi & Keamanan → Kalender"
+          }
+        }
+      }
+    },
+    "Calendar access granted" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akses kalender diizinkan"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Batal"
+          }
+        }
+      }
+    },
+    "Category" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kategori"
+          }
+        }
+      }
+    },
+    "Check again" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Periksa lagi"
+          }
+        }
+      }
+    },
+    "Check for Updates…" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Periksa Pembaruan…"
+          }
+        }
+      }
+    },
+    "Choose a dark or light appearance for the prayer overlay." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pilih tampilan gelap atau terang untuk layar pengingat."
+          }
+        }
+      }
+    },
+    "Choose the method used by your local mosque or region." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pilih metode yang dipakai masjid atau daerahmu."
+          }
+        }
+      }
+    },
+    "Clean uninstall (manual)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copot pemasangan bersih (manual)"
+          }
+        }
+      }
+    },
+    "Clears all settings and calendar events, then quits. Use to fix calendar access issues. Your subscription is not affected." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menghapus semua pengaturan dan acara kalender, lalu keluar. Pakai untuk memperbaiki masalah akses kalender. Langgananmu tidak terpengaruh."
+          }
+        }
+      }
+    },
+    "Connect" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hubungkan"
+          }
+        }
+      }
+    },
+    "Connected to Slack" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terhubung ke Slack"
+          }
+        }
+      }
+    },
+    "Connection" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Koneksi"
+          }
+        }
+      }
+    },
+    "Create daily busy blocks for each prayer so Outlook and Teams show you as busy. Events are recreated every day." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buat blok sibuk harian untuk tiap waktu sholat agar Outlook dan Teams menampilkanmu sedang sibuk. Acara dibuat ulang setiap hari."
+          }
+        }
+      }
+    },
+    "Custom (angles)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kustom (sudut)"
+          }
+        }
+      }
+    },
+    "Cycles before long break" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesi sebelum istirahat panjang"
+          }
+        }
+      }
+    },
+    "Dark" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelap"
+          }
+        }
+      }
+    },
+    "Default" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bawaan"
+          }
+        }
+      }
+    },
+    "Dhikr" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dzikir"
+          }
+        }
+      }
+    },
+    "Dhikr breaks" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dzikir saat istirahat"
+          }
+        }
+      }
+    },
+    "Dhuhr" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dzuhur"
+          }
+        }
+      }
+    },
+    "Disconnect" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Putuskan"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selesai"
+          }
+        }
+      }
+    },
+    "Download failed — tap to retry" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gagal mengunduh — klik untuk mencoba lagi"
+          }
+        }
+      }
+    },
+    "Dubai (UAE)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dubai (UEA)"
+          }
+        }
+      }
+    },
+    "Duration" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durasi"
+          }
+        }
+      }
+    },
+    "Dzikr" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dzikir"
+          }
+        }
+      }
+    },
+    "Egyptian General Authority" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otoritas Survei Umum Mesir"
+          }
+        }
+      }
+    },
+    "Enable Overlay" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktifkan layar pengingat"
+          }
+        }
+      }
+    },
+    "End a focus block before the next adhan." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akhiri sesi fokus sebelum adzan berikutnya."
+          }
+        }
+      }
+    },
+    "Enter coordinates if auto-detect is unavailable. Example: Mecca 21.4225, 39.8262" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masukkan koordinat jika deteksi otomatis tidak tersedia. Contoh: Makkah 21.4225, 39.8262"
+          }
+        }
+      }
+    },
+    "Fajr" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subuh"
+          }
+        }
+      }
+    },
+    "Focus" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fokus"
+          }
+        }
+      }
+    },
+    "Focus session complete. Take a breather." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesi fokus selesai. Tarik napas sejenak."
+          }
+        }
+      }
+    },
+    "Focus session complete. Take a longer break." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesi fokus selesai. Istirahatlah lebih lama."
+          }
+        }
+      }
+    },
+    "For locations above ~48° latitude. Auto picks based on your location." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Untuk lokasi di atas lintang ±48°. Otomatis memilih sesuai lokasimu."
+          }
+        }
+      }
+    },
+    "Frame each session — Bismillah to begin, Alhamdulillah on completion." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bingkai tiap sesi: Bismillah saat mulai, Alhamdulillah saat selesai."
+          }
+        }
+      }
+    },
+    "Full-screen reminders with Adhan audio when it's time to pray. Snooze if you need a few more minutes." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pengingat layar penuh dengan suara adzan saat waktu sholat tiba. Tunda jika kamu butuh beberapa menit lagi."
+          }
+        }
+      }
+    },
+    "General" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umum"
+          }
+        }
+      }
+    },
+    "Gentle Reminders" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pengingat yang Lembut"
+          }
+        }
+      }
+    },
+    "Get Started" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mulai"
+          }
+        }
+      }
+    },
+    "Getting a Slack Token" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mendapatkan Token Slack"
+          }
+        }
+      }
+    },
+    "Getting location..." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mencari lokasi…"
+          }
+        }
+      }
+    },
+    "Got it" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mengerti"
+          }
+        }
+      }
+    },
+    "Hanafi (later)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hanafi (lebih akhir)"
+          }
+        }
+      }
+    },
+    "High latitude rule" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aturan lintang tinggi"
+          }
+        }
+      }
+    },
+    "How long the overlay stays visible (5–15 minutes)." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lama layar pengingat tampil (5–15 menit)."
+          }
+        }
+      }
+    },
+    "How to get a Slack token" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cara mendapatkan token Slack"
+          }
+        }
+      }
+    },
+    "I am going to pray" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saya akan sholat"
+          }
+        }
+      }
+    },
+    "I subscribed: check again" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saya sudah berlangganan: periksa lagi"
+          }
+        }
+      }
+    },
+    "ISNA (North America)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ISNA (Amerika Utara)"
+          }
+        }
+      }
+    },
+    "If System Settings already shows Full Access, toggle Waqtu off then on to refresh. Restart Mac if it still fails." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jika Pengaturan Sistem sudah menunjukkan Akses Penuh, matikan lalu nyalakan lagi Waqtu di sana. Mulai ulang Mac jika masih gagal."
+          }
+        }
+      }
+    },
+    "Iftar" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berbuka"
+          }
+        }
+      }
+    },
+    "Imsak" : {
+      "shouldTranslate" : false
+    },
+    "Indeed, We have granted you al-Kawthar." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesungguhnya Kami telah memberimu nikmat yang banyak (al-Kautsar)."
+          }
+        }
+      }
+    },
+    "Indeed, prayer is obligatory on the believers at the specified time." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesungguhnya sholat itu kewajiban yang ditentukan waktunya atas orang-orang beriman."
+          }
+        }
+      }
+    },
+    "Integration" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Integrasi"
+          }
+        }
+      }
+    },
+    "Intention & dua" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niat & doa"
+          }
+        }
+      }
+    },
+    "Isha" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isya"
+          }
+        }
+      }
+    },
+    "Islamic Features" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fitur Islami"
+          }
+        }
+      }
+    },
+    "Kemenag RI (Indonesia)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kemenag RI"
+          }
+        }
+      }
+    },
+    "Kuwait" : {
+      "shouldTranslate" : false
+    },
+    "Late" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terlambat"
+          }
+        }
+      }
+    },
+    "Latitude" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lintang"
+          }
+        }
+      }
+    },
+    "Launch at Login" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buka saat login"
+          }
+        }
+      }
+    },
+    "Length of each focus block." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durasi tiap sesi fokus."
+          }
+        }
+      }
+    },
+    "Length of each prayer block (10–20 minutes)." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durasi tiap blok sholat (10–20 menit)."
+          }
+        }
+      }
+    },
+    "Let Waqtu Know Where You Are" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beri Tahu Waqtu Lokasimu"
+          }
+        }
+      }
+    },
+    "Light" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terang"
+          }
+        }
+      }
+    },
+    "Loading..." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Memuat…"
+          }
+        }
+      }
+    },
+    "Locate Me" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pakai Lokasi Saya"
+          }
+        }
+      }
+    },
+    "Location" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokasi"
+          }
+        }
+      }
+    },
+    "Location Source" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sumber Lokasi"
+          }
+        }
+      }
+    },
+    "Location unavailable" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokasi tidak tersedia"
+          }
+        }
+      }
+    },
+    "Long Break" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Istirahat Panjang"
+          }
+        }
+      }
+    },
+    "Long break" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Istirahat panjang"
+          }
+        }
+      }
+    },
+    "Longitude" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bujur"
+          }
+        }
+      }
+    },
+    "Looped during breaks. Add murattal.mp3 / dzikr.mp3 / sholawat.mp3. Auto rotates by cycle." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diputar berulang saat istirahat. Tambahkan murattal.mp3 / dzikr.mp3 / sholawat.mp3. Otomatis bergantian tiap sesi."
+          }
+        }
+      }
+    },
+    "Maghrib" : {
+      "shouldTranslate" : false
+    },
+    "Manage Subscription" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kelola Langganan"
+          }
+        }
+      }
+    },
+    "Manual Coordinates" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Koordinat Manual"
+          }
+        }
+      }
+    },
+    "Mark %@ as prayed" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tandai %@ selesai"
+          }
+        }
+      }
+    },
+    "Marked as prayed. Click to undo." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sudah ditandai selesai. Klik untuk membatalkan."
+          }
+        }
+      }
+    },
+    "Middle of the night" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tengah malam"
+          }
+        }
+      }
+    },
+    "Minute corrections" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Koreksi waktu (menit)"
+          }
+        }
+      }
+    },
+    "Missed" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terlewat"
+          }
+        }
+      }
+    },
+    "Moonsighting Committee (North America, UK)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moonsighting Committee (Amerika Utara, Inggris)"
+          }
+        }
+      }
+    },
+    "More about Waqtu Premium" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selengkapnya tentang Waqtu Premium"
+          }
+        }
+      }
+    },
+    "Murattal" : {
+      "shouldTranslate" : false
+    },
+    "Muslim World League" : {
+      "shouldTranslate" : false
+    },
+    "Never Miss a Prayer" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jangan Lewatkan Sholat"
+          }
+        }
+      }
+    },
+    "Next" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lanjut"
+          }
+        }
+      }
+    },
+    "Next Prayer" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sholat berikutnya"
+          }
+        }
+      }
+    },
+    "No Waqtu Premium on this account yet. A subscription bought in Waqtu on your iPhone or Android unlocks this Mac too." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akun ini belum memiliki Waqtu Premium. Langganan yang dibeli di Waqtu untuk iPhone atau Android juga membuka Mac ini."
+          }
+        }
+      }
+    },
+    "None" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tidak ada"
+          }
+        }
+      }
+    },
+    "Not connected" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Belum terhubung"
+          }
+        }
+      }
+    },
+    "Not now" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nanti saja"
+          }
+        }
+      }
+    },
+    "Not synced yet" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Belum disinkronkan"
+          }
+        }
+      }
+    },
+    "Notify before" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingatkan sebelum"
+          }
+        }
+      }
+    },
+    "Notify you before each prayer (e.g. \"Asr in 5 minutes\")." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beri tahu sebelum tiap waktu sholat (mis. \"Ashar 5 menit lagi\")."
+          }
+        }
+      }
+    },
+    "OK" : {
+      "shouldTranslate" : false
+    },
+    "Only a few minutes until %@. Focus after salah." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tinggal beberapa menit menuju %@. Lanjutkan fokus setelah sholat."
+          }
+        }
+      }
+    },
+    "Open Calendar Settings" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buka Pengaturan Kalender"
+          }
+        }
+      }
+    },
+    "Open Slack API" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buka Slack API"
+          }
+        }
+      }
+    },
+    "Pause" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeda"
+          }
+        }
+      }
+    },
+    "Paused" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dijeda"
+          }
+        }
+      }
+    },
+    "Payment is charged to your Apple ID. The subscription renews automatically unless cancelled at least 24 hours before the end of the period; manage or cancel it in your App Store account settings." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pembayaran dibebankan ke Apple ID-mu. Langganan diperpanjang otomatis kecuali dibatalkan paling lambat 24 jam sebelum periode berakhir; kelola atau batalkan di pengaturan akun App Store."
+          }
+        }
+      }
+    },
+    "Play Adhan sound" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Putar suara adzan"
+          }
+        }
+      }
+    },
+    "Play the Adhan when the overlay appears." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Putar adzan saat layar pengingat muncul."
+          }
+        }
+      }
+    },
+    "Pomodoro" : {
+      "shouldTranslate" : false
+    },
+    "Prayed" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sudah sholat"
+          }
+        }
+      }
+    },
+    "Prayer Reminders" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pengingat Sholat"
+          }
+        }
+      }
+    },
+    "Prayer Times" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jadwal Sholat"
+          }
+        }
+      }
+    },
+    "Prayer time at %@" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waktu sholat pukul %@"
+          }
+        }
+      }
+    },
+    "Prayer times for your day" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waktu sholat untuk harimu"
+          }
+        }
+      }
+    },
+    "Praying" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sedang sholat"
+          }
+        }
+      }
+    },
+    "Premium via the Mac App Store" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premium lewat Mac App Store"
+          }
+        }
+      }
+    },
+    "Premium via your Waqtu account" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premium lewat akun Waqtu-mu"
+          }
+        }
+      }
+    },
+    "Premium via your Waqtu account. Manage the subscription where you bought it." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premium lewat akun Waqtu-mu. Kelola langganan di tempat kamu membelinya."
+          }
+        }
+      }
+    },
+    "Qatar" : {
+      "shouldTranslate" : false
+    },
+    "Quit" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keluar"
+          }
+        }
+      }
+    },
+    "Quran verse break" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayat Al-Qur'an saat istirahat"
+          }
+        }
+      }
+    },
+    "Ramadhan" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ramadhan"
+          }
+        }
+      }
+    },
+    "Re-request full access and reload calendars. Use if your Outlook or other calendars don't appear. If they still don't show, quit and reopen Waqtu." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minta ulang akses penuh dan muat ulang daftar kalender. Pakai jika kalender Outlook atau lainnya tidak muncul. Jika masih tidak muncul, keluar lalu buka lagi Waqtu."
+          }
+        }
+      }
+    },
+    "Refresh calendar access" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muat ulang akses kalender"
+          }
+        }
+      }
+    },
+    "Refresh your current location for accurate prayer times." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perbarui lokasimu saat ini untuk waktu sholat yang akurat."
+          }
+        }
+      }
+    },
+    "Remind you of the post-salah tasbih (×33, ×33, ×34) during breaks." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingatkan tasbih setelah sholat (×33, ×33, ×34) saat istirahat."
+          }
+        }
+      }
+    },
+    "Reminder notifications" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifikasi pengingat"
+          }
+        }
+      }
+    },
+    "Remove All" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hapus Semua"
+          }
+        }
+      }
+    },
+    "Remove All Waqtu Events?" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hapus Semua Acara Waqtu?"
+          }
+        }
+      }
+    },
+    "Remove all Waqtu events from calendar" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hapus semua acara Waqtu dari kalender"
+          }
+        }
+      }
+    },
+    "Replaces the menu bar icon with the time left until iftar or imsak while it is Ramadhan." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selama Ramadhan, ikon bilah menu diganti dengan sisa waktu menuju berbuka atau imsak."
+          }
+        }
+      }
+    },
+    "Reset & Quit" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atur Ulang & Keluar"
+          }
+        }
+      }
+    },
+    "Reset Waqtu" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atur Ulang Waqtu"
+          }
+        }
+      }
+    },
+    "Reset Waqtu?" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atur Ulang Waqtu?"
+          }
+        }
+      }
+    },
+    "Restore Purchases" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulihkan Pembelian"
+          }
+        }
+      }
+    },
+    "Resume" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lanjutkan"
+          }
+        }
+      }
+    },
+    "Salah-aligned" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selaras waktu sholat"
+          }
+        }
+      }
+    },
+    "Say: He is Allah, the One. Allah, the Eternal Refuge." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Katakanlah: Dialah Allah, Yang Maha Esa. Allah tempat meminta segala sesuatu."
+          }
+        }
+      }
+    },
+    "Say: I seek refuge in the Lord of daybreak." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Katakanlah: Aku berlindung kepada Tuhan yang menguasai subuh."
+          }
+        }
+      }
+    },
+    "Say: I seek refuge in the Lord of mankind." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Katakanlah: Aku berlindung kepada Tuhannya manusia."
+          }
+        }
+      }
+    },
+    "Select" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pilih"
+          }
+        }
+      }
+    },
+    "Selected: %@" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dipilih: %@"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pengaturan"
+          }
+        }
+      }
+    },
+    "Seventh of the night (above 48° latitude)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sepertujuh malam (di atas lintang 48°)"
+          }
+        }
+      }
+    },
+    "Shafi (earlier)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Syafi'i (lebih awal)"
+          }
+        }
+      }
+    },
+    "Shafi, Maliki, Hanbali use earlier Asr; Hanafi uses later." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Syafi'i, Maliki, dan Hanbali memakai Ashar lebih awal; Hanafi lebih akhir."
+          }
+        }
+      }
+    },
+    "Sholawat" : {
+      "shouldTranslate" : false
+    },
+    "Short break" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Istirahat singkat"
+          }
+        }
+      }
+    },
+    "Show a full-screen notification when it's time for prayer." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tampilkan pengingat layar penuh saat waktu sholat tiba."
+          }
+        }
+      }
+    },
+    "Show a short surah to recite during breaks." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tampilkan surah pendek untuk dibaca saat istirahat."
+          }
+        }
+      }
+    },
+    "Show iftar / imsak countdown during Ramadhan" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tampilkan hitung mundur berbuka / imsak selama Ramadhan"
+          }
+        }
+      }
+    },
+    "Sign in to sync your prayer checklist and prayer settings with Waqtu on your iPhone or Android, and to use the Waqtu Premium you subscribed to there. Your location is never uploaded." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masuk untuk menyinkronkan mutabaah dan pengaturan sholat dengan Waqtu di iPhone atau Android, dan untuk memakai Waqtu Premium yang kamu langgani di sana. Lokasimu tidak pernah diunggah."
+          }
+        }
+      }
+    },
+    "Sign in to sync your prayer checklist and prayer settings with Waqtu on your iPhone or Android. Your location is never uploaded." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masuk untuk menyinkronkan mutabaah dan pengaturan sholat dengan Waqtu di iPhone atau Android. Lokasimu tidak pernah diunggah."
+          }
+        }
+      }
+    },
+    "Sign in under Account before subscribing so Premium also unlocks Waqtu on your iPhone or Android." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masuk di Akun sebelum berlangganan agar Premium juga membuka Waqtu di iPhone atau Android-mu."
+          }
+        }
+      }
+    },
+    "Sign in with Apple" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masuk dengan Apple"
+          }
+        }
+      }
+    },
+    "Sign in with Google" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masuk dengan Google"
+          }
+        }
+      }
+    },
+    "Sign out" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keluar"
+          }
+        }
+      }
+    },
+    "Singapore / Malaysia (MUIS / JAKIM)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Singapura / Malaysia (MUIS / JAKIM)"
+          }
+        }
+      }
+    },
+    "Skip" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lewati"
+          }
+        }
+      }
+    },
+    "Slack" : {
+      "shouldTranslate" : false
+    },
+    "Snooze" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tunda"
+          }
+        }
+      }
+    },
+    "Start" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mulai"
+          }
+        }
+      }
+    },
+    "Start Waqtu automatically when you log in." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jalankan Waqtu otomatis saat kamu login."
+          }
+        }
+      }
+    },
+    "Start before prayer" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mulai sebelum sholat"
+          }
+        }
+      }
+    },
+    "Startup" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saat Mulai"
+          }
+        }
+      }
+    },
+    "Status" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status"
+          }
+        }
+      }
+    },
+    "Status emoji" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emoji status"
+          }
+        }
+      }
+    },
+    "Status text" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teks status"
+          }
+        }
+      }
+    },
+    "Still at your Mac?" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masih di depan Mac?"
+          }
+        }
+      }
+    },
+    "Stops before %@" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berhenti sebelum %@"
+          }
+        }
+      }
+    },
+    "Streak %lldd" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Istiqamah %lld hari"
+          }
+        }
+      }
+    },
+    "Subscribe in Waqtu on your iPhone or Android phone (Rp 29.000/month or Rp 249.000/year), then sign in here under Account with the same Waqtu account." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berlangganan di Waqtu pada iPhone atau ponsel Android (Rp 29.000/bulan atau Rp 249.000/tahun), lalu masuk di sini lewat Akun dengan akun Waqtu yang sama."
+          }
+        }
+      }
+    },
+    "Subscribe monthly: %@/month" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berlangganan bulanan: %@/bulan"
+          }
+        }
+      }
+    },
+    "Subscribe to Waqtu Premium or sign in with your Waqtu account to keep using Waqtu." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berlangganan Waqtu Premium atau masuk dengan akun Waqtu-mu untuk terus memakai Waqtu."
+          }
+        }
+      }
+    },
+    "Subscribe yearly: %@/year" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berlangganan tahunan: %@/tahun"
+          }
+        }
+      }
+    },
+    "Subscribed in the Mac App Store." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berlangganan lewat Mac App Store."
+          }
+        }
+      }
+    },
+    "Sunrise" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terbit"
+          }
+        }
+      }
+    },
+    "Sync" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sinkron"
+          }
+        }
+      }
+    },
+    "Sync failed. Will retry." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Belum tersambung. Akan dicoba lagi."
+          }
+        }
+      }
+    },
+    "Sync now" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sinkronkan sekarang"
+          }
+        }
+      }
+    },
+    "Synced %@" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tersinkron %@"
+          }
+        }
+      }
+    },
+    "Synced: today's prayer checklist and history, calculation method, madhab and time adjustments." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yang tersinkron: mutabaah hari ini dan riwayatnya, metode perhitungan, mazhab, dan koreksi waktu."
+          }
+        }
+      }
+    },
+    "Syncing…" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menyinkronkan…"
+          }
+        }
+      }
+    },
+    "Tehran" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teheran"
+          }
+        }
+      }
+    },
+    "Test Overlay" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coba layar pengingat"
+          }
+        }
+      }
+    },
+    "Theme" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tema"
+          }
+        }
+      }
+    },
+    "This week: %lld/%lld (%lld%%)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pekan ini: %1$lld/%2$lld (%3$lld%%)"
+          }
+        }
+      }
+    },
+    "This will delete all prayer block events created by Waqtu from your calendar. Your other events are not affected." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ini akan menghapus semua acara blok sholat buatan Waqtu dari kalendermu. Acara lainnya tidak terpengaruh."
+          }
+        }
+      }
+    },
+    "Time remaining" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sisa waktu"
+          }
+        }
+      }
+    },
+    "Today's prayers" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sholat hari ini"
+          }
+        }
+      }
+    },
+    "Trial ending soon" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uji coba segera berakhir"
+          }
+        }
+      }
+    },
+    "Turkey (Diyanet)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turki (Diyanet)"
+          }
+        }
+      }
+    },
+    "Twilight angle" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sudut senja"
+          }
+        }
+      }
+    },
+    "Umm al-Qura (Makkah)" : {
+      "shouldTranslate" : false
+    },
+    "University of Islamic Sciences, Karachi" : {
+      "shouldTranslate" : false
+    },
+    "Update" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perbarui"
+          }
+        }
+      }
+    },
+    "Update available" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pembaruan tersedia"
+          }
+        }
+      }
+    },
+    "Updating..." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Memperbarui…"
+          }
+        }
+      }
+    },
+    "Upgrade" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premium"
+          }
+        }
+      }
+    },
+    "Use Slack emoji codes like :mosque: or :pray:. Unicode emoji also works: 🙏 🕌" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pakai kode emoji Slack seperti :mosque: atau :pray:. Emoji Unicode juga bisa: 🙏 🕌"
+          }
+        }
+      }
+    },
+    "Use your Mac's location for accurate prayer times." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pakai lokasi Mac untuk waktu sholat yang akurat."
+          }
+        }
+      }
+    },
+    "User OAuth Token" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Token OAuth pengguna"
+          }
+        }
+      }
+    },
+    "Version %@ (%@)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versi %1$@ (%2$@)"
+          }
+        }
+      }
+    },
+    "Waqtu %@ is ready to install" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waqtu %@ siap dipasang"
+          }
+        }
+      }
+    },
+    "Waqtu Premium" : {
+      "shouldTranslate" : false
+    },
+    "Waqtu Premium is active on this account." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waqtu Premium aktif di akun ini."
+          }
+        }
+      }
+    },
+    "Waqtu Premium is active." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waqtu Premium aktif."
+          }
+        }
+      }
+    },
+    "Waqtu Premium is one subscription for your Mac, iPhone and Android, kept by your Waqtu account. It includes sync across your devices and Circles." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waqtu Premium adalah satu langganan untuk Mac, iPhone, dan Android, tersimpan di akun Waqtu-mu. Termasuk sinkron antarperangkat dan Lingkaran."
+          }
+        }
+      }
+    },
+    "Waqtu account" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akun Waqtu"
+          }
+        }
+      }
+    },
+    "Waqtu for Android" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waqtu untuk Android"
+          }
+        }
+      }
+    },
+    "Waqtu for iPhone" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waqtu untuk iPhone"
+          }
+        }
+      }
+    },
+    "Waqtu shows prayer times right in your Mac's menu bar, with countdown to the next prayer." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waqtu menampilkan waktu sholat langsung di bilah menu Mac, lengkap dengan hitung mundur ke sholat berikutnya."
+          }
+        }
+      }
+    },
+    "Waqtu will create daily prayer blocks in your calendar so you appear busy during prayer times. Events are recreated every day to match changing prayer times." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waqtu akan membuat blok sholat harian di kalendermu agar kamu tampak sibuk selama waktu sholat. Acara dibuat ulang setiap hari mengikuti perubahan waktu sholat."
+          }
+        }
+      }
+    },
+    "We use your Mac's location to calculate accurate prayer times. Your location never leaves your device — no tracking, no servers." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lokasi Mac dipakai untuk menghitung waktu sholat yang akurat. Lokasimu tidak pernah keluar dari perangkat — tanpa pelacakan, tanpa server."
+          }
+        }
+      }
+    },
+    "Welcome to Waqtu" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selamat Datang di Waqtu"
+          }
+        }
+      }
+    },
+    "You tapped \"I am going to pray\" for %@ but your Mac is still active. Don't forget your commitment." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kamu menekan \"Saya akan sholat\" untuk %@, tetapi Mac-mu masih aktif. Jangan lupa niatmu."
+          }
+        }
+      }
+    },
+    "Your Slack status will change to \"Praying\" during prayer times and auto-clear when the prayer block ends." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status Slack-mu otomatis berubah selama waktu sholat dan kembali seperti semula saat blok sholat selesai."
+          }
+        }
+      }
+    },
+    "Your trial ends tomorrow. Subscribe to Waqtu Premium, or sign in with a subscribed Waqtu account, to keep using Waqtu." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uji cobamu berakhir besok. Berlangganan Waqtu Premium, atau masuk dengan akun Waqtu yang berlangganan, untuk terus memakai Waqtu."
+          }
+        }
+      }
+    },
+    "Your trial has ended" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masa uji coba berakhir"
+          }
+        }
+      }
+    },
+    "xoxp-..." : {
+      "shouldTranslate" : false
+    },
+    "· Best %lldd" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· Terpanjang %lld hari"
+          }
+        }
+      }
+    },
+    "الْحَمْدُ لِلَّهِ — Praise be to Allah. Rest well." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الْحَمْدُ لِلَّهِ — Segala puji bagi Allah. Selamat beristirahat."
+          }
+        }
+      }
+    },
+    "— Quran 4:103" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "— QS. An-Nisa' 4:103"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

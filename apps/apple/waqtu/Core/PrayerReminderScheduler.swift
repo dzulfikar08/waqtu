@@ -41,8 +41,8 @@ final class PrayerReminderScheduler {
             guard reminderDate > now else { continue }
 
             let content = UNMutableNotificationContent()
-            content.title = "\(prayer.name.displayName) in \(minutes) min"
-            content.body = "Prayer time at \(formatTime(prayer.time))"
+            content.title = String(localized: "\(prayer.name.displayName) in \(minutes) min")
+            content.body = String(localized: "Prayer time at \(formatTime(prayer.time))")
             content.sound = .default
 
             let components = Calendar.current.dateComponents(

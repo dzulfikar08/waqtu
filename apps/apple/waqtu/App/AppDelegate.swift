@@ -120,8 +120,8 @@ extension AppDelegate: SPUUpdaterDelegate, SPUStandardUserDriverDelegate {
         if !state.userInitiated {
             NSApp.dockTile.badgeLabel = "1"
             let content = UNMutableNotificationContent()
-            content.title = "Update available"
-            content.body = "Waqtu \(update.displayVersionString) is ready to install"
+            content.title = String(localized: "Update available")
+            content.body = String(localized: "Waqtu \(update.displayVersionString) is ready to install")
             let request = UNNotificationRequest(identifier: updateNotificationIdentifier, content: content, trigger: nil)
             UNUserNotificationCenter.current().add(request)
         }

@@ -16,7 +16,7 @@ final class OnboardingWindow: NSWindow {
         )
         self.isReleasedWhenClosed = false
         self.titlebarAppearsTransparent = true
-        self.title = "Welcome to Waqtu"
+        self.title = String(localized: "Welcome to Waqtu")
         self.center()
         self.level = .floating
 
@@ -46,23 +46,23 @@ struct OnboardingView: View {
     private let steps = [
         OnboardingStep(
             icon: "clock.badge",
-            title: "Never Miss a Prayer",
-            description: "Waqtu shows prayer times right in your Mac's menu bar, with countdown to the next prayer."
+            title: String(localized: "Never Miss a Prayer"),
+            description: String(localized: "Waqtu shows prayer times right in your Mac's menu bar, with countdown to the next prayer.")
         ),
         OnboardingStep(
             icon: "calendar.badge.plus",
-            title: "Calendar Protection",
-            description: "Automatically block your calendar during prayer times so colleagues see you as busy in Outlook and Teams."
+            title: String(localized: "Calendar Protection"),
+            description: String(localized: "Automatically block your calendar during prayer times so colleagues see you as busy in Outlook and Teams.")
         ),
         OnboardingStep(
             icon: "location.fill",
-            title: "Let Waqtu Know Where You Are",
-            description: "We use your Mac's location to calculate accurate prayer times. Your location never leaves your device — no tracking, no servers."
+            title: String(localized: "Let Waqtu Know Where You Are"),
+            description: String(localized: "We use your Mac's location to calculate accurate prayer times. Your location never leaves your device — no tracking, no servers.")
         ),
         OnboardingStep(
             icon: "bell.badge.fill",
-            title: "Gentle Reminders",
-            description: "Full-screen reminders with Adhan audio when it's time to pray. Snooze if you need a few more minutes."
+            title: String(localized: "Gentle Reminders"),
+            description: String(localized: "Full-screen reminders with Adhan audio when it's time to pray. Snooze if you need a few more minutes.")
         )
     ]
 
@@ -74,7 +74,7 @@ struct OnboardingView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 56, height: 56)
-                Text("Waqtu")
+                Text(verbatim: "Waqtu")
                     .font(.system(size: 22, weight: .bold))
                     .foregroundColor(.waqtuText)
             }
