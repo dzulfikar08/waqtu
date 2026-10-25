@@ -11,6 +11,7 @@ import { CirclesHome } from "@/circles/components/CirclesHome";
 import { Onboarding } from "@/circles/components/Onboarding";
 import { useLoad } from "@/circles/useLoad";
 import { useTranslation } from "@/i18n";
+import { PremiumGate } from "@/premium/PremiumGate";
 import { Button, Hint, Panel } from "@/ramadhan/components/fields";
 import { spacing, useTheme } from "@/theme";
 
@@ -60,7 +61,6 @@ function Loaded({ api }: { api: CirclesApi }) {
   const router = useRouter();
   const state = useLoad(async () => {
     const config = await api.config();
-    if (config.requiresPremium) return { config, profile: null, circles: [] };
     const profile = await api.getProfile();
     const circles = profile ? await api.list() : [];
     return { config, profile, circles };
@@ -80,30 +80,21 @@ function Loaded({ api }: { api: CirclesApi }) {
   if (!state.data) return <Text style={{ color: theme.muted }}>{t("circles.loading")}</Text>;
 
   const { config, profile, circles } = state.data;
-  if (config.requiresPremium) {
-    return (
-      <Section title={t("circles.premium.title")}>
-        <Panel>
-          <Hint>{t("circles.premium.body")}</Hint>
-        </Panel>
-      </Section>
-    );
-  }
-  if (!profile) {
-    return (
-      <Onboarding
-        api={api}
-        onJoined={(id) => {
-          void state.reload();
-          router.push(`/circle/${id}`);
-        }}
-      />
-    );
-  }
-  if (profile.suspended) {
-    return <Text style={{ color: theme.text }}>{t("circles.errors.suspended")}</Text>;
-  }
-  return <CirclesHome api={api} profile={profile} circles={circles} reload={state.reload} />;
+  const content = !profile ? (
+    <Onboarding
+      api={api}
+      onJoined={(id) => {
+        void state.reload();
+        router.push(`/circle/${id}`);
+      }}
+    />
+  ) : profile.suspended ? (
+    <Text style={{ color: theme.text }}>{t("circles.errors.suspended")}</Text>
+  ) : (
+    <CirclesHome api={api} profile={profile} circles={circles} reload={state.reload} />
+  );
+  // The server refuses joins and posts with `premium_required` while the switch is on.
+  return config.requiresPremium ? <PremiumGate>{content}</PremiumGate> : content;
 }
 
 const styles = StyleSheet.create({

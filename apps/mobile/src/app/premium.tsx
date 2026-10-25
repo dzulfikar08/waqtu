@@ -14,6 +14,7 @@ import {
 } from "react-native";
 
 import { authClient } from "@/auth/client";
+import { circlesApi } from "@/circles/client";
 import { Section } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { PremiumApiError } from "@/premium/api";
@@ -33,7 +34,8 @@ import { radius, spacing, useTheme } from "@/theme";
 /** The site serves Indonesian at the root and English under /en. */
 const legalUrl = (page: "privacy" | "terms", language: string) =>
   `https://getwaqtu.com${language.startsWith("id") ? "" : "/en"}/${page}`;
-const UNLOCK_KEYS = ["halaqah", "sync", "ramadhan", "fiqh"] as const;
+/** Exactly the features wrapped in `PremiumGate` (or, for sync, checked in `SyncController`). */
+const UNLOCK_KEYS = ["sync", "ramadhan"] as const;
 
 type Message = { text: string; tone: "ok" | "problem" };
 
@@ -48,6 +50,7 @@ export default function PremiumScreen() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<Message | null>(null);
   const [licenseKey, setLicenseKey] = useState("");
+  const [circlesPremium, setCirclesPremium] = useState(false);
 
   const api = authClient && userId ? premiumApiFor(authClient) : null;
   const store = t(Platform.OS === "ios" ? "premium.storeApple" : "premium.storeGoogle");
@@ -66,6 +69,22 @@ export default function PremiumScreen() {
   useEffect(() => {
     if (STORE_AVAILABLE && !premium) reloadPlans();
   }, [premium, reloadPlans]);
+
+  // Circles join the list only while the server switch `CIRCLES_REQUIRES_PREMIUM` is on.
+  useEffect(() => {
+    if (!circlesApi || !userId) return;
+    let live = true;
+    circlesApi
+      .config()
+      .then((config) => {
+        if (live) setCirclesPremium(config.requiresPremium);
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [userId]);
+  const unlocks = circlesPremium ? [...UNLOCK_KEYS, "circles" as const] : UNLOCK_KEYS;
 
   const problem = (error: unknown): Message => {
     if (error instanceof AlreadySubscribedError) {
@@ -226,7 +245,7 @@ export default function PremiumScreen() {
       <Text style={[styles.intro, { color: theme.text }]}>{t("premium.intro")}</Text>
 
       <Section title={t("premium.unlocksTitle")}>
-        {UNLOCK_KEYS.map((key) => (
+        {unlocks.map((key) => (
           <View key={key} style={[styles.bullet, { borderColor: theme.border }]}>
             <Text style={{ color: theme.text, fontSize: 16 }}>{t(`premium.unlocks.${key}`)}</Text>
           </View>

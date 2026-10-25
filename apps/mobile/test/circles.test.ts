@@ -219,6 +219,7 @@ describe("small helpers", () => {
     expect(errorKey(429, "rate_limited")).toBe("rateLimited");
     expect(errorKey(403, "suspended")).toBe("suspended");
     expect(errorKey(403, "summary_opt_in_required")).toBe("summaryOptIn");
+    expect(errorKey(403, "premium_required")).toBe("premiumRequired");
     expect(errorKey(413, null)).toBe("tooLarge");
     expect(errorKey(404, null)).toBe("notFound");
     expect(errorKey(500, null)).toBe("generic");
@@ -237,6 +238,7 @@ describe("small helpers", () => {
       "suspended",
       "summaryOptIn",
       "tooLarge",
+      "premiumRequired",
       "network",
       "generic",
     ] as const;
@@ -355,6 +357,27 @@ describe("api client", () => {
       120,
       "rateLimited",
     ]);
+  });
+
+  test("premium_required opens the paywall hook and still throws", async () => {
+    let opened = 0;
+    const api = createCirclesApi({
+      baseUrl: "https://api.example.test",
+      getCookie: () => "",
+      fetchImpl: (async () => ok({ error: "premium_required" }, 403)) as unknown as typeof fetch,
+      onPremiumRequired: () => opened++,
+    });
+    const error = (await api.joinPublic().catch((e: unknown) => e)) as CirclesHttpError;
+    expect([error.status, error.key, opened]).toEqual([403, "premiumRequired", 1]);
+
+    const other = createCirclesApi({
+      baseUrl: "https://api.example.test",
+      getCookie: () => "",
+      fetchImpl: (async () => ok({ error: "suspended" }, 403)) as unknown as typeof fetch,
+      onPremiumRequired: () => opened++,
+    });
+    await other.joinPublic().catch(() => {});
+    expect(opened).toBe(1);
   });
 
   test("401 is detectable and a dead network is a network error", async () => {

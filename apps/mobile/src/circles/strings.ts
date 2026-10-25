@@ -11,10 +11,6 @@ export const circlesId = {
     title: "Masuk dulu",
     body: "Lingkaran memakai akunmu supaya ruangnya aman. Nama dan emailmu tidak pernah terlihat oleh anggota lain.",
   },
-  premium: {
-    title: "Lingkaran adalah fitur premium",
-    body: "Fitur ini akan tersedia untuk pelanggan premium.",
-  },
   onboarding: {
     title: "Pilih nama samaranmu",
     body: "Hanya nama samaran ini yang terlihat di lingkaran. Kamu bisa menggantinya nanti.",
@@ -141,6 +137,7 @@ export const circlesId = {
     suspended: "Akses lingkaranmu sedang ditinjau.",
     summaryOptIn: "Aktifkan berbagi ringkasan dulu.",
     tooLarge: "Berkasnya terlalu besar.",
+    premiumRequired: "Bergabung dan menulis di lingkaran perlu Waqtu Premium.",
     network: "Tidak ada koneksi. Coba lagi nanti.",
     generic: "Terjadi kesalahan. Coba lagi.",
   },
@@ -159,10 +156,6 @@ export const circlesEn: Widen<typeof circlesId> = {
   signIn: {
     title: "Sign in first",
     body: "Circles use your account to keep the space safe. Your name and email are never shown to other members.",
-  },
-  premium: {
-    title: "Circles is a premium feature",
-    body: "It will be available to premium subscribers.",
   },
   onboarding: {
     title: "Pick an anonymous name",
@@ -289,6 +282,7 @@ export const circlesEn: Widen<typeof circlesId> = {
     suspended: "Your circle access is under review.",
     summaryOptIn: "Turn on summary sharing first.",
     tooLarge: "That file is too large.",
+    premiumRequired: "Joining and writing in circles needs Waqtu Premium.",
     network: "No connection. Try again later.",
     generic: "Something went wrong. Try again.",
   },
