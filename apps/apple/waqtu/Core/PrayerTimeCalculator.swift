@@ -70,8 +70,7 @@ final class PrayerTimeCalculator {
         return tomorrowPrayers.first
     }
 
-    /// Location the prayer times are calculated for (detected, or the manual fallback).
-    func getCoordinates() -> Coordinates {
+    private func getCoordinates() -> Coordinates {
         if settings.autoDetectLocation {
             return currentCoordinates ?? Coordinates(
                 latitude: settings.manualLatitude,

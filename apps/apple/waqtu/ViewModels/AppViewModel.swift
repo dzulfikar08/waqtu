@@ -3,7 +3,6 @@ import Combine
 import AppKit
 import CoreLocation
 import UserNotifications
-import Adhan
 
 @Observable
 final class AppViewModel {
@@ -628,12 +627,13 @@ final class AppViewModel {
     func imsakiyah() -> (span: Ramadhan.Span, table: Imsakiyah.Table)? {
         let offset = syncController.hijriOffset
         guard let span = Ramadhan.currentOrNext(on: Date(), hijriOffset: offset) else { return nil }
-        let coordinates = calculator.getCoordinates()
+        // Same location as the prayer times: the detected fix, else the manual coordinates.
+        let detected = settings.autoDetectLocation ? locationManager.locationForGeocoding?.coordinate : nil
         guard let table = Imsakiyah.table(
             hijriYear: span.hijriYear,
             hijriOffset: offset,
-            latitude: coordinates.latitude,
-            longitude: coordinates.longitude,
+            latitude: detected?.latitude ?? settings.manualLatitude,
+            longitude: detected?.longitude ?? settings.manualLongitude,
             timeZone: .current,
             method: settings.calculationMethod,
             madhab: settings.madhab,
