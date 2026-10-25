@@ -428,7 +428,7 @@ function SkyButton({
         styles.button,
         primary
           ? { backgroundColor: onSky.text, borderColor: onSky.text }
-          : { backgroundColor: onSky.glass, borderColor: onSky.line },
+          : { backgroundColor: onSky.shade, borderColor: onSky.line },
       ]}
     >
       <MaterialCommunityIcons name={icon} size={18} color={color} />

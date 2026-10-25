@@ -214,7 +214,7 @@ const SKIES: Record<DayPeriod, readonly [readonly string[], readonly string[]]> 
     ["#262F66", "#433A7A", "#6A4870"],
   ],
   sunrise: [
-    ["#2F7FC9", "#5DAEE3", "#F2C57C"],
+    ["#2F7FC9", "#58A6DD", "#E8B060"],
     ["#18406A", "#245A85", "#6A5C3E"],
   ],
   dhuhr: [
@@ -222,11 +222,11 @@ const SKIES: Record<DayPeriod, readonly [readonly string[], readonly string[]]> 
     ["#123A63", "#1C5788", "#2672A6"],
   ],
   asr: [
-    ["#C9702A", "#E39A3E", "#F2C46B"],
+    ["#C2621F", "#DE8E35", "#E9AE4C"],
     ["#5A3313", "#7E4A1B", "#9C6524"],
   ],
   maghrib: [
-    ["#B23A5B", "#DD5F4B", "#F29C58"],
+    ["#B23A5B", "#DD5F4B", "#EC8A48"],
     ["#5A2034", "#813041", "#9E4F38"],
   ],
   isha: [
@@ -273,6 +273,8 @@ export const onSky = {
   faint: "rgba(255,255,255,0.55)",
   glass: "rgba(255,255,255,0.18)",
   glassStrong: "rgba(255,255,255,0.28)",
+  /** Dark frost behind white text where the sky turns pale (a secondary button on a dawn or gold gradient). */
+  shade: "rgba(10,16,32,0.22)",
   line: "rgba(255,255,255,0.22)",
 } as const;
 

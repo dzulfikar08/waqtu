@@ -136,7 +136,7 @@ export function HeroButton({
         styles.button,
         primary
           ? { backgroundColor: onSky.text, borderColor: onSky.text }
-          : { backgroundColor: onSky.glass, borderColor: onSky.line },
+          : { backgroundColor: onSky.shade, borderColor: onSky.line },
       ]}
     >
       {icon ? <Ionicons name={icon} size={18} color={color} /> : null}
