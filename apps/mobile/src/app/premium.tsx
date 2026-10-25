@@ -16,9 +16,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { authClient } from "@/auth/client";
 import { circlesApi } from "@/circles/client";
-import { PillButton } from "@/components/PillButton";
 import { Card, IconChip, PressableScale, Section, type IconName } from "@/components/ui";
 import { useTranslation } from "@/i18n";
+import { Button } from "@/ramadhan/components/fields";
 import { PremiumApiError } from "@/premium/api";
 import type { Plan } from "@/premium/entitlement";
 import { purchasePlan, restorePurchases } from "@/premium/purchase";
@@ -203,7 +203,7 @@ export default function PremiumScreen() {
   );
 
   const secondary = (label: string, onPress: () => void, icon?: IconName) => (
-    <PillButton label={label} icon={icon} tone="secondary" disabled={busy} onPress={onPress} />
+    <Button block label={label} icon={icon} tone="plain" disabled={busy} onPress={onPress} />
   );
 
   return (

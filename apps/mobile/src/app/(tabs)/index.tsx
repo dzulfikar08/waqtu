@@ -83,14 +83,7 @@ export default function TodayScreen() {
         <>
           {location ? (
             <>
-              {next ? (
-                <NextPrayerCard
-                  slot={next}
-                  now={now}
-                  timeZone={location.timeZone}
-                  place={location.name ?? undefined}
-                />
-              ) : null}
+              {next ? <NextPrayerCard slot={next} now={now} timeZone={location.timeZone} /> : null}
               {times ? (
                 <View style={styles.block}>
                   <SectionTitle title={t("today.times")} icon="time-outline" />

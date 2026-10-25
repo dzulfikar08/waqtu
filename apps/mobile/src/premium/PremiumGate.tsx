@@ -2,10 +2,10 @@ import { useRouter } from "expo-router";
 import type { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { PillButton } from "@/components/PillButton";
 import { Card, IconChip } from "@/components/ui";
 import { DEMO_MODE } from "@/demo/mode";
 import { useTranslation } from "@/i18n";
+import { Button } from "@/ramadhan/components/fields";
 import { spacing, typography, useTheme } from "@/theme";
 
 import { usePremium } from "./usePremium";
@@ -33,7 +33,8 @@ export function PremiumGate({ children }: { children: ReactNode }) {
             </Text>
           </View>
         </View>
-        <PillButton
+        <Button
+          block
           label={t("premium.see")}
           icon="sparkles"
           onPress={() => router.push("/premium")}

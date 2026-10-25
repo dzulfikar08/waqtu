@@ -5,10 +5,10 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { itemLabel } from "@/components/itemLabel";
-import { PillButton } from "@/components/PillButton";
 import { IconChip, Pill, Row, Section, type IconName } from "@/components/ui";
 import { getSetting, setSyncedSetting } from "@/db/settings";
 import { useTranslation } from "@/i18n";
+import { Button } from "@/ramadhan/components/fields";
 import {
   MAX_LABEL,
   addBuiltinItem,
@@ -141,7 +141,8 @@ export default function ItemsScreen() {
               onPress={() => setKind("count")}
             />
           </View>
-          <PillButton
+          <Button
+            block
             label={t("items.add")}
             icon="add"
             disabled={name.trim().length === 0}

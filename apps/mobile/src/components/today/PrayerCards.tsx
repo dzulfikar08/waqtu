@@ -57,13 +57,10 @@ export function NextPrayerCard({
   slot,
   now,
   timeZone,
-  place,
 }: {
   slot: PrayerSlot;
   now: Date;
   timeZone: string;
-  /** City name, shown under the time like the popover's location line. */
-  place?: string;
 }) {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -104,12 +101,6 @@ export function NextPrayerCard({
       >
         {t("today.in", { time })}
       </Text>
-      {place ? (
-        <View style={styles.place}>
-          <MaterialCommunityIcons name="map-marker-outline" size={14} color={theme.muted} />
-          <Text style={[typography.footnote, { color: theme.muted }]}>{place}</Text>
-        </View>
-      ) : null}
     </Card>
   );
 }
@@ -286,7 +277,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
   },
   countdown: { fontSize: 40, fontWeight: "800", letterSpacing: -0.8, marginTop: spacing.xs },
-  place: { flexDirection: "row", alignItems: "center", gap: 4 },
   grow: { flex: 1 },
   timeRow: {
     minHeight: 52,

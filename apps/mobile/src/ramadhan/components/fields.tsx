@@ -1,7 +1,8 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState, type ReactNode } from "react";
 import { Platform, StyleSheet, Switch, Text, TextInput, View } from "react-native";
 
-import { PressableScale } from "@/components/ui";
+import { PressableScale, type IconName } from "@/components/ui";
 import { HIT, radius, spacing, tabular, typography, useTheme } from "@/theme";
 
 /** Padded body for a `Section` card. */
@@ -9,37 +10,45 @@ export function Panel({ children }: { children: ReactNode }) {
   return <View style={styles.panel}>{children}</View>;
 }
 
-/** Pill button: a filled accent pill (primary) or an outlined one (plain). */
+/** Pill button: a filled accent pill (primary) or an outlined one (plain); `block` makes it a full-width call to action. */
 export function Button({
   label,
   onPress,
   tone = "primary",
   disabled,
+  icon,
+  block,
+  accessibilityLabel,
 }: {
   label: string;
   onPress: () => void;
   tone?: "primary" | "plain";
   disabled?: boolean;
+  icon?: IconName;
+  block?: boolean;
+  accessibilityLabel?: string;
 }) {
   const theme = useTheme();
   const primary = tone === "primary";
+  const color = primary ? theme.accentText : theme.text;
   return (
     <PressableScale
       accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
       style={[
         styles.button,
+        block ? styles.block : null,
         {
           backgroundColor: primary ? theme.accent : "transparent",
           borderColor: primary ? theme.accent : theme.border,
         },
       ]}
     >
-      <Text style={[styles.buttonLabel, { color: primary ? theme.accentText : theme.text }]}>
-        {label}
-      </Text>
+      {icon ? <Ionicons name={icon} size={18} color={color} /> : null}
+      <Text style={[styles.buttonLabel, { color }]}>{label}</Text>
     </PressableScale>
   );
 }
@@ -186,9 +195,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md + 4,
     borderRadius: radius.pill,
     borderWidth: 1.5,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: spacing.sm,
   },
+  block: { alignSelf: "stretch", minHeight: HIT + 6, paddingHorizontal: spacing.lg },
   buttonLabel: { ...typography.callout, fontWeight: "600" },
   buttonRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: spacing.sm },
   toggleRow: {
