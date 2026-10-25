@@ -1,15 +1,16 @@
 import { getAuth } from "../auth";
 import type { AppEnv } from "../env";
 import {
-  APPLE_BUNDLE_ID,
-  APPLE_PRODUCT_IDS,
+  APPLE_IOS_APP,
+  APPLE_MAC_APP,
   APPLE_ROOT_CA_G3_SHA256,
   verifyAppleNotificationJws,
   verifyAppleTransactionJws,
+  type AppleApp,
   type AppleVerifyOptions,
 } from "./apple";
 import { handleAppleNotification, redeemAppleTransaction } from "./appleBilling";
-import { readEntitlement, writeEntitlement } from "./entitlement";
+import { readEntitlement } from "./entitlement";
 import {
   createGoogleKeySource,
   createGooglePlayClient,
@@ -20,7 +21,6 @@ import {
   type GooglePlayClient,
 } from "./google";
 import { handleGoogleNotification, syncGooglePurchase } from "./googleBilling";
-import { checkLicenseKey, processLicenseEvent, recheckLicenses } from "./license";
 import {
   createCheckout,
   createPortalSession,
@@ -31,7 +31,6 @@ import {
 } from "./polar";
 
 export const ENTITLEMENT_PATH = "/v1/entitlement";
-export const LINK_LICENSE_PATH = "/v1/entitlement/link-license";
 export const APPLE_PATH = "/v1/billing/apple";
 export const APPLE_NOTIFICATIONS_PATH = "/v1/billing/apple/notifications";
 export const GOOGLE_PATH = "/v1/billing/google";
@@ -46,7 +45,7 @@ const PURCHASE_TOKEN = /^[A-Za-z0-9._-]{10,2048}$/;
 
 /** The outside world the billing routes touch; tests replace exactly these. */
 export interface BillingOptions {
-  /** HTTP boundary to Google, Apple-free Polar API and the license server. */
+  /** HTTP boundary to Google and the Polar API. */
   fetch?: typeof fetch;
   /** SHA-256 of the Apple root certificate to pin. Only tests pin another root. */
   appleRootSha256?: string;
@@ -91,22 +90,25 @@ export type BillingHandler = (request: Request, env: AppEnv) => Promise<Response
  * Premium routes under `/v1/entitlement` and `/v1/billing`. Returns null for any other path so the
  * app router keeps handling sync and `/v1/me`.
  *
- * One Waqtu subscription unlocks mobile and the Mac app; a Mac lifetime license key keeps premium
- * forever. Every source (App Store, Play, Polar, license) writes rows into the same entitlement
- * table and `GET /v1/entitlement` resolves them. Trust never comes from a client claim: Apple
- * receipts are JWS chains verified to the pinned Apple root, Play purchases are re-read from the
- * Android Publisher API, Polar deliveries are HMAC-signed, license keys are validated by Polar.
+ * One Waqtu subscription unlocks mobile and the Mac app. Every source (App Store on iPhone and Mac,
+ * Play, Polar) writes rows into the same entitlement table and `GET /v1/entitlement` resolves them.
+ * Trust never comes from a client claim: Apple receipts are JWS chains verified to the pinned Apple
+ * root, Play purchases are re-read from the Android Publisher API, Polar deliveries are HMAC-signed.
  */
 export function createBillingHandler(options: BillingOptions = {}): BillingHandler {
   const now = options.now ?? Date.now;
   const fetchImpl: typeof fetch = options.fetch ?? ((input, init) => fetch(input, init));
   const appleOptions = (env: AppEnv): AppleVerifyOptions => {
-    const appId = Number(env.APPLE_APP_ID?.trim());
+    const withAppId = (app: AppleApp, raw: string | undefined): AppleApp => {
+      const appId = Number(raw?.trim());
+      return Number.isSafeInteger(appId) && appId > 0 ? { ...app, appAppleId: appId } : app;
+    };
     return {
       rootSha256: options.appleRootSha256 ?? APPLE_ROOT_CA_G3_SHA256,
-      bundleId: APPLE_BUNDLE_ID,
-      productIds: APPLE_PRODUCT_IDS,
-      ...(Number.isSafeInteger(appId) && appId > 0 ? { appAppleId: appId } : {}),
+      apps: [
+        withAppId(APPLE_IOS_APP, env.APPLE_APP_ID),
+        withAppId(APPLE_MAC_APP, env.APPLE_MAC_APP_ID),
+      ],
     };
   };
 
@@ -281,8 +283,7 @@ export function createBillingHandler(options: BillingOptions = {}): BillingHandl
   }
 
   async function polarWebhook(env: AppEnv, request: Request): Promise<Response> {
-    // License refunds and revocations need only the signing secret; subscription events also
-    // need the web subscription products and are ignored until those are configured.
+    // Subscription events need the web subscription products and are ignored until those are configured.
     const webhookSecret = env.POLAR_WEBHOOK_SECRET?.trim();
     if (!webhookSecret) return unavailable();
     const raw = await readBody(request);
@@ -307,51 +308,14 @@ export function createBillingHandler(options: BillingOptions = {}): BillingHandl
     }
     try {
       const config = polarConfig(env);
-      const outcome =
-        (await processLicenseEvent(env.APP_DB, payload, now())) ??
-        (config ? await processPolarEvent(env.APP_DB, config, payload, now()) : "ignored");
+      const outcome = config
+        ? await processPolarEvent(env.APP_DB, config, payload, now())
+        : "ignored";
       return json({ received: true, outcome }, 202);
     } catch (error) {
       console.error("polar webhook failed:", error);
       return json({ error: "retry" }, 500);
     }
-  }
-
-  async function linkLicense(env: AppEnv, request: Request): Promise<Response> {
-    const user = await sessionUser(env, request);
-    if (!user) return unauthorized();
-    const body = await readJson(request);
-    const key = typeof body?.key === "string" ? body.key.trim() : "";
-    if (!key || key.length > 200) return json({ error: "invalid_request" }, 400);
-
-    let check;
-    try {
-      check = await checkLicenseKey(env, key, fetchImpl, now());
-    } catch (error) {
-      console.error("license validation failed:", error);
-      return json({ error: "license_unreachable" }, 502);
-    }
-    if (check.status === "unavailable") return json({ error: "license_unreachable" }, 502);
-    if (check.status === "invalid") return json({ error: "invalid_license" }, 400);
-
-    const time = now();
-    const outcome = await writeEntitlement(
-      env.APP_DB,
-      {
-        userId: user.id,
-        source: "license",
-        externalId: check.licenseId,
-        productId: "mac-lifetime",
-        environment: null,
-        expiresAt: null,
-        customerRef: check.customerId,
-        checkedAt: time,
-        signedAt: time,
-      },
-      time,
-    );
-    if (outcome === "other-account") return json({ error: "linked_to_other_account" }, 409);
-    return json(await view(env, user.id));
   }
 
   return async function handleBilling(request: Request, env: AppEnv): Promise<Response | null> {
@@ -369,14 +333,9 @@ export function createBillingHandler(options: BillingOptions = {}): BillingHandl
         run: async () => {
           const user = await sessionUser(env, request);
           if (!user) return unauthorized();
-          // Lifetime keys are re-confirmed with Polar now and then; a Polar problem never blocks the read.
-          await recheckLicenses(env.APP_DB, env, user.id, fetchImpl, now()).catch(
-            (error: unknown) => console.error("license recheck failed:", error),
-          );
           return json(await view(env, user.id));
         },
       },
-      [LINK_LICENSE_PATH]: { method: "POST", run: () => linkLicense(env, request) },
       [APPLE_PATH]: { method: "POST", run: () => appleSubmit(env, request) },
       [APPLE_NOTIFICATIONS_PATH]: { method: "POST", run: () => appleNotification(env, request) },
       [GOOGLE_PATH]: { method: "POST", run: () => googleSubmit(env, request) },

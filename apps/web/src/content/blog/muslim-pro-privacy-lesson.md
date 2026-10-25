@@ -24,9 +24,9 @@ Reddit communities like r/islam and r/MuslimLounge were flooded with posts warni
 
 - **100% offline calculation** — Prayer times are calculated locally on your Mac using the Adhan library. Your coordinates never leave your device.
 - **No analytics, no tracking** — We don't collect usage data. No third-party SDKs. No data brokers.
-- **No account required** — You don't create an account, log in, or provide an email (unless you choose to purchase).
+- **No account required** — You don't create an account, log in, or provide an email unless you want Premium features like sync across devices.
 - **Calendar stays local** — Calendar events are created directly via macOS EventKit. We never read or transmit your calendar data.
-- **Transparent business model** — We make money by selling licenses, not data. One payment. That's it.
+- **Transparent business model** — We make money from an optional Premium subscription, not from data.
 
 ## What to look for in a privacy-respecting prayer app
 
@@ -34,7 +34,7 @@ Reddit communities like r/islam and r/MuslimLounge were flooded with posts warni
 2. **Is there a privacy policy?** — Read it. Look for mentions of "third-party services," "analytics," or "advertising partners."
 3. **Does it require an account?** — If yes, why? Prayer times don't need cloud sync.
 4. **Open-source?** — Apps you can inspect yourself eliminate trust issues entirely.
-5. **Paid vs free?** — If it's free, you are the product. A one-time payment means the developer is paid by you, not advertisers.
+5. **Paid vs free?** — If it's free, you are the product. Paying the developer directly means they are paid by you, not advertisers.
 
 <div class="neu-card p-6 mt-10">
   <p class="font-medium text-[var(--waqtu-text)]">Prayer times with no data collection</p>

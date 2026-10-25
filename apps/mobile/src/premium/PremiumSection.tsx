@@ -9,12 +9,8 @@ import { usePremium } from "./usePremium";
 export function PremiumSection() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { premium, entitlement } = usePremium();
-  const label = !premium
-    ? t("premium.settingsFree")
-    : entitlement?.expiresAt === null
-      ? t("premium.settingsLifetime")
-      : t("premium.settingsActive");
+  const { premium } = usePremium();
+  const label = premium ? t("premium.settingsActive") : t("premium.settingsFree");
   return (
     <Section title={t("premium.settingsTitle")}>
       <Row label={label} onPress={() => router.push("/premium")} />
