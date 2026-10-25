@@ -10,7 +10,8 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit -p .",
-    "test": "bun test test"
+    "test": "bun test test",
+    "eval:recitation": "bun scripts/recitation-eval.ts"
   },
   "dependencies": {
     "adhan": "4.4.6"
