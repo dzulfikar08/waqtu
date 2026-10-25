@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Same streak as the phone (DEV-13)
+
+- **One streak rule everywhere** — The Mac's streak is now computed from the synced checklist with the phone's rules: a day counts when at least the chosen number of practices is recorded, missed days within the weekly grace are forgiven, and paused days (illness, travel, excuse) neither count nor break it. The old Mac-only rule (all five prayers every day, no grace) is gone, so both devices show the same number.
+- **Streak settings sync** — Grace per week, the daily minimum and pauses live in Settings → Mutabaah and in the menu bar, stored in the account's `streak` setting shared with the phone.
+- Widgets keep the five-prayer dots; their streak numbers follow the new rule.
+
 ### Full mutabaah checklist on the Mac (DEV-13)
 
 - **Every practice** — The menu bar shows the whole mutabaah checklist, not only the five fardhu: rawatib, dhuha, tahajjud, tilawah pages, dzikir pagi/petang, sedekah, puasa sunnah, and your own practices. Fardhu chips mark a prayer done on time; right-click toggles on time, in congregation (jamaah) or made up (qadha), the same flags as the phone.

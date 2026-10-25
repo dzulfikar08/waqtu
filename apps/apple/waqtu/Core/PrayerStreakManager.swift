@@ -2,8 +2,9 @@
 //  PrayerStreakManager.swift
 //  waqtu
 //
-//  Prayer habit tracking: prayed/missed per prayer, daily/weekly/monthly streaks.
-//  Stored in UserDefaults as a simple JSON dictionary.
+//  The Mac's prayer log: prayed / late / missed per prayer (overlay, "I am going to pray").
+//  Stored in UserDefaults as JSON. The streak is computed from the synced checklist
+//  (waqtu-sync/MutabaahStreakModel.swift), with the phone's rules, not from this log.
 //
 
 import Foundation
@@ -102,129 +103,6 @@ final class PrayerStreakManager {
         }
     }
 
-    // MARK: - Queries
-
-    /// Get today's log entries.
-    var todayEntries: [PrayerLogEntry] {
-        let today = FardhMapping.dayKey(for: Date())
-        return entries.filter { $0.date == today }
-    }
-
-    /// How many prayers were prayed today.
-    var todayPrayedCount: Int {
-        todayEntries.filter { $0.status == .prayed || $0.status == .late }.count
-    }
-
-    /// Current streak: consecutive days where all 5 prayers were prayed.
-    var currentStreak: Int {
-        calculateStreak(endingAt: Date())
-    }
-
-    /// Best streak ever recorded.
-    var bestStreak: Int {
-        let allDates = uniqueDates()
-        var best = 0
-        for date in allDates {
-            let streak = calculateStreak(endingAt: date)
-            best = max(best, streak)
-        }
-        return best
-    }
-
-    /// Weekly stats: prayers prayed this week (Mon–Sun).
-    var weeklyStats: (prayed: Int, missed: Int, total: Int) {
-        let calendar = FardhMapping.gregorian()
-        guard let weekStart = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date())) else {
-            return (0, 0, 0)
-        }
-        let formatter = DayKeyFormatter()
-
-        var prayed = 0, missed = 0
-        let today = Date()
-        var current = weekStart
-        while current <= today {
-            let dateStr = formatter.string(from: current)
-            let dayEntries = entries.filter { $0.date == dateStr }
-            prayed += dayEntries.filter { $0.status == .prayed || $0.status == .late }.count
-            missed += dayEntries.filter { $0.status == .missed }.count
-            current = calendar.date(byAdding: .day, value: 1, to: current) ?? today
-        }
-        let totalDays = max(1, calendar.dateComponents([.day], from: weekStart, to: today).day ?? 0 + 1)
-        return (prayed, missed, totalDays * 5)
-    }
-
-    /// Monthly stats for the given month.
-    func monthlyStats(for date: Date = Date()) -> (prayed: Int, missed: Int, completionRate: Double) {
-        let calendar = FardhMapping.gregorian()
-        let components = calendar.dateComponents([.year, .month], from: date)
-        guard let monthStart = calendar.date(from: components),
-              let range = calendar.range(of: .day, in: .month, for: monthStart) else {
-            return (0, 0, 0)
-        }
-
-        let formatter = DayKeyFormatter()
-
-        var prayed = 0, missed = 0
-        for day in 1...range.count {
-            guard let dayDate = calendar.date(byAdding: .day, value: day - 1, to: monthStart),
-                  dayDate <= Date() else { break }
-            let dateStr = formatter.string(from: dayDate)
-            let dayEntries = entries.filter { $0.date == dateStr }
-            prayed += dayEntries.filter { $0.status == .prayed || $0.status == .late }.count
-            missed += dayEntries.filter { $0.status == .missed }.count
-        }
-
-        let total = prayed + missed
-        let rate = total > 0 ? Double(prayed) / Double(total) * 100 : 0
-        return (prayed, missed, rate)
-    }
-
-    /// Has the user logged this prayer today?
-    func hasLogged(prayer: String, date: Date = Date()) -> Bool {
-        let dateStr = FardhMapping.dayKey(for: date)
-        return entries.contains { $0.date == dateStr && $0.prayer == prayer }
-    }
-
-    /// Get status for a specific prayer today.
-    func statusFor(prayer: String, date: Date = Date()) -> PrayerLogEntry.Status? {
-        let dateStr = FardhMapping.dayKey(for: date)
-        return entries.first { $0.date == dateStr && $0.prayer == prayer }?.status
-    }
-
-    // MARK: - Private
-
-    private func uniqueDates() -> [Date] {
-        let formatter = DayKeyFormatter()
-        var seen = Set<String>()
-        return entries.compactMap { entry -> Date? in
-            guard seen.insert(entry.date).inserted else { return nil }
-            return formatter.date(from: entry.date)
-        }.sorted(by: >)
-    }
-
-    private func calculateStreak(endingAt endDate: Date) -> Int {
-        let calendar = FardhMapping.gregorian()
-        let formatter = DayKeyFormatter()
-
-        var streak = 0
-        var current = calendar.startOfDay(for: endDate)
-
-        while true {
-            let dateStr = formatter.string(from: current)
-            let dayEntries = entries.filter { $0.date == dateStr }
-            let prayedCount = dayEntries.filter { $0.status == .prayed || $0.status == .late }.count
-
-            // A day counts if all 5 prayers were prayed
-            guard prayedCount >= 5 else { break }
-
-            streak += 1
-            guard let previous = calendar.date(byAdding: .day, value: -1, to: current) else { break }
-            current = previous
-        }
-
-        return streak
-    }
-
     private func load() {
         guard let data = defaults.data(forKey: logKey),
               let decoded = try? JSONDecoder().decode([PrayerLogEntry].self, from: data) else {
@@ -250,39 +128,6 @@ final class PrayerStreakManager {
         defaults.set(data, forKey: logKey)
     }
 
-    /// A compact grid of the last 7 days for the streak report.
-    /// Returns an array of (dayLabel, statusIcon, isToday) tuples.
-    var weeklyGrid: [(label: String, status: String, isToday: Bool)] {
-        let calendar = FardhMapping.gregorian()
-        let formatter = DayKeyFormatter()
-        let dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-        let today = Date()
-        let todayStr = formatter.string(from: today)
-
-        return (0..<7).compactMap { offset -> (String, String, Bool)? in
-            guard let date = calendar.date(byAdding: .day, value: -(6 - offset), to: today) else { return nil }
-            let dateStr = formatter.string(from: date)
-            let dayEntries = entries.filter { $0.date == dateStr }
-            let prayed = dayEntries.filter { $0.status == .prayed || $0.status == .late }.count
-            let isToday = dateStr == todayStr
-
-            let status: String
-            if dayEntries.isEmpty {
-                status = isToday ? " " : "·"
-            } else if prayed >= 5 {
-                status = "●"
-            } else if prayed > 0 {
-                status = "◐"
-            } else {
-                status = "○"
-            }
-
-            let weekday = calendar.component(.weekday, from: date)
-            let label = dayNames[weekday - 1]
-            return (label, status, isToday)
-        }
-    }
-
     /// Remove all log data.
     func resetAll() {
         entries = []
@@ -290,10 +135,4 @@ final class PrayerStreakManager {
         clearedAt = [:]
         defaults.removeObject(forKey: clearedKey)
     }
-}
-
-/// The prayer log's Gregorian `yyyy-MM-dd` day keys, whatever the system calendar is.
-private struct DayKeyFormatter {
-    func string(from date: Date) -> String { FardhMapping.dayKey(for: date) }
-    func date(from key: String) -> Date? { FardhMapping.startOfDay(forKey: key) }
 }

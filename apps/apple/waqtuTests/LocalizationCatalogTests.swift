@@ -92,6 +92,12 @@ struct LocalizationCatalogTests {
             "My list": "active", "Available to add back": "available", "Your own practice": "custom",
             "Practice name, e.g. Read Al-Mulk": "namePlaceholder", "Checkbox": "kindCheck",
             "Counter": "kindCount", "Add": "add", "Today": "today",
+            // Streak copy (mobile `streak.*`, `streakSettings.*`).
+            "Paused. These days don't count and don't break your streak.": "paused",
+            "Start anywhere. One practice today already counts.": "start",
+            "Slow and steady. What matters is to keep going.": "going",
+            "Today is still open.": "todayOpen", "End pause": "pauseEnd",
+            "Pause (illness, travel, excuse)": "pauseStart",
         ]
         for (key, mobileKey) in pairs {
             let expected = try #require(mobileValue(mobileKey), "mobile id.ts has no \(mobileKey)")

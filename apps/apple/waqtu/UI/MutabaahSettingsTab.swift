@@ -82,6 +82,30 @@ struct MutabaahSettingsTab: View {
             } header: {
                 Text("Your own practice")
             }
+
+            // The phone's StreakSettingsSection: same ranges, same `streak` setting.
+            let config = sync.streakConfig
+            Section {
+                Stepper(value: Binding(
+                    get: { config.graceDays },
+                    set: { var next = config; next.graceDays = $0; sync.setStreakConfig(next) }
+                ), in: 0...MutabaahStreak.maxGraceDays) {
+                    Text("Grace per week: \(config.graceDays) days")
+                }
+                Stepper(value: Binding(
+                    get: { config.minDone },
+                    set: { var next = config; next.minDone = $0; sync.setStreakConfig(next) }
+                ), in: 1...max(1, items.count)) {
+                    Text("A day counts with at least \(config.minDone) practices recorded")
+                }
+                Button(sync.pauseActive ? String(localized: "End pause") : String(localized: "Pause (illness, travel, excuse)")) {
+                    sync.togglePause()
+                }
+                .buttonStyle(.bordered)
+                .tint(.waqtuPrimary)
+            } header: {
+                Text("Consistency streak")
+            }
         }
         .formStyle(.grouped)
         .scrollContentBackground(.hidden)

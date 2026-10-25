@@ -24,6 +24,8 @@ enum SyncStatus: Equatable {
 struct RemoteChanges: Equatable {
     var prayerLog = false
     var prayerSettings = false
+    /// Checklist entries, the item list or the streak settings (the streak may have moved).
+    var checklist = false
 }
 
 @Observable
@@ -141,6 +143,35 @@ final class MutabaahSyncController {
         }
     }
 
+    // MARK: - Streak (same rules and inputs as the phone)
+
+    /// Today's day key on this Mac.
+    var today: String { FardhMapping.dayKey(for: Date()) }
+
+    var streak: StreakResult { MutabaahStreakModel.streak(today: today, in: replica) }
+
+    var week: [MutabaahStreakModel.Day] { MutabaahStreakModel.week(today: today, in: replica) }
+
+    var streakConfig: StreakConfig { MutabaahStreakModel.config(in: replica) }
+
+    func setStreakConfig(_ config: StreakConfig) {
+        if MutabaahStreakModel.setConfig(config, in: replica, at: FardhMapping.millis(Date())) {
+            localEdit()
+        }
+    }
+
+    /// A pause is running (an open range), as the phone's streak settings decide it.
+    var pauseActive: Bool { streakConfig.pauses.contains { $0.to == nil } }
+
+    /// Starts a pause (illness, travel, excuse) from today, or ends the running one: paused days
+    /// neither count nor break the streak.
+    func togglePause() {
+        let config = streakConfig
+        setStreakConfig(pauseActive
+            ? MutabaahStreak.endPause(config, today: today)
+            : MutabaahStreak.startPause(config, today: today))
+    }
+
     private func localEdit() {
         revision += 1
         onLocalChecklistChange?()
@@ -234,8 +265,10 @@ final class MutabaahSyncController {
 
     /// Writes what a pull brought into the prayer log and the prayer preferences.
     private func merge(_ changes: inout RemoteChanges, _ report: SyncReport) {
-        if !report.pulledEntries.isEmpty || report.pulledSettings.contains(where: { $0.key == MutabaahSettingKey.items }) {
+        let checklistKeys: Set<String> = [MutabaahSettingKey.items, MutabaahSettingKey.streak]
+        if !report.pulledEntries.isEmpty || report.pulledSettings.contains(where: { checklistKeys.contains($0.key) }) {
             revision += 1
+            changes.checklist = true
         }
         for entry in report.pulledEntries {
             if let change = FardhMapping.change(for: entry) {
