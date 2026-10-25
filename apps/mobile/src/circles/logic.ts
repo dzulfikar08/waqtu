@@ -113,6 +113,44 @@ export function displayInviteCode(code: string): string {
   return code.length === 8 ? `${code.slice(0, 4)}-${code.slice(4)}` : code;
 }
 
+/** Enough of an invite code to send; the server ignores dashes and spaces. */
+export const isInviteCode = (code: string): boolean =>
+  code.replace(/[^A-Za-z0-9]/g, "").length >= 6;
+
+/** Fresh suggestions tried when a suggested handle turns out to be taken. */
+export const HANDLE_RETRIES = 3;
+
+/**
+ * Saves with `handle`; while the server says it is taken and the handle is still our own
+ * suggestion (`suggested`), tries up to `retries` fresh suggestions before giving up. A handle the
+ * user typed is never swapped silently: its `handle_taken` is thrown at once.
+ */
+export async function saveWithFreshHandle<T>({
+  handle,
+  suggested,
+  save,
+  suggest,
+  isTaken,
+  retries = HANDLE_RETRIES,
+}: {
+  handle: string;
+  suggested: boolean;
+  save: (handle: string) => Promise<T>;
+  suggest: () => string;
+  isTaken: (e: unknown) => boolean;
+  retries?: number;
+}): Promise<{ result: T; handle: string }> {
+  let current = handle;
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return { result: await save(current), handle: current };
+    } catch (e) {
+      if (!suggested || attempt >= retries || !isTaken(e)) throw e;
+      current = suggest();
+    }
+  }
+}
+
 export type ErrorKey =
   | "profileRequired"
   | "handleTaken"
@@ -125,6 +163,7 @@ export type ErrorKey =
   | "suspended"
   | "summaryOptIn"
   | "tooLarge"
+  | "premiumRequired"
   | "network"
   | "generic";
 
@@ -150,6 +189,8 @@ export function errorKey(status: number | null, code: string | null): ErrorKey {
       return "suspended";
     case "summary_opt_in_required":
       return "summaryOptIn";
+    case "premium_required":
+      return "premiumRequired";
     case "payload_too_large":
       return "tooLarge";
     case "not_found":

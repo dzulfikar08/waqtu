@@ -5,12 +5,14 @@ source. Website: [getwaqtu.com](https://getwaqtu.com).
 
 ## Layout
 
-| Path           | What                                                                     | Stack                       |
-| -------------- | ------------------------------------------------------------------------ | --------------------------- |
-| `apps/web`     | getwaqtu.com landing, blog, Polar checkout + webhook                     | Astro on Cloudflare Workers |
-| `apps/apple`   | macOS menu-bar companion (direct + Mac App Store), iOS, watchOS, widgets | Swift / SwiftUI, Xcode      |
-| `apps/mobile`  | iOS + Android phone app: Today, Ramadhan, settings, offline-first SQLite | Expo / React Native, EAS    |
-| `services/api` | Sparkle appcast, DMG download, license activate/validate                 | Cloudflare Worker, D1, R2   |
+| Path            | What                                                                                                | Stack                       |
+| --------------- | --------------------------------------------------------------------------------------------------- | --------------------------- |
+| `apps/web`      | getwaqtu.com landing, blog, Polar checkout + webhook                                                | Astro on Cloudflare Workers |
+| `apps/apple`    | macOS menu-bar app (direct + Mac App Store); the iPhone app is now `apps/mobile` on `dat.waqtu.ios` | Swift / SwiftUI, Xcode      |
+| `apps/mobile`   | iOS + Android phone app: Today, Ramadhan, settings, offline-first SQLite                            | Expo / React Native, EAS    |
+| `services/api`  | Auth, sync, circles (halaqah), billing/entitlements, releases (Sparkle appcast, DMG)                | Cloudflare Worker, D1, R2   |
+| `packages/core` | Shared logic: prayer times, Hijri/Ramadhan, khatam plan, fidyah/zakat                               | TypeScript, bun test        |
+| `content/`      | Bundled content: Quran text + metadata (Tanzil), halaqah material                                   | Data files                  |
 
 Prayer-time math runs on the device; location never leaves it.
 
@@ -54,7 +56,9 @@ by linking their key to their account. Premium belongs to the signed-in account:
 and `GET /v1/entitlement` answers `{ premium, source, expiresAt }` (`expiresAt` null with `premium` true
 = lifetime). Trust never comes from a client claim: App Store receipts are JWS chains verified to
 Apple Root CA G3, Play purchases are re-read from the Android Publisher API, Polar webhooks are
-HMAC-signed, license keys are validated by Polar. Endpoints and tests: `services/api/README.md`.
+HMAC-signed, license keys are validated by Polar. RevenueCat is not used: it was replaced by native IAP
+(`expo-iap`) plus our own server-side verification. The license-key field is hidden on iOS (App Store
+Guideline 3.1.1); keys can still be linked from the Android app. Endpoints and tests: `services/api/README.md`.
 
 Prices live in the stores, not in code. Suggested prices:
 

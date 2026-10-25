@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { DEMO_MODE } from "@/demo/mode";
 import { useTranslation } from "@/i18n";
 import { radius, spacing, useTheme } from "@/theme";
 
@@ -9,14 +10,15 @@ import { usePremium } from "./usePremium";
 
 /**
  * Shows `children` to premium accounts and a plain, dismissible explanation with a link to the
- * paywall to everyone else. Use around a whole premium feature, never around free core.
+ * paywall to everyone else. Use around a whole premium feature, never around free core. The
+ * store-screenshot build (DEMO_MODE) shows every feature, since the listing advertises them.
  */
 export function PremiumGate({ children }: { children: ReactNode }) {
   const { premium } = usePremium();
   const router = useRouter();
   const { t } = useTranslation();
   const theme = useTheme();
-  if (premium) return <>{children}</>;
+  if (premium || DEMO_MODE) return <>{children}</>;
   return (
     <View style={[styles.box, { backgroundColor: theme.surface, borderColor: theme.border }]}>
       <Text style={[styles.title, { color: theme.text }]}>{t("premium.locked")}</Text>

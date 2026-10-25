@@ -136,6 +136,7 @@ export const id = {
     syncing: "Menyinkronkan…",
     ok: "Tersinkron",
     error: "Belum tersambung. Akan dicoba lagi.",
+    premium: "Sinkron antarperangkat · Premium",
   },
   settings: {
     language: "Bahasa",

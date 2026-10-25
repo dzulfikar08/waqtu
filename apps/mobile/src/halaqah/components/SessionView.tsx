@@ -10,7 +10,9 @@ import { radius, spacing, useTheme } from "@/theme";
 import { completeDay, getReflection, MAX_REFLECTION, saveReflection, uncompleteDay } from "../db";
 import { watchUrl } from "../embed";
 import type { Program, ProgramDay } from "../program";
+import { ShareToCircle } from "./ShareToCircle";
 import { VideoEmbed } from "./VideoEmbed";
+import { VoiceReflection } from "./VoiceReflection";
 
 export function useLang(): "id" | "en" {
   return useTranslation().i18n.language === "en" ? "en" : "id";
@@ -24,7 +26,10 @@ interface Props {
   todayKey: DayKey;
 }
 
-/** One day's session: video, summary, madhhab note, private reflection, amalan, and the Selesai button. */
+/**
+ * One day's session: video, summary, madhhab note, private reflection (text and voice, optionally
+ * shared to a circle), optional amalan, and the Selesai button.
+ */
 export function SessionView({ program, day, done, todayKey }: Props) {
   const db = useSQLiteContext();
   const { t } = useTranslation();
@@ -86,15 +91,19 @@ export function SessionView({ program, day, done, todayKey }: Props) {
         <Panel>
           <Text style={[styles.body, { color: theme.text }]}>{day.reflectionPrompt}</Text>
           <ReflectionField programId={program.id} day={day.day} />
+          <VoiceReflection programId={program.id} day={day.day} />
           <Hint>{t("halaqah.reflectionPrivate")}</Hint>
+          <ShareToCircle programId={program.id} day={day.day} />
         </Panel>
       </Section>
 
-      <Section title={t("halaqah.amalan")}>
-        <Panel>
-          <Text style={[styles.body, { color: theme.text }]}>{day.amalan}</Text>
-        </Panel>
-      </Section>
+      {day.amalan ? (
+        <Section title={t("halaqah.amalan")}>
+          <Panel>
+            <Text style={[styles.body, { color: theme.text }]}>{day.amalan}</Text>
+          </Panel>
+        </Section>
+      ) : null}
 
       {day.sources.length > 0 ? (
         <Section title={t("halaqah.sources")}>

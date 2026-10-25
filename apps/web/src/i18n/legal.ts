@@ -74,9 +74,9 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
         paragraphs: ["Hal-hal ini tidak pernah kami terima, dengan atau tanpa akun:"],
         items: [
           "<strong>Lokasi.</strong> Koordinat dipakai untuk menghitung waktu sholat dan disimpan di perangkat. Di aplikasi ponsel tidak ada pencarian nama kota lewat server; di Mac kami memakai CoreLocation dengan akurasi kasar (sekitar satu kilometer). Lokasi tidak ikut sinkron.",
-          "<strong>Refleksi halaqah.</strong> Catatan yang kamu tulis setelah halaqah hanya tersimpan di ponsel ini. Yang tersinkron hanyalah tanda bahwa halaqah hari itu sudah dicentang di daftar mutabaah, sama seperti item lain.",
+          "<strong>Refleksi halaqah.</strong> Catatan yang kamu tulis dan refleksi suara yang kamu rekam setelah halaqah hanya tersimpan di ponsel ini (rekaman dikecualikan dari cadangan, seperti rekaman hafalan). Yang tersinkron hanyalah tanda bahwa halaqah hari itu sudah dicentang di daftar mutabaah, sama seperti item lain. Refleksi baru meninggalkan ponsel bila kamu sendiri membagikannya ke sebuah lingkaran; saat itu ia menjadi kiriman lingkaran biasa (lihat bagian Lingkaran).",
           "<strong>Rencana dan rekaman hafalan.</strong> Rencana hafalan dan rekaman bacaanmu hanya ada di ponsel ini. Rekaman dikecualikan dari cadangan (di iOS lewat penanda &quot;exclude from backup&quot;, di Android karena cadangan aplikasi dimatikan), jadi tidak ikut pindah ke ponsel baru. Tanda murojaah di daftar mutabaah tersinkron seperti item lain; isi bacaan dan rekamannya tidak.",
-          "<strong>Pengingat adzan.</strong> Dijadwalkan lokal di perangkat. Kami tidak memakai notifikasi push.",
+          "<strong>Pengingat adzan dan halaqah.</strong> Dijadwalkan lokal di perangkat. Kami tidak memakai notifikasi push.",
           "<strong>Isi kalender (Mac).</strong> Jika kamu mengizinkan, Waqtu menulis blok sholat ke kalendermu lewat EventKit. Isi kalendermu tidak dikirim ke server kami.",
         ],
       },
@@ -215,9 +215,9 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
         paragraphs: ["We never receive these, with or without an account:"],
         items: [
           "<strong>Location.</strong> Coordinates are used to calculate prayer times and stored on the device. The phone app does not look up city names through a server; the Mac app uses CoreLocation at coarse accuracy (about one kilometer). Location is not synced.",
-          "<strong>Halaqah reflections.</strong> The notes you write after a halaqah stay on this phone. Only the tick that marks that day's halaqah as done in your mutabaah checklist syncs, like any other checklist item.",
+          "<strong>Halaqah reflections.</strong> The notes you write and the voice reflections you record after a halaqah stay on this phone (recordings are excluded from backups, like hafalan recordings). Only the tick that marks that day's halaqah as done in your mutabaah checklist syncs, like any other checklist item. A reflection leaves the phone only if you share it to a circle yourself; it then becomes an ordinary circle post (see Circles).",
           "<strong>Hafalan plans and recordings.</strong> Your memorization plans and recitation recordings exist only on this phone. Recordings are excluded from backups (on iOS through the &quot;exclude from backup&quot; flag, on Android because app backup is turned off), so they do not move to a new phone. The murojaah tick in your checklist syncs like any other item; the recitation and recordings do not.",
-          "<strong>Adhan reminders.</strong> Scheduled locally on the device. We do not use push notifications.",
+          "<strong>Adhan and halaqah reminders.</strong> Scheduled locally on the device. We do not use push notifications.",
           "<strong>Calendar content (Mac).</strong> If you allow it, Waqtu writes prayer blocks to your calendar through EventKit. Your calendar content is not sent to our servers.",
         ],
       },

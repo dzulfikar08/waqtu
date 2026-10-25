@@ -154,7 +154,9 @@ newer state, and a subscription held by one account is refused for another (409)
   `{ url }`; 409 `already_premium` if the account already has premium. `POST /v1/billing/polar/portal`
   returns the customer portal `{ url }`.
 - `POST /v1/billing/polar/webhook`: Polar `subscription.*`, `benefit_grant.revoked` and `order.refunded` events
-  (Standard Webhooks signature).
+  (Standard Webhooks signature). Needs only `POLAR_WEBHOOK_SECRET`: license revocations and refunds are
+  processed even when the web subscription products are not configured; `subscription.*` events are
+  then ignored.
 
 Secrets: `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`, `GOOGLE_PLAY_RTDN_PUSH_EMAIL` or `GOOGLE_PLAY_RTDN_TOKEN`,
 `GOOGLE_PLAY_PACKAGE_NAME` (optional, default `dat.waqtu.app`), `POLAR_ACCESS_TOKEN`, `POLAR_ORG_ID`,
@@ -175,12 +177,12 @@ Small anonymous reflection groups, public or private, always gender-separated (i
 
 ### Infra to create before deploying
 
-| What                       | How                                                                                                                                                                                                                                                                           |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| R2 bucket for voice notes  | `npx wrangler r2 bucket create waqtu-circle-media`. Bound as `CIRCLE_MEDIA` in `wrangler.toml`. Keep it **private** (no public access, no custom domain): notes are only served through the Worker after a membership check. `wrangler deploy` fails until the bucket exists. |
-| D1 migration               | `npx wrangler d1 migrations apply waqtu-db --remote` (applies `0003_circles.sql`).                                                                                                                                                                                            |
-| `ADMIN_USER_IDS` secret    | Comma-separated better-auth user ids that may use the moderation queue: `npx wrangler secret put ADMIN_USER_IDS`. Find an id with `GET /v1/me` while signed in. Unset means nobody is an admin. For `wrangler dev` put it in `.dev.vars`.                                     |
-| `CIRCLES_REQUIRES_PREMIUM` | Plain var in `wrangler.toml`, `"false"` today. `GET /v1/circles/config` reports it as `requiresPremium`; the app then shows a premium notice instead of circles. The server does not enforce entitlements: DEV-12 adds that check where it flips the flag.                    |
+| What                       | How                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R2 bucket for voice notes  | `npx wrangler r2 bucket create waqtu-circle-media`. Bound as `CIRCLE_MEDIA` in `wrangler.toml`. Keep it **private** (no public access, no custom domain): notes are only served through the Worker after a membership check. `wrangler deploy` fails until the bucket exists.                                                                                                                                         |
+| D1 migration               | `npx wrangler d1 migrations apply waqtu-db --remote` (applies `0003_circles.sql`).                                                                                                                                                                                                                                                                                                                                    |
+| `ADMIN_USER_IDS` secret    | Comma-separated better-auth user ids that may use the moderation queue: `npx wrangler secret put ADMIN_USER_IDS`. Find an id with `GET /v1/me` while signed in. Unset means nobody is an admin. For `wrangler dev` put it in `.dev.vars`.                                                                                                                                                                             |
+| `CIRCLES_REQUIRES_PREMIUM` | Plain var in `wrangler.toml`, `"false"` today. `GET /v1/circles/config` reports it as `requiresPremium`; the app then shows the premium gate instead of circles to accounts without premium. When `"true"`, the server refuses joining (`join`, `join-private`, `private`) and posting (`posts`, `summary`, media upload) with 403 `premium_required` unless `/v1/entitlement` would say premium; reading stays open. |
 
 No other secrets: voice notes are uploaded through the Worker (5 MB limit, audio mime allowlist), so no R2 S3 credentials are needed.
 

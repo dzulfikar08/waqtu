@@ -19,6 +19,10 @@ final class WaqtuAccount {
     private(set) var errorMessage: String?
     /// Bearer session token; nil when signed out.
     private(set) var token: String?
+    /// Premium the account holds on the server (e.g. an App Store or Play subscription made on the
+    /// phone). Cached so it holds offline; refreshed on sign-in, launch and every sync (see
+    /// `MutabaahSyncController`), cleared on sign-out.
+    private(set) var serverPremium = false
 
     /// Called after sign-in, sign-out and when the server rejects the session.
     @ObservationIgnored var onSessionChange: (() -> Void)?
@@ -27,6 +31,7 @@ final class WaqtuAccount {
     private let keychain: KeychainStore
     private static let tokenAccount = "sessionToken"
     private static let userAccount = "user"
+    private static let serverPremiumKey = "account.serverPremium"
 
     var isSignedIn: Bool { token != nil && user != nil }
 
@@ -38,6 +43,7 @@ final class WaqtuAccount {
            let user = try? JSONDecoder().decode(AccountUser.self, from: json) {
             self.token = stored
             self.user = user
+            self.serverPremium = UserDefaults.standard.bool(forKey: Self.serverPremiumKey)
         }
     }
 
@@ -120,6 +126,30 @@ final class WaqtuAccount {
         self.token = token
         self.user = user
         onSessionChange?()
+        await refreshEntitlement()
+    }
+
+    /// Re-reads the account's premium status. Network failures keep the cached value; a rejected
+    /// session ends the sign-in.
+    @MainActor
+    func refreshEntitlement() async {
+        guard let token else { return }
+        do {
+            let entitlement = try await api.entitlement(token: token)
+            guard self.token == token else { return }
+            setServerPremium(entitlement.premium)
+        } catch {
+            if isUnauthorized(error), self.token == token { sessionExpired() }
+        }
+    }
+
+    private func setServerPremium(_ premium: Bool) {
+        serverPremium = premium
+        if premium {
+            UserDefaults.standard.set(true, forKey: Self.serverPremiumKey)
+        } else {
+            UserDefaults.standard.removeObject(forKey: Self.serverPremiumKey)
+        }
     }
 
     @MainActor
@@ -144,6 +174,7 @@ final class WaqtuAccount {
         keychain.delete(Self.userAccount)
         token = nil
         user = nil
+        setServerPremium(false)
     }
 }
 

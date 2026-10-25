@@ -218,20 +218,28 @@ describe("khatamPlan", () => {
     expect(plan({ targetKhatam: 3 }).dailyTarget).toBe(Math.ceil(1812 / 29));
   });
   test("on schedule keeps the target", () => {
-    const p = plan({ today: addDays(start, 10), pagesReadBeforeToday: 210 });
+    // Expected before day 11: ceil(604 * 10 / 29) = 209 pages.
+    const p = plan({ today: addDays(start, 10), pagesReadBeforeToday: 209 });
     expect(p.daysLeft).toBe(19);
+    expect(p.expectedPagesBeforeToday).toBe(209);
     expect(p.pagesBehind).toBe(0);
     expect(p.dailyTarget).toBe(21);
     expect(p.rebalanced).toBe(false);
   });
   test("behind schedule rebalances the remaining days", () => {
-    // Day 11 of 29, only 100 of the expected 210 pages read.
+    // Day 11 of 29, only 100 of the expected 209 pages read.
     const p = plan({ today: addDays(start, 10), pagesReadBeforeToday: 100 });
     expect(p.pagesRemaining).toBe(504);
     expect(p.daysLeft).toBe(19);
     expect(p.dailyTarget).toBe(Math.ceil(504 / 19)); // 27
-    expect(p.expectedPagesBeforeToday).toBe(210);
-    expect(p.pagesBehind).toBe(110);
+    expect(p.expectedPagesBeforeToday).toBe(209);
+    expect(p.pagesBehind).toBe(109);
+    expect(p.rebalanced).toBe(true);
+  });
+  test("a small shortfall on day 11 of 29 still rebalances", () => {
+    const p = plan({ today: addDays(start, 10), pagesReadBeforeToday: 204 });
+    expect(p.pagesBehind).toBe(5);
+    expect(p.dailyTarget).toBe(22);
     expect(p.rebalanced).toBe(true);
   });
   test("ahead of schedule lowers the daily target", () => {

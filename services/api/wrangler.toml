@@ -11,7 +11,7 @@ crons = ["17 * * * *"]
 # App Store numeric app id of Waqtu (not a secret): Production server notifications must carry it.
 APPLE_APP_ID = "6826628861"
 ENVIRONMENT = "production"
-# Tells the app circles are a premium feature. DEV-12 flips this once entitlements exist.
+# "true" makes circles premium: the app gates the tab and the API refuses joins/posts with 403 premium_required.
 CIRCLES_REQUIRES_PREMIUM = "false"
 
 [[d1_databases]]
