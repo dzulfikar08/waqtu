@@ -16,7 +16,7 @@ import {
 } from "react-native";
 
 import { PressableScale } from "@/components/ui";
-import { HIT, useTheme } from "@/theme";
+import { HIT, hueColors, useTheme, type Hue } from "@/theme";
 
 import { useReportTabBarInset } from "./tabBarInset";
 import {
@@ -73,6 +73,7 @@ function TabItem({
   focused,
   radius,
   height,
+  wash,
   accessibilityLabel,
   onPress,
   onLongPress,
@@ -82,13 +83,14 @@ function TabItem({
   focused: boolean;
   radius: number;
   height: number;
+  /** The tab's own soft colour behind it while it is the current one. */
+  wash: string;
   accessibilityLabel?: string;
   onPress: () => void;
   onLongPress: () => void;
   testID?: string;
   children: ReactNode;
 }) {
-  const theme = useTheme();
   const reduced = useReducedMotion();
   const [progress] = useState(() => new Animated.Value(focused ? 1 : 0));
   useEffect(() => {
@@ -122,7 +124,7 @@ function TabItem({
         style={[
           StyleSheet.absoluteFill,
           {
-            backgroundColor: theme.accentSoft,
+            backgroundColor: wash,
             borderRadius: radius,
             opacity: progress,
             transform: [
@@ -143,7 +145,16 @@ function TabItem({
  * route hidden with `href: null` carries `tabBarItemStyle.display === 'none'`). Draws nothing where the focused route
  * hides the bar (`tabBarStyle.display === 'none'`) and, on Android, while the keyboard is open.
  */
-export function FloatingTabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
+export function FloatingTabBar({
+  state,
+  descriptors,
+  navigation,
+  insets,
+  hues,
+}: BottomTabBarProps & {
+  /** Each tab's colour by route name, so the current tab lights up in its section's hue. */
+  hues: Readonly<Record<string, Hue>>;
+}) {
   const theme = useTheme();
   const { fontScale } = useWindowDimensions();
   const keyboardOpen = useAndroidKeyboardOpen();
@@ -185,14 +196,18 @@ export function FloatingTabBar({ state, descriptors, navigation, insets }: Botto
             height: pillHeight,
             borderRadius: pillHeight / 2,
             backgroundColor: theme.tabBar,
-            borderColor: theme.separator,
+            borderColor: theme.dark ? theme.separator : "rgba(16,24,40,0.08)",
+            boxShadow: theme.dark
+              ? "0 10px 28px -6px rgba(0,0,0,0.55)"
+              : "0 2px 6px rgba(16,24,40,0.05), 0 12px 28px -8px rgba(16,24,40,0.16)",
           },
         ]}
       >
         {visible.map((route) => {
           const { options } = descriptors[route.key];
           const focused = route.key === focusedRoute.key;
-          const color = focused ? theme.accent : theme.muted;
+          const hue = hueColors(theme, hues[route.name] ?? "brand");
+          const color = focused ? hue.base : theme.muted;
           const title = options.title ?? route.name;
           const onPress = () => {
             const event = navigation.emit({
@@ -210,6 +225,7 @@ export function FloatingTabBar({ state, descriptors, navigation, insets }: Botto
               key={route.key}
               focused={focused}
               radius={itemRadius}
+              wash={hue.soft}
               height={itemHeight}
               accessibilityLabel={options.tabBarAccessibilityLabel ?? title}
               testID={options.tabBarButtonTestID}
@@ -251,12 +267,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: TAB_BAR_PADDING,
     borderWidth: TAB_BAR_BORDER,
-    // One restrained lift: the pill floats over the content, so it needs it.
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.16,
-    shadowRadius: 16,
-    elevation: 6,
+    // One restrained lift (boxShadow, set per theme): the pill floats over the content, so it needs it.
   },
   item: {
     flex: 1,

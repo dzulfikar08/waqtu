@@ -1,8 +1,10 @@
-import { useColorScheme, type TextStyle, type ViewStyle } from "react-native";
+import { StyleSheet, useColorScheme, type TextStyle, type ViewStyle } from "react-native";
+
+import type { DayPeriod } from "@/prayer/period";
 
 /**
- * Design tokens, taken from apps/apple. Dark mode is the macOS menu bar popover (`MenuBarView.swift`): a near-black green
- * page, one slightly lighter green card per section with hairline separators, light text, muted green labels and gold for
+ * Design tokens, taken from apps/apple. Dark mode is the macOS menu bar popover (`MenuBarView.swift`): a near-black
+ * page, one slightly lighter card per section with hairline separators, light text, muted green labels and gold for
  * the live countdown. Light mode is the iOS companion (`WaqtuColors.swift`, `TodayView.swift`): #F7F7FA page, white cards
  * with a soft shadow, teal accent and slate secondary.
  */
@@ -10,7 +12,6 @@ export const palette = {
   primary: "#4A8B6F",
   primaryLight: "#6BA888",
   primaryDark: "#2D5F4C",
-  macBackground: "#1A2E25",
   teal: "#12877D",
   gold: "#D4A574",
   secondary: "#6B8FAD",
@@ -85,12 +86,12 @@ export const lightTheme: Theme = {
 
 export const darkTheme: Theme = {
   dark: true,
-  background: "#0E1A15",
-  surface: palette.macBackground,
-  surfaceAlt: "#243B31",
+  background: "#0C1412",
+  surface: "#16211E",
+  surfaceAlt: "#21302B",
   text: "#E8F0ED",
-  muted: "#A8C9B8",
-  faint: "#6E8A7D",
+  muted: "#A9BDB5",
+  faint: "#6C8079",
   accent: palette.primaryLight,
   accentText: "#0E1A15",
   accentSoft: "rgba(107,168,136,0.16)",
@@ -106,7 +107,7 @@ export const darkTheme: Theme = {
   warning: "#FCD34D",
   warningSoft: "rgba(252,211,77,0.14)",
   scrim: "rgba(0,0,0,0.60)",
-  tabBar: "#1E352B",
+  tabBar: "#1B2925",
 };
 
 export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 } as const;
@@ -133,21 +134,134 @@ export const typography = {
 } as const satisfies Record<string, TextStyle>;
 
 /**
- * Card chrome: a soft shadow on light (iOS `.shadow(color: .black.opacity(0.05), radius: 10, y: 4)`), a hairline on dark
- * where a shadow does not read.
+ * Card chrome. Light: a hairline plus a very soft two-layer `boxShadow` (drawn the same on Android and iOS; Android's
+ * `elevation` left dark blobs at the rounded corners). Dark: a hairline only, where a shadow does not read.
  */
 export function cardChrome(theme: Theme): ViewStyle {
   return theme.dark
     ? { backgroundColor: theme.surface, borderWidth: 1, borderColor: theme.separator }
     : {
         backgroundColor: theme.surface,
-        shadowColor: "#0B1F17",
-        shadowOpacity: 0.06,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 4 },
-        elevation: 2,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: "rgba(16,24,40,0.08)",
+        boxShadow: "0 1px 2px rgba(16,24,40,0.04), 0 6px 16px -4px rgba(16,24,40,0.08)",
       };
 }
+
+/** A section's own colour, so each part of the app is recognisable at a glance and not all green. */
+export type Hue =
+  | "brand"
+  | "prayer"
+  | "streak"
+  | "hafalan"
+  | "halaqah"
+  | "ramadhan"
+  | "circles"
+  | "week"
+  | "neutral";
+
+/** [light, dark] base colour per hue, as r,g,b. */
+const HUES: Record<Hue, readonly [string, string]> = {
+  brand: ["18,135,125", "107,168,136"],
+  prayer: ["43,123,216", "125,183,245"],
+  streak: ["217,119,6", "242,180,92"],
+  hafalan: ["14,116,144", "92,198,217"],
+  halaqah: ["124,77,204", "183,154,242"],
+  ramadhan: ["176,120,40", "212,165,116"],
+  circles: ["209,65,106", "242,139,168"],
+  week: ["79,91,213", "155,164,245"],
+  neutral: ["90,125,154", "168,184,200"],
+};
+
+export interface HueColors {
+  /** Icons, figures and progress fills. */
+  base: string;
+  /** Icon badge fill. */
+  soft: string;
+  /** Barely-there card tint. */
+  wash: string;
+}
+
+export function hueColors(theme: Theme, hue: Hue): HueColors {
+  const rgb = HUES[hue][theme.dark ? 1 : 0];
+  return {
+    base: `rgb(${rgb})`,
+    soft: `rgba(${rgb},${theme.dark ? 0.18 : 0.12})`,
+    wash: `rgba(${rgb},${theme.dark ? 0.09 : 0.06})`,
+  };
+}
+
+/** A card tinted by its section's hue: a soft wash in the top-left corner fading into the card colour. */
+export function tintedCard(theme: Theme, hue: Hue): ViewStyle {
+  const { wash } = hueColors(theme, hue);
+  return {
+    ...cardChrome(theme),
+    experimental_backgroundImage: `linear-gradient(135deg, ${wash} 0%, ${theme.surface} 70%)`,
+  };
+}
+
+/** Sky colours per part of the day, top-left to bottom-right: [light, dark]; dark is the same sky, dimmed. */
+const SKIES: Record<DayPeriod, readonly [readonly string[], readonly string[]]> = {
+  fajr: [
+    ["#3B4A9E", "#7A6BC4", "#D99BB0"],
+    ["#1C2350", "#342D63", "#563A5C"],
+  ],
+  sunrise: [
+    ["#2F7FC9", "#5DAEE3", "#F2C57C"],
+    ["#12324F", "#1D4A6C", "#574C34"],
+  ],
+  dhuhr: [
+    ["#1A72C7", "#3B9EEB", "#7CCBF7"],
+    ["#0E2B48", "#16466D", "#1F5F87"],
+  ],
+  asr: [
+    ["#C9702A", "#E39A3E", "#F2C46B"],
+    ["#45270F", "#653B16", "#80531D"],
+  ],
+  maghrib: [
+    ["#B23A5B", "#DD5F4B", "#F29C58"],
+    ["#46192A", "#682834", "#86422F"],
+  ],
+  isha: [
+    ["#171B47", "#2A2B72", "#47398A"],
+    ["#0A0D24", "#141841", "#232156"],
+  ],
+};
+
+/** The sky of `period` as a CSS gradient for `experimental_backgroundImage`. */
+export function skyGradient(period: DayPeriod, dark: boolean, angle = 150): string {
+  const stops = SKIES[period][dark ? 1 : 0];
+  return `linear-gradient(${angle}deg, ${stops[0]} 0%, ${stops[1]} 55%, ${stops[2]} 100%)`;
+}
+
+/** The middle colour of `period`'s sky, for a faint wash behind the Today header. */
+export function skyTone(period: DayPeriod, dark: boolean): string {
+  return SKIES[period][dark ? 1 : 0][1];
+}
+
+/** One colour per prayer for its glyph in the times list: [light, dark]. */
+const PRAYER_TONES: Record<DayPeriod, readonly [string, string]> = {
+  fajr: ["#6E5FC0", "#A99BF0"],
+  sunrise: ["#D18A1F", "#F2C063"],
+  dhuhr: ["#2B7BD8", "#7DB7F5"],
+  asr: ["#D9772B", "#F2A65C"],
+  maghrib: ["#CC4A5E", "#F28C8C"],
+  isha: ["#4A4FB0", "#9BA4F5"],
+};
+
+export function prayerTone(period: DayPeriod, dark: boolean): string {
+  return PRAYER_TONES[period][dark ? 1 : 0];
+}
+
+/** Text and glyphs drawn on a sky gradient. */
+export const onSky = {
+  text: "#FFFFFF",
+  muted: "rgba(255,255,255,0.78)",
+  faint: "rgba(255,255,255,0.55)",
+  glass: "rgba(255,255,255,0.18)",
+  glassStrong: "rgba(255,255,255,0.28)",
+  line: "rgba(255,255,255,0.22)",
+} as const;
 
 export function useTheme(): Theme {
   return useColorScheme() === "dark" ? darkTheme : lightTheme;

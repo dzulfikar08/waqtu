@@ -1,10 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useState, type ComponentProps, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ComponentProps, type ReactNode } from "react";
 import {
   Animated,
   Easing,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -15,7 +14,18 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useTabBarInset } from "@/components/tabbar/tabBarInset";
-import { HIT, cardChrome, radius, spacing, tabular, typography, useTheme } from "@/theme";
+import {
+  HIT,
+  cardChrome,
+  hueColors,
+  radius,
+  spacing,
+  tabular,
+  tintedCard,
+  typography,
+  useTheme,
+  type Hue,
+} from "@/theme";
 
 export type IconName = ComponentProps<typeof Ionicons>["name"];
 
@@ -79,13 +89,16 @@ export function PressableScale({
 
 /**
  * A tab screen: draws its own large title under the status bar (the tabs have no native header) and pads the end of
- * the content by what the floating tab bar covers, so the last card scrolls fully above it.
+ * the content by what the floating tab bar covers, so the last card scrolls fully above it. An optional `backdrop`
+ * (the Today sky) sits behind the header and drifts up slower than the content; the status bar gets the page colour
+ * once the content scrolls under it.
  */
 export function Screen({
   title,
   eyebrow,
   caption,
   right,
+  backdrop,
   children,
 }: {
   title: string;
@@ -94,14 +107,37 @@ export function Screen({
   /** Line under the title, e.g. the Hijri date. */
   caption?: ReactNode;
   right?: ReactNode;
+  /** Drawn behind the top of the screen, full width, from the top edge. */
+  backdrop?: ReactNode;
   children: ReactNode;
 }) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const tabBar = useTabBarInset();
+  const [scrollY] = useState(() => new Animated.Value(0));
   return (
     <View style={[styles.fill, { backgroundColor: theme.background }]}>
-      <ScrollView
+      {backdrop ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.backdrop,
+            {
+              transform: [
+                {
+                  translateY: scrollY.interpolate({
+                    inputRange: [-1, 0, 1],
+                    outputRange: [0, 0, -0.6],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          {backdrop}
+        </Animated.View>
+      ) : null}
+      <Animated.ScrollView
         style={styles.fill}
         contentContainerStyle={[
           styles.screen,
@@ -112,6 +148,10 @@ export function Screen({
         ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+          useNativeDriver: true,
+        })}
       >
         <View style={styles.pageHeader}>
           <View style={styles.pageHeaderText}>
@@ -128,30 +168,43 @@ export function Screen({
           {right}
         </View>
         {children}
-      </ScrollView>
-      {/* Edge-to-edge: content scrolls under the status bar, so the bar gets the page colour behind it. */}
-      <View
+      </Animated.ScrollView>
+      {/* Edge-to-edge: content scrolls under the status bar, so the bar fades to the page colour once it does. */}
+      <Animated.View
         pointerEvents="none"
-        style={[styles.statusBar, { height: insets.top, backgroundColor: theme.background }]}
+        style={[
+          styles.statusBar,
+          {
+            height: insets.top,
+            backgroundColor: theme.background,
+            opacity: scrollY.interpolate({
+              inputRange: [0, spacing.lg],
+              outputRange: [0, 0.96],
+              extrapolate: "clamp",
+            }),
+          },
+        ]}
       />
     </View>
   );
 }
 
-/** One soft card: white with a soft shadow on light, the popover green with a hairline on dark. */
+/** One soft card: white with a hairline and a soft shadow on light, a hairline on dark; `hue` tints its corner. */
 export function Card({
   children,
   style,
   padded = true,
+  hue,
 }: {
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
   /** False for a card of rows that bring their own padding. */
   padded?: boolean;
+  hue?: Hue;
 }) {
   const theme = useTheme();
   return (
-    <View style={[styles.card, cardChrome(theme), style]}>
+    <View style={[styles.card, hue ? tintedCard(theme, hue) : cardChrome(theme), style]}>
       <View style={[styles.cardClip, padded ? styles.cardPadded : null]}>{children}</View>
     </View>
   );
@@ -193,15 +246,20 @@ export function SectionTitle({
   title,
   icon,
   right,
+  hue,
 }: {
   title: string;
   icon?: IconName;
   right?: ReactNode;
+  /** Colours the glyph with the section's hue. */
+  hue?: Hue;
 }) {
   const theme = useTheme();
   return (
     <View style={styles.sectionHeader} accessibilityRole="header">
-      {icon ? <Ionicons name={icon} size={15} color={theme.muted} /> : null}
+      {icon ? (
+        <Ionicons name={icon} size={15} color={hue ? hueColors(theme, hue).base : theme.muted} />
+      ) : null}
       <Text style={[typography.overline, styles.grow, { color: theme.muted }]}>{title}</Text>
       {right}
     </View>
@@ -214,6 +272,7 @@ export function Section({
   icon,
   right,
   footer,
+  hue,
   children,
 }: {
   title: string;
@@ -221,13 +280,15 @@ export function Section({
   right?: ReactNode;
   /** Small print under the card. */
   footer?: string;
+  /** The section's colour: its title glyph and a faint tint on the card. */
+  hue?: Hue;
   children: ReactNode;
 }) {
   const theme = useTheme();
   return (
     <View style={styles.section}>
-      <SectionTitle title={title} icon={icon} right={right} />
-      <Card padded={false}>
+      <SectionTitle title={title} icon={icon} right={right} hue={hue} />
+      <Card padded={false} hue={hue}>
         <View style={styles.rows}>{children}</View>
       </Card>
       {footer ? (
@@ -261,6 +322,7 @@ export function Row({
   disabled,
   destructive,
   chevron,
+  hue,
 }: {
   label: string;
   detail?: string;
@@ -272,30 +334,27 @@ export function Row({
   destructive?: boolean;
   /** Draws the trailing chevron of a row that opens another screen. */
   chevron?: boolean;
+  /** Colours the leading glyph; the accent by default. */
+  hue?: Hue;
 }) {
   const theme = useTheme();
   const tint = destructive ? theme.danger : theme.text;
+  const chip = hue ? hueColors(theme, hue) : { base: theme.accent, soft: theme.accentSoft };
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="button"
       accessibilityState={{ selected, disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.row,
-        {
-          borderColor: theme.separator,
-          backgroundColor: pressed ? theme.surfaceAlt : "transparent",
-          opacity: disabled ? 0.45 : 1,
-        },
-      ]}
+      scaleTo={0.985}
+      style={[styles.row, { borderColor: theme.separator }]}
     >
       {icon ? (
         <IconChip
           icon={icon}
           size={30}
-          color={destructive ? theme.danger : theme.accent}
-          background={destructive ? theme.dangerSoft : theme.accentSoft}
+          color={destructive ? theme.danger : chip.base}
+          background={destructive ? theme.dangerSoft : chip.soft}
         />
       ) : null}
       <View style={styles.rowText}>
@@ -309,7 +368,7 @@ export function Row({
       ) : null}
       {selected ? <Ionicons name="checkmark-circle" size={22} color={theme.accent} /> : null}
       {chevron ? <Ionicons name="chevron-forward" size={18} color={theme.faint} /> : null}
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -382,11 +441,28 @@ export function StepperRow({
   );
 }
 
-/** Round checkbox: an outlined ring when off, a filled accent disc with a check when on. */
+/** Round checkbox: an outlined ring when off, a filled accent disc with a check when on; pops when it changes. */
 export function CheckCircle({ checked, size = 26 }: { checked: boolean; size?: number }) {
   const theme = useTheme();
+  const [scale] = useState(() => new Animated.Value(1));
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    scale.setValue(checked ? 0.6 : 0.85);
+    const run = Animated.spring(scale, {
+      toValue: 1,
+      friction: 4,
+      tension: 160,
+      useNativeDriver: true,
+    });
+    run.start();
+    return () => run.stop();
+  }, [checked, scale]);
   return (
-    <View
+    <Animated.View
       style={{
         width: size,
         height: size,
@@ -396,11 +472,56 @@ export function CheckCircle({ checked, size = 26 }: { checked: boolean; size?: n
         backgroundColor: checked ? theme.accent : "transparent",
         alignItems: "center",
         justifyContent: "center",
+        transform: [{ scale }],
       }}
     >
       {checked ? (
         <Ionicons name="checkmark" size={Math.round(size * 0.65)} color={theme.accentText} />
       ) : null}
+    </Animated.View>
+  );
+}
+
+/** A progress bar that grows to `value` (0 to 1) when it appears and eases to each new value. */
+export function ProgressTrack({
+  value,
+  fill,
+  track,
+  height = 8,
+}: {
+  value: number;
+  /** A colour or a CSS gradient for the filled part. */
+  fill: string;
+  track: string;
+  height?: number;
+}) {
+  const clamped = Math.min(1, Math.max(0, value));
+  const [progress] = useState(() => new Animated.Value(0));
+  useEffect(() => {
+    const run = Animated.timing(progress, {
+      toValue: clamped,
+      duration: 700,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    });
+    run.start();
+    return () => run.stop();
+  }, [clamped, progress]);
+  const gradient = fill.startsWith("linear-gradient");
+  return (
+    <View
+      accessible={false}
+      style={{ height, borderRadius: height / 2, backgroundColor: track, overflow: "hidden" }}
+    >
+      <Animated.View
+        style={{
+          height,
+          borderRadius: height / 2,
+          transformOrigin: "left center",
+          transform: [{ scaleX: progress }],
+          ...(gradient ? { experimental_backgroundImage: fill } : { backgroundColor: fill }),
+        }}
+      />
     </View>
   );
 }
@@ -450,7 +571,8 @@ export function Pill({
 const styles = StyleSheet.create({
   screen: { paddingHorizontal: spacing.md + 4, gap: spacing.lg },
   fill: { flex: 1 },
-  statusBar: { position: "absolute", top: 0, left: 0, right: 0, opacity: 0.96 },
+  statusBar: { position: "absolute", top: 0, left: 0, right: 0 },
+  backdrop: { position: "absolute", top: 0, left: 0, right: 0 },
   pageHeader: { flexDirection: "row", alignItems: "flex-start", gap: spacing.md },
   pageHeaderText: { flex: 1, gap: 2 },
   card: { borderRadius: radius.lg },

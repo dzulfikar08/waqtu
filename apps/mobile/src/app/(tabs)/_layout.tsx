@@ -7,7 +7,7 @@ import { TabBarInsetProvider } from "@/components/tabbar/tabBarInset";
 import type { IconName } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { useRamadhanTabVisible } from "@/ramadhan/visibility";
-import { useTheme } from "@/theme";
+import { useTheme, type Hue } from "@/theme";
 
 /** One filled glyph for the active tab, its outline for the rest. */
 function tabIcon(active: IconName, inactive: IconName) {
@@ -23,6 +23,15 @@ function tabIcon(active: IconName, inactive: IconName) {
     return <Ionicons name={focused ? active : inactive} size={size} color={color} />;
   };
 }
+
+/** Each tab lights up in its section's colour. */
+const TAB_HUES: Readonly<Record<string, Hue>> = {
+  index: "prayer",
+  week: "week",
+  ramadhan: "ramadhan",
+  circles: "circles",
+  settings: "neutral",
+};
 
 /**
  * The tab roots. The bar floats over them (`FloatingTabBar`): each screen draws its own title (`Screen`) and pads its
@@ -42,7 +51,7 @@ function TabsNavigator({ background }: { background: string }) {
   const showRamadhan = useRamadhanTabVisible();
   return (
     <Tabs
-      tabBar={(props) => <FloatingTabBar {...props} />}
+      tabBar={(props) => <FloatingTabBar {...props} hues={TAB_HUES} />}
       screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: background } }}
     >
       <Tabs.Screen
