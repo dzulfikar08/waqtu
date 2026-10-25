@@ -1,10 +1,14 @@
+import { ExtensionStorage } from "@bacons/apple-targets";
 import type { FastingCountdown } from "@waqtu/core";
 import type { SQLiteDatabase } from "expo-sqlite";
 import { Platform } from "react-native";
 
 import WaqtuCountdown from "../../modules/waqtu-countdown";
+import { readPrayerConfig } from "./prayerConfig";
 import { KEYS } from "./settings";
+import { countdownWidgetSchedule } from "./widgetSchedule";
 import { getSetting, setSetting } from "@/db/settings";
+import { i18n } from "@/i18n/core";
 
 export interface LiveCountdownCopy {
   /** e.g. "Menuju berbuka". */
@@ -81,4 +85,26 @@ export async function hideLiveCountdown(db: SQLiteDatabase): Promise<void> {
     // The system already ended it (target reached or user dismissed).
   }
   await setSetting(db, KEYS.liveActivityId, null);
+}
+
+// Shared with the iOS widget extension (targets/countdown-widget, built only with WAQTU_IOS_WIDGET=1).
+const IOS_APP_GROUP = "group.dat.waqtu.ios";
+const IOS_SCHEDULE_KEY = "countdownSchedule";
+const IOS_WIDGET_KIND = "WaqtuCountdownWidget";
+
+/**
+ * Hands the home-screen widget the next days of imsak and maghrib (translated in the current
+ * language), or clears it while no location is set. The widget advances through them on its own.
+ */
+export async function syncCountdownWidget(db: SQLiteDatabase): Promise<void> {
+  const config = await readPrayerConfig(db);
+  const t = (key: string, options?: Record<string, string>) => i18n.t(key, options);
+  const json = JSON.stringify(config ? countdownWidgetSchedule(config, new Date(), t) : []);
+  if (Platform.OS === "android") {
+    WaqtuCountdown?.setWidgetSchedule(json);
+  } else if (Platform.OS === "ios") {
+    // No-op stubs where the native module is not linked (Expo Go); harmless without the App Group.
+    new ExtensionStorage(IOS_APP_GROUP).set(IOS_SCHEDULE_KEY, json);
+    ExtensionStorage.reloadWidget(IOS_WIDGET_KIND);
+  }
 }

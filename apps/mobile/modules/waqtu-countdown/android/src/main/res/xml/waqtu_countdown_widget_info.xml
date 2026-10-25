@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- updatePeriodMillis is only a fallback: the widget sets its own alarm for the next boundary. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+  android:description="@string/waqtu_countdown_widget_description"
+  android:initialLayout="@layout/waqtu_countdown_widget"
+  android:previewLayout="@layout/waqtu_countdown_widget"
+  android:minWidth="110dp"
+  android:minHeight="110dp"
+  android:minResizeWidth="110dp"
+  android:minResizeHeight="40dp"
+  android:targetCellWidth="2"
+  android:targetCellHeight="2"
+  android:resizeMode="horizontal|vertical"
+  android:updatePeriodMillis="3600000"
+  android:widgetCategory="home_screen" />

@@ -38,6 +38,7 @@
       "expo-web-browser",
       "expo-sharing",
       "expo-live-activity",
+      "./plugins/withCountdownWidget",
       "expo-iap",
       [
         "expo-audio",
