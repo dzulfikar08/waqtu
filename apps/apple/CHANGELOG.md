@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Kemenag on the Mac (DEV-6)
+
+- **Kemenag RI method** — New "Kemenag RI (Indonesia)" method (Fajr 20°, Isha 18°, ihtiyat, rounding up), identical to the mobile app. A phone set to Kemenag now syncs as Kemenag instead of being mapped to Singapore (which was 2–4 min off). CI compares the app's own calculator against `@waqtu/core` for Kemenag and MWL.
+
 ### Waqtu account and sync (DEV-13, Mac parity with the mobile app)
 
 - **Waqtu account** — Settings → Account: Sign in with Google (system browser session) and, in the Mac App Store build, native Sign in with Apple. The session token lives in the Keychain; sign out ends it on the server too.

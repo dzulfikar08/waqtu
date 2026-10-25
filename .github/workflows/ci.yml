@@ -102,7 +102,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
 
   prayer-parity:
-    # Adhan-Swift (same pin as the app) vs @waqtu/core: 10 cities x 365 days, MWL + Kemenag, ±1 min.
+    # App SharedPrayerCalculator (apps/apple/shared, same Adhan-Swift pin) vs @waqtu/core: 10 cities x 365 days, MWL + Kemenag, ±1 min.
     runs-on: macos-latest
     timeout-minutes: 30
     steps:
