@@ -8,9 +8,10 @@ import { dayKeyInZone } from "@/mutabaah/dates";
 import { formatLocalTime } from "@waqtu/core";
 
 import { canScheduleExactAlarms } from "../../modules/exact-alarm";
-import { ADHAN_CHANNEL_ID } from "./setup";
+import { halaqahNudgeRequests } from "./halaqah";
+import { ADHAN_CHANNEL_ID, HALAQAH_CHANNEL_ID } from "./setup";
 
-/** iOS caps pending local notifications at 64; seven days of five prayers is 35. */
+/** iOS caps pending local notifications at 64; seven days of five prayers and one halaqah nudge is 42. */
 const DAYS_AHEAD = 7;
 
 export const PRAYER_CATEGORY = "prayer";
@@ -52,9 +53,10 @@ let queue: Promise<void> = Promise.resolve();
 let lastKey: string | null = null;
 
 /**
- * Replaces the pending prayer notifications with the next seven days. Skips the work when
- * nothing that affects them changed since the last run (same day, setup, language, permission).
- * Calls are serialized so two overlapping runs cannot leave duplicates.
+ * Replaces the pending local notifications (prayers and the daily halaqah nudge) with the next seven
+ * days. Skips the work when nothing that affects them changed since the last run (same day, setup,
+ * language, permission, planned nudges). Calls are serialized so two overlapping runs cannot leave
+ * duplicates.
  */
 export function reschedulePrayerNotifications(db: SQLiteDatabase): Promise<void> {
   const run = queue.then(() => scheduleAll(db));
@@ -67,18 +69,30 @@ async function scheduleAll(db: SQLiteDatabase): Promise<void> {
   const settings = await readPrayerSettings(db);
   const now = new Date();
   const location = settings.location;
-  const granted = permission.status === "granted" && location !== null;
+  const allowed = permission.status === "granted";
+  const nudges = allowed ? await halaqahNudgeRequests(db, settings, now, DAYS_AHEAD) : [];
   const key = JSON.stringify([
-    granted,
+    allowed,
     canScheduleExactAlarms(),
     settings,
     i18n.language,
     location ? dayKeyInZone(now, location.timeZone) : null,
+    nudges,
   ]);
   if (key === lastKey) return;
 
   await Notifications.cancelAllScheduledNotificationsAsync();
-  if (!granted) {
+  for (const nudge of nudges) {
+    await Notifications.scheduleNotificationAsync({
+      content: { title: nudge.title, body: nudge.body, data: { ...nudge.data }, sound: true },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: nudge.at,
+        channelId: HALAQAH_CHANNEL_ID,
+      },
+    });
+  }
+  if (!allowed || location === null) {
     lastKey = key;
     return;
   }

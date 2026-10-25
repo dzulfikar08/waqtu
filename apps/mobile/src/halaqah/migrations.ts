@@ -19,3 +19,19 @@ export const HALAQAH_MIGRATION: readonly string[] = [
     PRIMARY KEY (program_id, day)
   )`,
 ];
+
+/**
+ * Private voice reflections: one recording per program day, a file in the app's private
+ * `halaqah` folder (see recordings.ts). Device-local like the text reflection; a recording reaches
+ * the server only when the user shares it to a circle, as an ordinary circle voice note.
+ */
+export const HALAQAH_VOICE_MIGRATION: readonly string[] = [
+  `CREATE TABLE halaqah_voice (
+    program_id TEXT NOT NULL,
+    day INTEGER NOT NULL CHECK (day >= 1),
+    file TEXT NOT NULL,
+    seconds INTEGER NOT NULL CHECK (seconds >= 1),
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (program_id, day)
+  )`,
+];

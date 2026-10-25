@@ -39,7 +39,8 @@ export interface ProgramDay {
   video: Video;
   summary: string;
   reflectionPrompt: string;
-  amalan: string;
+  /** Optional small practice for the day; null when the day has none. */
+  amalan: string | null;
   sources: string[];
   /** Madhhab positions on a disputed fiqh point; null on days without one. */
   madhhabNote: string | null;
@@ -187,6 +188,10 @@ function readDay(r: Reader, raw: unknown, index: number, phases: readonly Phase[
   if (note !== null && (typeof note !== "string" || note.trim() === "")) {
     r.problems.push(`${path}.madhhab_note_id: expected a non-empty string or null`);
   }
+  const amalan = d["amalan_id"];
+  if (amalan != null && (typeof amalan !== "string" || amalan.trim() === "")) {
+    r.problems.push(`${path}.amalan_id: expected a non-empty string, null, or absent`);
+  }
   return {
     day,
     phase,
@@ -196,7 +201,7 @@ function readDay(r: Reader, raw: unknown, index: number, phases: readonly Phase[
     video: readVideo(r, d["video"], `${path}.video`),
     summary: r.str(d, "summary_id", path),
     reflectionPrompt: r.str(d, "reflection_prompt_id", path),
-    amalan: r.str(d, "amalan_id", path),
+    amalan: typeof amalan === "string" ? amalan : null,
     sources: sources.filter((s): s is string => typeof s === "string"),
     madhhabNote: typeof note === "string" ? note : null,
   };
@@ -252,4 +257,20 @@ export function isReleasable(program: Pick<Program, "status">, dev: boolean): bo
 
 export function dayOf(program: Program, day: number): ProgramDay | null {
   return program.days[day - 1] ?? null;
+}
+
+/**
+ * The `halaqahDayId` a circle post carries when it shares a reflection: `<programId>:<day>`, which
+ * fits the server's reference pattern (`^[A-Za-z0-9._:-]{1,64}$`).
+ */
+export function halaqahRef(programId: string, day: number): string {
+  return `${programId}:${day}`;
+}
+
+const HALAQAH_REF = /^([a-z0-9][a-z0-9-]{0,63}):([1-9]\d{0,2})$/;
+
+/** Reads a `halaqahRef` back; null for anything else (older posts may carry other references). */
+export function parseHalaqahRef(ref: string): { programId: string; day: number } | null {
+  const m = HALAQAH_REF.exec(ref);
+  return m ? { programId: m[1], day: Number(m[2]) } : null;
 }
