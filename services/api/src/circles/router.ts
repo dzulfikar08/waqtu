@@ -1,3 +1,4 @@
+import { readEntitlement } from "../billing/entitlement";
 import { isAdmin, readQueue, requireAdmin, resolvePost, resolveUser } from "./admin";
 import {
   changeMembership,
@@ -47,7 +48,7 @@ export interface CirclesEnv {
   APP_DB: D1Database;
   CIRCLE_MEDIA: R2Bucket;
   ADMIN_USER_IDS?: string;
-  /** "true" tells clients circles are a premium feature (DEV-12 flips it). Not enforced here. */
+  /** "true" makes circles premium: joining, creating and posting need an active entitlement. */
   CIRCLES_REQUIRES_PREMIUM?: string;
 }
 
@@ -76,6 +77,13 @@ async function member(c: Ctx, active = false) {
   if (!isId(circleId)) throw notFound();
   await requireProfile(db(c), c.userId);
   return requireMember(db(c), c.userId, circleId, { active });
+}
+
+/** Joining and posting need premium while `CIRCLES_REQUIRES_PREMIUM` is "true"; reading never does. */
+async function requirePremium(c: Ctx): Promise<void> {
+  if (c.env.CIRCLES_REQUIRES_PREMIUM !== "true") return;
+  const { premium } = await readEntitlement(db(c), c.userId, c.now);
+  if (!premium) throw new HttpError(403, "premium_required");
 }
 
 function postParam(c: Ctx): string {
@@ -136,6 +144,7 @@ const routes: Route[] = [
     pattern: ["join"],
     handler: async (c) => {
       const profile = await requireProfile(db(c), c.userId);
+      await requirePremium(c);
       await enforceRate(db(c), c.userId, "join", c.now);
       const result = await joinPublic(db(c), c.userId, profile, c.now);
       return json(result, result.created ? 201 : 200);
@@ -146,6 +155,7 @@ const routes: Route[] = [
     pattern: ["join-private"],
     handler: async (c) => {
       const profile = await requireProfile(db(c), c.userId);
+      await requirePremium(c);
       const { code } = parseJoinPrivate(await readJson(c.request));
       await enforceRate(db(c), c.userId, "join", c.now);
       return json(await joinPrivate(db(c), c.userId, profile, code, c.now));
@@ -156,6 +166,7 @@ const routes: Route[] = [
     pattern: ["private"],
     handler: async (c) => {
       const profile = await requireProfile(db(c), c.userId);
+      await requirePremium(c);
       const { name } = parsePrivateCircle(await readJson(c.request));
       await enforceRate(db(c), c.userId, "join", c.now);
       return json({ circle: await createPrivate(db(c), c.userId, profile, name, c.now) }, 201);
@@ -198,6 +209,7 @@ const routes: Route[] = [
     pattern: [":id", "posts"],
     handler: async (c) => {
       await member(c, true);
+      await requirePremium(c);
       const input = parsePost(await readJson(c.request));
       await enforceRate(db(c), c.userId, "post", c.now);
       const post = await createPost(db(c), c.userId, c.params.id as string, input, c.now);
@@ -267,6 +279,7 @@ const routes: Route[] = [
     pattern: [":id", "summary"],
     handler: async (c) => {
       await member(c, true);
+      await requirePremium(c);
       const profile = await requireProfile(db(c), c.userId);
       if (!profile.summaryOptIn) throw new HttpError(403, "summary_opt_in_required");
       const input = parseSummary(await readJson(c.request), c.now);
@@ -280,6 +293,7 @@ const routes: Route[] = [
     pattern: [":id", "media"],
     handler: async (c) => {
       await member(c, true);
+      await requirePremium(c);
       await enforceRate(db(c), c.userId, "upload", c.now);
       return await uploadMedia(c.env, c.request, c.userId, c.params.id as string, c.now);
     },

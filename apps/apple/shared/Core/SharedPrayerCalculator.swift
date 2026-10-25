@@ -19,34 +19,14 @@ public final class SharedPrayerCalculator {
         adjustments: PrayerAdjustmentsData = .zero
     ) -> [PrayerTime] {
         #if canImport(Adhan)
-        let coordinates = Adhan.Coordinates(latitude: latitude, longitude: longitude)
-        let calendar = Calendar(identifier: .gregorian)
-        let components = calendar.dateComponents([.year, .month, .day], from: date)
-
-        let calcMethod = Adhan.CalculationMethod(rawValue: method) ?? .muslimWorldLeague
-        var params = calcMethod.params
-        params.madhab = Madhab(rawValue: madhab == "hanafi" ? 2 : 1) ?? .shafi
-
-        if highLatitudeRule != "auto",
-           let rule = HighLatitudeRule(rawValue: highLatitudeRule) {
-            params.highLatitudeRule = rule
-        } else {
-            params.highLatitudeRule = nil
-        }
-
-        params.adjustments = PrayerAdjustments(
-            fajr: adjustments.fajr,
-            sunrise: adjustments.sunrise,
-            dhuhr: adjustments.dhuhr,
-            asr: adjustments.asr,
-            maghrib: adjustments.maghrib,
-            isha: adjustments.isha
-        )
-
-        let prayerTimes = Adhan.PrayerTimes(
-            coordinates: coordinates,
-            date: components,
-            calculationParameters: params
+        let prayerTimes = adhanTimes(
+            latitude: latitude,
+            longitude: longitude,
+            date: date,
+            method: method,
+            madhab: madhab,
+            highLatitudeRule: highLatitudeRule,
+            adjustments: adjustments
         )
 
         var times: [PrayerTime] = []
@@ -61,6 +41,32 @@ public final class SharedPrayerCalculator {
         return []
         #endif
     }
+
+    #if canImport(Adhan)
+    /// Raw Adhan times (incl. sunrise) for the civil day of `date` in `calendar`'s zone.
+    /// `method` is `"kemenag"` or an `Adhan.CalculationMethod` raw value.
+    public static func adhanTimes(
+        latitude: Double,
+        longitude: Double,
+        date: Date,
+        calendar: Calendar = Calendar(identifier: .gregorian),
+        method: String,
+        madhab: String = "shafi",
+        highLatitudeRule: String = "auto",
+        adjustments: PrayerAdjustmentsData = .zero
+    ) -> Adhan.PrayerTimes? {
+        Adhan.PrayerTimes(
+            coordinates: Adhan.Coordinates(latitude: latitude, longitude: longitude),
+            date: calendar.dateComponents([.year, .month, .day], from: date),
+            calculationParameters: PrayerMethodParameters.make(
+                method: method,
+                madhab: madhab,
+                highLatitudeRule: highLatitudeRule,
+                adjustments: adjustments
+            )
+        )
+    }
+    #endif
 
     /// Get the next upcoming prayer from a list.
     public static func nextPrayer(from prayers: [PrayerTime]) -> PrayerTime? {

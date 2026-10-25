@@ -174,6 +174,8 @@ final class MutabaahSyncController {
                 status = .failed
             }
         }
+        // Launch, foreground and periodic syncs also pick up a subscription bought on the phone.
+        await account.refreshEntitlement()
     }
 
     /// Writes what a pull brought into the prayer log and the prayer preferences.

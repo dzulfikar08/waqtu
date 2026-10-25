@@ -5,6 +5,7 @@ import { useTranslation } from "@/i18n";
 import { Button, Hint, ProgressBar } from "@/ramadhan/components/fields";
 import { spacing, useTheme } from "@/theme";
 import { DayList } from "@/halaqah/components/DayList";
+import { NudgeSettings } from "@/halaqah/components/NudgeSettings";
 import { SessionView, useLang } from "@/halaqah/components/SessionView";
 import { halaqahAvailable } from "@/halaqah/bundled";
 import { dayOf } from "@/halaqah/program";
@@ -87,6 +88,8 @@ export default function HalaqahScreen() {
         done={done}
         today={position.kind === "during" ? position.day : null}
       />
+
+      <NudgeSettings />
     </ScrollView>
   );
 }

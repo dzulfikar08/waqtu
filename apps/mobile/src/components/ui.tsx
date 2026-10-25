@@ -52,12 +52,15 @@ export function StepperRow({
   onChange,
   min,
   max,
+  format = String,
 }: {
   label: string;
   value: number;
   onChange: (next: number) => void;
   min: number;
   max: number;
+  /** Shown in place of the raw number, e.g. a zero-padded minute. */
+  format?: (value: number) => string;
 }) {
   const theme = useTheme();
   const button = (symbol: string, next: number, disabled: boolean) => (
@@ -77,7 +80,7 @@ export function StepperRow({
       <Text style={[styles.rowLabel, { color: theme.text }]}>{label}</Text>
       <View style={styles.stepper}>
         {button("−", value - 1, value <= min)}
-        <Text style={[styles.stepValue, { color: theme.text }]}>{value}</Text>
+        <Text style={[styles.stepValue, { color: theme.text }]}>{format(value)}</Text>
         {button("+", value + 1, value >= max)}
       </View>
     </View>

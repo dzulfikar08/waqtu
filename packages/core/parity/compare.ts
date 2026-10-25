@@ -1,4 +1,4 @@
-// Compares Adhan-Swift output (parity/swift.json) with @waqtu/core for the same cities/year.
+// Compares the Apple apps' SharedPrayerCalculator output (apps/apple/parity -> swift.json) with @waqtu/core for the same cities/year.
 // Usage: bun parity/compare.ts <swift.json> <year> [toleranceMinutes=1]
 import { calculatePrayerTimes, type MethodId, type PrayerName } from "../src/index";
 import cities from "./cities.json";

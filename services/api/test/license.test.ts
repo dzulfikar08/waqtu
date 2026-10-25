@@ -90,7 +90,7 @@ async function entitlement(l: Linked, e: AppEnv = polarEnv) {
   };
 }
 
-async function deliver(handle: BillingHandler, event: unknown) {
+async function deliver(handle: BillingHandler, event: unknown, e: AppEnv = polarEnv) {
   const body = JSON.stringify(event);
   const id = crypto.randomUUID();
   const timestamp = Math.floor(Date.now() / 1000);
@@ -114,7 +114,7 @@ async function deliver(handle: BillingHandler, event: unknown) {
       },
       body,
     }),
-    polarEnv,
+    e,
   );
   expect(res!.status).toBe(202);
   return ((await res!.json()) as { outcome: string }).outcome;
@@ -199,6 +199,37 @@ describe("a refunded Mac license", () => {
     expect(l.polar.statusCalls).toHaveLength(1);
     expect((await entitlement(l)).premium).toBe(true);
     expect(l.polar.statusCalls).toHaveLength(1);
+  });
+
+  describe("without web subscription products configured", () => {
+    // Only the Mac license is sold: token + org for key checks, the webhook secret, no products.
+    const licenseOnlyEnv: AppEnv = {
+      ...polarEnv,
+      POLAR_PRODUCT_MONTHLY_ID: undefined,
+      POLAR_PRODUCT_YEARLY_ID: undefined,
+    };
+
+    it("still revokes premium when Polar revokes the license-key benefit grant", async () => {
+      expect(await deliver(l.handle, grantRevoked(l.licenseId), licenseOnlyEnv)).toBe("revoked");
+      expect((await entitlement(l, licenseOnlyEnv)).premium).toBe(false);
+    });
+
+    it("still re-checks the customer's keys after an order refund", async () => {
+      expect(await deliver(l.handle, orderRefunded(l.customerId), licenseOnlyEnv)).toBe(
+        "rechecked",
+      );
+      l.polar.keyStatus = () =>
+        Response.json({ id: l.licenseId, status: "revoked", expires_at: null });
+      expect((await entitlement(l, licenseOnlyEnv)).premium).toBe(false);
+    });
+
+    it("ignores subscription events", async () => {
+      const subscription = {
+        type: "subscription.active",
+        data: { id: "sub_1", status: "active", product_id: "prod-monthly" },
+      };
+      expect(await deliver(l.handle, subscription, licenseOnlyEnv)).toBe("ignored");
+    });
   });
 });
 

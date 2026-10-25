@@ -16,6 +16,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Row, Section } from "@/components/ui";
 import { HalaqahCard } from "@/halaqah/components/HalaqahCard";
 import { useTranslation } from "@/i18n";
+import { PremiumGate } from "@/premium/PremiumGate";
 import { spacing, useTheme } from "@/theme";
 import { CountdownCard } from "@/ramadhan/components/CountdownCard";
 import { DailyCard } from "@/ramadhan/components/DailyCard";
@@ -138,10 +139,15 @@ export default function RamadhanScreen() {
 
       <DailyCard ctx={ctx} night={night} />
       <HalaqahCard />
-      <KhatamCard ctx={ctx} locale={locale} />
+      {/* Free: countdown, daily worship, imsakiyah. Premium: the khatam, qadha and zakat trackers. */}
+      <PremiumGate>
+        <KhatamCard ctx={ctx} locale={locale} />
+      </PremiumGate>
       {config ? <ImsakiyahCard ctx={ctx} config={config} /> : null}
-      <QadhaCard ctx={ctx} locale={locale} />
-      <ZakatCard ctx={ctx} locale={locale} />
+      <PremiumGate>
+        <QadhaCard ctx={ctx} locale={locale} />
+        <ZakatCard ctx={ctx} locale={locale} />
+      </PremiumGate>
     </ScrollView>
   );
 }

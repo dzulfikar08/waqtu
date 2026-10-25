@@ -139,6 +139,7 @@ export const en: Widen<typeof id> = {
     syncing: "Syncing…",
     ok: "Synced",
     error: "Not connected. Will try again.",
+    premium: "Sync across devices · Premium",
   },
   settings: {
     language: "Language",

@@ -114,3 +114,56 @@ export async function saveReflection(
     Date.now(),
   );
 }
+
+export interface VoiceReflection {
+  /** File name inside the private `halaqah` folder (recordings.ts). */
+  file: string;
+  seconds: number;
+}
+
+export async function getVoiceReflection(
+  db: SQLiteDatabase,
+  programId: string,
+  day: number,
+): Promise<VoiceReflection | null> {
+  return db.getFirstAsync<VoiceReflection>(
+    "SELECT file, seconds FROM halaqah_voice WHERE program_id = ? AND day = ?",
+    programId,
+    day,
+  );
+}
+
+/**
+ * Keeps one voice reflection per day on this device. Returns the file it replaced (or null) so the
+ * caller can delete it once the new row is stored.
+ */
+export async function saveVoiceReflection(
+  db: SQLiteDatabase,
+  programId: string,
+  day: number,
+  voice: VoiceReflection,
+): Promise<string | null> {
+  const previous = await getVoiceReflection(db, programId, day);
+  await db.runAsync(
+    `INSERT INTO halaqah_voice (program_id, day, file, seconds, updated_at) VALUES (?, ?, ?, ?, ?)
+     ON CONFLICT(program_id, day) DO UPDATE SET file = excluded.file, seconds = excluded.seconds, updated_at = excluded.updated_at`,
+    programId,
+    day,
+    voice.file,
+    Math.max(1, Math.round(voice.seconds)),
+    Date.now(),
+  );
+  return previous && previous.file !== voice.file ? previous.file : null;
+}
+
+/** Forgets the day's voice reflection; returns its file name (or null) for the caller to delete. */
+export async function deleteVoiceReflection(
+  db: SQLiteDatabase,
+  programId: string,
+  day: number,
+): Promise<string | null> {
+  const previous = await getVoiceReflection(db, programId, day);
+  if (!previous) return null;
+  await db.runAsync("DELETE FROM halaqah_voice WHERE program_id = ? AND day = ?", programId, day);
+  return previous.file;
+}

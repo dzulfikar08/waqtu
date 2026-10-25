@@ -2,8 +2,11 @@ import { Database } from "bun:sqlite";
 import { beforeEach, describe, expect, test } from "bun:test";
 
 import { MIGRATIONS } from "../src/db/migrations";
-import type { SyncEntry, SyncSetting } from "../src/mutabaah/merge";
+import { setSyncedSetting } from "../src/db/settings";
+import { addCustomItem, DEFAULT_ITEMS, parseItems, serializeItems } from "../src/mutabaah/items";
+import { settingWins, type SyncEntry, type SyncSetting } from "../src/mutabaah/merge";
 import { runSync, type PullPage, type SyncTransport } from "../src/mutabaah/syncEngine";
+import { ITEMS_KEY } from "../src/mutabaah/syncKeys";
 import {
   createSqliteStore,
   cursorKey,
@@ -12,6 +15,7 @@ import {
   type SqlDb,
   type SqlParam,
 } from "../src/sync/sqliteStore";
+import { asExpoDb } from "./helpers/sqlite";
 
 /** The real SQL and migrations on bun:sqlite, behind the same async surface as expo-sqlite. */
 function openDb(): { db: SqlDb; sqlite: Database } {
@@ -38,30 +42,52 @@ function openDb(): { db: SqlDb; sqlite: Database } {
   return { db, sqlite };
 }
 
-/** Per-user server data with the contract's rev cursor. */
+/** One change on the server, in rev order: an entry or a setting. */
+type Change = { rev: number } & ({ entry: SyncEntry } | { setting: SyncSetting });
+
+/** Per-user server data with the contract's rev cursor; entries and settings share one change log. */
 class Server {
-  private users = new Map<string, { rev: number; rows: (SyncEntry & { rev: number })[] }>();
-  seed(userId: string, entries: Omit<SyncEntry, "updatedAt">[]) {
-    const user = { rev: 0, rows: [] as (SyncEntry & { rev: number })[] };
-    for (const e of entries) user.rows.push({ ...e, updatedAt: 100, rev: ++user.rev });
+  private users = new Map<string, { rev: number; changes: Change[] }>();
+  seed(
+    userId: string,
+    entries: Omit<SyncEntry, "updatedAt">[],
+    settings: Omit<SyncSetting, "updatedAt">[] = [],
+  ) {
+    const user = { rev: 0, changes: [] as Change[] };
+    for (const e of entries)
+      user.changes.push({ entry: { ...e, updatedAt: 100 }, rev: ++user.rev });
+    for (const s of settings) {
+      user.changes.push({ setting: { ...s, updatedAt: 100 }, rev: ++user.rev });
+    }
     this.users.set(userId, user);
   }
+  /** The user's settings after last-write-wins, as the server would serve them to a new device. */
+  settings(userId: string): Map<string, SyncSetting> {
+    const merged = new Map<string, SyncSetting>();
+    for (const c of this.users.get(userId)?.changes ?? []) {
+      if ("setting" in c && settingWins(c.setting, merged.get(c.setting.key))) {
+        merged.set(c.setting.key, c.setting);
+      }
+    }
+    return merged;
+  }
   transport(userId: string): SyncTransport {
-    const user = this.users.get(userId) ?? { rev: 0, rows: [] };
+    const user = this.users.get(userId) ?? { rev: 0, changes: [] };
     this.users.set(userId, user);
     return {
       pull: async (since, limit): Promise<PullPage> => {
-        const rows = user.rows.filter((r) => r.rev > Number(since));
-        const page = rows.slice(0, limit);
+        const changes = user.changes.filter((c) => c.rev > Number(since));
+        const page = changes.slice(0, limit);
         return {
-          entries: page.map(({ rev: _rev, ...e }) => e),
-          settings: [] as SyncSetting[],
+          entries: page.flatMap((c) => ("entry" in c ? [c.entry] : [])),
+          settings: page.flatMap((c) => ("setting" in c ? [c.setting] : [])),
           cursor: String(page.length ? page[page.length - 1].rev : since),
-          hasMore: rows.length > limit,
+          hasMore: changes.length > limit,
         };
       },
-      push: async (entries) => {
-        for (const e of entries) user.rows.push({ ...e, rev: ++user.rev });
+      push: async (entries, settings) => {
+        for (const entry of entries) user.changes.push({ entry, rev: ++user.rev });
+        for (const setting of settings) user.changes.push({ setting, rev: ++user.rev });
       },
     };
   }
@@ -125,6 +151,35 @@ describe("switching accounts", () => {
     const report = await sync(A);
     expect(report).toEqual({ pulled: 2, pushed: 1 });
     expect(days()).toContain("2026-03-05|fajr");
+  });
+
+  test("a custom amalan added offline is uploaded on the first sign-in and reaches a new phone", async () => {
+    // The account already holds an older item list, for example from another phone.
+    const C = "user-c";
+    server.seed(C, [], [{ key: ITEMS_KEY, value: serializeItems(DEFAULT_ITEMS) }]);
+
+    // Offline, before any sign-in: the user adds "Baca Al-Mulk" in the item manager.
+    const items = addCustomItem(DEFAULT_ITEMS, "Baca Al-Mulk", "check", () => "mulk01");
+    await setSyncedSetting(asExpoDb(sqlite), ITEMS_KEY, serializeItems(items));
+    expect(await createSqliteStore(db, "pre").dirtySettings()).toHaveLength(1);
+
+    // First sign-in: the newer offline list beats the server's and is pushed.
+    expect(await sync(C)).toEqual({ pulled: 0, pushed: 1 });
+    expect(await createSqliteStore(db, C).dirtySettings()).toEqual([]);
+    expect(server.settings(C).get(ITEMS_KEY)?.value).toBe(serializeItems(items));
+
+    // A second phone signing in to the same account gets the custom item.
+    const other = openDb();
+    await prepareAccount(other.db, C);
+    await runSync(createSqliteStore(other.db, C), server.transport(C));
+    const stored = other.sqlite
+      .query<{ value: string }, [string]>("SELECT value FROM settings WHERE key = ?")
+      .get(ITEMS_KEY);
+    expect(parseItems(stored?.value)).toContainEqual({
+      id: "c.mulk01",
+      kind: "check",
+      label: "Baca Al-Mulk",
+    });
   });
 
   test("signing out and back in as the same user keeps data and cursor", async () => {

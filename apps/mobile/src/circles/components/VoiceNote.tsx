@@ -61,7 +61,8 @@ export function VoiceNote({
   );
 }
 
-function ActivePlayer({ source, total }: { source: AudioSource; total: number }) {
+/** Plays `source` from mount; also used for private halaqah voice reflections (a local file). */
+export function ActivePlayer({ source, total }: { source: AudioSource; total: number }) {
   const { t } = useTranslation();
   const theme = useTheme();
   const player = useAudioPlayer(source);

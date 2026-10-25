@@ -10,8 +10,11 @@ import {
   errorKey,
   formatDuration,
   groupCircles,
+  HANDLE_RETRIES,
   handleProblem,
+  isInviteCode,
   refreshFeed,
+  saveWithFreshHandle,
   suggestHandle,
   summaryFromWeek,
   tzOffsetHours,
@@ -216,6 +219,7 @@ describe("small helpers", () => {
     expect(errorKey(429, "rate_limited")).toBe("rateLimited");
     expect(errorKey(403, "suspended")).toBe("suspended");
     expect(errorKey(403, "summary_opt_in_required")).toBe("summaryOptIn");
+    expect(errorKey(403, "premium_required")).toBe("premiumRequired");
     expect(errorKey(413, null)).toBe("tooLarge");
     expect(errorKey(404, null)).toBe("notFound");
     expect(errorKey(500, null)).toBe("generic");
@@ -234,6 +238,7 @@ describe("small helpers", () => {
       "suspended",
       "summaryOptIn",
       "tooLarge",
+      "premiumRequired",
       "network",
       "generic",
     ] as const;
@@ -354,6 +359,27 @@ describe("api client", () => {
     ]);
   });
 
+  test("premium_required opens the paywall hook and still throws", async () => {
+    let opened = 0;
+    const api = createCirclesApi({
+      baseUrl: "https://api.example.test",
+      getCookie: () => "",
+      fetchImpl: (async () => ok({ error: "premium_required" }, 403)) as unknown as typeof fetch,
+      onPremiumRequired: () => opened++,
+    });
+    const error = (await api.joinPublic().catch((e: unknown) => e)) as CirclesHttpError;
+    expect([error.status, error.key, opened]).toEqual([403, "premiumRequired", 1]);
+
+    const other = createCirclesApi({
+      baseUrl: "https://api.example.test",
+      getCookie: () => "",
+      fetchImpl: (async () => ok({ error: "suspended" }, 403)) as unknown as typeof fetch,
+      onPremiumRequired: () => opened++,
+    });
+    await other.joinPublic().catch(() => {});
+    expect(opened).toBe(1);
+  });
+
   test("401 is detectable and a dead network is a network error", async () => {
     const unauthorized = client(() => ok({ error: "unauthorized" }, 401));
     expect(isUnauthorized(await unauthorized.api.list().catch((e: unknown) => e))).toBe(true);
@@ -381,5 +407,107 @@ describe("api client", () => {
     });
     await api.list();
     expect(Object.keys(calls[0]!.init.headers as Record<string, string>)).toEqual([]);
+  });
+});
+
+describe("saveWithFreshHandle", () => {
+  const taken = () => new CirclesHttpError(409, "handle_taken");
+  const isTaken = (e: unknown) => e instanceof CirclesHttpError && e.key === "handleTaken";
+
+  /** A save that rejects the first `clashes` handles as taken. */
+  function saver(clashes: number) {
+    const tried: string[] = [];
+    const save = async (handle: string) => {
+      tried.push(handle);
+      if (tried.length <= clashes) throw taken();
+      return { handle };
+    };
+    return { tried, save };
+  }
+
+  const suggestions = () => {
+    let n = 0;
+    return () => `Fresh_${++n}`;
+  };
+
+  test("keeps the first handle when it is free", async () => {
+    const { tried, save } = saver(0);
+    const out = await saveWithFreshHandle({
+      handle: "Sabar_Embun_482",
+      suggested: true,
+      save,
+      suggest: suggestions(),
+      isTaken,
+    });
+    expect(out).toEqual({ result: { handle: "Sabar_Embun_482" }, handle: "Sabar_Embun_482" });
+    expect(tried).toEqual(["Sabar_Embun_482"]);
+  });
+
+  test("retries a taken suggestion with fresh ones", async () => {
+    const { tried, save } = saver(2);
+    const out = await saveWithFreshHandle({
+      handle: "Sabar_Embun_482",
+      suggested: true,
+      save,
+      suggest: suggestions(),
+      isTaken,
+    });
+    expect(out.handle).toBe("Fresh_2");
+    expect(tried).toEqual(["Sabar_Embun_482", "Fresh_1", "Fresh_2"]);
+  });
+
+  test("gives up with handle_taken after the bounded retries", async () => {
+    const { tried, save } = saver(100);
+    await expect(
+      saveWithFreshHandle({
+        handle: "Sabar_Embun_482",
+        suggested: true,
+        save,
+        suggest: suggestions(),
+        isTaken,
+      }),
+    ).rejects.toMatchObject({ code: "handle_taken" });
+    expect(tried).toHaveLength(1 + HANDLE_RETRIES);
+  });
+
+  test("never swaps a handle the user typed", async () => {
+    const { tried, save } = saver(1);
+    await expect(
+      saveWithFreshHandle({
+        handle: "my_own",
+        suggested: false,
+        save,
+        suggest: suggestions(),
+        isTaken,
+      }),
+    ).rejects.toMatchObject({ code: "handle_taken" });
+    expect(tried).toEqual(["my_own"]);
+  });
+
+  test("other errors are not retried", async () => {
+    const tried: string[] = [];
+    const save = async (handle: string) => {
+      tried.push(handle);
+      throw new CirclesHttpError(null, null);
+    };
+    await expect(
+      saveWithFreshHandle({
+        handle: "Sabar_1",
+        suggested: true,
+        save,
+        suggest: suggestions(),
+        isTaken,
+      }),
+    ).rejects.toMatchObject({ status: null });
+    expect(tried).toEqual(["Sabar_1"]);
+  });
+});
+
+describe("isInviteCode", () => {
+  test("needs six letters or digits, ignoring dashes and spaces", () => {
+    expect(isInviteCode("")).toBe(false);
+    expect(isInviteCode("AB-12")).toBe(false);
+    expect(isInviteCode("ABCD-2345")).toBe(true);
+    expect(isInviteCode(" abc 123 ")).toBe(true);
   });
 });

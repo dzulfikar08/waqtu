@@ -255,8 +255,12 @@ export function khatamPlan(input: KhatamPlanInput): KhatamPlan {
   const elapsed = Math.min(Math.max(diffDays(start, today), 0), totalDays);
   const daysLeft = totalDays - elapsed;
   const originalDailyTarget = Math.ceil(totalPages / totalDays);
-  const expectedPagesBeforeToday = Math.min(totalPages, originalDailyTarget * elapsed);
+  const expectedPagesBeforeToday = Math.min(
+    totalPages,
+    Math.ceil((totalPages * elapsed) / totalDays),
+  );
   const dailyTarget = daysLeft > 0 ? Math.ceil(remaining / daysLeft) : remaining;
+  const pagesBehind = Math.max(0, expectedPagesBeforeToday - before);
   const pagesRead = Math.min(before + pagesReadToday, totalPages);
   return {
     totalPages,
@@ -267,8 +271,8 @@ export function khatamPlan(input: KhatamPlanInput): KhatamPlan {
     originalDailyTarget,
     todayRemaining: Math.max(0, dailyTarget - pagesReadToday),
     expectedPagesBeforeToday,
-    pagesBehind: Math.max(0, expectedPagesBeforeToday - before),
-    rebalanced: dailyTarget > originalDailyTarget,
+    pagesBehind,
+    rebalanced: pagesBehind > 0 && dailyTarget > originalDailyTarget,
     completed: pagesRead >= totalPages,
     dailyJuz: dailyTarget / (pagesPerKhatam / QURAN_JUZ),
   };

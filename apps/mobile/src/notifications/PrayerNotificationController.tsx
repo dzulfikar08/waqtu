@@ -5,17 +5,20 @@ import { AppState } from "react-native";
 import { onDataChanged } from "@/db/events";
 import { i18n } from "@/i18n";
 
+import { useHalaqahNudgeTap } from "./halaqah";
 import { reschedulePrayerNotifications, setupPrayerCategory } from "./prayer";
 
 const DEBOUNCE_MS = 2_000;
 
 /**
- * Keeps the next seven days of prayer notifications current: on launch, when the app returns to
- * the foreground (also after the permission prompt), after location/method/offset changes, and
- * when the language changes (titles and the action label are translated when scheduled).
+ * Keeps the next seven days of prayer notifications and halaqah nudges current: on launch, when
+ * the app returns to the foreground (also after the permission prompt), after location/method/
+ * offset, nudge time or halaqah progress changes, and when the language changes (titles and the
+ * action label are translated when scheduled). Also opens the halaqah screen from a tapped nudge.
  */
 export function PrayerNotificationController() {
   const db = useSQLiteContext();
+  useHalaqahNudgeTap();
 
   useEffect(() => {
     const schedule = () => {

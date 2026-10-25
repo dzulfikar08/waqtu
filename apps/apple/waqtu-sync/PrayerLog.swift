@@ -51,10 +51,27 @@ enum Fardh: String, CaseIterable {
 }
 
 enum FardhMapping {
-    /// Local day key, like the prayer log's: `yyyy-MM-dd` in the device zone.
+    /// Gregorian calendar in `calendar`'s time zone. Day keys and civil dates are always Gregorian,
+    /// whatever calendar the user picked in System Settings (Islamic, Buddhist, Japanese...).
+    static func gregorian(in calendar: Calendar = .current) -> Calendar {
+        var gregorian = Calendar(identifier: .gregorian)
+        gregorian.timeZone = calendar.timeZone
+        gregorian.locale = calendar.locale
+        gregorian.firstWeekday = calendar.firstWeekday
+        return gregorian
+    }
+
+    /// Local day key, like the prayer log's: Gregorian `yyyy-MM-dd` in `calendar`'s zone.
     static func dayKey(for date: Date, calendar: Calendar = .current) -> String {
-        let c = calendar.dateComponents([.year, .month, .day], from: date)
+        let c = gregorian(in: calendar).dateComponents([.year, .month, .day], from: date)
         return String(format: "%04d-%02d-%02d", c.year ?? 1970, c.month ?? 1, c.day ?? 1)
+    }
+
+    /// Start of the day a key names, in `calendar`'s zone; nil for a malformed key.
+    static func startOfDay(forKey key: String, calendar: Calendar = .current) -> Date? {
+        guard isDayKey(key) else { return nil }
+        let parts = key.split(separator: "-").compactMap { Int($0) }
+        return gregorian(in: calendar).date(from: DateComponents(year: parts[0], month: parts[1], day: parts[2]))
     }
 
     static func isDayKey(_ s: String) -> Bool {
@@ -125,9 +142,13 @@ enum FardhMapping {
 enum LogSync {
     /// Writes one local log edit into the replica. Skipped when the replica already holds an
     /// equivalent state, so the phone's extra flags (jamaah, qadha) survive a re-save on the Mac.
+    /// `.missed` stays local: the Mac infers it (still active after "I am going to pray") and the
+    /// account has no "missed" value, so pushing it would only erase a done/jamaah record the
+    /// phone made for the same prayer.
     @discardableResult
     static func record(_ change: PrayerLogChange, in replica: MutabaahReplica) -> Bool {
-        guard let fardh = Fardh(logName: change.prayer), FardhMapping.isDayKey(change.date) else { return false }
+        guard change.status != .missed,
+              let fardh = Fardh(logName: change.prayer), FardhMapping.isDayKey(change.date) else { return false }
         let wanted = change.status.map(FardhMapping.value(for:)) ?? 0
         if let current = replica.entryValue(date: change.date, itemId: fardh.rawValue),
            FardhMapping.status(forValue: current) == FardhMapping.status(forValue: wanted) {
@@ -164,7 +185,8 @@ enum LogSync {
                 queued += 1
             }
         }
-        for row in log {
+        // `.missed` stays local, as in `record`.
+        for row in log where row.status != .missed {
             guard let entry = FardhMapping.entry(for: row) else { continue }
             if let current = replica.entry(date: entry.date, itemId: entry.itemId) {
                 guard entry.updatedAt > current.updatedAt,

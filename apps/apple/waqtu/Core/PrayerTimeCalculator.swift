@@ -14,22 +14,18 @@ final class PrayerTimeCalculator {
         let calendar = Calendar(identifier: .gregorian)
         let components = calendar.dateComponents([.year, .month, .day], from: date)
 
-        let method = CalculationMethod(rawValue: settings.calculationMethod) ?? .muslimWorldLeague
-        var params = method.params
-        params.madhab = Madhab(rawValue: settings.madhab == "hanafi" ? 2 : 1) ?? .shafi
-        if settings.highLatitudeRule != "auto",
-           let rule = HighLatitudeRule(rawValue: settings.highLatitudeRule) {
-            params.highLatitudeRule = rule
-        } else {
-            params.highLatitudeRule = nil
-        }
-        params.adjustments = PrayerAdjustments(
-            fajr: settings.adjustmentFajr,
-            sunrise: settings.adjustmentSunrise,
-            dhuhr: settings.adjustmentDhuhr,
-            asr: settings.adjustmentAsr,
-            maghrib: settings.adjustmentMaghrib,
-            isha: settings.adjustmentIsha
+        let params = PrayerMethodParameters.make(
+            method: settings.calculationMethod,
+            madhab: settings.madhab,
+            highLatitudeRule: settings.highLatitudeRule,
+            adjustments: PrayerAdjustmentsData(
+                fajr: settings.adjustmentFajr,
+                sunrise: settings.adjustmentSunrise,
+                dhuhr: settings.adjustmentDhuhr,
+                asr: settings.adjustmentAsr,
+                maghrib: settings.adjustmentMaghrib,
+                isha: settings.adjustmentIsha
+            )
         )
 
         let prayerTimes = PrayerTimes(

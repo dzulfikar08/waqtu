@@ -11,10 +11,6 @@ export const circlesId = {
     title: "Masuk dulu",
     body: "Lingkaran memakai akunmu supaya ruangnya aman. Nama dan emailmu tidak pernah terlihat oleh anggota lain.",
   },
-  premium: {
-    title: "Lingkaran adalah fitur premium",
-    body: "Fitur ini akan tersedia untuk pelanggan premium.",
-  },
   onboarding: {
     title: "Pilih nama samaranmu",
     body: "Hanya nama samaran ini yang terlihat di lingkaran. Kamu bisa menggantinya nanti.",
@@ -26,6 +22,9 @@ export const circlesId = {
     ikhwan: "Ikhwan",
     akhwat: "Akhwat",
     join: "Gabung lingkaran",
+    inviteTitle: "Punya kode undangan?",
+    inviteHint:
+      "Opsional. Isi kode dari teman atau keluarga untuk langsung masuk lingkaran privat mereka.",
     privacy:
       "Yang disimpan: nama samaran, ikhwan/akhwat, bahasa, dan zona waktu kasar (misalnya UTC+7). Lokasi tidak pernah dikirim.",
   },
@@ -51,6 +50,7 @@ export const circlesId = {
     joinWithCode: "Masuk dengan kode",
     inviteCode: "Kode: {{code}}",
     myProfile: "Profil lingkaran",
+    saveHandle: "Simpan nama samaran",
     summaryOptIn: "Boleh membagikan ringkasan pekan",
     summaryOptInHint:
       "Hanya angka total pekan ini, tanpa nama ibadah. Tidak pernah dibagikan otomatis.",
@@ -137,6 +137,7 @@ export const circlesId = {
     suspended: "Akses lingkaranmu sedang ditinjau.",
     summaryOptIn: "Aktifkan berbagi ringkasan dulu.",
     tooLarge: "Berkasnya terlalu besar.",
+    premiumRequired: "Bergabung dan menulis di lingkaran perlu Waqtu Premium.",
     network: "Tidak ada koneksi. Coba lagi nanti.",
     generic: "Terjadi kesalahan. Coba lagi.",
   },
@@ -156,10 +157,6 @@ export const circlesEn: Widen<typeof circlesId> = {
     title: "Sign in first",
     body: "Circles use your account to keep the space safe. Your name and email are never shown to other members.",
   },
-  premium: {
-    title: "Circles is a premium feature",
-    body: "It will be available to premium subscribers.",
-  },
   onboarding: {
     title: "Pick an anonymous name",
     body: "Only this handle is visible in a circle. You can change it later.",
@@ -171,6 +168,9 @@ export const circlesEn: Widen<typeof circlesId> = {
     ikhwan: "Ikhwan (brothers)",
     akhwat: "Akhwat (sisters)",
     join: "Join a circle",
+    inviteTitle: "Have an invite code?",
+    inviteHint:
+      "Optional. Enter a code from a friend or family to join their private circle directly.",
     privacy:
       "What is stored: handle, ikhwan/akhwat, language and a coarse time zone (like UTC+7). Your location is never sent.",
   },
@@ -196,6 +196,7 @@ export const circlesEn: Widen<typeof circlesId> = {
     joinWithCode: "Join with code",
     inviteCode: "Code: {{code}}",
     myProfile: "Circle profile",
+    saveHandle: "Save handle",
     summaryOptIn: "Allow sharing my weekly summary",
     summaryOptInHint:
       "Only this week's totals, never practice names. Nothing is ever shared automatically.",
@@ -281,6 +282,7 @@ export const circlesEn: Widen<typeof circlesId> = {
     suspended: "Your circle access is under review.",
     summaryOptIn: "Turn on summary sharing first.",
     tooLarge: "That file is too large.",
+    premiumRequired: "Joining and writing in circles needs Waqtu Premium.",
     network: "No connection. Try again later.",
     generic: "Something went wrong. Try again.",
   },

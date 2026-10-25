@@ -281,8 +281,10 @@ export function createBillingHandler(options: BillingOptions = {}): BillingHandl
   }
 
   async function polarWebhook(env: AppEnv, request: Request): Promise<Response> {
-    const config = polarConfig(env);
-    if (!config) return unavailable();
+    // License refunds and revocations need only the signing secret; subscription events also
+    // need the web subscription products and are ignored until those are configured.
+    const webhookSecret = env.POLAR_WEBHOOK_SECRET?.trim();
+    if (!webhookSecret) return unavailable();
     const raw = await readBody(request);
     if (raw === null) return json({ error: "payload_too_large" }, 413);
     const verified = await verifyWebhook(
@@ -292,7 +294,7 @@ export function createBillingHandler(options: BillingOptions = {}): BillingHandl
         timestamp: request.headers.get("webhook-timestamp") ?? "",
         signature: request.headers.get("webhook-signature") ?? "",
       },
-      config.webhookSecret,
+      webhookSecret,
       now(),
     );
     if (!verified) return json({ error: "invalid_signature" }, 401);
@@ -304,9 +306,10 @@ export function createBillingHandler(options: BillingOptions = {}): BillingHandl
       return json({ error: "invalid_request" }, 400);
     }
     try {
+      const config = polarConfig(env);
       const outcome =
         (await processLicenseEvent(env.APP_DB, payload, now())) ??
-        (await processPolarEvent(env.APP_DB, config, payload, now()));
+        (config ? await processPolarEvent(env.APP_DB, config, payload, now()) : "ignored");
       return json({ received: true, outcome }, 202);
     } catch (error) {
       console.error("polar webhook failed:", error);

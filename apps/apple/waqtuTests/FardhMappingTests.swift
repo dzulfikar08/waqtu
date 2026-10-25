@@ -51,6 +51,19 @@ struct FardhMappingTests {
         #expect(FardhMapping.dayKey(for: date, calendar: cal) == "2027-02-08")
     }
 
+    @Test func dayKeyIsGregorianUnderAnIslamicSystemCalendar() {
+        var islamic = Calendar(identifier: .islamicUmmAlQura)
+        islamic.timeZone = TimeZone(identifier: "Asia/Jakarta")!
+        let date = Date(timeIntervalSince1970: 1_802_030_400)
+        #expect(FardhMapping.dayKey(for: date, calendar: islamic) == "2027-02-08")
+        var buddhist = Calendar(identifier: .buddhist)
+        buddhist.timeZone = islamic.timeZone
+        #expect(FardhMapping.dayKey(for: date, calendar: buddhist) == "2027-02-08")
+        #expect(FardhMapping.startOfDay(forKey: "2027-02-08", calendar: islamic)
+                == Date(timeIntervalSince1970: 1_802_019_600))  // 2027-02-08 00:00 Jakarta
+        #expect(FardhMapping.startOfDay(forKey: "2027-02-30", calendar: islamic) == nil)
+    }
+
     @Test func dayKeyValidation() {
         #expect(FardhMapping.isDayKey("2028-02-29"))
         #expect(!FardhMapping.isDayKey("2027-02-29"))
@@ -80,13 +93,20 @@ struct LogSyncTests {
         #expect(replica.entryValue(date: "2027-02-08", itemId: "dhuhr") == 0)
     }
 
-    @Test func missedIsRecordedAsNothingAndOverridesAnEarlierDone() {
+    @Test func missedStaysLocalAndNeverErasesThePhonesRecord() {
         let replica = MutabaahReplica(fileURL: nil)
-        replica.putRemoteEntry(SyncEntry(date: "2027-02-08", itemId: "asr", value: 3, updatedAt: 1000))
+        // The phone recorded Asr prayed in jamaah; the Mac later inferred "missed" (still active).
+        replica.putRemoteEntry(SyncEntry(date: "2027-02-08", itemId: "asr", value: 7, updatedAt: 1000))
         let missed = PrayerLogChange(date: "2027-02-08", prayer: "Asr", status: .missed, at: FardhMapping.date(fromMillis: 3000))
 
-        #expect(LogSync.record(missed, in: replica))
-        #expect(replica.entryValue(date: "2027-02-08", itemId: "asr") == 0)
+        #expect(!LogSync.record(missed, in: replica))
+        #expect(replica.entryValue(date: "2027-02-08", itemId: "asr") == 7)
+        #expect(replica.dirtyEntries().isEmpty)
+
+        // Reconcile after sign-in leaves it alone too.
+        #expect(LogSync.reconcile(log: [logEntry("2027-02-08", "Asr", .missed, at: 3000)], into: replica) == 0)
+        #expect(replica.entryValue(date: "2027-02-08", itemId: "asr") == 7)
+        #expect(replica.dirtyEntries().isEmpty)
     }
 
     @Test func resavingTheSameStateKeepsThePhonesExtraFlags() {

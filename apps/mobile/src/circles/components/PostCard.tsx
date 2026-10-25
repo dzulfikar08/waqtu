@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
+import { parseHalaqahRef } from "@/halaqah/program";
 import { useTranslation } from "@/i18n";
 import { radius, spacing, useTheme } from "@/theme";
 
@@ -43,6 +44,7 @@ export function PostCard({
     hour: "2-digit",
     minute: "2-digit",
   }).format(post.createdAt);
+  const halaqah = post.halaqahDayId ? parseHalaqahRef(post.halaqahDayId) : null;
 
   const fail = (e: unknown) => {
     const key =
@@ -123,7 +125,9 @@ export function PostCard({
 
       {post.halaqahDayId ? (
         <Text style={[styles.meta, { color: theme.secondary }]}>
-          {t("circles.circle.halaqahLinked", { day: post.halaqahDayId })}
+          {halaqah
+            ? t("halaqah.linkedDay", { day: halaqah.day })
+            : t("circles.circle.halaqahLinked", { day: post.halaqahDayId })}
         </Text>
       ) : null}
       {post.text ? <Text style={[styles.text, { color: theme.text }]}>{post.text}</Text> : null}
