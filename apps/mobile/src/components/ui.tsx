@@ -100,34 +100,41 @@ export function Screen({
   const insets = useSafeAreaInsets();
   const tabBar = useTabBarInset();
   return (
-    <ScrollView
-      style={{ backgroundColor: theme.background }}
-      contentContainerStyle={[
-        styles.screen,
-        {
-          paddingTop: insets.top + spacing.md,
-          paddingBottom: spacing.xl + Math.max(tabBar, insets.bottom),
-        },
-      ]}
-      keyboardShouldPersistTaps="handled"
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={styles.pageHeader}>
-        <View style={styles.pageHeaderText}>
-          {eyebrow}
-          <Text
-            accessibilityRole="header"
-            style={[typography.largeTitle, { color: theme.text }]}
-            numberOfLines={2}
-          >
-            {title}
-          </Text>
-          {caption}
+    <View style={[styles.fill, { backgroundColor: theme.background }]}>
+      <ScrollView
+        style={styles.fill}
+        contentContainerStyle={[
+          styles.screen,
+          {
+            paddingTop: insets.top + spacing.md,
+            paddingBottom: spacing.xl + Math.max(tabBar, insets.bottom),
+          },
+        ]}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.pageHeader}>
+          <View style={styles.pageHeaderText}>
+            {eyebrow}
+            <Text
+              accessibilityRole="header"
+              style={[typography.largeTitle, { color: theme.text }]}
+              numberOfLines={2}
+            >
+              {title}
+            </Text>
+            {caption}
+          </View>
+          {right}
         </View>
-        {right}
-      </View>
-      {children}
-    </ScrollView>
+        {children}
+      </ScrollView>
+      {/* Edge-to-edge: content scrolls under the status bar, so the bar gets the page colour behind it. */}
+      <View
+        pointerEvents="none"
+        style={[styles.statusBar, { height: insets.top, backgroundColor: theme.background }]}
+      />
+    </View>
   );
 }
 
@@ -442,6 +449,8 @@ export function Pill({
 
 const styles = StyleSheet.create({
   screen: { paddingHorizontal: spacing.md + 4, gap: spacing.lg },
+  fill: { flex: 1 },
+  statusBar: { position: "absolute", top: 0, left: 0, right: 0, opacity: 0.96 },
   pageHeader: { flexDirection: "row", alignItems: "flex-start", gap: spacing.md },
   pageHeaderText: { flex: 1, gap: 2 },
   card: { borderRadius: radius.lg },
