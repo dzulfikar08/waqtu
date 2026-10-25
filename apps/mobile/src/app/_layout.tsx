@@ -9,6 +9,7 @@ import { authClient } from "@/auth/client";
 import { protectExistingRecordings } from "@/hafalan/recordings";
 import { initLocale } from "@/db/settings";
 import { DATABASE_NAME, migrate } from "@/db/migrations";
+import { importSwiftStreak } from "@/db/swiftStreakImport";
 import { useTranslation } from "@/i18n";
 import { PrayerNotificationController } from "@/notifications/PrayerNotificationController";
 import { setupNotificationChannels } from "@/notifications/setup";
@@ -17,12 +18,16 @@ import { SyncController } from "@/sync/SyncController";
 import { useTheme } from "@/theme";
 import "@/i18n";
 import "@/notifications/background";
+import { iCloudKVAvailable, readSharedStreakData } from "../../modules/waqtu-icloud-kv";
 
 void SplashScreen.preventAutoHideAsync().catch(() => {});
 
 async function initDatabase(db: SQLiteDatabase): Promise<void> {
   await migrate(db);
   await initLocale(db);
+  // One-time import of the old Swift app's streak. Skipped (and retried by a later build) until the
+  // build has the iCloud entitlement; a failure must never keep the app from opening.
+  if (iCloudKVAvailable) await importSwiftStreak(db, readSharedStreakData).catch(() => 0);
 }
 
 export default function RootLayout() {

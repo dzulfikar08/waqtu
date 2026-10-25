@@ -10,6 +10,12 @@
 #   IOS_LIVE_ACTIVITY_PROFILE_BASE64 base64 of the App Store profile for the Live Activity widget extension
 #                                    (dat.waqtu.ios.LiveActivity, same distribution certificate)
 #   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_BASE64   App Store Connect API key (.p8), only for the TestFlight upload
+# and this optional variable (Settings -> Environments -> release -> Variables, not a secret):
+#   WAQTU_ICLOUD_KV              "1" adds the iCloud key-value storage entitlement (identifier
+#                                $(TeamIdentifierPrefix)dat.waqtu) so the app imports the old Swift app's
+#                                streak. Leave unset until IOS_PROVISIONING_PROFILE_BASE64 holds a profile
+#                                regenerated after enabling iCloud on the dat.waqtu.ios App ID; otherwise
+#                                signing fails because the profile lacks the entitlement.
 # Nothing is uploaded unless `upload_testflight` is ticked.
 name: Release iOS
 
@@ -90,6 +96,8 @@ jobs:
 
       - name: Build with EAS (local)
         working-directory: apps/mobile
+        env:
+          WAQTU_ICLOUD_KV: ${{ vars.WAQTU_ICLOUD_KV }}
         run: bunx eas-cli@latest build --local --non-interactive --platform ios --profile production --output "$RUNNER_TEMP/Waqtu.ipa"
 
       - name: Checksum
