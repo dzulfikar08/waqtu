@@ -6,6 +6,12 @@
 
 - **Indonesian and English** — The Mac app's menu bar, settings, onboarding, overlay and notifications are translated into Indonesian through a String Catalog (`waqtu/Localizable.xcstrings`). Macs set to Indonesian get Indonesian; everything else stays English. Prayer and mutabaah terms match the mobile app (Subuh, Dzuhur, Ashar, Maghrib, Isya; Istiqamah; Berbuka/Imsak).
 
+### Waqtu Premium subscription replaces lifetime (DEV-12, DEV-13)
+
+- **Mac App Store build** — The lifetime purchase (`dat.waqtu.lifetime`) is replaced by the auto-renewing subscriptions `dat.waqtu.mac.premium.monthly` and `.yearly` (StoreKit 2: purchase, restore, `Transaction.updates`, `currentEntitlements`). Each active subscription is also sent to the signed-in Waqtu account (`POST /v1/billing/apple`), so it unlocks the phone apps too. Settings → Upgrade shows the prices from the App Store, Restore Purchases, Manage Subscription, terms and privacy links.
+- **Direct-download build** — The Polar license-key purchase and activation UI are gone. After the 7-day trial, Waqtu unlocks with a Waqtu account that holds a subscription bought on iPhone or Android; the Upgrade screen links to both apps and has an Account tab to sign in.
+- Settings → Account shows whether the account has Waqtu Premium, with "Check again".
+
 ### Kemenag on the Mac (DEV-6)
 
 - **Kemenag RI method** — New "Kemenag RI (Indonesia)" method (Fajr 20°, Isha 18°, ihtiyat, rounding up), identical to the mobile app. A phone set to Kemenag now syncs as Kemenag instead of being mapped to Singapore (which was 2–4 min off). CI compares the app's own calculator against `@waqtu/core` for Kemenag and MWL.
@@ -19,7 +25,6 @@
 - **Premium from the account** — An active Waqtu subscription (App Store, Play or Polar) on the signed-in account unlocks the Mac app (`GET /v1/entitlement`, refreshed on sign-in, launch and every sync; cached offline, cleared on sign-out).
 - **Fix: non-Gregorian system calendars** — Prayer log day keys and Ramadhan detection always use Gregorian dates, so an Islamic, Buddhist or Japanese system calendar no longer writes Hijri-year keys into the synced log.
 - **Fix: "still working" no longer erases the phone's record** — The "missed" the Mac infers after "I am going to pray" stays on this Mac and is never synced over a done/jamaah record made on the phone.
-- **License** — Direct-download build: "Link license to account" attaches the Polar license to the signed-in account (hidden until the server offers it).
 - Unit tests for the sync merge, mapping, settings whitelist and Ramadhan countdown run in CI (`xcodebuild test`, scheme `waqtu`).
 
 ## 1.1.0 (May 2026)
