@@ -2,8 +2,8 @@
 //  ModulesMenuSection.swift
 //  waqtu
 //
-//  The menu bar's row of module buttons; each opens its own window (ModuleWindows). Renders
-//  nothing (not even its divider) when no module is available in this build.
+//  The menu bar's row of module buttons; each opens its own window (ModuleWindows). Halaqah only
+//  shows when its content may be released in this build.
 //
 
 import AppKit
@@ -13,17 +13,16 @@ struct ModulesMenuSection: View {
     let viewModel: AppViewModel
 
     var body: some View {
-        if HalaqahModel.isAvailable {
-            VStack(spacing: 0) {
-                HStack(spacing: 8) {
-                    if HalaqahModel.isAvailable {
-                        moduleButton(mstr("modules.halaqah"), systemImage: "play.rectangle", action: openHalaqah)
-                    }
+        VStack(spacing: 0) {
+            HStack(spacing: 8) {
+                if HalaqahModel.isAvailable {
+                    moduleButton(mstr("modules.halaqah"), systemImage: "play.rectangle", action: openHalaqah)
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                Divider()
+                moduleButton(mstr("modules.hafalan"), systemImage: "book", action: openHafalan)
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            Divider()
         }
     }
 
@@ -46,6 +45,15 @@ struct ModulesMenuSection: View {
                 program: program,
                 store: HalaqahStore(fileURL: HalaqahStore.defaultFileURL()),
                 sync: sync))
+        }
+    }
+
+    private func openHafalan() {
+        guard let text = HafalanModel.bundledText else { return }
+        ModuleWindows.shared.open(.hafalan, title: mstr("modules.hafalan"), size: NSSize(width: 1000, height: 760)) {
+            HafalanWindowView(model: HafalanModel(
+                text: text,
+                store: HafalanPlanStore(fileURL: HafalanPlanStore.defaultFileURL())))
         }
     }
 }
