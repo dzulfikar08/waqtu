@@ -55,11 +55,20 @@ The script will: build the DMG, sign it with Sparkle, upload to R2, and insert a
 
 ## App backend: auth and sync (`/api/auth/*`, `/v1/*`)
 
-The same worker also serves the Waqtu mobile app. `src/app.ts` exports `handleApp`, which `worker.ts` calls first; it answers `/api/auth/*` (better-auth) and `/v1/*` (sync API) and returns `null` for every other path so the release, appcast, and license routes above keep working unchanged.
+The same worker also serves the Waqtu mobile app. `src/app.ts` exports `handleApp`, which `worker.ts` calls first; it answers `/api/auth/*` (better-auth) and `/v1/*` (sync API) and returns `null` for every other path so the release, appcast, and legacy license routes above keep working unchanged.
+
+### Legacy routes kept for installed Mac apps
+
+Waqtu stopped selling the Mac lifetime license (2026-10-25: Premium is one subscription everywhere). Mac app versions released before that call two routes on their own, so these stay:
+
+- `GET /appcast.xml` (and `/`, `/latest`): Sparkle update feed. Old versions update themselves to the subscription build through it.
+- `POST /license/validate` `{ key, activation_id }`: old direct-download builds re-validate a stored Polar key on every launch. It still asks Polar and answers `{ valid }` (500 `License server not configured` without `POLAR_ACCESS_TOKEN`/`POLAR_ORG_ID`); old builds treat any failure as "not licensed" and fall back to their trial state, so it never crashes them.
+
+Removed: `POST /license/activate` (only the purchase flow of old builds used it; nobody holds a key) and `POST /v1/entitlement/link-license`.
 
 ### Database
 
-A second D1 binding, `APP_DB` (`waqtu-db`), holds the app data. The existing `DB` binding stays for releases. Migrations live in `migrations/` (`0001_auth.sql` for better-auth, `0002_sync.sql` for sync data, `0003_circles.sql` for halaqah circles, `0004_entitlement.sql` for premium entitlements):
+A second D1 binding, `APP_DB` (`waqtu-db`), holds the app data. The existing `DB` binding stays for releases. Migrations live in `migrations/` (`0001_auth.sql` for better-auth, `0002_sync.sql` for sync data, `0003_circles.sql` for halaqah circles, `0004_entitlement.sql` for premium entitlements, `0005_drop_license_entitlements.sql` removes the retired Mac license rows and columns):
 
 ```bash
 npx wrangler d1 migrations apply waqtu-db --remote   # production
@@ -118,33 +127,31 @@ All `/v1/*` routes need a better-auth session (cookie from the Expo client, or a
 
 - `GET /v1/me` returns `{ id, email, name }`.
 - `POST /v1/sync` with `{ entries?, settings? }` (max 500 entries, 100 settings, body at most 1,000,000 bytes: larger requests get `413 {"error":"payload_too_large"}`; unknown fields get 400) upserts last-write-wins and returns `{ applied: { entries, settings }, cursor }`. A write applies only if its `updatedAt` is newer, or equal with a greater value. Identical re-pushes change nothing and leave the cursor alone.
+- Sync is a Waqtu Premium feature, but `/v1/sync` deliberately does not check premium: the gate lives in the apps (mobile syncs only with premium). The Mac app syncs during its free trial, which is a local trial the server cannot see, and a first sign-in uploads the device's log before the app has read the account's entitlement; a server-side `403` would break both. See `docs/backend-decision.md`.
 - `GET /v1/sync?since=<cursor>&limit=<1..500>` returns `{ entries, settings, cursor, hasMore }` ordered by revision. Settings are `{ key, value, updatedAt }`; there is no deletion, set a key to an empty string instead. Loop while `hasMore`, passing the returned `cursor` as `since`.
 - Account deletion is `POST /api/auth/delete-user`; foreign keys cascade and remove the user's synced rows.
 
 ### Premium (`/v1/entitlement`, `/v1/billing/*`)
 
 Code: `src/billing/`. Setup of the stores and secrets: "Store setup" in the root README. Every source writes
-rows into `entitlement` (`source`, `external_id`, `user_id`, `expires_at`; `expires_at` null = lifetime);
-a row only moves forward by its `signed_at`, so late notifications and old receipt replays cannot undo a
-newer state, and a subscription held by one account is refused for another (409).
+rows into `entitlement` (`source`, `external_id`, `user_id`, `expires_at`); every source is a subscription
+with an end date. A row only moves forward by its `signed_at`, so late notifications and old receipt
+replays cannot undo a newer state, and a subscription held by one account is refused for another (409).
 
-- `GET /v1/entitlement` (session) returns `{ premium, source, expiresAt }`. Lifetime outranks dated periods,
-  otherwise the latest expiry wins; when not premium, `source`/`expiresAt` describe the most recent lapsed
-  period (both null if the user never held premium).
-- `POST /v1/entitlement/link-license` `{ key }` (session) validates a Mac license key with Polar (granted,
-  not expired) and grants lifetime premium; one key links to one account. 400 `invalid_license`, 502
-  `license_unreachable`, 409 `linked_to_other_account`. A linked key is re-confirmed with Polar
-  (`GET /v1/license-keys/{id}`, scope `license_keys:read`) on `GET /v1/entitlement` when its last check is
-  older than 7 days or a refund flagged it; a revoked, disabled, expired or deleted key loses premium, a
-  Polar outage never does. Polar `benefit_grant.revoked` (license-keys benefit) revokes the row at once;
-  `order.refunded` flags the customer's keys for that re-check.
-- `POST /v1/billing/apple` `{ signedTransaction }` (session): StoreKit 2 JWS verified to Apple Root CA G3
-  (bundle `dat.waqtu.ios`, products `dat.waqtu.premium.monthly|yearly`), granted until the store's
-  `expiresDate`. Returns the entitlement.
+- `GET /v1/entitlement` (session) returns `{ premium, source, expiresAt }`. The latest expiry wins; when not
+  premium, `source`/`expiresAt` describe the most recent lapsed period (both null if the user never held
+  premium).
+- `POST /v1/billing/apple` `{ signedTransaction }` (session): StoreKit 2 JWS verified to Apple Root CA G3,
+  granted until the store's `expiresDate`. Two App Store apps sell Premium, each with its own products:
+  the iPhone app (bundle `dat.waqtu.ios`, `dat.waqtu.premium.monthly|yearly`) and the Mac App Store app
+  (bundle `dat.waqtu`, `dat.waqtu.mac.premium.monthly|yearly`). A product of the other app, or the retired
+  Mac `dat.waqtu.lifetime`, is refused. Returns the entitlement.
 - `POST /v1/billing/apple/notifications` `{ signedPayload }`: App Store Server Notifications V2 (Production and
-  Sandbox), verified like receipts; renewals, expiry and grace period rewrite the row. A refund/revoke only
-  ends access when it is for the transaction the stored period came from (`order_id`); a refund of an
-  earlier period leaves the paid period alone.
+  Sandbox) for both apps, verified like receipts; the transaction inside must belong to the app the
+  notification names. Production notifications must carry the app's numeric id when it is configured
+  (`APPLE_APP_ID` for the iPhone app, `APPLE_MAC_APP_ID` for the Mac app). Renewals, expiry and grace
+  period rewrite the row. A refund/revoke only ends access when it is for the transaction the stored
+  period came from (`order_id`); a refund of an earlier period leaves the paid period alone.
 - `POST /v1/billing/google` `{ purchaseToken }` (session): re-read from the Android Publisher API
   (`premium`, base plan `monthly|yearly`), granted until Google's expiry, then acknowledged. Returns the
   entitlement plus `pending` (cash payments are granted only once Play charges them).
@@ -152,16 +159,16 @@ newer state, and a subscription held by one account is refused for another (409)
   Google-signed push JWT (`GOOGLE_PLAY_RTDN_PUSH_EMAIL`) or `?token=` (`GOOGLE_PLAY_RTDN_TOKEN`).
 - `POST /v1/billing/polar/checkout` `{ plan: "monthly" | "yearly" }` (session) returns a hosted checkout
   `{ url }`; 409 `already_premium` if the account already has premium. `POST /v1/billing/polar/portal`
-  returns the customer portal `{ url }`.
-- `POST /v1/billing/polar/webhook`: Polar `subscription.*`, `benefit_grant.revoked` and `order.refunded` events
-  (Standard Webhooks signature). Needs only `POLAR_WEBHOOK_SECRET`: license revocations and refunds are
-  processed even when the web subscription products are not configured; `subscription.*` events are
-  then ignored.
+  returns the customer portal `{ url }`. No client calls checkout today (the website sells nothing).
+- `POST /v1/billing/polar/webhook`: Polar `subscription.*` events (Standard Webhooks signature); ignored
+  until the subscription products are configured.
 
 Secrets: `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`, `GOOGLE_PLAY_RTDN_PUSH_EMAIL` or `GOOGLE_PLAY_RTDN_TOKEN`,
-`GOOGLE_PLAY_PACKAGE_NAME` (optional, default `dat.waqtu.app`), `POLAR_ACCESS_TOKEN`, `POLAR_ORG_ID`,
+`GOOGLE_PLAY_PACKAGE_NAME` (optional, default `dat.waqtu.app`), `POLAR_ACCESS_TOKEN`,
 `POLAR_WEBHOOK_SECRET`, `POLAR_PRODUCT_MONTHLY_ID`, `POLAR_PRODUCT_YEARLY_ID`, `POLAR_SERVER` and
-`POLAR_SUCCESS_URL` (optional). `APPLE_APP_ID` is a plain var in `wrangler.toml`.
+`POLAR_SUCCESS_URL` (optional). `POLAR_ORG_ID` is only read by the legacy `/license/validate`.
+`APPLE_APP_ID` is a plain var in `wrangler.toml`; add `APPLE_MAC_APP_ID` there once the Mac App Store
+app's numeric id is known.
 
 ### Tests
 
@@ -177,12 +184,12 @@ Small anonymous reflection groups, public or private, always gender-separated (i
 
 ### Infra to create before deploying
 
-| What                       | How                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| R2 bucket for voice notes  | `npx wrangler r2 bucket create waqtu-circle-media`. Bound as `CIRCLE_MEDIA` in `wrangler.toml`. Keep it **private** (no public access, no custom domain): notes are only served through the Worker after a membership check. `wrangler deploy` fails until the bucket exists.                                                                                                                                         |
-| D1 migration               | `npx wrangler d1 migrations apply waqtu-db --remote` (applies `0003_circles.sql`).                                                                                                                                                                                                                                                                                                                                    |
-| `ADMIN_USER_IDS` secret    | Comma-separated better-auth user ids that may use the moderation queue: `npx wrangler secret put ADMIN_USER_IDS`. Find an id with `GET /v1/me` while signed in. Unset means nobody is an admin. For `wrangler dev` put it in `.dev.vars`.                                                                                                                                                                             |
-| `CIRCLES_REQUIRES_PREMIUM` | Plain var in `wrangler.toml`, `"false"` today. `GET /v1/circles/config` reports it as `requiresPremium`; the app then shows the premium gate instead of circles to accounts without premium. When `"true"`, the server refuses joining (`join`, `join-private`, `private`) and posting (`posts`, `summary`, media upload) with 403 `premium_required` unless `/v1/entitlement` would say premium; reading stays open. |
+| What                       | How                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R2 bucket for voice notes  | `npx wrangler r2 bucket create waqtu-circle-media`. Bound as `CIRCLE_MEDIA` in `wrangler.toml`. Keep it **private** (no public access, no custom domain): notes are only served through the Worker after a membership check. `wrangler deploy` fails until the bucket exists.                                                                                                                                                                                                                                     |
+| D1 migration               | `npx wrangler d1 migrations apply waqtu-db --remote` (applies `0003_circles.sql`).                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `ADMIN_USER_IDS` secret    | Comma-separated better-auth user ids that may use the moderation queue: `npx wrangler secret put ADMIN_USER_IDS`. Find an id with `GET /v1/me` while signed in. Unset means nobody is an admin. For `wrangler dev` put it in `.dev.vars`.                                                                                                                                                                                                                                                                         |
+| `CIRCLES_REQUIRES_PREMIUM` | Plain var in `wrangler.toml`, `"true"` (owner decision 2026-10-25: circles are Premium). `GET /v1/circles/config` reports it as `requiresPremium`; the app then shows the premium gate instead of circles to accounts without premium. When `"true"`, the server refuses joining (`join`, `join-private`, `private`) and posting (`posts`, `summary`, media upload) with 403 `premium_required` unless `/v1/entitlement` would say premium; reading stays open. Tests run with `"false"` and turn it on per test. |
 
 No other secrets: voice notes are uploaded through the Worker (5 MB limit, audio mime allowlist), so no R2 S3 credentials are needed.
 

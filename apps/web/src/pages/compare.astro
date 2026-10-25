@@ -19,7 +19,6 @@ const features = [
   "Hijri date display",
   "Prayer log / streaks",
   "Slack status integration",
-  "One-time payment (no subscription)",
 ];
 
 interface Competitor {
@@ -30,11 +29,11 @@ interface Competitor {
 }
 
 const competitors: Competitor[] = [
-  { name: "Waqtu", price: "$2.99 intro / $9.99 lifetime", platform: "macOS 12+", highlights: [true, true, true, true, true, true, true, true, true, true, true, true, true] },
-  { name: "Sajda", price: "Free / $3.99 Pro", platform: "macOS 13+", highlights: [true, false, false, true, true, true, true, false, false, false, false, false, false] },
-  { name: "Minarah", price: "Free", platform: "macOS 14+", highlights: [false, false, false, true, false, false, true, false, true, false, false, false, false] },
-  { name: "PrayerCal", price: "Free", platform: "Web (ICS)", highlights: [false, true, false, false, true, false, false, false, false, false, false, false, false] },
-  { name: "Guidance", price: "Free", platform: "macOS + iOS", highlights: [false, false, false, false, true, false, false, false, false, false, false, false, false] },
+  { name: "Waqtu", price: "Free trial · Premium Rp 29.000/mo or Rp 249.000/yr", platform: "macOS 12+, iOS, Android", highlights: [true, true, true, true, true, true, true, true, true, true, true, true] },
+  { name: "Sajda", price: "Free / $3.99 Pro", platform: "macOS 13+", highlights: [true, false, false, true, true, true, true, false, false, false, false, false] },
+  { name: "Minarah", price: "Free", platform: "macOS 14+", highlights: [false, false, false, true, false, false, true, false, true, false, false, false] },
+  { name: "PrayerCal", price: "Free", platform: "Web (ICS)", highlights: [false, true, false, false, true, false, false, false, false, false, false, false] },
+  { name: "Guidance", price: "Free", platform: "macOS + iOS", highlights: [false, false, false, false, true, false, false, false, false, false, false, false] },
 ];
 
 interface CompetitorDetail {
@@ -61,10 +60,9 @@ const details: CompetitorDetail[] = [
       "Hijri date display",
       "Adhan audio with Fajr-specific version",
       "Pre-prayer reminder notifications",
-      "One-time payment, lifetime access",
-      "30-day money-back guarantee",
+      "Free trial; one Premium subscription (sync, Circles) covers Mac, iPhone and Android",
     ],
-    cons: ["macOS only (iOS companion planned)"],
+    cons: ["Premium features need a subscription"],
     bestFor: "Muslim professionals who use a Mac at work and want calendar protection",
   },
   {
@@ -199,7 +197,7 @@ const details: CompetitorDetail[] = [
               Download Waqtu
               <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
             </a>
-            <a href="/mac#pricing" class="neu-btn-secondary inline-flex items-center gap-2 px-8 py-3.5 font-medium text-[var(--waqtu-text)]">Lifetime access — <span class="font-mono font-bold">$2.99</span></a>
+            <a href="/mac#pricing" class="neu-btn-secondary inline-flex items-center gap-2 px-8 py-3.5 font-medium text-[var(--waqtu-text)]">See Premium pricing</a>
           </div>
         </div>
       </div>

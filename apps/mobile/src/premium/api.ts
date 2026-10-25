@@ -5,8 +5,6 @@ export type PremiumErrorCode =
   | "unauthorized"
   | "linked_to_other_account"
   | "invalid_receipt"
-  | "invalid_license"
-  | "license_unreachable"
   | "google_unreachable"
   | "unavailable"
   | "network"
@@ -26,8 +24,6 @@ const KNOWN_CODES: readonly PremiumErrorCode[] = [
   "unauthorized",
   "linked_to_other_account",
   "invalid_receipt",
-  "invalid_license",
-  "license_unreachable",
   "google_unreachable",
   "unavailable",
 ];
@@ -39,8 +35,6 @@ export interface PremiumApi {
   submitApple(signedTransaction: string): Promise<Entitlement>;
   /** Play purchase token; the server re-reads it from Google. `pending` = not charged yet. */
   submitGoogle(purchaseToken: string): Promise<Entitlement & { pending: boolean }>;
-  /** Mac lifetime license key. */
-  linkLicense(key: string): Promise<Entitlement>;
 }
 
 export function createPremiumApi(baseUrl: string, getCookie: () => Promise<string>): PremiumApi {
@@ -85,6 +79,5 @@ export function createPremiumApi(baseUrl: string, getCookie: () => Promise<strin
       if (!parsed) throw new PremiumApiError("unknown", 200);
       return { ...parsed, pending: (payload as { pending?: unknown }).pending === true };
     },
-    linkLicense: (key) => entitlement("/v1/entitlement/link-license", { key }),
   };
 }

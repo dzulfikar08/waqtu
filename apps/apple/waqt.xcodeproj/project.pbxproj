@@ -18,7 +18,15 @@
 		AA447E9D2F417E8200A6E861 /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = 1333C6AA761E8AC4FC22AEC1 /* Adhan */; };
 		AA50DE822F4174E2006EDD6E /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = AA50DE812F4174E2006EDD6E /* Sparkle */; };
 		C17B4582B11CD69A2CDDEDCF /* waqtu-widget in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 47D6F5E916FFD6DA5FC1879D /* waqtu-widget */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		385614E264FAD380FA494BAF /* program.json in Resources */ = {isa = PBXBuildFile; fileRef = DFFF25C482CDFB1D93DB378E /* program.json */; };
+		2BA09201E0304FAA78E8D5D3 /* program.json in Resources */ = {isa = PBXBuildFile; fileRef = DFFF25C482CDFB1D93DB378E /* program.json */; };
 		FE96562A027EDE3137DD1A52 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E814699275DB5EF2E2B6AC60 /* Foundation.framework */; };
+		EB6528E2EC9462EB77181441 /* quran-uthmani-1.1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8874B94D3460E39AC80B111E /* quran-uthmani-1.1.txt */; };
+		449DBAFB2DFCC9F35541E7C9 /* quran-uthmani-1.1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8874B94D3460E39AC80B111E /* quran-uthmani-1.1.txt */; };
+		8D82A52D5780943215F772E7 /* AmiriQuran-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D94241551BCE880E056DBFFA /* AmiriQuran-Regular.ttf */; };
+		CC21837216F3B7FFA7AF00CC /* AmiriQuran-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D94241551BCE880E056DBFFA /* AmiriQuran-Regular.ttf */; };
+		C754C9AC9AA1437D02B3A5F3 /* AmiriQuran-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = BBEC023C812E2512FE606408 /* AmiriQuran-OFL.txt */; };
+		A1A186797C2E67C6C58EDD62 /* AmiriQuran-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = BBEC023C812E2512FE606408 /* AmiriQuran-OFL.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -116,6 +124,10 @@
 		E814699275DB5EF2E2B6AC60 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		F302ECD96F7C0432C2E86FA2 /* waqtu-ios */ = {isa = PBXFileReference; includeInIndex = 0; path = "waqtu-ios"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F54AD20B8E6472CEC93A520D /* waqtu-watch */ = {isa = PBXFileReference; includeInIndex = 0; path = "waqtu-watch"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DFFF25C482CDFB1D93DB378E /* program.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = program.json; path = "../../content/halaqah/ramadhan-1448/program.json"; sourceTree = SOURCE_ROOT; };
+		8874B94D3460E39AC80B111E /* quran-uthmani-1.1.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = quran-uthmani-1.1.txt; path = "../../content/quran/quran-uthmani-1.1.txt"; sourceTree = SOURCE_ROOT; };
+		D94241551BCE880E056DBFFA /* AmiriQuran-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = AmiriQuran-Regular.ttf; path = "../mobile/assets/fonts/AmiriQuran-Regular.ttf"; sourceTree = SOURCE_ROOT; };
+		BBEC023C812E2512FE606408 /* AmiriQuran-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = AmiriQuran-OFL.txt; path = "../mobile/assets/fonts/AmiriQuran-OFL.txt"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -332,6 +344,17 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		7BDA627D22F2BC56549EBBC1 /* BundledContent */ = {
+			isa = PBXGroup;
+			children = (
+				DFFF25C482CDFB1D93DB378E /* program.json */,
+				8874B94D3460E39AC80B111E /* quran-uthmani-1.1.txt */,
+				D94241551BCE880E056DBFFA /* AmiriQuran-Regular.ttf */,
+				BBEC023C812E2512FE606408 /* AmiriQuran-OFL.txt */,
+			);
+			name = BundledContent;
+			sourceTree = "<group>";
+		};
 		AA40DE7D2F4174E2006EDD6D = {
 			isa = PBXGroup;
 			children = (
@@ -352,6 +375,7 @@
 				88F976BBAE5A4CFDC5BEDFBB /* macos-widget */,
 				3B87E626326006D1F430CA36 /* shared */,
 				93B740C16A1438F2EF0A3F9C /* ios-uitests */,
+				7BDA627D22F2BC56549EBBC1 /* BundledContent */,
 			);
 			sourceTree = "<group>";
 		};
@@ -704,6 +728,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2BA09201E0304FAA78E8D5D3 /* program.json in Resources */,
+				449DBAFB2DFCC9F35541E7C9 /* quran-uthmani-1.1.txt in Resources */,
+				CC21837216F3B7FFA7AF00CC /* AmiriQuran-Regular.ttf in Resources */,
+				A1A186797C2E67C6C58EDD62 /* AmiriQuran-OFL.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -718,6 +746,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				385614E264FAD380FA494BAF /* program.json in Resources */,
+				EB6528E2EC9462EB77181441 /* quran-uthmani-1.1.txt in Resources */,
+				8D82A52D5780943215F772E7 /* AmiriQuran-Regular.ttf in Resources */,
+				C754C9AC9AA1437D02B3A5F3 /* AmiriQuran-OFL.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

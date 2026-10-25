@@ -2,8 +2,8 @@ import { beforeAll, describe, expect, test } from "vitest";
 
 import type { AppleVerifyOptions } from "../src/billing/apple";
 import {
-  APPLE_BUNDLE_ID,
-  APPLE_PRODUCT_IDS,
+  APPLE_IOS_APP,
+  APPLE_MAC_APP,
   APPLE_ROOT_CA_G3_SHA256,
   appleAccountToken,
   verifyAppleTransactionJws,
@@ -23,8 +23,9 @@ const APPLE_WWDR_G6_B64 =
 // the tests pin the generated root exactly like the server pins Apple Root
 // CA - G3.
 
-const BUNDLE = APPLE_BUNDLE_ID;
-const [PRODUCT, YEARLY] = APPLE_PRODUCT_IDS;
+const BUNDLE = APPLE_IOS_APP.bundleId;
+const [PRODUCT, YEARLY] = APPLE_IOS_APP.productIds as [string, string];
+const [MAC_MONTHLY, MAC_YEARLY] = APPLE_MAC_APP.productIds as [string, string];
 const SIGNED_DATE = Date.parse("2026-10-13T00:00:00Z");
 const NOT_BEFORE = Date.parse("2026-01-01T00:00:00Z");
 const NOT_AFTER = Date.parse("2027-01-01T00:00:00Z");
@@ -317,8 +318,7 @@ beforeAll(async () => {
 
   pinned = {
     rootSha256: await sha256Hex(root.der),
-    bundleId: BUNDLE,
-    productIds: [PRODUCT, YEARLY],
+    apps: [APPLE_IOS_APP, APPLE_MAC_APP],
   };
 });
 
@@ -350,6 +350,30 @@ describe("verifyAppleTransactionJws", () => {
     const jws = await validJws(validPayload({ productId: YEARLY }));
     const result = await verifyAppleTransactionJws(jws, pinned);
     expect(result.ok && result.transaction.productId).toBe(YEARLY);
+  });
+
+  test("accepts the Mac App Store subscriptions under the Mac bundle", async () => {
+    for (const productId of [MAC_MONTHLY, MAC_YEARLY]) {
+      const jws = await validJws(validPayload({ bundleId: APPLE_MAC_APP.bundleId, productId }));
+      const result = await verifyAppleTransactionJws(jws, pinned);
+      expect(result.ok && result.transaction.productId).toBe(productId);
+    }
+  });
+
+  test("rejects a product sold by the other app", async () => {
+    const macProductOnIphone = await validJws(validPayload({ productId: MAC_MONTHLY }));
+    expect(await rejectReason(macProductOnIphone)).toBe("product");
+    const iphoneProductOnMac = await validJws(
+      validPayload({ bundleId: APPLE_MAC_APP.bundleId, productId: PRODUCT }),
+    );
+    expect(await rejectReason(iphoneProductOnMac)).toBe("product");
+  });
+
+  test("rejects the retired Mac lifetime product", async () => {
+    const jws = await validJws(
+      validPayload({ bundleId: APPLE_MAC_APP.bundleId, productId: "dat.waqtu.lifetime" }),
+    );
+    expect(await rejectReason(jws)).toBe("product");
   });
 
   test("verifies Apple's real WWDR G6 under the pinned G3 root (P-384, SHA-384)", async () => {

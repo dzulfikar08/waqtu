@@ -18,7 +18,7 @@ Every app below was judged on five criteria:
 - **Calendar protection** — Does it block your calendar and show you as busy in Outlook and Teams?
 - **Privacy** — Does it work offline, with no ads and no tracking?
 - **Accuracy** — Can it match your local mosque, with multiple calculation methods and per-prayer offsets?
-- **Price** — One fair payment, or a forever subscription?
+- **Price** — Is it free, or what do you pay, and what does it unlock?
 
 ## At a glance: Mac prayer apps compared
 
@@ -63,7 +63,7 @@ Want the full feature-by-feature table? [See the complete comparison here](/comp
       </tr>
       <tr>
         <td>Price</td>
-        <td class="waqtu-col price-label">$2.99</td>
+        <td class="waqtu-col price-label">Free trial / Rp 29.000/mo</td>
         <td>Free / $3.99</td>
         <td>Free</td>
         <td>Free</td>
@@ -87,11 +87,11 @@ Want the full feature-by-feature table? [See the complete comparison here](/comp
 - Slack status sets itself to "Praying" and clears when the block ends
 - Fully offline; your location never leaves your Mac
 - Multiple calculation methods, plus per-prayer offsets to match your mosque
-- One $2.99 intro payment, lifetime access — no subscription
+- Free trial; one Waqtu Premium subscription (Rp 29.000/month or Rp 249.000/year) unlocks sync and Circles on Mac, iPhone and Android
 
 **Cons:**
 
-- macOS only (an iOS companion is planned)
+- Premium features need a subscription
 
 _Verdict:_ If you miss prayers because of meetings, Waqtu is built for exactly that problem. Read more in our guide on [why you need a prayer times app on your Mac](/blog/why-mac-prayer-times-app).
 
