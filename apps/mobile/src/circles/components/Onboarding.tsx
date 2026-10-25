@@ -1,10 +1,11 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-import { Row, Section } from "@/components/ui";
+import { Card, IconChip, Row, Section } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { Button, Hint, Panel } from "@/ramadhan/components/fields";
-import { radius, spacing, useTheme } from "@/theme";
+import { radius, spacing, typography, useTheme } from "@/theme";
 
 import type { CirclesApi } from "../api";
 import { CirclesHttpError } from "../api";
@@ -17,6 +18,7 @@ import {
   tzOffsetHours,
 } from "../logic";
 import type { Gender } from "../types";
+import { TextField } from "./TextField";
 
 /**
  * First-time setup and the first join in one screen: pick a gender (one tap), then "Join" (second
@@ -76,12 +78,24 @@ export function Onboarding({
 
   return (
     <View style={styles.root}>
-      <Text style={[styles.title, { color: theme.text }]}>{t("circles.onboarding.title")}</Text>
-      <Text style={{ color: theme.muted }}>{t("circles.onboarding.body")}</Text>
+      <Card>
+        <View style={styles.hero}>
+          <IconChip icon="people" size={48} />
+          <Text
+            accessibilityRole="header"
+            style={[typography.title, styles.grow, { color: theme.text }]}
+          >
+            {t("circles.onboarding.title")}
+          </Text>
+        </View>
+        <Text style={[typography.subhead, styles.body, { color: theme.muted }]}>
+          {t("circles.onboarding.body")}
+        </Text>
+      </Card>
 
-      <Section title={t("circles.onboarding.handle")}>
+      <Section title={t("circles.onboarding.handle")} icon="at-outline">
         <Panel>
-          <TextInput
+          <TextField
             accessibilityLabel={t("circles.onboarding.handle")}
             autoCapitalize="none"
             autoCorrect={false}
@@ -91,7 +105,6 @@ export function Onboarding({
               setHandle(next);
               setSuggested(false);
             }}
-            style={[styles.input, { color: theme.text, borderColor: theme.border }]}
           />
           {problem ? <Hint>{t(`circles.handleProblem.${problem}`)}</Hint> : null}
           <Button
@@ -105,13 +118,15 @@ export function Onboarding({
         </Panel>
       </Section>
 
-      <Section title={t("circles.onboarding.gender")}>
+      <Section title={t("circles.onboarding.gender")} icon="people-outline">
         <Row
+          icon="man-outline"
           label={t("circles.onboarding.ikhwan")}
           selected={gender === "ikhwan"}
           onPress={() => setGender("ikhwan")}
         />
         <Row
+          icon="woman-outline"
           label={t("circles.onboarding.akhwat")}
           selected={gender === "akhwat"}
           onPress={() => setGender("akhwat")}
@@ -121,24 +136,33 @@ export function Onboarding({
         </Panel>
       </Section>
 
-      <Section title={t("circles.onboarding.inviteTitle")}>
+      <Section title={t("circles.onboarding.inviteTitle")} icon="key-outline">
         <Panel>
           <Hint>{t("circles.onboarding.inviteHint")}</Hint>
-          <TextInput
+          <TextField
             accessibilityLabel={t("circles.home.codeLabel")}
             autoCapitalize="characters"
             autoCorrect={false}
             placeholder={t("circles.home.codePlaceholder")}
-            placeholderTextColor={theme.muted}
             maxLength={12}
             value={code}
             onChangeText={setCode}
-            style={[styles.input, { color: theme.text, borderColor: theme.border }]}
           />
         </Panel>
       </Section>
 
-      {error ? <Text style={{ color: theme.text }}>{error}</Text> : null}
+      {error ? (
+        <View style={[styles.error, { backgroundColor: theme.dangerSoft }]}>
+          <Ionicons
+            name="alert-circle"
+            size={18}
+            color={theme.danger}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
+          <Text style={[typography.subhead, styles.grow, { color: theme.text }]}>{error}</Text>
+        </View>
+      ) : null}
       <Button
         label={
           busy
@@ -150,19 +174,35 @@ export function Onboarding({
         onPress={() => void submit()}
         disabled={!ready}
       />
-      <Hint>{t("circles.onboarding.privacy")}</Hint>
+      <View style={styles.privacy}>
+        <Ionicons
+          name="lock-closed-outline"
+          size={14}
+          color={theme.muted}
+          accessibilityElementsHidden
+          importantForAccessibility="no"
+          style={styles.privacyIcon}
+        />
+        <View style={styles.grow}>
+          <Hint>{t("circles.onboarding.privacy")}</Hint>
+        </View>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { gap: spacing.md },
-  title: { fontSize: 22, fontWeight: "700" },
-  input: {
-    minHeight: 44,
-    borderWidth: 1,
+  root: { gap: spacing.lg },
+  hero: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
+  grow: { flex: 1 },
+  body: { lineHeight: 20 },
+  error: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    padding: spacing.md - 4,
     borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    fontSize: 16,
   },
+  privacy: { flexDirection: "row", gap: spacing.sm, paddingHorizontal: spacing.xs },
+  privacyIcon: { marginTop: 2 },
 });

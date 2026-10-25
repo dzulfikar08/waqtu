@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
-# Installs the demo APK on the running emulator and captures every store screenshot in id and en.
+# Installs the demo APK on the running emulator and captures every store screenshot in id and en (light theme), then the
+# design review shots in <output dir>/review/{dark,light}: the store screens in dark plus review.yaml in both themes.
 # Usage: android-shots.sh <apk> <output dir> [APP_ID]
 set -euo pipefail
 
 apk=$1
 out=$2
 app_id=${3:-dat.waqtu.app}
-flow="$(cd "$(dirname "$0")/.." && pwd)/maestro/screens.yaml"
+maestro_dir="$(cd "$(dirname "$0")/.." && pwd)/maestro"
+flow="$maestro_dir/screens.yaml"
 
 adb wait-for-device
 adb install -r "$apk"
@@ -21,6 +23,9 @@ adb shell am broadcast -a com.android.systemui.demo -e command clock -e hhmm 094
 adb shell am broadcast -a com.android.systemui.demo -e command battery -e level 100 -e plugged false
 adb shell am broadcast -a com.android.systemui.demo -e command network -e wifi show -e level 4
 adb shell am broadcast -a com.android.systemui.demo -e command notifications -e visible false
+
+# Store screenshots are the light theme.
+adb shell cmd uimode night no
 
 mkdir -p "$out"
 # On failure keep what the screen and the app said, so the artifact explains it.
@@ -39,5 +44,25 @@ for locale in id en; do
     [ "$attempt" -lt 3 ] || { adb exec-out screencap -p > "$out/failure.png" || true; exit 1; }
   done
 done
+# Design review: best effort, never fails the store screenshots above.
+review() {
+  local theme=$1 file=$2 dest="$out/review/$1"
+  adb shell cmd uimode night "$([ "$theme" = dark ] && echo yes || echo no)"
+  mkdir -p "$dest"
+  for attempt in 1 2; do
+    dir="$dest/maestro-$(basename "$file" .yaml)-$attempt"
+    if maestro test -e APP_ID="$app_id" -e LOCALE=en --test-output-dir "$dir" "$file"; then
+      find "$dir" -name "en-*.png" -exec cp {} "$dest/" \;
+      return 0
+    fi
+  done
+  echo "::warning::review shots ($theme, $(basename "$file")) failed"
+}
+trap - ERR
+review dark "$flow"
+review dark "$maestro_dir/review.yaml"
+review light "$maestro_dir/review.yaml"
+adb shell cmd uimode night no
+
 adb shell wm size | tee size.txt
 ls -l

@@ -6,7 +6,7 @@ import { useTranslation } from "@/i18n";
 import type { CheckView } from "@/recitation/check";
 import { arabicDigits } from "../format";
 import { wordKey, type UnitBlock } from "../text";
-import { radius, spacing, useTheme } from "@/theme";
+import { cardChrome, radius, spacing, typography, useTheme } from "@/theme";
 
 export type TestMode = "show" | "hide" | "letters";
 
@@ -50,15 +50,20 @@ export function UnitText({
   };
   const first = blocks[0]?.ayahs[0]?.index ?? 0;
   return (
-    <View style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+    <View style={[styles.card, cardChrome(theme)]}>
       {blocks.map((block) => (
         <View key={`${block.surah}:${block.ayahs[0].ayah}`} style={styles.block}>
           {block.startsSurah ? (
-            <View style={[styles.surah, { borderColor: theme.border }]}>
+            <View
+              style={[
+                styles.surah,
+                { backgroundColor: theme.accentSoft, borderColor: theme.separator },
+              ]}
+            >
               <Text style={[styles.surahArabic, { color: theme.accent, fontFamily }]}>
                 {surahInfo(block.surah).arabic}
               </Text>
-              <Text style={{ color: theme.muted, fontSize: 13 }}>
+              <Text style={[typography.footnote, { color: theme.muted }]}>
                 {t("hafalan.surahLabel", {
                   name:
                     i18n.language === "en"
@@ -93,9 +98,13 @@ export function UnitText({
                           !open
                             ? { backgroundColor: theme.border }
                             : flag === "skipped"
-                              ? { color: theme.danger, textDecorationLine: "underline" }
+                              ? {
+                                  color: theme.danger,
+                                  backgroundColor: theme.dangerSoft,
+                                  textDecorationLine: "underline",
+                                }
                               : flag === "substituted"
-                                ? { color: theme.warning }
+                                ? { color: theme.warning, backgroundColor: theme.warningSoft }
                                 : undefined
                         }
                       >
@@ -106,7 +115,7 @@ export function UnitText({
                   );
                 })}{" "}
                 <Text
-                  style={check?.jumpAyahs.has(ayah.index) ? { color: theme.danger } : undefined}
+                  style={{ color: check?.jumpAyahs.has(ayah.index) ? theme.danger : theme.gold }}
                 >
                   {`\uFD3F${arabicDigits(ayah.ayah)}\uFD3E`}
                 </Text>{" "}
@@ -125,12 +134,13 @@ function maskOf(word: string): string {
 }
 
 const styles = StyleSheet.create({
-  card: { borderRadius: radius.md, borderWidth: StyleSheet.hairlineWidth, padding: spacing.md },
+  card: { borderRadius: radius.lg, paddingHorizontal: spacing.md + 2, paddingVertical: spacing.md },
   block: { gap: spacing.sm },
   surah: {
     alignItems: "center",
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingBottom: spacing.sm,
+    borderRadius: radius.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingVertical: spacing.sm,
     marginBottom: spacing.xs,
   },
   surahArabic: { fontSize: 28 },

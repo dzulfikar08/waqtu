@@ -4,16 +4,20 @@ import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Section } from "@/components/ui";
+import { Card, Divider, IconChip } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { requestNotificationPermission } from "@/notifications/setup";
-import { radius, spacing, useTheme } from "@/theme";
+import { spacing, tabular, typography, useTheme } from "@/theme";
 import { formatCountdown } from "../dates";
 import { hideLiveCountdown, showLiveCountdown } from "../liveCountdown";
 import { KEYS } from "../settings";
 import { getSetting, setSetting } from "@/db/settings";
 import { Hint, Panel, ToggleRow } from "./fields";
 
+/**
+ * The fasting hero, as Today's next-prayer card: an iftar or sahur badge, the time it counts to and the live
+ * countdown in large digits (gold on dark, teal on light), with the lock-screen countdown switch beneath.
+ */
 export function CountdownCard({
   now,
   countdown,
@@ -75,63 +79,86 @@ export function CountdownCard({
   };
 
   return (
-    <Section title={t("ramadhan.tab")}>
-      <Panel>
+    <Card padded={false}>
+      <View style={styles.hero}>
         {countdown ? (
-          <View
-            style={[styles.hero, { backgroundColor: theme.background, borderColor: theme.border }]}
-          >
-            <Text style={[styles.label, { color: theme.muted }]}>
-              {t(
-                countdown.phase === "sahur"
-                  ? "ramadhan.countdown.sahur"
-                  : "ramadhan.countdown.fasting",
-              )}
-            </Text>
-            <Text accessibilityRole="timer" style={[styles.clock, { color: theme.accent }]}>
+          <>
+            <View style={styles.heroTop}>
+              <IconChip
+                icon={countdown.phase === "sahur" ? "moon" : "restaurant"}
+                size={48}
+                color={theme.countdown}
+                background={theme.dark ? theme.goldSoft : theme.accentSoft}
+              />
+              <View style={styles.grow}>
+                <Text style={[typography.overline, { color: theme.muted }]}>
+                  {t(
+                    countdown.phase === "sahur"
+                      ? "ramadhan.countdown.sahur"
+                      : "ramadhan.countdown.fasting",
+                  )}
+                </Text>
+                <Text style={[typography.headline, tabular, { color: theme.text }]}>
+                  {t("ramadhan.countdown.at", {
+                    prayer: t(`ramadhan.countdown.${countdown.target}`),
+                    time: formatLocalTime(countdown.at, timeZone),
+                  })}
+                </Text>
+              </View>
+            </View>
+            <Text
+              accessibilityRole="timer"
+              style={[styles.clock, tabular, { color: theme.countdown }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+            >
               {formatCountdown(+countdown.at - +now)}
             </Text>
-            <Text style={{ color: theme.text }}>
-              {t("ramadhan.countdown.at", {
-                prayer: t(`ramadhan.countdown.${countdown.target}`),
-                time: formatLocalTime(countdown.at, timeZone),
-              })}
-            </Text>
-          </View>
+          </>
         ) : (
-          <Hint>{t("ramadhan.noPrayerTimes")}</Hint>
+          <View style={styles.heroTop}>
+            <IconChip
+              icon="time-outline"
+              size={40}
+              color={theme.muted}
+              background={theme.surfaceAlt}
+            />
+            <View style={styles.grow}>
+              <Hint>{t("ramadhan.noPrayerTimes")}</Hint>
+            </View>
+          </View>
         )}
-      </Panel>
-      <ToggleRow
-        label={t("ramadhan.countdown.live")}
-        hint={t("ramadhan.countdown.liveHint")}
-        value={live}
-        onValueChange={(v) => void toggleLive(v)}
-        disabled={!countdown}
-      />
-      {liveNote ? (
-        <Panel>
-          <Hint>
-            {t(
-              liveNote === "denied"
-                ? "ramadhan.countdown.liveDenied"
-                : "ramadhan.countdown.liveUnavailable",
-            )}
-          </Hint>
-        </Panel>
-      ) : null}
-    </Section>
+      </View>
+      <Divider />
+      <View style={styles.rows}>
+        <ToggleRow
+          label={t("ramadhan.countdown.live")}
+          hint={t("ramadhan.countdown.liveHint")}
+          value={live}
+          onValueChange={(v) => void toggleLive(v)}
+          disabled={!countdown}
+        />
+        {liveNote ? (
+          <Panel>
+            <Hint>
+              {t(
+                liveNote === "denied"
+                  ? "ramadhan.countdown.liveDenied"
+                  : "ramadhan.countdown.liveUnavailable",
+              )}
+            </Hint>
+          </Panel>
+        ) : null}
+      </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  hero: {
-    alignItems: "center",
-    gap: spacing.xs,
-    padding: spacing.lg,
-    borderRadius: radius.lg,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  label: { fontSize: 14, fontWeight: "600", textTransform: "uppercase" },
-  clock: { fontSize: 48, fontWeight: "700", fontVariant: ["tabular-nums"] },
+  hero: { padding: spacing.md + 2, gap: spacing.sm },
+  heroTop: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
+  grow: { flex: 1, gap: 2 },
+  clock: { fontSize: 52, fontWeight: "800", letterSpacing: -1 },
+  // Clips the last row's hairline against the card's edge.
+  rows: { marginBottom: -1 },
 });

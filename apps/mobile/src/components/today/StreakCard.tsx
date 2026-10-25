@@ -1,8 +1,11 @@
+import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useTranslation } from "@/i18n";
 import type { StreakResult } from "@/mutabaah/streak";
-import { radius, spacing, useTheme } from "@/theme";
+import { spacing, tabular, typography, useTheme } from "@/theme";
+
+import { Card } from "../ui";
 
 /** Streak with forgiving copy: never a loss message, a missed day is simply not mentioned. */
 export function StreakCard({ streak }: { streak: StreakResult }) {
@@ -19,42 +22,51 @@ export function StreakCard({ streak }: { streak: StreakResult }) {
     lines.push(t("streak.todayOpen"));
 
   return (
-    <View style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+    <Card>
       <View style={styles.head}>
-        <Text
-          style={{
-            color: theme.muted,
-            fontSize: 13,
-            fontWeight: "600",
-            textTransform: "uppercase",
-          }}
-        >
-          {t("streak.title")}
-        </Text>
-        <Text style={{ color: theme.accent, fontSize: 28, fontWeight: "700" }}>
-          {t("streak.days", { count: streak.current })}
-        </Text>
+        <View style={[styles.badge, { backgroundColor: theme.goldSoft }]}>
+          <Ionicons
+            name={streak.paused ? "pause" : "flame"}
+            size={24}
+            color={theme.gold}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
+        </View>
+        <View style={styles.grow}>
+          <Text style={[typography.overline, { color: theme.muted }]}>{t("streak.title")}</Text>
+          <Text style={[styles.figure, tabular, { color: theme.text }]}>
+            {t("streak.days", { count: streak.current })}
+          </Text>
+        </View>
         {streak.best > streak.current ? (
-          <Text style={{ color: theme.muted, fontSize: 13 }}>
+          <Text style={[typography.footnote, styles.best, { color: theme.muted }]}>
             {t("streak.best", { count: streak.best })}
           </Text>
         ) : null}
       </View>
-      {lines.map((line) => (
-        <Text key={line} style={{ color: theme.text, fontSize: 14 }}>
-          {line}
-        </Text>
-      ))}
-    </View>
+      <View style={styles.lines}>
+        {lines.map((line) => (
+          <Text key={line} style={[typography.subhead, { color: theme.muted, lineHeight: 20 }]}>
+            {line}
+          </Text>
+        ))}
+      </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    borderRadius: radius.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    padding: spacing.md,
-    gap: spacing.xs,
+  head: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
+  badge: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  head: { gap: 2 },
+  grow: { flex: 1, gap: 2 },
+  figure: { fontSize: 26, fontWeight: "800", letterSpacing: -0.4 },
+  best: { maxWidth: 120, textAlign: "right" },
+  lines: { gap: 2, marginTop: spacing.xs },
 });

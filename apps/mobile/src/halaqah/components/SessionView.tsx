@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Linking, StyleSheet, Text, TextInput, View } from "react-native";
@@ -6,7 +7,7 @@ import { Section } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import type { DayKey } from "@/mutabaah/dates";
 import { Button, Hint, Panel } from "@/ramadhan/components/fields";
-import { radius, spacing, useTheme } from "@/theme";
+import { radius, spacing, tabular, typography, useTheme } from "@/theme";
 import { completeDay, getReflection, MAX_REFLECTION, saveReflection, uncompleteDay } from "../db";
 import { watchUrl } from "../embed";
 import type { Program, ProgramDay } from "../program";
@@ -48,57 +49,76 @@ export function SessionView({ program, day, done, todayKey }: Props) {
   return (
     <View style={styles.root}>
       <View style={styles.head}>
-        <Text style={{ color: theme.accent, fontWeight: "600" }}>
+        <Text style={[typography.overline, tabular, { color: theme.accent }]}>
           {t("halaqah.dayN", { day: day.day })}
           {phase ? ` · ${phase.title[lang]}` : ""}
         </Text>
-        <Text style={[styles.title, { color: theme.text }]}>{day.title[lang]}</Text>
-      </View>
-
-      <VideoEmbed key={video.youtubeId} youtubeId={video.youtubeId} />
-      <View style={styles.meta}>
-        <Text style={{ color: theme.muted }}>
-          {t("halaqah.speakerLine", {
-            speaker: video.speaker,
-            channel: video.channelName,
-            minutes: video.durationMin,
-          })}
+        <Text accessibilityRole="header" style={[typography.title, { color: theme.text }]}>
+          {day.title[lang]}
         </Text>
-        <Hint>{t("halaqah.videoNote")}</Hint>
-        <Button
-          tone="plain"
-          label={t("halaqah.openYoutube")}
-          onPress={() => void Linking.openURL(watchUrl(video.youtubeId)).catch(() => {})}
-        />
-        {lang === "en" ? <Hint>{t("halaqah.contentNote")}</Hint> : null}
       </View>
 
-      <Section title={t("halaqah.summary")}>
+      <View style={styles.video}>
+        <VideoEmbed key={video.youtubeId} youtubeId={video.youtubeId} />
+        <View style={styles.meta}>
+          <View style={styles.speaker}>
+            <Ionicons name="person-circle-outline" size={18} color={theme.muted} />
+            <Text style={[typography.subhead, tabular, styles.grow, { color: theme.muted }]}>
+              {t("halaqah.speakerLine", {
+                speaker: video.speaker,
+                channel: video.channelName,
+                minutes: video.durationMin,
+              })}
+            </Text>
+          </View>
+          <Hint>{t("halaqah.videoNote")}</Hint>
+          <Button
+            tone="plain"
+            label={t("halaqah.openYoutube")}
+            onPress={() => void Linking.openURL(watchUrl(video.youtubeId)).catch(() => {})}
+          />
+          {lang === "en" ? <Hint>{t("halaqah.contentNote")}</Hint> : null}
+        </View>
+      </View>
+
+      <Section title={t("halaqah.summary")} icon="document-text-outline">
         <Panel>
           <Text style={[styles.body, { color: theme.text }]}>{day.summary}</Text>
         </Panel>
       </Section>
 
       {day.madhhabNote ? (
-        <Section title={t("halaqah.madhhab")}>
+        <Section title={t("halaqah.madhhab")} icon="library-outline">
           <Panel>
             <Text style={[styles.body, { color: theme.text }]}>{day.madhhabNote}</Text>
           </Panel>
         </Section>
       ) : null}
 
-      <Section title={t("halaqah.reflection")}>
+      <Section title={t("halaqah.reflection")} icon="create-outline">
         <Panel>
-          <Text style={[styles.body, { color: theme.text }]}>{day.reflectionPrompt}</Text>
+          <Text style={[styles.body, styles.prompt, { color: theme.text }]}>
+            {day.reflectionPrompt}
+          </Text>
           <ReflectionField programId={program.id} day={day.day} />
           <VoiceReflection programId={program.id} day={day.day} />
-          <Hint>{t("halaqah.reflectionPrivate")}</Hint>
+          <View style={styles.speaker}>
+            <Ionicons
+              name="lock-closed-outline"
+              size={14}
+              color={theme.muted}
+              style={styles.lock}
+            />
+            <View style={styles.grow}>
+              <Hint>{t("halaqah.reflectionPrivate")}</Hint>
+            </View>
+          </View>
           <ShareToCircle programId={program.id} day={day.day} />
         </Panel>
       </Section>
 
       {day.amalan ? (
-        <Section title={t("halaqah.amalan")}>
+        <Section title={t("halaqah.amalan")} icon="leaf-outline">
           <Panel>
             <Text style={[styles.body, { color: theme.text }]}>{day.amalan}</Text>
           </Panel>
@@ -106,7 +126,7 @@ export function SessionView({ program, day, done, todayKey }: Props) {
       ) : null}
 
       {day.sources.length > 0 ? (
-        <Section title={t("halaqah.sources")}>
+        <Section title={t("halaqah.sources")} icon="bookmarks-outline">
           <Panel>
             {day.sources.map((source) => (
               <Hint key={source}>{source}</Hint>
@@ -115,14 +135,23 @@ export function SessionView({ program, day, done, todayKey }: Props) {
         </Section>
       ) : null}
 
-      {done ? (
-        <Text style={{ color: theme.accent, fontWeight: "600" }}>{t("halaqah.markedDone")}</Text>
-      ) : null}
-      <Button
-        tone={done ? "plain" : "primary"}
-        label={done ? t("halaqah.undo") : t("halaqah.markDone")}
-        onPress={toggleDone}
-      />
+      <View style={styles.finish}>
+        {done ? (
+          <View style={[styles.banner, { backgroundColor: theme.accentSoft }]}>
+            <Ionicons name="checkmark-circle" size={22} color={theme.accent} />
+            <Text
+              style={[typography.callout, styles.grow, { color: theme.accent, fontWeight: "600" }]}
+            >
+              {t("halaqah.markedDone")}
+            </Text>
+          </View>
+        ) : null}
+        <Button
+          tone={done ? "plain" : "primary"}
+          label={done ? t("halaqah.undo") : t("halaqah.markDone")}
+          onPress={toggleDone}
+        />
+      </View>
     </View>
   );
 }
@@ -184,7 +213,7 @@ function ReflectionField({ programId, day }: { programId: string; day: number })
         onBlur={flush}
         style={[
           styles.input,
-          { color: theme.text, borderColor: theme.border, backgroundColor: theme.background },
+          { color: theme.text, borderColor: theme.border, backgroundColor: theme.surfaceAlt },
         ]}
         textAlignVertical="top"
       />
@@ -195,10 +224,14 @@ function ReflectionField({ programId, day }: { programId: string; day: number })
 
 const styles = StyleSheet.create({
   root: { gap: spacing.lg },
-  head: { gap: spacing.xs, paddingHorizontal: spacing.sm },
-  title: { fontSize: 22, fontWeight: "700" },
-  meta: { gap: spacing.sm, paddingHorizontal: spacing.sm },
+  head: { gap: spacing.xs, paddingHorizontal: spacing.xs },
+  video: { gap: spacing.md - 4 },
+  meta: { gap: spacing.sm, paddingHorizontal: spacing.xs },
+  speaker: { flexDirection: "row", alignItems: "flex-start", gap: spacing.sm },
+  lock: { marginTop: 2 },
+  grow: { flex: 1 },
   body: { fontSize: 16, lineHeight: 24 },
+  prompt: { fontWeight: "600" },
   reflection: { gap: spacing.xs },
   input: {
     minHeight: 120,
@@ -206,5 +239,14 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     padding: spacing.md,
     fontSize: 16,
+    lineHeight: 22,
+  },
+  finish: { gap: spacing.md - 4 },
+  banner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    padding: spacing.md - 4,
+    borderRadius: radius.md,
   },
 });

@@ -2,11 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import type { ColorValue } from "react-native";
 
+import { FloatingTabBar } from "@/components/tabbar/FloatingTabBar";
+import { TabBarInsetProvider } from "@/components/tabbar/tabBarInset";
+import type { IconName } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { useRamadhanTabVisible } from "@/ramadhan/visibility";
 import { useTheme } from "@/theme";
-
-type IconName = keyof typeof Ionicons.glyphMap;
 
 /** One filled glyph for the active tab, its outline for the rest. */
 function tabIcon(active: IconName, inactive: IconName) {
@@ -23,20 +24,26 @@ function tabIcon(active: IconName, inactive: IconName) {
   };
 }
 
+/**
+ * The tab roots. The bar floats over them (`FloatingTabBar`): each screen draws its own title (`Screen`) and pads its
+ * content by the height the bar covers. Hafalan, Halaqah and the other detail screens are pushed on the root stack.
+ */
 export default function TabsLayout() {
-  const { t } = useTranslation();
   const theme = useTheme();
+  return (
+    <TabBarInsetProvider>
+      <TabsNavigator background={theme.background} />
+    </TabBarInsetProvider>
+  );
+}
+
+function TabsNavigator({ background }: { background: string }) {
+  const { t } = useTranslation();
   const showRamadhan = useRamadhanTabVisible();
   return (
     <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: theme.accent,
-        tabBarInactiveTintColor: theme.muted,
-        tabBarStyle: { backgroundColor: theme.surface, borderTopColor: theme.border },
-        headerStyle: { backgroundColor: theme.background },
-        headerTintColor: theme.text,
-        headerShadowVisible: false,
-      }}
+      tabBar={(props) => <FloatingTabBar {...props} />}
+      screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: background } }}
     >
       <Tabs.Screen
         name="index"

@@ -1,7 +1,8 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Linking, Pressable, StyleSheet, Text } from "react-native";
 
 import { useTranslation } from "@/i18n";
-import { spacing, useTheme } from "@/theme";
+import { spacing, typography, useTheme } from "@/theme";
 
 /** Tanzil's terms ask that the text's source is named and linked to tanzil.net. */
 export function QuranCredit() {
@@ -11,14 +12,30 @@ export function QuranCredit() {
     <Pressable
       accessibilityRole="link"
       onPress={() => void Linking.openURL("https://tanzil.net")}
-      style={styles.box}
+      style={({ pressed }) => [styles.box, { opacity: pressed ? 0.6 : 1 }]}
     >
-      <Text style={[styles.text, { color: theme.muted }]}>{t("hafalan.credit")}</Text>
+      <Ionicons
+        name="information-circle-outline"
+        size={16}
+        color={theme.faint}
+        style={styles.icon}
+      />
+      <Text style={[typography.footnote, styles.text, { color: theme.muted }]}>
+        {t("hafalan.credit")}
+      </Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  box: { minHeight: 44, justifyContent: "center", paddingHorizontal: spacing.sm },
-  text: { fontSize: 13, lineHeight: 18, textDecorationLine: "underline" },
+  box: {
+    minHeight: 44,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.xs + 2,
+    paddingHorizontal: spacing.sm,
+  },
+  icon: { alignSelf: "flex-start", marginTop: 1 },
+  text: { flexShrink: 1, lineHeight: 18, textDecorationLine: "underline" },
 });

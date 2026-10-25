@@ -1,19 +1,21 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useMemo } from "react";
-import { ScrollView, StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { Checklist } from "@/components/today/Checklist";
 import { LocationPrompt, NextPrayerCard, PrayerTimesList } from "@/components/today/PrayerCards";
 import { StreakCard } from "@/components/today/StreakCard";
-import { Section } from "@/components/ui";
+import { Screen, Section, SectionTitle } from "@/components/ui";
 import { HafalanCard } from "@/hafalan/components/HafalanCard";
 import { HalaqahTodayRow } from "@/halaqah/components/HalaqahTodayRow";
 import { useMutabaah, useNow } from "@/hooks/useMutabaah";
 import { formatHijri } from "@/lib/hijri";
 import { useTranslation } from "@/i18n";
+import { FLAG } from "@/mutabaah/items";
 import { refreshLocationIfStale } from "@/prayer/location";
 import { nextSlot, timesFor } from "@/prayer/schedule";
-import { spacing, useTheme } from "@/theme";
+import { spacing, tabular, typography, useTheme } from "@/theme";
 
 const MS_DAY = 86_400_000;
 
@@ -45,20 +47,36 @@ export default function TodayScreen() {
     weekday: "long",
     day: "numeric",
     month: "long",
-    year: "numeric",
   }).format(now);
   const hijri = formatHijri(
     new Date(now.getTime() + (settings?.hijriOffset ?? 0) * MS_DAY),
     i18n.language,
   );
 
+  const eyebrow = location?.name ? (
+    <View style={styles.eyebrow}>
+      <Ionicons name="location" size={14} color={theme.accent} />
+      <Text style={[typography.subhead, { color: theme.muted, fontWeight: "600" }]}>
+        {location.name}
+      </Text>
+    </View>
+  ) : null;
+  const caption = hijri ? (
+    <View style={styles.eyebrow}>
+      <Ionicons name="moon" size={13} color={theme.gold} />
+      <Text style={[typography.callout, { color: theme.gold, fontWeight: "600" }]}>{hijri}</Text>
+    </View>
+  ) : null;
+
+  const done = model
+    ? model.items.filter((item) => {
+        const value = model.todayEntries.get(item.id) ?? 0;
+        return item.kind === "fardh" ? (value & FLAG.DONE) !== 0 : value > 0;
+      }).length
+    : 0;
+
   return (
-    <ScrollView
-      style={{ backgroundColor: theme.background }}
-      contentContainerStyle={styles.content}
-    >
-      <Text style={[styles.date, { color: theme.text }]}>{gregorian}</Text>
-      {hijri ? <Text style={[styles.hijri, { color: theme.accent }]}>{hijri}</Text> : null}
+    <Screen title={gregorian} eyebrow={eyebrow} caption={caption}>
       {!model ? (
         <Text style={{ color: theme.muted }}>{t("today.loading")}</Text>
       ) : (
@@ -67,12 +85,14 @@ export default function TodayScreen() {
             <>
               {next ? <NextPrayerCard slot={next} now={now} timeZone={location.timeZone} /> : null}
               {times ? (
-                <Section title={t("today.times")}>
+                <View style={styles.block}>
+                  <SectionTitle title={t("today.times")} icon="time-outline" />
                   <PrayerTimesList
                     times={times}
                     highlight={next && next.day === model.today ? next.prayer : null}
+                    allPassed={next !== null && next.day !== model.today}
                   />
-                </Section>
+                </View>
               ) : null}
             </>
           ) : (
@@ -81,7 +101,19 @@ export default function TodayScreen() {
           <StreakCard streak={model.streak} />
           <HalaqahTodayRow />
           <HafalanCard />
-          <Section title={t("today.checklist")}>
+          <Section
+            title={t("today.checklist")}
+            icon="checkbox-outline"
+            right={
+              model.items.length > 0 ? (
+                <Text
+                  style={[typography.footnote, tabular, { color: theme.accent, fontWeight: "700" }]}
+                >
+                  {done}/{model.items.length}
+                </Text>
+              ) : null
+            }
+          >
             <Checklist
               items={model.items}
               day={model.today}
@@ -91,12 +123,11 @@ export default function TodayScreen() {
           </Section>
         </>
       )}
-    </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { padding: spacing.lg, gap: spacing.md },
-  date: { fontSize: 24, fontWeight: "700" },
-  hijri: { fontSize: 18, fontWeight: "600" },
+  eyebrow: { flexDirection: "row", alignItems: "center", gap: 5, marginVertical: 2 },
+  block: { gap: spacing.sm },
 });

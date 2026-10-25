@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import {
   addDays,
   calculatePrayerTimes,
@@ -11,13 +12,13 @@ import {
 import { useFocusEffect, useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-import { Row, Section } from "@/components/ui";
+import { Row, Screen, Section } from "@/components/ui";
 import { HalaqahCard } from "@/halaqah/components/HalaqahCard";
 import { useTranslation } from "@/i18n";
 import { PremiumGate } from "@/premium/PremiumGate";
-import { spacing, useTheme } from "@/theme";
+import { typography, useTheme } from "@/theme";
 import { CountdownCard } from "@/ramadhan/components/CountdownCard";
 import { DailyCard } from "@/ramadhan/components/DailyCard";
 import { Hint, Panel } from "@/ramadhan/components/fields";
@@ -105,35 +106,42 @@ export default function RamadhanScreen() {
   const day = ramadhanDay(ctx.today, hijriOffset);
   const daysUntil = diffDays(ctx.today, ctx.span.start);
 
-  return (
-    <ScrollView
-      style={{ backgroundColor: theme.background }}
-      contentContainerStyle={styles.content}
-    >
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: theme.text }]}>
+  const caption = (
+    <View style={styles.caption}>
+      <View style={styles.captionLine}>
+        <Ionicons name="moon" size={13} color={theme.gold} />
+        <Text style={[typography.callout, styles.grow, { color: theme.gold, fontWeight: "600" }]}>
           {day !== null
             ? t("ramadhan.dayOf", { day, year: ctx.span.hijriYear })
             : t("ramadhan.startsIn", { count: daysUntil, year: ctx.span.hijriYear })}
         </Text>
-        <Text style={{ color: theme.muted }}>
-          {day !== null
-            ? t("ramadhan.eidOn", { date: formatCivilDate(ctx.span.eid, locale) })
-            : t("ramadhan.startsOn", {
-                date: formatCivilDate(ctx.span.start, locale),
-                year: ctx.span.hijriYear,
-              })}
-        </Text>
       </View>
+      <Text style={[typography.subhead, { color: theme.muted }]}>
+        {day !== null
+          ? t("ramadhan.eidOn", { date: formatCivilDate(ctx.span.eid, locale) })
+          : t("ramadhan.startsOn", {
+              date: formatCivilDate(ctx.span.start, locale),
+              year: ctx.span.hijriYear,
+            })}
+      </Text>
+    </View>
+  );
 
+  return (
+    <Screen title={t("ramadhan.tab")} caption={caption}>
       {config ? (
         <CountdownCard now={now} countdown={countdown} timeZone={config.timeZone} />
       ) : (
-        <Section title={t("ramadhan.tab")}>
+        <Section title={t("ramadhan.tab")} icon="location-outline">
           <Panel>
             <Hint>{t("ramadhan.needLocation")}</Hint>
           </Panel>
-          <Row label={t("tabs.settings")} onPress={() => router.push("/settings")} />
+          <Row
+            label={t("tabs.settings")}
+            icon="settings-outline"
+            chevron
+            onPress={() => router.push("/settings")}
+          />
         </Section>
       )}
 
@@ -148,12 +156,12 @@ export default function RamadhanScreen() {
         <QadhaCard ctx={ctx} locale={locale} />
         <ZakatCard ctx={ctx} locale={locale} />
       </PremiumGate>
-    </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { padding: spacing.md, gap: spacing.lg },
-  header: { gap: spacing.xs, paddingHorizontal: spacing.sm },
-  title: { fontSize: 24, fontWeight: "700" },
+  caption: { gap: 2, marginTop: 2 },
+  captionLine: { flexDirection: "row", alignItems: "center", gap: 5 },
+  grow: { flex: 1 },
 });

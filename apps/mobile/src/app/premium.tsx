@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useEffect, useState } from "react";
@@ -11,11 +12,13 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { authClient } from "@/auth/client";
 import { circlesApi } from "@/circles/client";
-import { Section } from "@/components/ui";
+import { Card, IconChip, PressableScale, Section, type IconName } from "@/components/ui";
 import { useTranslation } from "@/i18n";
+import { Button } from "@/ramadhan/components/fields";
 import { PremiumApiError } from "@/premium/api";
 import type { Plan } from "@/premium/entitlement";
 import { purchasePlan, restorePurchases } from "@/premium/purchase";
@@ -28,13 +31,18 @@ import {
   type Plans,
 } from "@/premium/store";
 import { premiumApiFor, usePremium } from "@/premium/usePremium";
-import { radius, spacing, useTheme } from "@/theme";
+import { HIT, radius, spacing, tabular, typography, useTheme } from "@/theme";
 
 /** The site serves Indonesian at the root and English under /en. */
 const legalUrl = (page: "privacy" | "terms", language: string) =>
   `https://getwaqtu.com${language.startsWith("id") ? "" : "/en"}/${page}`;
 /** Exactly the features wrapped in `PremiumGate` (or, for sync, checked in `SyncController`). */
 const UNLOCK_KEYS = ["sync", "ramadhan"] as const;
+const UNLOCK_ICONS: Record<(typeof UNLOCK_KEYS)[number] | "circles", IconName> = {
+  sync: "sync",
+  ramadhan: "moon",
+  circles: "people",
+};
 
 type Message = { text: string; tone: "ok" | "problem" };
 
@@ -43,6 +51,7 @@ export default function PremiumScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const { premium, entitlement, userId } = usePremium();
   const [plans, setPlans] = useState<Plans | null>(null);
   const [plansFailed, setPlansFailed] = useState(false);
@@ -166,20 +175,24 @@ export default function PremiumScreen() {
       price: offer.displayPrice,
     });
     return (
-      <Pressable
+      <PressableScale
         key={plan}
         accessibilityRole="button"
         accessibilityLabel={t("premium.subscribe", { plan: name })}
         accessibilityState={{ disabled: busy }}
         disabled={busy}
         onPress={() => void subscribe(plan)}
-        style={[styles.plan, { backgroundColor: theme.accent, opacity: busy ? 0.5 : 1 }]}
+        style={[styles.plan, { borderColor: theme.accent, backgroundColor: theme.accentSoft }]}
       >
-        <Text style={[styles.planName, { color: theme.accentText }]}>
-          {t("premium.subscribe", { plan: name })}
-        </Text>
-        <Text style={{ color: theme.accentText, fontSize: 15 }}>{price}</Text>
-      </Pressable>
+        <View style={styles.grow}>
+          <Text style={[typography.headline, { color: theme.text }]}>
+            {t("premium.subscribe", { plan: name })}
+          </Text>
+          <Text style={[typography.callout, tabular, { color: theme.muted }]}>{price}</Text>
+        </View>
+        {plan === "yearly" ? <Ionicons name="star" size={18} color={theme.gold} /> : null}
+        <Ionicons name="chevron-forward" size={18} color={theme.accent} />
+      </PressableScale>
     );
   };
 
@@ -189,22 +202,14 @@ export default function PremiumScreen() {
     </Pressable>
   );
 
-  const secondary = (label: string, onPress: () => void) => (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ disabled: busy }}
-      disabled={busy}
-      onPress={onPress}
-      style={[styles.secondary, { borderColor: theme.border, opacity: busy ? 0.5 : 1 }]}
-    >
-      <Text style={{ color: theme.text, fontSize: 16 }}>{label}</Text>
-    </Pressable>
+  const secondary = (label: string, onPress: () => void, icon?: IconName) => (
+    <Button block label={label} icon={icon} tone="plain" disabled={busy} onPress={onPress} />
   );
 
   return (
     <ScrollView
       style={{ backgroundColor: theme.background }}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={[styles.content, { paddingBottom: spacing.xl + insets.bottom }]}
     >
       <Stack.Screen
         options={{
@@ -213,54 +218,94 @@ export default function PremiumScreen() {
           headerStyle: { backgroundColor: theme.background },
           headerTintColor: theme.text,
           headerShadowVisible: false,
+          contentStyle: { backgroundColor: theme.background },
         }}
       />
-      <Text style={[styles.intro, { color: theme.text }]}>{t("premium.intro")}</Text>
+      <Card>
+        <View style={styles.hero}>
+          <IconChip icon="diamond" size={64} color={theme.gold} background={theme.goldSoft} />
+          <Text style={[typography.title, styles.center, { color: theme.text }]}>
+            {t("premium.title")}
+          </Text>
+          <Text style={[styles.intro, styles.center, { color: theme.muted }]}>
+            {t("premium.intro")}
+          </Text>
+        </View>
+      </Card>
 
-      <Section title={t("premium.unlocksTitle")}>
+      <Section title={t("premium.unlocksTitle")} icon="sparkles">
         {unlocks.map((key) => (
-          <View key={key} style={[styles.bullet, { borderColor: theme.border }]}>
-            <Text style={{ color: theme.text, fontSize: 16 }}>{t(`premium.unlocks.${key}`)}</Text>
+          <View key={key} style={[styles.bullet, { borderColor: theme.separator }]}>
+            <IconChip
+              icon={UNLOCK_ICONS[key]}
+              size={30}
+              color={theme.gold}
+              background={theme.goldSoft}
+            />
+            <Text style={[typography.callout, styles.grow, { color: theme.text }]}>
+              {t(`premium.unlocks.${key}`)}
+            </Text>
           </View>
         ))}
       </Section>
 
-      <Section title={t("premium.freeTitle")}>
-        <View style={styles.bullet}>
-          <Text style={{ color: theme.text, fontSize: 16 }}>{t("premium.free")}</Text>
+      <Section title={t("premium.freeTitle")} icon="heart">
+        <View style={[styles.bullet, { borderColor: theme.separator }]}>
+          <IconChip icon="checkmark" size={30} />
+          <Text style={[typography.callout, styles.grow, { color: theme.text }]}>
+            {t("premium.free")}
+          </Text>
         </View>
       </Section>
 
-      <View style={styles.block}>
-        <Text style={[styles.status, { color: theme.text }]}>{status()}</Text>
-        {premium && sourceLabel() ? (
-          <Text style={{ color: theme.muted, fontSize: 14 }}>{sourceLabel()}</Text>
-        ) : null}
-        {message ? (
-          <Text
-            accessibilityLiveRegion="polite"
-            style={{ color: message.tone === "ok" ? theme.accent : theme.text, fontSize: 15 }}
-          >
-            {message.text}
-          </Text>
-        ) : null}
-      </View>
+      <Card>
+        <View style={styles.status}>
+          <Ionicons
+            name={premium ? "checkmark-circle" : "person-circle-outline"}
+            size={24}
+            color={premium ? theme.accent : theme.muted}
+          />
+          <View style={styles.grow}>
+            <Text style={[typography.headline, { color: theme.text }]}>{status()}</Text>
+            {premium && sourceLabel() ? (
+              <Text style={[typography.subhead, { color: theme.muted }]}>{sourceLabel()}</Text>
+            ) : null}
+            {message ? (
+              <Text
+                accessibilityLiveRegion="polite"
+                style={[
+                  typography.callout,
+                  { color: message.tone === "ok" ? theme.accent : theme.danger },
+                ]}
+              >
+                {message.text}
+              </Text>
+            ) : null}
+          </View>
+        </View>
+      </Card>
 
       {!userId ? (
         <View style={styles.block}>
-          <Text style={{ color: theme.text, fontSize: 15 }}>{t("premium.signInFirst")}</Text>
-          {secondary(t("premium.signIn"), () => router.push("/settings"))}
+          <Text style={[typography.callout, { color: theme.text }]}>
+            {t("premium.signInFirst")}
+          </Text>
+          {secondary(t("premium.signIn"), () => router.push("/settings"), "settings-outline")}
         </View>
       ) : null}
 
       {userId && !premium ? (
         <View style={styles.block}>
           {!STORE_AVAILABLE ? (
-            <Text style={{ color: theme.muted }}>{t("premium.storeUnavailable")}</Text>
+            <Text style={[typography.callout, { color: theme.muted }]}>
+              {t("premium.storeUnavailable")}
+            </Text>
           ) : plansFailed ? (
             <>
-              <Text style={{ color: theme.muted }}>{t("premium.plansUnavailable")}</Text>
-              {secondary(t("premium.retry"), reloadPlans)}
+              <Text style={[typography.callout, { color: theme.muted }]}>
+                {t("premium.plansUnavailable")}
+              </Text>
+              {secondary(t("premium.retry"), reloadPlans, "refresh")}
             </>
           ) : plans === null ? (
             <ActivityIndicator color={theme.accent} />
@@ -275,16 +320,22 @@ export default function PremiumScreen() {
 
       {userId && STORE_AVAILABLE ? (
         <View style={styles.block}>
-          {secondary(t("premium.restore"), () => void restore())}
+          {secondary(t("premium.restore"), () => void restore(), "refresh")}
           {premium && (entitlement?.source === "apple" || entitlement?.source === "google")
-            ? secondary(t("premium.manage"), () => void openManageSubscriptions().catch(() => {}))
+            ? secondary(
+                t("premium.manage"),
+                () => void openManageSubscriptions().catch(() => {}),
+                "card-outline",
+              )
             : null}
         </View>
       ) : null}
 
       {STORE_AVAILABLE ? (
         <View style={styles.block}>
-          <Text style={{ color: theme.muted, fontSize: 13 }}>{t("premium.terms", { store })}</Text>
+          <Text style={[typography.footnote, { color: theme.muted }]}>
+            {t("premium.terms", { store })}
+          </Text>
           <View style={styles.links}>
             {link(t("premium.privacy"), legalUrl("privacy", i18n.language))}
             {link(t("premium.termsLink"), legalUrl("terms", i18n.language))}
@@ -296,28 +347,32 @@ export default function PremiumScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { padding: spacing.md, gap: spacing.lg },
-  intro: { fontSize: 16, lineHeight: 23 },
-  bullet: { paddingHorizontal: spacing.md, paddingVertical: spacing.sm + 2 },
-  block: { gap: spacing.sm },
-  status: { fontSize: 17, fontWeight: "600" },
-  plan: {
-    minHeight: 56,
-    borderRadius: radius.md,
+  content: { paddingHorizontal: spacing.md + 4, paddingTop: spacing.md, gap: spacing.lg },
+  hero: { alignItems: "center", gap: spacing.sm, paddingVertical: spacing.sm },
+  center: { textAlign: "center" },
+  intro: { ...typography.callout, lineHeight: 22 },
+  grow: { flex: 1, gap: 2 },
+  bullet: {
+    minHeight: 52,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm + 2,
-    justifyContent: "center",
-    gap: 2,
-  },
-  planName: { fontSize: 17, fontWeight: "600" },
-  secondary: {
-    minHeight: 48,
-    borderRadius: radius.md,
-    borderWidth: 1,
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    gap: spacing.md - 4,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  block: { gap: spacing.sm + 4 },
+  status: { flexDirection: "row", alignItems: "flex-start", gap: spacing.md - 4 },
+  plan: {
+    minHeight: HIT + 20,
+    borderRadius: radius.lg,
+    borderWidth: 2,
     paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm + 4,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md - 4,
   },
   links: { flexDirection: "row", gap: spacing.md },
-  link: { fontSize: 14, textDecorationLine: "underline" },
+  link: { ...typography.subhead, textDecorationLine: "underline" },
 });

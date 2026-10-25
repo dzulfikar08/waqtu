@@ -1,14 +1,18 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { PressableScale, type IconName } from "@/components/ui";
 import { useTranslation } from "@/i18n";
-import { radius, spacing, useTheme } from "@/theme";
+import { HIT, radius, spacing, tabular, typography, useTheme } from "@/theme";
 
 import type { CirclesApi } from "../api";
 import { CirclesHttpError } from "../api";
 import { formatDuration } from "../logic";
 import type { Post } from "../types";
 import { useVoiceRecorder, VOICE_MIME } from "../useVoiceRecorder";
+import { TextField } from "./TextField";
 
 /** Text and/or one voice note. The halaqah day, when the screen was opened from one, rides along. */
 export function Composer({
@@ -30,6 +34,7 @@ export function Composer({
 }) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const voice = useVoiceRecorder(maxVoiceSeconds);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
@@ -61,105 +66,164 @@ export function Composer({
   };
 
   return (
-    <View style={[styles.box, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+    <View
+      style={[
+        styles.box,
+        {
+          backgroundColor: theme.surface,
+          borderColor: theme.separator,
+          paddingBottom: spacing.sm + 4 + insets.bottom,
+        },
+      ]}
+    >
       {halaqahDayId ? (
-        <Text style={[styles.meta, { color: theme.secondary }]}>
-          {t("circles.circle.halaqahLinked", { day: halaqahDayId })}
-        </Text>
+        <View style={styles.status}>
+          <Ionicons
+            name="link"
+            size={14}
+            color={theme.secondary}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
+          <Text style={[typography.footnote, styles.grow, { color: theme.secondary }]}>
+            {t("circles.circle.halaqahLinked", { day: halaqahDayId })}
+          </Text>
+        </View>
       ) : null}
-      <TextInput
+      <TextField
         accessibilityLabel={t("circles.circle.write")}
         multiline
         maxLength={maxText}
         placeholder={t("circles.circle.write")}
-        placeholderTextColor={theme.muted}
         value={text}
         onChangeText={setText}
-        style={[styles.input, { color: theme.text, borderColor: theme.border }]}
+        style={styles.input}
       />
       {voice.recording ? (
-        <View style={styles.row}>
-          <Text style={{ color: theme.text, flex: 1 }}>
+        <View style={styles.status}>
+          <View style={[styles.dot, { backgroundColor: theme.danger }]} />
+          <Text style={[typography.subhead, tabular, styles.grow, { color: theme.text }]}>
             {t("circles.circle.recording", { time: formatDuration(voice.elapsedSeconds) })}
           </Text>
-          <Pill label={t("circles.circle.stopRecording")} onPress={() => void voice.stop()} />
         </View>
       ) : voice.draft ? (
-        <View style={styles.row}>
-          <Text style={{ color: theme.text, flex: 1 }}>
+        <View style={styles.status}>
+          <Ionicons
+            name="mic"
+            size={16}
+            color={theme.accent}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
+          <Text style={[typography.subhead, tabular, styles.grow, { color: theme.text }]}>
             {t("circles.circle.voiceReady", { time: formatDuration(voice.draft.seconds) })}
           </Text>
-          <Pill label={t("circles.circle.discard")} onPress={voice.discard} />
         </View>
-      ) : (
-        <View style={styles.row}>
-          <Pill label={`🎙 ${t("circles.circle.voice")}`} onPress={() => void voice.start()} />
-        </View>
-      )}
+      ) : null}
       {voice.problem ? (
-        <Text style={[styles.meta, { color: theme.muted }]}>
+        <Text style={[typography.footnote, { color: theme.danger }]}>
           {voice.problem === "denied"
             ? t("circles.circle.micDenied")
             : t("circles.circle.recordFailed")}
         </Text>
       ) : null}
-      <Pressable
-        accessibilityRole="button"
-        accessibilityState={{ disabled: !canSend }}
-        disabled={!canSend}
-        onPress={() => void send()}
-        style={[styles.send, { backgroundColor: theme.accent, opacity: canSend ? 1 : 0.5 }]}
-      >
-        <Text style={{ color: theme.accentText, fontWeight: "700" }}>
-          {sending ? t("circles.circle.posting") : t("circles.circle.send")}
-        </Text>
-      </Pressable>
+      <View style={styles.actions}>
+        {voice.recording ? (
+          <Pill
+            icon="stop"
+            tint={theme.danger}
+            label={t("circles.circle.stopRecording")}
+            onPress={() => void voice.stop()}
+          />
+        ) : voice.draft ? (
+          <Pill icon="trash-outline" label={t("circles.circle.discard")} onPress={voice.discard} />
+        ) : (
+          <Pill
+            icon="mic-outline"
+            label={t("circles.circle.voice")}
+            onPress={() => void voice.start()}
+          />
+        )}
+        <PressableScale
+          accessibilityRole="button"
+          accessibilityState={{ disabled: !canSend }}
+          disabled={!canSend}
+          onPress={() => void send()}
+          style={[styles.send, { backgroundColor: theme.accent }]}
+        >
+          <Ionicons name="paper-plane" size={16} color={theme.accentText} />
+          <Text style={[typography.callout, styles.sendLabel, { color: theme.accentText }]}>
+            {sending ? t("circles.circle.posting") : t("circles.circle.send")}
+          </Text>
+        </PressableScale>
+      </View>
     </View>
   );
 }
 
-function Pill({ label, onPress }: { label: string; onPress: () => void }) {
+/** Outlined round-ended button with a leading glyph. */
+function Pill({
+  icon,
+  label,
+  tint,
+  onPress,
+}: {
+  icon: IconName;
+  label: string;
+  tint?: string;
+  onPress: () => void;
+}) {
   const theme = useTheme();
+  const color = tint ?? theme.text;
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="button"
       onPress={onPress}
-      style={[styles.pill, { borderColor: theme.border }]}
+      scaleTo={0.95}
+      style={[styles.pill, { borderColor: tint ?? theme.border }]}
     >
-      <Text style={{ color: theme.text }}>{label}</Text>
-    </Pressable>
+      <Ionicons name={icon} size={16} color={color} />
+      <Text style={[typography.subhead, styles.pillLabel, { color }]}>{label}</Text>
+    </PressableScale>
   );
 }
 
 const styles = StyleSheet.create({
   box: {
-    padding: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.sm + 4,
     gap: spacing.sm,
     borderTopWidth: StyleSheet.hairlineWidth,
   },
-  input: {
-    minHeight: 64,
-    maxHeight: 160,
-    borderWidth: 1,
-    borderRadius: radius.md,
-    padding: spacing.sm,
-    fontSize: 16,
-    textAlignVertical: "top",
+  grow: { flex: 1 },
+  input: { minHeight: 64, maxHeight: 160, textAlignVertical: "top" },
+  status: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
+  dot: { width: 10, height: 10, borderRadius: 5 },
+  actions: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: spacing.sm,
   },
-  row: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
   pill: {
-    minHeight: 40,
-    paddingHorizontal: spacing.md,
-    borderRadius: 20,
+    minHeight: HIT - 4,
+    paddingHorizontal: spacing.md - 2,
+    borderRadius: radius.pill,
     borderWidth: 1,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: 6,
   },
+  pillLabel: { fontWeight: "600" },
   send: {
-    minHeight: 44,
-    borderRadius: radius.md,
+    minHeight: HIT,
+    paddingHorizontal: spacing.md + 4,
+    borderRadius: radius.pill,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: spacing.sm,
   },
-  meta: { fontSize: 13 },
+  sendLabel: { fontWeight: "700" },
 });

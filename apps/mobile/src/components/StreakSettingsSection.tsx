@@ -59,8 +59,8 @@ export function StreakSettingsSection() {
   };
 
   return (
-    <Section title={t("streakSettings.title")}>
-      <Row label={t("items.manage")} onPress={() => router.push("/items")} />
+    <Section title={t("streakSettings.title")} icon="flame">
+      <Row label={t("items.manage")} icon="list" chevron onPress={() => router.push("/items")} />
       <StepperRow
         label={t("streakSettings.grace", { count: config.graceDays })}
         value={config.graceDays}
@@ -77,6 +77,7 @@ export function StreakSettingsSection() {
       />
       <Row
         label={pauseActive ? t("streakSettings.pauseEnd") : t("streakSettings.pauseStart")}
+        icon={pauseActive ? "play-circle-outline" : "pause-circle-outline"}
         selected={pauseActive}
         onPress={() => void togglePause()}
       />

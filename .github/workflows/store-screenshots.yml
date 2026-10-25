@@ -1,5 +1,7 @@
 # Store screenshots for Waqtu (apps/mobile), id + en: a demo build runs on an Android emulator (Pixel 6 and Pixel 7 Pro)
 # and an iPhone Pro Max simulator (6.9"), and Maestro (apps/mobile/store/maestro/screens.yaml) captures each screen.
+# The store screenshots are the light theme; each artifact also holds design review shots under review/{dark,light}
+# (the store screens in dark plus apps/mobile/store/maestro/review.yaml in both themes, English only).
 #
 # Manual only (Actions tab -> "Store screenshots" -> Run workflow). No secrets: both apps are unsigned debug-signed
 # builds. They are built with EXPO_PUBLIC_DEMO_MODE=1, which freezes the clock at 12 Feb 2027 17:00 WIB and lets
@@ -88,7 +90,7 @@ jobs:
     needs: build-android
     if: ${{ !cancelled() && inputs.platforms != 'ios' && needs.build-android.result != 'failure' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:

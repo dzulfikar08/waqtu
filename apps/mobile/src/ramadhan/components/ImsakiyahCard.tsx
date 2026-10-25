@@ -6,11 +6,12 @@ import { captureRef } from "react-native-view-shot";
 
 import { Section } from "@/components/ui";
 import { useTranslation } from "@/i18n";
-import { lightTheme, radius, spacing, useTheme } from "@/theme";
+import { lightTheme, radius, spacing, tabular, typography } from "@/theme";
 import type { RamadhanContext } from "../context";
 import type { PrayerConfig } from "../prayerConfig";
 import { toIso } from "../dates";
 import { Button, Hint, Panel } from "./fields";
+import { IconLine } from "./figures";
 
 const COLUMNS = [
   "imsak",
@@ -24,7 +25,6 @@ const COLUMNS = [
 /** Table of a Hijri month's prayer times, plus sharing it as a PNG. */
 export function ImsakiyahCard({ ctx, config }: { ctx: RamadhanContext; config: PrayerConfig }) {
   const { t } = useTranslation();
-  const theme = useTheme();
   const { span, hijriOffset, todayIso } = ctx;
   const captureTarget = useRef<View>(null);
   const [busy, setBusy] = useState(false);
@@ -67,7 +67,7 @@ export function ImsakiyahCard({ ctx, config }: { ctx: RamadhanContext; config: P
   };
 
   return (
-    <Section title={t("ramadhan.imsakiyah.title")}>
+    <Section title={t("ramadhan.imsakiyah.title")} icon="calendar-outline">
       <Panel>
         <ImsakiyahTable
           ref={captureTarget}
@@ -92,7 +92,7 @@ export function ImsakiyahCard({ ctx, config }: { ctx: RamadhanContext; config: P
             )}
           </Hint>
         ) : null}
-        <Text style={{ color: theme.muted, fontSize: 12 }}>{config.timeZone}</Text>
+        <IconLine icon="globe-outline">{config.timeZone}</IconLine>
       </Panel>
     </Section>
   );
@@ -121,43 +121,48 @@ function ImsakiyahTable({
     <View
       ref={ref}
       collapsable={false}
-      style={[styles.sheet, { backgroundColor: colors.surface, borderColor: colors.border }]}
+      style={[styles.sheet, { backgroundColor: colors.surface, borderColor: colors.separator }]}
     >
       <Text style={[styles.title, { color: colors.text }]}>{heading}</Text>
       <Text style={[styles.place, { color: colors.muted }]}>{place}</Text>
       <View style={[styles.row, styles.headRow, { backgroundColor: colors.accent }]}>
-        <Text style={[styles.cell, styles.narrow, styles.head]}>{t("ramadhan.imsakiyah.day")}</Text>
-        <Text style={[styles.cell, styles.narrow, styles.head]}>
+        <Text style={[styles.cell, styles.narrow, styles.head, { color: colors.accentText }]}>
+          {t("ramadhan.imsakiyah.day")}
+        </Text>
+        <Text style={[styles.cell, styles.narrow, styles.head, { color: colors.accentText }]}>
           {t("ramadhan.imsakiyah.date")}
         </Text>
         {COLUMNS.map((c) => (
-          <Text key={c} style={[styles.cell, styles.head]}>
+          <Text key={c} style={[styles.cell, styles.head, { color: colors.accentText }]}>
             {t(`ramadhan.imsakiyah.${c}`)}
           </Text>
         ))}
       </View>
       {rows.map((row, i) => {
         const today = toIso(row.date) === todayIso;
+        const ink = { color: today ? colors.accent : colors.text };
         return (
           <View
             key={row.hijriDay}
             style={[
               styles.row,
-              { backgroundColor: today ? "#DCEFEA" : i % 2 === 1 ? "#F4F6F8" : colors.surface },
+              {
+                backgroundColor: today
+                  ? colors.accentSoft
+                  : i % 2 === 1
+                    ? colors.surfaceAlt
+                    : colors.surface,
+              },
             ]}
           >
-            <Text
-              style={[styles.cell, styles.narrow, today && styles.today, { color: colors.text }]}
-            >
+            <Text style={[styles.cell, styles.narrow, today && styles.today, ink]}>
               {row.hijriDay}
             </Text>
-            <Text
-              style={[styles.cell, styles.narrow, today && styles.today, { color: colors.text }]}
-            >
+            <Text style={[styles.cell, styles.narrow, today && styles.today, ink]}>
               {row.date.day}/{row.date.month}
             </Text>
             {COLUMNS.map((c) => (
-              <Text key={c} style={[styles.cell, today && styles.today, { color: colors.text }]}>
+              <Text key={c} style={[styles.cell, today && styles.today, ink]}>
                 {row.local[c] ?? "—"}
               </Text>
             ))}
@@ -174,15 +179,20 @@ const styles = StyleSheet.create({
     padding: spacing.sm,
     borderRadius: radius.md,
     borderWidth: StyleSheet.hairlineWidth,
-    gap: 0,
+    overflow: "hidden",
   },
-  title: { fontSize: 16, fontWeight: "700", textAlign: "center" },
-  place: { fontSize: 12, textAlign: "center", marginBottom: spacing.sm },
-  row: { flexDirection: "row", alignItems: "center", paddingVertical: 3 },
-  headRow: { borderRadius: 4 },
-  cell: { flex: 1.25, fontSize: 11, textAlign: "center", fontVariant: ["tabular-nums"] },
+  title: { ...typography.headline, fontWeight: "700", textAlign: "center" },
+  place: { ...typography.caption, textAlign: "center", marginBottom: spacing.sm },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 4,
+    borderRadius: radius.sm / 2,
+  },
+  headRow: { paddingVertical: 6, marginBottom: 2 },
+  cell: { flex: 1.25, fontSize: 11, textAlign: "center", ...tabular },
   narrow: { flex: 0.9 },
-  head: { color: "#FFFFFF", fontWeight: "700" },
-  today: { fontWeight: "700" },
+  head: { fontWeight: "700" },
+  today: { fontWeight: "800" },
   footer: { fontSize: 11, textAlign: "center", marginTop: spacing.sm },
 });

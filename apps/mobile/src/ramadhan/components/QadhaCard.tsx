@@ -1,11 +1,11 @@
 import { FIDYAH_MUD_RICE_KG, fidyah, type Rate } from "@waqtu/core";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
-import { Section } from "@/components/ui";
+import { Divider, IconChip, Section } from "@/components/ui";
 import { useTranslation } from "@/i18n";
-import { spacing, useTheme } from "@/theme";
+import { spacing } from "@/theme";
 import type { RamadhanContext } from "../context";
 import { addQadha, getQadhaTotals, undoQadha, type QadhaTotals } from "../db";
 import { formatNumber, formatRupiah } from "../format";
@@ -13,13 +13,13 @@ import { KEYS } from "../settings";
 import { useStoredMode } from "../useStoredMode";
 import { useStoredNumber } from "../useStoredNumber";
 import { Button, ButtonRow, Heading, Hint, NumberField, Panel } from "./fields";
+import { ResultBox, ResultDetail, ResultFigure, Stat, StatRow } from "./figures";
 
 const NO_TOTALS: QadhaTotals = { owed: 0, madeUp: 0, remaining: 0 };
 
 /** Qadha puasa ledger, with the fidyah for days that cannot be made up. */
 export function QadhaCard({ ctx, locale }: { ctx: RamadhanContext; locale: string }) {
   const { t } = useTranslation();
-  const theme = useTheme();
   const db = useSQLiteContext();
   const [totals, setTotals] = useState<QadhaTotals>(NO_TOTALS);
   const [count, setCount] = useState<number | null>(1);
@@ -35,20 +35,21 @@ export function QadhaCard({ ctx, locale }: { ctx: RamadhanContext; locale: strin
     await reload().catch(() => {});
   };
 
+  const remainingDays = t("ramadhan.qadha.days", { count: totals.remaining });
+
   return (
-    <Section title={t("ramadhan.qadha.title")}>
+    <Section title={t("ramadhan.qadha.title")} icon="calendar-clear-outline">
       <Panel>
-        <Heading>
-          {t("ramadhan.qadha.remaining")}: {t("ramadhan.qadha.days", { count: totals.remaining })}
-        </Heading>
-        <View style={{ flexDirection: "row", gap: spacing.lg }}>
-          <Text style={{ color: theme.muted }}>
-            {t("ramadhan.qadha.owed")}: {totals.owed}
-          </Text>
-          <Text style={{ color: theme.muted }}>
-            {t("ramadhan.qadha.madeUp")}: {totals.madeUp}
-          </Text>
-        </View>
+        <StatRow>
+          <Stat
+            label={t("ramadhan.qadha.remaining")}
+            value={totals.remaining}
+            accessibilityLabel={`${t("ramadhan.qadha.remaining")}: ${remainingDays}`}
+            highlight
+          />
+          <Stat label={t("ramadhan.qadha.owed")} value={totals.owed} />
+          <Stat label={t("ramadhan.qadha.madeUp")} value={totals.madeUp} />
+        </StatRow>
         {totals.owed === 0 ? <Hint>{t("ramadhan.qadha.none")}</Hint> : null}
         <NumberField label={t("ramadhan.qadha.count")} value={count} onChangeNumber={setCount} />
         <ButtonRow>
@@ -72,6 +73,7 @@ export function QadhaCard({ ctx, locale }: { ctx: RamadhanContext; locale: strin
           />
         ) : null}
       </Panel>
+      <Divider />
       <FidyahPanel remaining={totals.remaining} locale={locale} />
     </Section>
   );
@@ -79,7 +81,6 @@ export function QadhaCard({ ctx, locale }: { ctx: RamadhanContext; locale: strin
 
 function FidyahPanel({ remaining, locale }: { remaining: number; locale: string }) {
   const { t } = useTranslation();
-  const theme = useTheme();
   const db = useSQLiteContext();
   const { mode, set: setMode } = useStoredMode(db, KEYS.fidyahMode);
   const kg = useStoredNumber(db, KEYS.fidyahKg, FIDYAH_MUD_RICE_KG);
@@ -102,10 +103,14 @@ function FidyahPanel({ remaining, locale }: { remaining: number; locale: string 
     return fidyah(dueDays, rate);
   }, [dueDays, mode, kg.value, cash.value, pricePerKg.value]);
   const priceField = mode === "cash" ? cash : pricePerKg;
+  const showAmount = result?.amount != null && (mode === "cash" || (pricePerKg.value ?? 0) > 0);
 
   return (
     <Panel>
-      <Heading>{t("ramadhan.fidyah.title")}</Heading>
+      <View style={styles.heading}>
+        <IconChip icon="basket-outline" />
+        <Heading>{t("ramadhan.fidyah.title")}</Heading>
+      </View>
       <Hint>{t("ramadhan.fidyah.hint")}</Hint>
       <ButtonRow>
         <Button
@@ -138,22 +143,33 @@ function FidyahPanel({ remaining, locale }: { remaining: number; locale: string 
         suffix="Rp"
         onChangeNumber={priceField.set}
       />
-      {result ? (
-        <View>
+      {result && (result.riceKg !== null || showAmount) ? (
+        <ResultBox icon={mode === "rice" ? "basket-outline" : "cash-outline"}>
           {result.riceKg !== null ? (
-            <Text style={{ color: theme.text, fontSize: 18, fontWeight: "700" }}>
+            <ResultFigure>
               {t("ramadhan.fidyah.resultRice", { kg: formatNumber(result.riceKg, locale, 3) })}
-            </Text>
+            </ResultFigure>
           ) : null}
-          {result.amount !== null && (mode === "cash" || (pricePerKg.value ?? 0) > 0) ? (
-            <Text style={{ color: theme.text, fontSize: 18, fontWeight: "700" }}>
-              {t(mode === "cash" ? "ramadhan.fidyah.resultCash" : "ramadhan.fidyah.resultAmount", {
-                amount: formatRupiah(result.amount, locale),
-              })}
-            </Text>
+          {result.amount !== null && showAmount ? (
+            result.riceKg !== null ? (
+              <ResultDetail>
+                {t("ramadhan.fidyah.resultAmount", { amount: formatRupiah(result.amount, locale) })}
+              </ResultDetail>
+            ) : (
+              <ResultFigure>
+                {t(
+                  mode === "cash" ? "ramadhan.fidyah.resultCash" : "ramadhan.fidyah.resultAmount",
+                  { amount: formatRupiah(result.amount, locale) },
+                )}
+              </ResultFigure>
+            )
           ) : null}
-        </View>
+        </ResultBox>
       ) : null}
     </Panel>
   );
 }
+
+const styles = StyleSheet.create({
+  heading: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
+});

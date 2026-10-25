@@ -1,11 +1,14 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { itemLabel } from "@/components/itemLabel";
-import { Row, Section } from "@/components/ui";
+import { IconChip, Pill, Row, Section, type IconName } from "@/components/ui";
 import { getSetting, setSyncedSetting } from "@/db/settings";
 import { useTranslation } from "@/i18n";
+import { Button } from "@/ramadhan/components/fields";
 import {
   MAX_LABEL,
   addBuiltinItem,
@@ -18,7 +21,14 @@ import {
   type ItemKind,
 } from "@/mutabaah/items";
 import { ITEMS_KEY } from "@/mutabaah/syncKeys";
-import { radius, spacing, useTheme } from "@/theme";
+import { HIT, radius, spacing, typography, useTheme } from "@/theme";
+
+/** The glyph of each kind of item: a prayer, a done/not-done habit, a counted one. */
+const KIND_ICON: Record<ItemKind, IconName> = {
+  fardh: "time-outline",
+  check: "checkmark-done",
+  count: "repeat",
+};
 
 function token(): string {
   return Math.random().toString(36).slice(2, 12).padEnd(10, "0");
@@ -28,6 +38,7 @@ export default function ItemsScreen() {
   const db = useSQLiteContext();
   const { t } = useTranslation();
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const [items, setItems] = useState<ItemDef[] | null>(null);
   const [name, setName] = useState("");
   const [kind, setKind] = useState<Exclude<ItemKind, "fardh">>("check");
@@ -53,11 +64,16 @@ export default function ItemsScreen() {
   return (
     <ScrollView
       style={{ backgroundColor: theme.background }}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={[styles.content, { paddingBottom: spacing.xl + insets.bottom }]}
       keyboardShouldPersistTaps="handled"
     >
-      <Text style={{ color: theme.muted }}>{t("items.fardhNote")}</Text>
-      <Section title={t("items.active")}>
+      <View style={styles.note}>
+        <Ionicons name="information-circle-outline" size={18} color={theme.muted} />
+        <Text style={[typography.footnote, styles.grow, { color: theme.muted }]}>
+          {t("items.fardhNote")}
+        </Text>
+      </View>
+      <Section title={t("items.active")} icon="list">
         {items.map((item) => {
           const label = itemLabel(item, t);
           return (
@@ -66,23 +82,31 @@ export default function ItemsScreen() {
               accessibilityRole="button"
               accessibilityLabel={t("items.remove", { name: label })}
               onPress={() => save(removeItem(items, item.id))}
-              style={[styles.line, { borderColor: theme.border }]}
+              style={({ pressed }) => [
+                styles.line,
+                {
+                  borderColor: theme.separator,
+                  backgroundColor: pressed ? theme.surfaceAlt : "transparent",
+                },
+              ]}
             >
-              <Text style={{ color: theme.text, fontSize: 16, flexShrink: 1 }}>{label}</Text>
-              <Text style={{ color: theme.muted, fontSize: 20 }}>−</Text>
+              <IconChip icon={KIND_ICON[item.kind]} size={30} />
+              <Text style={[typography.body, styles.grow, { color: theme.text }]}>{label}</Text>
+              <Ionicons name="remove-circle" size={24} color={theme.danger} />
             </Pressable>
           );
         })}
       </Section>
 
       {missingBuiltins(items).length > 0 ? (
-        <Section title={t("items.available")}>
+        <Section title={t("items.available")} icon="add-circle">
           {missingBuiltins(items).map((item) => {
             const label = itemLabel(item, t);
             return (
               <Row
                 key={item.id}
                 label={`+ ${label}`}
+                icon={KIND_ICON[item.kind]}
                 onPress={() => save(addBuiltinItem(items, item.id))}
               />
             );
@@ -90,93 +114,66 @@ export default function ItemsScreen() {
         </Section>
       ) : null}
 
-      <Section title={t("items.custom")}>
+      <Section title={t("items.custom")} icon="create">
         <View style={styles.form}>
           <TextInput
             value={name}
             onChangeText={setName}
             maxLength={MAX_LABEL}
             placeholder={t("items.namePlaceholder")}
-            placeholderTextColor={theme.muted}
-            style={[styles.input, { color: theme.text, borderColor: theme.border }]}
+            placeholderTextColor={theme.faint}
+            style={[
+              styles.input,
+              { color: theme.text, borderColor: theme.border, backgroundColor: theme.surfaceAlt },
+            ]}
             returnKeyType="done"
             onSubmitEditing={addCustom}
           />
           <View style={styles.kinds}>
-            <Kind
+            <Pill
               label={t("items.kindCheck")}
               on={kind === "check"}
               onPress={() => setKind("check")}
             />
-            <Kind
+            <Pill
               label={t("items.kindCount")}
               on={kind === "count"}
               onPress={() => setKind("count")}
             />
           </View>
-          <Pressable
-            accessibilityRole="button"
+          <Button
+            block
+            label={t("items.add")}
+            icon="add"
             disabled={name.trim().length === 0}
             onPress={addCustom}
-            style={[
-              styles.add,
-              { backgroundColor: theme.accent, opacity: name.trim().length === 0 ? 0.4 : 1 },
-            ]}
-          >
-            <Text style={{ color: theme.accentText, fontWeight: "600" }}>{t("items.add")}</Text>
-          </Pressable>
+          />
         </View>
       </Section>
     </ScrollView>
   );
 }
 
-function Kind({ label, on, onPress }: { label: string; on: boolean; onPress: () => void }) {
-  const theme = useTheme();
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ selected: on }}
-      onPress={onPress}
-      style={[
-        styles.kind,
-        {
-          borderColor: on ? theme.accent : theme.border,
-          backgroundColor: on ? theme.accent : "transparent",
-        },
-      ]}
-    >
-      <Text style={{ color: on ? theme.accentText : theme.text, fontWeight: "600" }}>{label}</Text>
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
-  content: { padding: spacing.md, gap: spacing.lg },
+  content: { paddingHorizontal: spacing.md + 4, paddingTop: spacing.md, gap: spacing.lg },
+  note: { flexDirection: "row", alignItems: "flex-start", gap: spacing.sm, paddingHorizontal: 4 },
+  grow: { flex: 1 },
   line: {
-    minHeight: 48,
+    minHeight: 52,
     paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm + 2,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    gap: spacing.md,
+    gap: spacing.md - 4,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  form: { padding: spacing.md, gap: spacing.sm },
+  form: { padding: spacing.md, gap: spacing.md - 4 },
   input: {
-    minHeight: 48,
+    minHeight: HIT + 4,
     borderWidth: 1,
     borderRadius: radius.md,
     paddingHorizontal: spacing.md,
-    fontSize: 16,
+    ...typography.body,
   },
   kinds: { flexDirection: "row", gap: spacing.sm },
-  kind: {
-    minHeight: 44,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    justifyContent: "center",
-  },
-  add: { minHeight: 48, borderRadius: radius.md, alignItems: "center", justifyContent: "center" },
 });

@@ -5,19 +5,25 @@ import {
   type HafalanTarget,
   type IsoDay,
 } from "@waqtu/core";
+import { Ionicons } from "@expo/vector-icons";
 import { useSQLiteContext } from "expo-sqlite";
 import { useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Row, Section } from "@/components/ui";
+import { Row, Section, type IconName } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { Button, Hint, NumberField, Panel } from "@/ramadhan/components/fields";
-import { spacing, useTheme } from "@/theme";
+import { radius, spacing, tabular, typography, useTheme } from "@/theme";
 import { savePlan, planUnits } from "../db";
 import { pagesSpanned, targetFromInput } from "../format";
 import { removeRecordings } from "../recordings";
 
 const KINDS = ["surah", "juz", "pages"] as const;
+const KIND_ICON: Record<(typeof KINDS)[number], IconName> = {
+  surah: "document-text-outline",
+  juz: "albums-outline",
+  pages: "copy-outline",
+};
 
 /** Creates the plan: a range of surahs, juz or pages, and the number of days to finish it in. */
 export function PlanForm({ today }: { today: IsoDay }) {
@@ -51,10 +57,11 @@ export function PlanForm({ today }: { today: IsoDay }) {
   };
 
   return (
-    <Section title={t("hafalan.newPlan")}>
+    <Section title={t("hafalan.newPlan")} icon="add-circle-outline">
       {KINDS.map((k) => (
         <Row
           key={k}
+          icon={KIND_ICON[k]}
           label={t(`hafalan.kind.${k}`)}
           selected={kind === k}
           onPress={() => {
@@ -69,15 +76,20 @@ export function PlanForm({ today }: { today: IsoDay }) {
         <NumberField label={t("hafalan.to")} value={to} onChangeNumber={setTo} />
         <NumberField label={t("hafalan.days")} value={days} onChangeNumber={setDays} />
         {from !== null && !valid ? (
-          <Text style={{ color: theme.muted }}>{t("hafalan.invalidTarget")}</Text>
+          <View style={styles.invalid}>
+            <Ionicons name="alert-circle-outline" size={18} color={theme.warning} />
+            <Text style={[typography.subhead, styles.grow, { color: theme.warning }]}>
+              {t("hafalan.invalidTarget")}
+            </Text>
+          </View>
         ) : null}
         {preview && dayCount !== null ? (
-          <View style={styles.preview}>
-            <Text style={{ color: theme.text }}>
-              {t("hafalan.preview", { units: preview.units, pages: preview.pages })}
-            </Text>
-            <Text style={{ color: theme.accent, fontWeight: "600" }}>
+          <View style={[styles.preview, { backgroundColor: theme.surfaceAlt }]}>
+            <Text style={[typography.headline, tabular, { color: theme.accent }]}>
               {t("hafalan.perDay", { count: Math.ceil(preview.units / dayCount) })}
+            </Text>
+            <Text style={[typography.subhead, tabular, { color: theme.text }]}>
+              {t("hafalan.preview", { units: preview.units, pages: preview.pages })}
             </Text>
             <Hint>{t("hafalan.partNote")}</Hint>
           </View>
@@ -92,4 +104,8 @@ export function PlanForm({ today }: { today: IsoDay }) {
   );
 }
 
-const styles = StyleSheet.create({ preview: { gap: spacing.xs } });
+const styles = StyleSheet.create({
+  invalid: { flexDirection: "row", alignItems: "flex-start", gap: spacing.sm },
+  grow: { flex: 1 },
+  preview: { gap: spacing.xs, padding: spacing.md, borderRadius: radius.md },
+});
