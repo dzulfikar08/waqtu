@@ -195,24 +195,49 @@ describe("gender isolation", () => {
     const sister = await member("akhwat");
     const circle = await privateCircle(brother);
     const p = await post(brother, circle.id, "bismillah");
+    expect(
+      (await call(brother, "PUT", `/${circle.id}/posts/${p.id}/reaction`, { emoji: SPARKLE }))
+        .status,
+    ).toBe(200);
+    const week = {
+      weekEnd: new Date().toISOString().slice(0, 10),
+      countedDays: 5,
+      fardhOnTime: 28,
+      fardhJamaah: 10,
+      pages: 42,
+    };
 
     expect((await joinCode(sister, circle.inviteCode)).status).toBe(404);
     for (const [method, path, json] of [
       ["GET", `/${circle.id}`],
       ["GET", `/${circle.id}/feed`],
       ["POST", `/${circle.id}/posts`, { text: "salam" }],
+      ["DELETE", `/${circle.id}/posts/${p.id}`],
       ["PUT", `/${circle.id}/posts/${p.id}/reaction`, { emoji: SPARKLE }],
+      ["DELETE", `/${circle.id}/posts/${p.id}/reaction`],
       ["POST", `/${circle.id}/posts/${p.id}/report`, { target: "post", reason: "spam" }],
       ["POST", `/${circle.id}/posts/${p.id}/block`],
+      ["POST", `/${circle.id}/summary`, week],
+      ["PUT", `/${circle.id}/media`],
       ["GET", `/${circle.id}/media/${p.id}`],
       ["POST", `/${circle.id}/pause`],
+      ["POST", `/${circle.id}/resume`],
       ["POST", `/${circle.id}/leave`],
     ] as const) {
       const res = await call(sister, method, path, json);
       expect(res.status, `${method} ${path}`).toBe(404);
     }
     expect((await call(sister, "GET", "")).body.circles).toEqual([]);
-    expect(await feed(brother, circle.id)).toHaveLength(1);
+    const posts = await feed(brother, circle.id);
+    expect(posts).toHaveLength(1);
+    expect(posts[0]!.reactions[SPARKLE]).toBe(1);
+
+    // POST /private: a circle the sister creates stays closed to the brother, code and all.
+    const hers = await privateCircle(sister);
+    expect((await joinCode(brother, hers.inviteCode)).status).toBe(404);
+    expect((await call(brother, "GET", `/${hers.id}`)).status).toBe(404);
+    const brotherCircles = (await call(brother, "GET", "")).body.circles as { id: string }[];
+    expect(brotherCircles.map((c) => c.id)).toEqual([circle.id]);
   });
 
   test("the database refuses a cross-gender membership even around the API", async () => {
