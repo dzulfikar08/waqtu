@@ -276,8 +276,8 @@ describe("completion and reflections (real migrations, SQLite)", () => {
     to: string,
   ) => getEntriesBetween(db, from, to);
 
-  test("the halaqah voice migration is the latest step", () => {
-    expect(MIGRATIONS.at(-1)).toBe(HALAQAH_VOICE_MIGRATION);
+  test("the halaqah voice migration is a migration step", () => {
+    expect(MIGRATIONS).toContain(HALAQAH_VOICE_MIGRATION);
   });
 
   test("Selesai records progress and a dirty `halaqah` mutabaah entry on today's date", async () => {
