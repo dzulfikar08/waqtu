@@ -88,7 +88,8 @@ struct MenuBarView: View {
             // Controls
             ControlsSection(
                 overlayEnabled: $viewModel.settings.overlayEnabled,
-                onTestOverlay: { viewModel.showTestOverlay() }
+                onTestOverlay: { viewModel.showTestOverlay() },
+                onImsakiyah: { viewModel.showImsakiyah() }
             )
 
             Divider()
@@ -437,6 +438,7 @@ struct StreakReportView: View {
 struct ControlsSection: View {
     @Binding var overlayEnabled: Bool
     let onTestOverlay: () -> Void
+    let onImsakiyah: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -466,6 +468,22 @@ struct ControlsSection: View {
                         .foregroundColor(.waqtuPrimary)
                         .font(.system(size: 12))
                     Text("Test Overlay")
+                        .font(.system(size: 13))
+                        .foregroundColor(.waqtuText)
+                    Spacer()
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .buttonStyle(ControlRowButtonStyle())
+
+            // Ramadhan month table
+            Button(action: onImsakiyah) {
+                HStack {
+                    Image(systemName: "calendar")
+                        .foregroundColor(.waqtuPrimary)
+                        .font(.system(size: 12))
+                    Text("Imsakiyah")
                         .font(.system(size: 13))
                         .foregroundColor(.waqtuText)
                     Spacer()
