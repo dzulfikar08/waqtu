@@ -1,15 +1,16 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   RefreshControl,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CirclesHttpError } from "@/circles/api";
 import { circlesApi } from "@/circles/client";
@@ -25,10 +26,11 @@ import {
 } from "@/circles/logic";
 import type { Circle, CircleProfile, CirclesConfig, Post } from "@/circles/types";
 import { useLoad } from "@/circles/useLoad";
+import { Card, IconChip, PressableScale } from "@/components/ui";
 import { useMutabaah } from "@/hooks/useMutabaah";
 import { useTranslation } from "@/i18n";
 import { Button, Hint } from "@/ramadhan/components/fields";
-import { spacing, useTheme } from "@/theme";
+import { HIT, radius, spacing, typography, useTheme } from "@/theme";
 
 interface Screen {
   circle: Circle;
@@ -53,6 +55,7 @@ function CircleFeed({
 }) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const mutabaah = useMutabaah();
   const [posts, setPosts] = useState<Post[]>([]);
@@ -138,10 +141,27 @@ function CircleFeed({
     return (
       <View style={styles.header}>
         {circle.myStatus === "paused" ? (
-          <Text style={{ color: theme.muted }}>{t("circles.circle.menu.pausedBanner")}</Text>
+          <View style={[styles.banner, { backgroundColor: theme.goldSoft }]}>
+            <Ionicons
+              name="pause-circle"
+              size={18}
+              color={theme.gold}
+              accessibilityElementsHidden
+              importantForAccessibility="no"
+            />
+            <Text style={[typography.subhead, styles.grow, { color: theme.text }]}>
+              {t("circles.circle.menu.pausedBanner")}
+            </Text>
+          </View>
         ) : null}
         {canPost(circle) ? (
-          <View style={styles.header}>
+          <Card>
+            <View style={styles.summaryHead}>
+              <IconChip icon="stats-chart" />
+              <View style={styles.grow}>
+                <Hint>{t("circles.circle.summary.shareHint")}</Hint>
+              </View>
+            </View>
             {profile.summaryOptIn ? (
               <Button
                 tone="plain"
@@ -156,10 +176,23 @@ function CircleFeed({
                 onPress={() => void enableSummary(profile)}
               />
             )}
-            <Hint>{t("circles.circle.summary.shareHint")}</Hint>
+          </Card>
+        ) : null}
+        {notice ? (
+          <View
+            accessibilityLiveRegion="polite"
+            style={[styles.banner, { backgroundColor: theme.accentSoft }]}
+          >
+            <Ionicons
+              name="information-circle"
+              size={18}
+              color={theme.accent}
+              accessibilityElementsHidden
+              importantForAccessibility="no"
+            />
+            <Text style={[typography.subhead, styles.grow, { color: theme.text }]}>{notice}</Text>
           </View>
         ) : null}
-        {notice ? <Text style={{ color: theme.text }}>{notice}</Text> : null}
       </View>
     );
     // shareSummary/enableSummary close over stable api/state methods.
@@ -170,7 +203,15 @@ function CircleFeed({
     const key = state.error instanceof CirclesHttpError ? state.error.key : "generic";
     return (
       <View style={[styles.center, { backgroundColor: theme.background }]}>
-        <Text style={{ color: theme.text }}>{t(`circles.errors.${key}`)}</Text>
+        <IconChip
+          icon="alert-circle-outline"
+          size={48}
+          color={theme.danger}
+          background={theme.dangerSoft}
+        />
+        <Text style={[typography.callout, styles.centerText, { color: theme.text }]}>
+          {t(`circles.errors.${key}`)}
+        </Text>
         <Button label={t("circles.retry")} onPress={() => void state.reload()} />
       </View>
     );
@@ -178,7 +219,8 @@ function CircleFeed({
   if (!state.data) {
     return (
       <View style={[styles.center, { backgroundColor: theme.background }]}>
-        <Text style={{ color: theme.muted }}>{t("circles.loading")}</Text>
+        <IconChip icon="hourglass-outline" size={48} />
+        <Text style={[typography.callout, { color: theme.muted }]}>{t("circles.loading")}</Text>
       </View>
     );
   }
@@ -197,31 +239,42 @@ function CircleFeed({
         options={{
           title,
           headerRight: () => (
-            <Pressable
+            <PressableScale
               accessibilityRole="button"
               accessibilityLabel={t("circles.circle.menu.title")}
-              hitSlop={8}
               onPress={() => setMenu("circle")}
+              scaleTo={0.9}
+              style={styles.menuButton}
             >
-              <Text style={{ color: theme.text, fontSize: 24, paddingHorizontal: spacing.sm }}>
-                ⋯
-              </Text>
-            </Pressable>
+              <Ionicons name="ellipsis-horizontal-circle" size={26} color={theme.accent} />
+            </PressableScale>
           ),
         }}
       />
       <FlatList
         data={posts}
         keyExtractor={(post) => post.id}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[
+          styles.list,
+          { paddingBottom: spacing.lg + (canPost(circle) ? 0 : insets.bottom) },
+        ]}
+        keyboardShouldPersistTaps="handled"
         refreshControl={
-          <RefreshControl refreshing={state.loading} onRefresh={() => void state.reload()} />
+          <RefreshControl
+            refreshing={state.loading}
+            onRefresh={() => void state.reload()}
+            tintColor={theme.accent}
+            colors={[theme.accent]}
+          />
         }
         ListHeaderComponent={header}
         ListEmptyComponent={
-          <Text style={{ color: theme.muted, padding: spacing.md }}>
-            {t("circles.circle.empty")}
-          </Text>
+          <View style={styles.empty}>
+            <IconChip icon="chatbubbles-outline" size={56} />
+            <Text style={[typography.callout, styles.centerText, { color: theme.muted }]}>
+              {t("circles.circle.empty")}
+            </Text>
+          </View>
         }
         ListFooterComponent={
           nextBefore ? (
@@ -292,12 +345,24 @@ function CircleFeed({
 
 const styles = StyleSheet.create({
   list: { padding: spacing.md, gap: spacing.md },
-  header: { gap: spacing.sm },
+  header: { gap: spacing.md },
+  grow: { flex: 1 },
+  banner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    padding: spacing.md - 4,
+    borderRadius: radius.md,
+  },
+  summaryHead: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
+  menuButton: { width: HIT, height: HIT, alignItems: "center", justifyContent: "center" },
+  empty: { alignItems: "center", gap: spacing.md, paddingVertical: spacing.xl },
   center: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     gap: spacing.md,
-    padding: spacing.md,
+    padding: spacing.lg,
   },
+  centerText: { textAlign: "center" },
 });

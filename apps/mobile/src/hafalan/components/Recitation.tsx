@@ -1,12 +1,15 @@
+import { Ionicons } from "@expo/vector-icons";
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useVoiceRecorder } from "@/circles/useVoiceRecorder";
+import { PressableScale } from "@/components/ui";
 import { useTranslation } from "@/i18n";
-import { Button, ButtonRow, Hint } from "@/ramadhan/components/fields";
-import { radius, spacing, useTheme } from "@/theme";
+import { Button, Hint } from "@/ramadhan/components/fields";
+import { HIT, radius, spacing, tabular, typography, useTheme } from "@/theme";
+import { MicButton } from "./MicButton";
 import { deleteRecording, saveRecording, type StoredRecording } from "../db";
 import { formatSeconds } from "../format";
 import { addMark, ayahAt, markOf, type AyahMarks } from "../marks";
@@ -88,28 +91,27 @@ export function Recitation({
       <Hint>{t("hafalan.recitationHint")}</Hint>
       {recorder.recording ? (
         <>
-          <Text style={{ color: theme.text, fontWeight: "600" }}>
-            {t("hafalan.recording", { time: formatSeconds(recorder.elapsedSeconds) })}
-          </Text>
-          <ButtonRow>
-            {ayahCount > 1 ? (
-              <Button
-                tone="plain"
-                label={t("hafalan.nextAyah", {
-                  n: Math.min(marks.length + 1, ayahCount),
-                  total: ayahCount,
-                })}
-                disabled={marks.length >= ayahCount}
-                onPress={() => setMarks((m) => addMark(m, recorder.elapsedSeconds, ayahCount))}
-              />
-            ) : null}
-            <Button label={t("hafalan.stop")} onPress={() => void recorder.stop()} />
-          </ButtonRow>
+          <View style={styles.live}>
+            <View style={[styles.dot, { backgroundColor: theme.danger }]} />
+            <Text style={[typography.headline, tabular, { color: theme.text }]}>
+              {t("hafalan.recording", { time: formatSeconds(recorder.elapsedSeconds) })}
+            </Text>
+          </View>
+          <MicButton recording label={t("hafalan.stop")} onPress={() => void recorder.stop()} />
+          {ayahCount > 1 ? (
+            <Button
+              label={t("hafalan.nextAyah", {
+                n: Math.min(marks.length + 1, ayahCount),
+                total: ayahCount,
+              })}
+              disabled={marks.length >= ayahCount}
+              onPress={() => setMarks((m) => addMark(m, recorder.elapsedSeconds, ayahCount))}
+            />
+          ) : null}
         </>
       ) : (
-        <Button
+        <MicButton
           label={t("hafalan.record")}
-          tone={saved ? "plain" : "primary"}
           onPress={() => {
             setFailed(false);
             setMarks([0]);
@@ -118,7 +120,9 @@ export function Recitation({
         />
       )}
       {ayahCount > 1 ? <Hint>{t("hafalan.marksHint")}</Hint> : null}
-      {problem ? <Text style={{ color: theme.muted }}>{t(`hafalan.${problem}`)}</Text> : null}
+      {problem ? (
+        <Text style={[typography.subhead, { color: theme.danger }]}>{t(`hafalan.${problem}`)}</Text>
+      ) : null}
       {saved && !recorder.recording ? (
         <SavedPlayer
           key={saved.file}
@@ -201,39 +205,81 @@ function SavedPlayer({
     }
   };
 
+  const progress = status.duration > 0 ? Math.min(1, status.currentTime / status.duration) : 0;
   return (
-    <View style={[styles.player, { borderColor: theme.border, backgroundColor: theme.background }]}>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={status.playing ? t("hafalan.pause") : t("hafalan.play")}
-        onPress={() => void toggle()}
-        style={styles.row}
-      >
-        <Text style={{ color: theme.accent, fontSize: 18 }}>{status.playing ? "❚❚" : "▶"}</Text>
-        <Text style={{ color: theme.text }}>
-          {formatSeconds(status.currentTime)} / {formatSeconds(status.duration || seconds)}
+    <View style={[styles.player, { backgroundColor: theme.surfaceAlt }]}>
+      <View style={styles.playerRow}>
+        <PressableScale
+          accessibilityRole="button"
+          accessibilityLabel={status.playing ? t("hafalan.pause") : t("hafalan.play")}
+          onPress={() => void toggle()}
+          scaleTo={0.9}
+          style={[styles.play, { backgroundColor: theme.accent }]}
+        >
+          <Ionicons
+            name={status.playing ? "pause" : "play"}
+            size={20}
+            color={theme.accentText}
+            style={status.playing ? undefined : styles.playGlyph}
+          />
+        </PressableScale>
+        <View style={styles.timeline}>
+          <View style={[styles.track, { backgroundColor: theme.border }]}>
+            <View
+              style={[
+                styles.fill,
+                { backgroundColor: theme.accent, width: `${Math.round(progress * 100)}%` },
+              ]}
+            />
+          </View>
+          <Text style={[typography.footnote, tabular, { color: theme.muted }]}>
+            {formatSeconds(status.currentTime)} / {formatSeconds(status.duration || seconds)}
+          </Text>
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("hafalan.deleteRecording")}
+          onPress={onDelete}
+          hitSlop={4}
+          style={({ pressed }) => [
+            styles.delete,
+            { backgroundColor: pressed ? theme.dangerSoft : "transparent" },
+          ]}
+        >
+          <Ionicons name="trash-outline" size={20} color={theme.danger} />
+        </Pressable>
+      </View>
+      {failed ? (
+        <Text style={[typography.footnote, { color: theme.danger }]}>
+          {t("hafalan.playFailed")}
         </Text>
-      </Pressable>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={t("hafalan.deleteRecording")}
-        onPress={onDelete}
-        style={styles.row}
-      >
-        <Text style={{ color: theme.muted }}>{t("hafalan.deleteRecording")}</Text>
-      </Pressable>
-      {failed ? <Text style={{ color: theme.muted }}>{t("hafalan.playFailed")}</Text> : null}
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  box: { gap: spacing.sm },
-  player: {
-    borderRadius: radius.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
+  box: { gap: spacing.md },
+  live: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: spacing.sm },
+  dot: { width: 10, height: 10, borderRadius: 5 },
+  player: { borderRadius: radius.md, padding: spacing.sm + 2, gap: spacing.xs },
+  playerRow: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
+  play: {
+    width: HIT,
+    height: HIT,
+    borderRadius: HIT / 2,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  row: { minHeight: 44, flexDirection: "row", alignItems: "center", gap: spacing.md },
+  playGlyph: { marginLeft: 3 },
+  timeline: { flex: 1, gap: spacing.xs + 2 },
+  track: { height: 4, borderRadius: 2, overflow: "hidden" },
+  fill: { height: 4, borderRadius: 2 },
+  delete: {
+    width: HIT,
+    height: HIT,
+    borderRadius: HIT / 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

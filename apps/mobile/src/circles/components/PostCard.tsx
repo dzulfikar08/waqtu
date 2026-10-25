@@ -1,9 +1,11 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 
+import { Card, PressableScale, type IconName } from "@/components/ui";
 import { parseHalaqahRef } from "@/halaqah/program";
 import { useTranslation } from "@/i18n";
-import { radius, spacing, useTheme } from "@/theme";
+import { HIT, radius, spacing, tabular, typography, useTheme } from "@/theme";
 
 import type { CirclesApi } from "../api";
 import type { Post, ReportReason } from "../types";
@@ -106,50 +108,77 @@ export function PostCard({
     ]);
 
   return (
-    <View style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+    <Card>
       <View style={styles.header}>
-        <Text style={[styles.handle, { color: theme.text }]}>
-          {post.handle}
-          {post.mine ? ` · ${t("circles.circle.mine")}` : ""}
-        </Text>
-        <Text style={[styles.time, { color: theme.muted }]}>{time}</Text>
-        <Pressable
+        <Avatar handle={post.handle} />
+        <View style={styles.grow}>
+          <Text
+            style={[typography.subhead, styles.handle, { color: theme.text }]}
+            numberOfLines={1}
+          >
+            {post.handle}
+            {post.mine ? (
+              <Text style={{ color: theme.accent }}>{` · ${t("circles.circle.mine")}`}</Text>
+            ) : null}
+          </Text>
+          <Text style={[typography.caption, tabular, { color: theme.muted }]}>{time}</Text>
+        </View>
+        <PressableScale
           accessibilityRole="button"
           accessibilityLabel={t("circles.circle.post.more")}
-          hitSlop={8}
           onPress={() => setMenu("options")}
+          scaleTo={0.9}
+          style={styles.more}
         >
-          <Text style={[styles.more, { color: theme.muted }]}>⋯</Text>
-        </Pressable>
+          <Ionicons name="ellipsis-horizontal" size={20} color={theme.muted} />
+        </PressableScale>
       </View>
 
       {post.halaqahDayId ? (
-        <Text style={[styles.meta, { color: theme.secondary }]}>
-          {halaqah
-            ? t("halaqah.linkedDay", { day: halaqah.day })
-            : t("circles.circle.halaqahLinked", { day: post.halaqahDayId })}
-        </Text>
+        <View style={[styles.meta, { backgroundColor: theme.secondarySoft }]}>
+          <Ionicons
+            name="link"
+            size={14}
+            color={theme.secondary}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
+          <Text style={[typography.footnote, styles.metaText, { color: theme.secondary }]}>
+            {halaqah
+              ? t("halaqah.linkedDay", { day: halaqah.day })
+              : t("circles.circle.halaqahLinked", { day: post.halaqahDayId })}
+          </Text>
+        </View>
       ) : null}
       {post.text ? <Text style={[styles.text, { color: theme.text }]}>{post.text}</Text> : null}
       {post.media ? <VoiceNote api={api} circleId={circleId} media={post.media} /> : null}
       {post.summary ? (
-        <View style={[styles.summary, { borderColor: theme.border }]}>
-          <Text style={[styles.summaryTitle, { color: theme.text }]}>
-            {t("circles.circle.summary.title")}
-          </Text>
-          <Text style={{ color: theme.text }}>
+        <View style={[styles.summary, { backgroundColor: theme.surfaceAlt }]}>
+          <View style={styles.summaryHead}>
+            <Ionicons
+              name="stats-chart"
+              size={14}
+              color={theme.accent}
+              accessibilityElementsHidden
+              importantForAccessibility="no"
+            />
+            <Text style={[typography.overline, { color: theme.muted }]}>
+              {t("circles.circle.summary.title")}
+            </Text>
+          </View>
+          <SummaryLine icon="calendar-outline">
             {t("circles.circle.summary.days", { n: post.summary.countedDays })}
-          </Text>
-          <Text style={{ color: theme.text }}>
+          </SummaryLine>
+          <SummaryLine icon="moon-outline">
             {t("circles.circle.summary.fardh", {
               onTime: post.summary.fardhOnTime,
               jamaah: post.summary.fardhJamaah,
             })}
-          </Text>
+          </SummaryLine>
           {post.summary.pages > 0 ? (
-            <Text style={{ color: theme.text }}>
+            <SummaryLine icon="book-outline">
               {t("circles.circle.summary.pages", { n: post.summary.pages })}
-            </Text>
+            </SummaryLine>
           ) : null}
         </View>
       ) : null}
@@ -158,25 +187,34 @@ export function PostCard({
         {reactions.map((emoji) => {
           const selected = post.myReaction === emoji;
           return (
-            <Pressable
+            <PressableScale
               key={emoji}
               accessibilityRole="button"
               accessibilityLabel={t("circles.circle.reactionLabel", { emoji })}
               accessibilityState={{ selected, disabled: !canReact }}
               disabled={!canReact}
               onPress={() => void react(emoji)}
+              scaleTo={0.92}
               style={[
                 styles.reaction,
                 {
                   borderColor: selected ? theme.accent : theme.border,
-                  backgroundColor: selected ? theme.background : "transparent",
-                  opacity: canReact ? 1 : 0.5,
+                  backgroundColor: selected ? theme.accentSoft : "transparent",
                 },
               ]}
             >
               <Text style={styles.emoji}>{emoji}</Text>
-              <Text style={{ color: theme.muted }}>{post.reactions[emoji] ?? 0}</Text>
-            </Pressable>
+              <Text
+                style={[
+                  typography.footnote,
+                  tabular,
+                  styles.count,
+                  { color: selected ? theme.accent : theme.muted },
+                ]}
+              >
+                {post.reactions[emoji] ?? 0}
+              </Text>
+            </PressableScale>
           );
         })}
       </View>
@@ -225,31 +263,79 @@ export function PostCard({
           onPress: () => void report(reason),
         }))}
       />
+    </Card>
+  );
+}
+
+/** Round initial of a handle on the soft accent wash. Decorative: the handle is read next to it. */
+function Avatar({ handle }: { handle: string }) {
+  const theme = useTheme();
+  return (
+    <View
+      accessible={false}
+      importantForAccessibility="no-hide-descendants"
+      style={[styles.avatar, { backgroundColor: theme.accentSoft }]}
+    >
+      <Text style={[styles.initial, { color: theme.accent }]}>
+        {handle.replace(/^@/, "").charAt(0).toUpperCase()}
+      </Text>
+    </View>
+  );
+}
+
+/** One line of a shared weekly summary with its glyph. */
+function SummaryLine({ icon, children }: { icon: IconName; children: string }) {
+  const theme = useTheme();
+  return (
+    <View style={styles.summaryLine}>
+      <Ionicons
+        name={icon}
+        size={15}
+        color={theme.muted}
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+      />
+      <Text style={[typography.subhead, tabular, styles.grow, { color: theme.text }]}>
+        {children}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    borderRadius: radius.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    padding: spacing.md,
-    gap: spacing.sm,
+  header: { flexDirection: "row", alignItems: "center", gap: spacing.sm + 4 },
+  grow: { flex: 1 },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  header: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
-  handle: { flex: 1, fontSize: 15, fontWeight: "700" },
-  time: { fontSize: 12 },
-  more: { fontSize: 22, paddingHorizontal: spacing.xs },
-  meta: { fontSize: 13 },
+  initial: { fontSize: 17, fontWeight: "700" },
+  handle: { fontWeight: "700" },
+  more: {
+    width: HIT,
+    height: HIT,
+    marginRight: -spacing.sm,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  meta: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm + 2,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.pill,
+  },
+  metaText: { fontWeight: "600" },
   text: { fontSize: 16, lineHeight: 23 },
-  summary: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: radius.md,
-    padding: spacing.sm,
-    gap: 2,
-  },
-  summaryTitle: { fontWeight: "700" },
-  reactions: { flexDirection: "row", gap: spacing.sm },
+  summary: { borderRadius: radius.md, padding: spacing.md - 4, gap: spacing.xs + 2 },
+  summaryHead: { flexDirection: "row", alignItems: "center", gap: 6 },
+  summaryLine: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
+  reactions: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, marginTop: spacing.xs },
   reaction: {
     minHeight: 40,
     minWidth: 56,
@@ -257,9 +343,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    borderRadius: 20,
+    paddingHorizontal: spacing.sm + 2,
+    borderRadius: radius.pill,
     borderWidth: 1,
   },
   emoji: { fontSize: 18 },
+  count: { fontWeight: "600" },
 });

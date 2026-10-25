@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import {
   setAudioModeAsync,
   useAudioPlayer,
@@ -8,7 +9,7 @@ import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useTranslation } from "@/i18n";
-import { radius, spacing, useTheme } from "@/theme";
+import { radius, spacing, tabular, typography, useTheme } from "@/theme";
 
 import type { CirclesApi } from "../api";
 import { formatDuration } from "../logic";
@@ -40,7 +41,7 @@ export function VoiceNote({
   };
 
   return (
-    <View style={[styles.box, { borderColor: theme.border, backgroundColor: theme.background }]}>
+    <View style={[styles.box, { backgroundColor: theme.surfaceAlt }]}>
       {source ? (
         <ActivePlayer source={source} total={media.durationSeconds} />
       ) : (
@@ -50,13 +51,39 @@ export function VoiceNote({
           onPress={() => void open()}
           style={styles.row}
         >
-          <Text style={[styles.icon, { color: theme.accent }]}>▶</Text>
-          <Text style={{ color: theme.text }}>{formatDuration(media.durationSeconds)}</Text>
+          <PlayDisc playing={false} />
+          <Ionicons
+            name="mic"
+            size={16}
+            color={theme.muted}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
+          <Text style={[typography.callout, tabular, styles.time, { color: theme.text }]}>
+            {formatDuration(media.durationSeconds)}
+          </Text>
         </Pressable>
       )}
       {failed ? (
-        <Text style={[styles.error, { color: theme.muted }]}>{t("circles.circle.playFailed")}</Text>
+        <Text style={[typography.footnote, styles.error, { color: theme.danger }]}>
+          {t("circles.circle.playFailed")}
+        </Text>
       ) : null}
+    </View>
+  );
+}
+
+/** Filled accent disc with a play or pause glyph, readable on either theme. */
+function PlayDisc({ playing }: { playing: boolean }) {
+  const theme = useTheme();
+  return (
+    <View style={[styles.disc, { backgroundColor: theme.accent }]}>
+      <Ionicons
+        name={playing ? "pause" : "play"}
+        size={18}
+        color={theme.accentText}
+        style={playing ? null : styles.playNudge}
+      />
     </View>
   );
 }
@@ -89,6 +116,9 @@ export function ActivePlayer({ source, total }: { source: AudioSource; total: nu
     else player.play();
   };
 
+  const length = status.duration || total;
+  const fraction = length > 0 ? Math.min(1, status.currentTime / length) : 0;
+
   return (
     <View>
       <Pressable
@@ -99,13 +129,25 @@ export function ActivePlayer({ source, total }: { source: AudioSource; total: nu
         onPress={toggle}
         style={styles.row}
       >
-        <Text style={[styles.icon, { color: theme.accent }]}>{status.playing ? "❚❚" : "▶"}</Text>
-        <Text style={{ color: theme.text }}>
-          {formatDuration(status.currentTime)} / {formatDuration(status.duration || total)}
+        <PlayDisc playing={status.playing} />
+        <View style={styles.grow}>
+          <View style={[styles.track, { backgroundColor: theme.border }]}>
+            <View
+              style={[
+                styles.fill,
+                { backgroundColor: theme.accent, width: `${Math.round(fraction * 100)}%` },
+              ]}
+            />
+          </View>
+        </View>
+        <Text style={[typography.footnote, tabular, { color: theme.text }]}>
+          {formatDuration(status.currentTime)} / {formatDuration(length)}
         </Text>
       </Pressable>
       {failed ? (
-        <Text style={[styles.error, { color: theme.muted }]}>{t("circles.circle.playFailed")}</Text>
+        <Text style={[typography.footnote, styles.error, { color: theme.danger }]}>
+          {t("circles.circle.playFailed")}
+        </Text>
       ) : null}
     </View>
   );
@@ -114,11 +156,15 @@ export function ActivePlayer({ source, total }: { source: AudioSource; total: nu
 const styles = StyleSheet.create({
   box: {
     borderRadius: radius.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm + 2,
+    paddingVertical: spacing.xs,
   },
-  row: { minHeight: 44, flexDirection: "row", alignItems: "center", gap: spacing.md },
-  icon: { fontSize: 18 },
-  error: { fontSize: 13, paddingBottom: spacing.xs },
+  row: { minHeight: 48, flexDirection: "row", alignItems: "center", gap: spacing.sm + 4 },
+  grow: { flex: 1 },
+  time: { fontWeight: "600" },
+  disc: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
+  playNudge: { marginLeft: 2 },
+  track: { height: 4, borderRadius: 2, overflow: "hidden" },
+  fill: { height: 4, borderRadius: 2 },
+  error: { paddingBottom: spacing.xs },
 });

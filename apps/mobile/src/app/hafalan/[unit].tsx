@@ -1,8 +1,10 @@
+import { Ionicons } from "@expo/vector-icons";
 import { canGrade, newUnitState } from "@waqtu/core";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useTranslation } from "@/i18n";
 import { Recitation, type SeekToAyah } from "@/hafalan/components/Recitation";
@@ -13,12 +15,12 @@ import { unitBlocks, wordKeys } from "@/hafalan/text";
 import { QuranCredit } from "@/hafalan/components/QuranCredit";
 import { useHafalan } from "@/hafalan/useHafalan";
 import { useQuranFont } from "@/hafalan/useQuranFont";
-import { Button, ButtonRow, Heading, Hint } from "@/ramadhan/components/fields";
+import { Button, ButtonRow, Hint } from "@/ramadhan/components/fields";
 import type { CheckView } from "@/recitation/check";
 import { RecitationCheck } from "@/recitation/components/RecitationCheck";
 import { useRecitationDev } from "@/recitation/useDevSettings";
-import { Section } from "@/components/ui";
-import { spacing, useTheme } from "@/theme";
+import { IconChip, PressableScale, Section, type IconName } from "@/components/ui";
+import { HIT, radius, spacing, tabular, typography, useTheme } from "@/theme";
 
 const FONT_SIZE = 30;
 const MODES: readonly TestMode[] = ["show", "hide", "letters"];
@@ -34,6 +36,7 @@ export default function UnitScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const font = useQuranFont();
   const { unit: param } = useLocalSearchParams<{ unit: string }>();
   const index = Number(param);
@@ -86,25 +89,37 @@ export default function UnitScreen() {
     }
   };
 
+  const roleIcon: IconName =
+    role === "sabaq"
+      ? "book"
+      : role === "murojaah"
+        ? "repeat"
+        : role === "done"
+          ? "checkmark-done"
+          : "time-outline";
+
   return (
     <ScrollView
       style={{ backgroundColor: theme.background }}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={[styles.content, { paddingBottom: spacing.xl + insets.bottom }]}
     >
       <View style={styles.header}>
-        <Heading>{unitLabel(unit)}</Heading>
-        <Hint>
-          {t("hafalan.page", { page: unit.page })} ·{" "}
-          {t(
-            role === "sabaq"
-              ? "hafalan.unitSabaq"
-              : role === "murojaah"
-                ? "hafalan.unitMurojaah"
-                : role === "done"
-                  ? "hafalan.unitDone"
-                  : "hafalan.unitOther",
-          )}
-        </Hint>
+        <IconChip icon={roleIcon} size={44} />
+        <View style={styles.grow}>
+          <Text style={[typography.title, { color: theme.text }]}>{unitLabel(unit)}</Text>
+          <Text style={[typography.subhead, tabular, { color: theme.muted }]}>
+            {t("hafalan.page", { page: unit.page })} ·{" "}
+            {t(
+              role === "sabaq"
+                ? "hafalan.unitSabaq"
+                : role === "murojaah"
+                  ? "hafalan.unitMurojaah"
+                  : role === "done"
+                    ? "hafalan.unitDone"
+                    : "hafalan.unitOther",
+            )}
+          </Text>
+        </View>
       </View>
 
       <UnitText
@@ -119,18 +134,35 @@ export default function UnitScreen() {
         onAyahPress={recording?.marks.length ? (ayah) => seekRef.current?.(ayah) : undefined}
       />
 
-      <Section title={t("hafalan.test")}>
+      <Section title={t("hafalan.test")} icon="eye-off-outline">
         <View style={styles.panel}>
-          <ButtonRow>
+          <View style={[styles.segments, { backgroundColor: theme.surfaceAlt }]}>
             {MODES.map((m) => (
-              <Button
+              <PressableScale
                 key={m}
-                label={t(MODE_LABEL[m])}
-                tone={mode === m ? "primary" : "plain"}
+                accessibilityRole="button"
+                accessibilityState={{ selected: mode === m }}
                 onPress={() => changeMode(m)}
-              />
+                scaleTo={0.96}
+                style={[
+                  styles.segment,
+                  { backgroundColor: mode === m ? theme.accent : "transparent" },
+                ]}
+              >
+                <Text
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  style={[
+                    typography.subhead,
+                    styles.segmentLabel,
+                    { color: mode === m ? theme.accentText : theme.muted },
+                  ]}
+                >
+                  {t(MODE_LABEL[m])}
+                </Text>
+              </PressableScale>
             ))}
-          </ButtonRow>
+          </View>
           {mode !== "show" ? (
             <>
               <Hint>{t("hafalan.testHint")}</Hint>
@@ -159,15 +191,24 @@ export default function UnitScreen() {
         </View>
       </Section>
 
-      <Section title={t("hafalan.grade")}>
+      <Section title={t("hafalan.grade")} icon="ribbon-outline">
         <View style={styles.panel}>
           {graded ? (
             <>
-              <Text style={{ color: theme.accent, fontWeight: "600" }}>
-                {graded.dayComplete
-                  ? t("hafalan.gradedDone")
-                  : t("hafalan.graded", { day: graded.due })}
-              </Text>
+              <View style={[styles.saved, { backgroundColor: theme.accentSoft }]}>
+                <Ionicons name="checkmark-circle" size={22} color={theme.accent} />
+                <Text
+                  style={[
+                    typography.callout,
+                    styles.grow,
+                    { color: theme.accent, fontWeight: "600" },
+                  ]}
+                >
+                  {graded.dayComplete
+                    ? t("hafalan.gradedDone")
+                    : t("hafalan.graded", { day: graded.due })}
+                </Text>
+              </View>
               <ButtonRow>
                 {next !== null ? (
                   <Button
@@ -186,23 +227,50 @@ export default function UnitScreen() {
           ) : (
             <>
               <Hint>{gradable ? t("hafalan.gradeHint") : t("hafalan.unitDone")}</Hint>
-              <ButtonRow>
-                {([0, 1, 2, 3, 4, 5] as const).map((g) => (
-                  <Button
-                    key={g}
-                    tone={g >= 3 ? "primary" : "plain"}
-                    disabled={!gradable}
-                    label={`${g} · ${t(`hafalan.grades.${g}`)}`}
-                    onPress={() => void grade(g)}
-                  />
-                ))}
-              </ButtonRow>
+              <View style={styles.grades}>
+                {([0, 1, 2, 3, 4, 5] as const).map((g) => {
+                  const good = g >= 3;
+                  return (
+                    <PressableScale
+                      key={g}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${g} · ${t(`hafalan.grades.${g}`)}`}
+                      accessibilityState={{ disabled: !gradable }}
+                      disabled={!gradable}
+                      onPress={() => void grade(g)}
+                      style={[
+                        styles.gradeCell,
+                        {
+                          backgroundColor: good ? theme.accentSoft : theme.surfaceAlt,
+                          borderColor: good ? theme.accent : theme.border,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.gradeFigure,
+                          tabular,
+                          { color: good ? theme.accent : theme.text },
+                        ]}
+                      >
+                        {g}
+                      </Text>
+                      <Text
+                        numberOfLines={2}
+                        style={[typography.caption, styles.gradeLabel, { color: theme.muted }]}
+                      >
+                        {t(`hafalan.grades.${g}`)}
+                      </Text>
+                    </PressableScale>
+                  );
+                })}
+              </View>
             </>
           )}
         </View>
       </Section>
 
-      <Section title={t("hafalan.recitation")}>
+      <Section title={t("hafalan.recitation")} icon="mic-outline">
         <View style={styles.panel}>
           <Recitation
             key={index}
@@ -215,7 +283,7 @@ export default function UnitScreen() {
         </View>
       </Section>
       {dev.enabled ? (
-        <Section title={t("recitation.title")}>
+        <Section title={t("recitation.title")} icon="pulse-outline">
           <View style={styles.panel}>
             <RecitationCheck key={index} unit={unit} unitIndex={index} onView={setCheck} />
           </View>
@@ -228,7 +296,40 @@ export default function UnitScreen() {
 
 const styles = StyleSheet.create({
   message: { padding: spacing.lg },
-  content: { padding: spacing.md, gap: spacing.lg },
-  header: { gap: spacing.xs, paddingHorizontal: spacing.sm },
+  content: { paddingHorizontal: spacing.md + 4, paddingTop: spacing.sm, gap: spacing.lg },
+  header: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
+  grow: { flex: 1, gap: 2 },
   panel: { padding: spacing.md, gap: spacing.md },
+  segments: { flexDirection: "row", borderRadius: radius.pill, padding: 3, gap: 3 },
+  segment: {
+    flex: 1,
+    minHeight: HIT - 6,
+    borderRadius: radius.pill,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: spacing.sm,
+  },
+  segmentLabel: { fontWeight: "600" },
+  saved: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    padding: spacing.md - 4,
+    borderRadius: radius.md,
+  },
+  grades: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
+  gradeCell: {
+    flexGrow: 1,
+    flexBasis: "30%",
+    minHeight: 72,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.sm,
+    gap: 2,
+  },
+  gradeFigure: { fontSize: 24, fontWeight: "800" },
+  gradeLabel: { textAlign: "center" },
 });

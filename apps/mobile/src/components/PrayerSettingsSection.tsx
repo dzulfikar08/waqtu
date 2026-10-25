@@ -15,7 +15,7 @@ import {
   PRAYER_KEYS,
 } from "@/prayer/config";
 import { saveCity, saveCurrentLocation } from "@/prayer/location";
-import { spacing, useTheme } from "@/theme";
+import { spacing, typography, useTheme } from "@/theme";
 
 import { Row, Section, StepperRow } from "./ui";
 
@@ -34,10 +34,17 @@ export function PrayerSettingsSection() {
 
   return (
     <>
-      <Section title={t("prayerSettings.location")}>
-        <Row label={place} onPress={() => {}} selected={settings.location !== null} disabled />
+      <Section title={t("prayerSettings.location")} icon="location">
+        <Row
+          label={place}
+          icon="location-outline"
+          onPress={() => {}}
+          selected={settings.location !== null}
+          disabled
+        />
         <Row
           label={t("today.useGps")}
+          icon="navigate-outline"
           onPress={() => {
             setGpsFailed(false);
             void saveCurrentLocation(db, { ask: true }).then((result) =>
@@ -45,7 +52,11 @@ export function PrayerSettingsSection() {
             );
           }}
         />
-        <Row label={t("today.pickCity")} onPress={() => setPicking((p) => !p)} />
+        <Row
+          label={t("today.pickCity")}
+          icon="business-outline"
+          onPress={() => setPicking((p) => !p)}
+        />
         {picking
           ? CITIES.map((city) => (
               <Row
@@ -60,13 +71,13 @@ export function PrayerSettingsSection() {
             ))
           : null}
         {gpsFailed ? (
-          <Text style={{ color: theme.muted, padding: spacing.md }}>
+          <Text style={[typography.footnote, { color: theme.danger, padding: spacing.md }]}>
             {t("today.locationFailed")}
           </Text>
         ) : null}
       </Section>
 
-      <Section title={t("prayerSettings.method")}>
+      <Section title={t("prayerSettings.method")} icon="calculator">
         {METHOD_IDS.map((id) => (
           <Row
             key={id}
@@ -77,7 +88,7 @@ export function PrayerSettingsSection() {
         ))}
       </Section>
 
-      <Section title={t("prayerSettings.asr")}>
+      <Section title={t("prayerSettings.asr")} icon="partly-sunny">
         {ASR_MADHABS.map((id) => (
           <Row
             key={id}
@@ -88,7 +99,7 @@ export function PrayerSettingsSection() {
         ))}
       </Section>
 
-      <Section title={t("prayerSettings.offsets")}>
+      <Section title={t("prayerSettings.offsets")} icon="options">
         {OFFSET_PRAYERS.map((prayer) => (
           <StepperRow
             key={prayer}

@@ -1,10 +1,10 @@
 import { useRouter } from "expo-router";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-import { Section } from "@/components/ui";
+import { Card, IconChip, SectionTitle } from "@/components/ui";
 import { useTranslation } from "@/i18n";
-import { Button, Hint, Panel } from "@/ramadhan/components/fields";
-import { spacing, useTheme } from "@/theme";
+import { Button, ProgressBar } from "@/ramadhan/components/fields";
+import { spacing, tabular, typography, useTheme } from "@/theme";
 import { dayOf } from "../program";
 import { useHalaqahProgress, useHalaqahToday } from "../useHalaqah";
 import { useLang } from "./SessionView";
@@ -25,31 +25,59 @@ export function HalaqahCard() {
   const { program, position } = today;
   const day = position.kind === "during" ? dayOf(program, position.day) : null;
   return (
-    <Section title={t("halaqah.title")}>
-      <Panel>
+    <View style={styles.section}>
+      <SectionTitle title={t("halaqah.title")} icon="school-outline" />
+      <Card>
+        <View style={styles.head}>
+          <IconChip
+            icon={day ? "play" : "school"}
+            size={48}
+            color={theme.gold}
+            background={theme.goldSoft}
+          />
+          <View style={styles.grow}>
+            {day ? (
+              <>
+                <Text style={[typography.overline, tabular, { color: theme.accent }]}>
+                  {t("halaqah.dayN", { day: day.day })}
+                </Text>
+                <Text style={[typography.headline, { color: theme.text }]}>{day.title[lang]}</Text>
+              </>
+            ) : (
+              <>
+                <Text style={[typography.headline, { color: theme.text }]}>
+                  {t("halaqah.programTitle")}
+                </Text>
+                <Text style={[typography.subhead, { color: theme.muted }]}>
+                  {t("halaqah.openAnyTime")}
+                </Text>
+              </>
+            )}
+          </View>
+        </View>
         {day ? (
-          <>
-            <Text style={{ color: theme.accent, fontWeight: "600" }}>
-              {t("halaqah.dayN", { day: day.day })}
+          <View style={styles.progress}>
+            <ProgressBar fraction={done.size / program.totalDays} />
+            <Text style={[typography.footnote, tabular, { color: theme.muted }]}>
+              {t("halaqah.progress", { done: done.size, total: program.totalDays })}
             </Text>
-            <Text style={[styles.title, { color: theme.text }]}>{day.title[lang]}</Text>
-            <Hint>{t("halaqah.progress", { done: done.size, total: program.totalDays })}</Hint>
-          </>
-        ) : (
-          <>
-            <Text style={[styles.title, { color: theme.text }]}>{t("halaqah.programTitle")}</Text>
-            <Hint>{t("halaqah.openAnyTime")}</Hint>
-          </>
-        )}
-        <Button
-          label={day ? t("halaqah.openToday") : t("halaqah.startEarly")}
-          onPress={() => router.push("/halaqah")}
-        />
-      </Panel>
-    </Section>
+          </View>
+        ) : null}
+        <View style={styles.action}>
+          <Button
+            label={day ? t("halaqah.openToday") : t("halaqah.startEarly")}
+            onPress={() => router.push("/halaqah")}
+          />
+        </View>
+      </Card>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  title: { fontSize: 18, fontWeight: "700", marginBottom: spacing.xs },
+  section: { gap: spacing.sm },
+  head: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
+  grow: { flex: 1, gap: 2 },
+  progress: { gap: spacing.xs + 2, marginTop: spacing.sm },
+  action: { marginTop: spacing.sm },
 });

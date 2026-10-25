@@ -1,9 +1,10 @@
 import { useRouter } from "expo-router";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import type { ReactNode } from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 import { authClient, type AuthClient } from "@/auth/client";
 import { AccountSection } from "@/components/AccountSection";
-import { Section } from "@/components/ui";
+import { Card, IconChip, Screen, Section, type IconName } from "@/components/ui";
 import type { CirclesApi } from "@/circles/api";
 import { CirclesHttpError, isUnauthorized } from "@/circles/api";
 import { circlesApi } from "@/circles/client";
@@ -13,37 +14,63 @@ import { useLoad } from "@/circles/useLoad";
 import { useTranslation } from "@/i18n";
 import { PremiumGate } from "@/premium/PremiumGate";
 import { Button, Hint, Panel } from "@/ramadhan/components/fields";
-import { spacing, useTheme } from "@/theme";
+import { spacing, typography, useTheme } from "@/theme";
 
 export default function CirclesScreen() {
   const { t } = useTranslation();
-  const theme = useTheme();
   return (
-    <ScrollView
-      style={{ backgroundColor: theme.background }}
-      contentContainerStyle={styles.content}
-      keyboardShouldPersistTaps="handled"
-    >
-      <Text style={[styles.title, { color: theme.text }]}>{t("circles.title")}</Text>
+    <Screen title={t("circles.tab")}>
       {authClient && circlesApi ? (
         <SignedInGate client={authClient} api={circlesApi} />
       ) : (
-        <Text style={{ color: theme.muted }}>{t("circles.unavailable")}</Text>
+        <Notice icon="cloud-offline-outline" text={t("circles.unavailable")} />
       )}
-    </ScrollView>
+    </Screen>
+  );
+}
+
+/** A card holding one status line (loading, unavailable, an error) with its glyph. */
+function Notice({
+  icon,
+  text,
+  tone = "muted",
+  children,
+}: {
+  icon: IconName;
+  text: string;
+  tone?: "muted" | "danger";
+  children?: ReactNode;
+}) {
+  const theme = useTheme();
+  const danger = tone === "danger";
+  return (
+    <Card>
+      <View style={styles.notice}>
+        <IconChip
+          icon={icon}
+          color={danger ? theme.danger : theme.accent}
+          background={danger ? theme.dangerSoft : theme.accentSoft}
+        />
+        <Text
+          style={[typography.callout, styles.grow, { color: danger ? theme.text : theme.muted }]}
+        >
+          {text}
+        </Text>
+      </View>
+      {children}
+    </Card>
   );
 }
 
 function SignedInGate({ client, api }: { client: AuthClient; api: CirclesApi }) {
   const { t } = useTranslation();
-  const theme = useTheme();
   const { data: session, isPending } = client.useSession();
 
-  if (isPending) return <Text style={{ color: theme.muted }}>{t("circles.loading")}</Text>;
+  if (isPending) return <Notice icon="hourglass-outline" text={t("circles.loading")} />;
   if (!session) {
     return (
       <View style={styles.stack}>
-        <Section title={t("circles.signIn.title")}>
+        <Section title={t("circles.signIn.title")} icon="log-in-outline">
           <Panel>
             <Hint>{t("circles.signIn.body")}</Hint>
           </Panel>
@@ -57,7 +84,6 @@ function SignedInGate({ client, api }: { client: AuthClient; api: CirclesApi }) 
 
 function Loaded({ api }: { api: CirclesApi }) {
   const { t } = useTranslation();
-  const theme = useTheme();
   const router = useRouter();
   const state = useLoad(async () => {
     const config = await api.config();
@@ -69,15 +95,16 @@ function Loaded({ api }: { api: CirclesApi }) {
   if (state.error) {
     const key = state.error instanceof CirclesHttpError ? state.error.key : "generic";
     return (
-      <View style={styles.stack}>
-        <Text style={{ color: theme.text }}>
-          {isUnauthorized(state.error) ? t("circles.signIn.title") : t(`circles.errors.${key}`)}
-        </Text>
+      <Notice
+        icon="alert-circle-outline"
+        tone="danger"
+        text={isUnauthorized(state.error) ? t("circles.signIn.title") : t(`circles.errors.${key}`)}
+      >
         <Button label={t("circles.retry")} onPress={() => void state.reload()} />
-      </View>
+      </Notice>
     );
   }
-  if (!state.data) return <Text style={{ color: theme.muted }}>{t("circles.loading")}</Text>;
+  if (!state.data) return <Notice icon="hourglass-outline" text={t("circles.loading")} />;
 
   const { config, profile, circles } = state.data;
   const content = !profile ? (
@@ -89,7 +116,7 @@ function Loaded({ api }: { api: CirclesApi }) {
       }}
     />
   ) : profile.suspended ? (
-    <Text style={{ color: theme.text }}>{t("circles.errors.suspended")}</Text>
+    <Notice icon="ban-outline" tone="danger" text={t("circles.errors.suspended")} />
   ) : (
     <CirclesHome api={api} profile={profile} circles={circles} reload={state.reload} />
   );
@@ -99,7 +126,7 @@ function Loaded({ api }: { api: CirclesApi }) {
 }
 
 const styles = StyleSheet.create({
-  content: { padding: spacing.md, gap: spacing.md, paddingBottom: spacing.xl },
-  title: { fontSize: 28, fontWeight: "700" },
-  stack: { gap: spacing.md },
+  stack: { gap: spacing.lg },
+  notice: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
+  grow: { flex: 1 },
 });

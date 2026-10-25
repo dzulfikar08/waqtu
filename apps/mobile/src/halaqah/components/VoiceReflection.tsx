@@ -8,7 +8,7 @@ import { formatDuration, MAX_VOICE_SECONDS } from "@/circles/logic";
 import { useVoiceRecorder } from "@/circles/useVoiceRecorder";
 import { useTranslation } from "@/i18n";
 import { Button, ButtonRow, Hint } from "@/ramadhan/components/fields";
-import { spacing, useTheme } from "@/theme";
+import { radius, spacing, tabular, typography, useTheme } from "@/theme";
 import {
   deleteVoiceReflection,
   getVoiceReflection,
@@ -81,12 +81,13 @@ export function VoiceReflection({ programId, day }: { programId: string; day: nu
   return (
     <View style={styles.root}>
       {recorder.recording ? (
-        <ButtonRow>
-          <Text style={[styles.status, { color: theme.text }]}>
+        <View style={[styles.live, { backgroundColor: theme.dangerSoft }]}>
+          <View style={[styles.dot, { backgroundColor: theme.danger }]} />
+          <Text style={[typography.callout, tabular, styles.status, { color: theme.text }]}>
             {t("circles.circle.recording", { time: formatDuration(recorder.elapsedSeconds) })}
           </Text>
           <Button label={t("halaqah.voice.stop")} onPress={() => void recorder.stop()} />
-        </ButtonRow>
+        </View>
       ) : voice ? (
         <>
           {playing ? (
@@ -135,5 +136,14 @@ export function VoiceReflection({ programId, day }: { programId: string; day: nu
 
 const styles = StyleSheet.create({
   root: { gap: spacing.sm },
-  status: { flex: 1, fontSize: 16 },
+  live: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    paddingLeft: spacing.md - 4,
+    padding: spacing.xs + 2,
+    borderRadius: radius.pill,
+  },
+  dot: { width: 10, height: 10, borderRadius: 5 },
+  status: { flex: 1, fontWeight: "600" },
 });

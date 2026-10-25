@@ -1,13 +1,15 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Pressable, StyleSheet, Switch, Text, TextInput, View } from "react-native";
+import { Platform, StyleSheet, Switch, Text, TextInput, View } from "react-native";
 
-import { radius, spacing, useTheme } from "@/theme";
+import { PressableScale } from "@/components/ui";
+import { HIT, radius, spacing, tabular, typography, useTheme } from "@/theme";
 
 /** Padded body for a `Section` card. */
 export function Panel({ children }: { children: ReactNode }) {
   return <View style={styles.panel}>{children}</View>;
 }
 
+/** Pill button: a filled accent pill (primary) or an outlined one (plain). */
 export function Button({
   label,
   onPress,
@@ -22,7 +24,7 @@ export function Button({
   const theme = useTheme();
   const primary = tone === "primary";
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       disabled={disabled}
@@ -32,17 +34,17 @@ export function Button({
         {
           backgroundColor: primary ? theme.accent : "transparent",
           borderColor: primary ? theme.accent : theme.border,
-          opacity: disabled ? 0.5 : 1,
         },
       ]}
     >
       <Text style={[styles.buttonLabel, { color: primary ? theme.accentText : theme.text }]}>
         {label}
       </Text>
-    </Pressable>
+    </PressableScale>
   );
 }
 
+/** A labelled switch row with an optional hint, separated from the next row by a hairline. */
 export function ToggleRow({
   label,
   hint,
@@ -58,9 +60,11 @@ export function ToggleRow({
 }) {
   const theme = useTheme();
   return (
-    <View style={[styles.toggleRow, { borderColor: theme.border }]}>
+    <View style={[styles.toggleRow, { borderColor: theme.separator }]}>
       <View style={styles.toggleText}>
-        <Text style={[styles.toggleLabel, { color: theme.text }]}>{label}</Text>
+        <Text style={[typography.body, { color: disabled ? theme.faint : theme.text }]}>
+          {label}
+        </Text>
         {hint ? <Text style={[styles.hint, { color: theme.muted }]}>{hint}</Text> : null}
       </View>
       <Switch
@@ -69,6 +73,11 @@ export function ToggleRow({
         value={value}
         onValueChange={onValueChange}
         trackColor={{ true: theme.accent, false: theme.border }}
+        ios_backgroundColor={theme.border}
+        // iOS keeps its white thumb; Android's Material thumb otherwise ignores the theme.
+        thumbColor={
+          Platform.OS === "android" ? (theme.dark ? theme.text : theme.surface) : undefined
+        }
       />
     </View>
   );
@@ -106,15 +115,16 @@ export function NumberField({
 
   return (
     <View style={styles.field}>
-      <Text style={[styles.hint, { color: theme.muted }]}>{label}</Text>
+      <Text style={[styles.fieldLabel, { color: theme.muted }]}>{label}</Text>
       <View
-        style={[styles.inputWrap, { borderColor: theme.border, backgroundColor: theme.background }]}
+        style={[styles.inputWrap, { borderColor: theme.border, backgroundColor: theme.surfaceAlt }]}
       >
         <TextInput
           accessibilityLabel={label}
           keyboardType={decimal ? "decimal-pad" : "number-pad"}
           placeholder={placeholder}
-          placeholderTextColor={theme.muted}
+          placeholderTextColor={theme.faint}
+          selectionColor={theme.accent}
           value={text}
           onChangeText={(next) => {
             setText(next);
@@ -124,19 +134,24 @@ export function NumberField({
               parsed !== null && Number.isFinite(parsed) && parsed >= 0 ? parsed : null,
             );
           }}
-          style={[styles.input, { color: theme.text }]}
+          style={[styles.input, tabular, { color: theme.text }]}
         />
-        {suffix ? <Text style={{ color: theme.muted }}>{suffix}</Text> : null}
+        {suffix ? (
+          <Text style={[typography.callout, { color: theme.muted, fontWeight: "600" }]}>
+            {suffix}
+          </Text>
+        ) : null}
       </View>
     </View>
   );
 }
 
+/** Thin rounded bar: an accent fill over a soft track. */
 export function ProgressBar({ fraction }: { fraction: number }) {
   const theme = useTheme();
   const clamped = Math.min(1, Math.max(0, fraction));
   return (
-    <View style={[styles.track, { backgroundColor: theme.border }]}>
+    <View style={[styles.track, { backgroundColor: theme.surfaceAlt }]}>
       <View
         style={[
           styles.fill,
@@ -147,16 +162,19 @@ export function ProgressBar({ fraction }: { fraction: number }) {
   );
 }
 
+/** Secondary small print. */
 export function Hint({ children }: { children: ReactNode }) {
   const theme = useTheme();
   return <Text style={[styles.hint, { color: theme.muted }]}>{children}</Text>;
 }
 
+/** Card-level figure or heading, in the title size. */
 export function Heading({ children }: { children: ReactNode }) {
   const theme = useTheme();
-  return <Text style={[styles.heading, { color: theme.text }]}>{children}</Text>;
+  return <Text style={[typography.title, tabular, { color: theme.text }]}>{children}</Text>;
 }
 
+/** Buttons side by side, wrapping onto a new line when they do not fit. */
 export function ButtonRow({ children }: { children: ReactNode }) {
   return <View style={styles.buttonRow}>{children}</View>;
 }
@@ -164,19 +182,19 @@ export function ButtonRow({ children }: { children: ReactNode }) {
 const styles = StyleSheet.create({
   panel: { padding: spacing.md, gap: spacing.md },
   button: {
-    minHeight: 44,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.md,
-    borderWidth: 1,
+    minHeight: HIT,
+    paddingHorizontal: spacing.md + 4,
+    borderRadius: radius.pill,
+    borderWidth: 1.5,
     alignItems: "center",
     justifyContent: "center",
   },
-  buttonLabel: { fontSize: 15, fontWeight: "600" },
-  buttonRow: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
+  buttonLabel: { ...typography.callout, fontWeight: "600" },
+  buttonRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: spacing.sm },
   toggleRow: {
-    minHeight: 52,
+    minHeight: 56,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.sm + 2,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -184,12 +202,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   toggleText: { flex: 1, gap: 2 },
-  toggleLabel: { fontSize: 16 },
-  hint: { fontSize: 13, lineHeight: 18 },
-  heading: { fontSize: 20, fontWeight: "700" },
-  field: { gap: spacing.xs },
+  hint: { ...typography.footnote, lineHeight: 18 },
+  field: { gap: 6 },
+  fieldLabel: { ...typography.footnote, fontWeight: "600" },
   inputWrap: {
-    minHeight: 44,
+    minHeight: HIT + 4,
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
@@ -197,7 +214,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     borderWidth: 1,
   },
-  input: { flex: 1, fontSize: 16, paddingVertical: spacing.sm },
-  track: { height: 8, borderRadius: 4, overflow: "hidden" },
-  fill: { height: 8, borderRadius: 4 },
+  input: { flex: 1, ...typography.body, fontWeight: "600", paddingVertical: spacing.sm },
+  track: { height: 8, borderRadius: radius.pill, overflow: "hidden" },
+  fill: { height: 8, borderRadius: radius.pill },
 });

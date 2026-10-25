@@ -1,16 +1,18 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-import { Row, Section } from "@/components/ui";
+import { Divider, IconChip, Row, Section } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { Button, Hint, Panel, ToggleRow } from "@/ramadhan/components/fields";
-import { radius, spacing, useTheme } from "@/theme";
+import { radius, spacing, typography, useTheme } from "@/theme";
 
 import type { CirclesApi } from "../api";
 import { CirclesHttpError } from "../api";
 import { displayInviteCode, groupCircles, handleProblem, isInviteCode } from "../logic";
 import type { Block, Circle, CircleProfile } from "../types";
+import { TextField } from "./TextField";
 
 function circleTitle(circle: Circle, fallback: string): string {
   return circle.name ?? fallback;
@@ -69,19 +71,27 @@ export function CirclesHome({
 
   return (
     <View style={styles.root}>
-      <Text style={{ color: theme.muted }}>{t("circles.intro")}</Text>
+      <Text style={[typography.subhead, styles.intro, { color: theme.muted }]}>
+        {t("circles.intro")}
+      </Text>
 
-      <Section title={t("circles.home.yourCircle")}>
+      <Section title={t("circles.home.yourCircle")} icon="globe-outline">
         {publicCircle ? (
           <Row
-            label={`${circleTitle(publicCircle, t("circles.circle.defaultName"))}\n${describe(publicCircle)}`}
+            icon="people"
+            label={circleTitle(publicCircle, t("circles.circle.defaultName"))}
+            detail={describe(publicCircle)}
+            chevron
             onPress={() => open(publicCircle)}
           />
         ) : (
           <Panel>
-            <Text style={[styles.heading, { color: theme.text }]}>
-              {t("circles.home.noCircle")}
-            </Text>
+            <View style={styles.empty}>
+              <IconChip icon="people-outline" size={44} />
+              <Text style={[typography.headline, styles.grow, { color: theme.text }]}>
+                {t("circles.home.noCircle")}
+              </Text>
+            </View>
             <Hint>{t("circles.home.noCircleBody")}</Hint>
             <Button
               label={busy ? t("circles.loading") : t("circles.home.joinPublic")}
@@ -98,26 +108,27 @@ export function CirclesHome({
         )}
       </Section>
 
-      <Section title={t("circles.home.privateTitle")}>
+      <Section title={t("circles.home.privateTitle")} icon="lock-closed-outline">
         {privateCircles.map((circle) => (
           <Row
             key={circle.id}
-            label={`${circleTitle(circle, t("circles.home.privateTitle"))}\n${describe(circle)}`}
+            icon="lock-closed"
+            label={circleTitle(circle, t("circles.home.privateTitle"))}
+            detail={describe(circle)}
+            chevron
             onPress={() => open(circle)}
           />
         ))}
         <Panel>
           <Hint>{t("circles.home.privateBody")}</Hint>
-          <TextInput
+          <TextField
             accessibilityLabel={t("circles.home.codeLabel")}
             autoCapitalize="characters"
             autoCorrect={false}
             placeholder={t("circles.home.codePlaceholder")}
-            placeholderTextColor={theme.muted}
             maxLength={12}
             value={code}
             onChangeText={setCode}
-            style={[styles.input, { color: theme.text, borderColor: theme.border }]}
           />
           <Button
             label={t("circles.home.joinWithCode")}
@@ -131,14 +142,15 @@ export function CirclesHome({
               })
             }
           />
-          <TextInput
+        </Panel>
+        <Divider />
+        <Panel>
+          <TextField
             accessibilityLabel={t("circles.home.privateName")}
             placeholder={t("circles.home.privateName")}
-            placeholderTextColor={theme.muted}
             maxLength={40}
             value={name}
             onChangeText={setName}
-            style={[styles.input, { color: theme.text, borderColor: theme.border }]}
           />
           <Button
             tone="plain"
@@ -156,16 +168,15 @@ export function CirclesHome({
         </Panel>
       </Section>
 
-      <Section title={t("circles.home.myProfile")}>
+      <Section title={t("circles.home.myProfile")} icon="person-circle-outline">
         <Panel>
-          <TextInput
+          <TextField
             accessibilityLabel={t("circles.onboarding.handle")}
             autoCapitalize="none"
             autoCorrect={false}
             maxLength={24}
             value={handle}
             onChangeText={setHandle}
-            style={[styles.input, { color: theme.text, borderColor: theme.border }]}
           />
           {handleIssue ? <Hint>{t(`circles.handleProblem.${handleIssue}`)}</Hint> : null}
           <Button
@@ -205,6 +216,7 @@ export function CirclesHome({
           }
         />
         <Row
+          icon="ban-outline"
           label={t("circles.home.blocked")}
           onPress={() =>
             void run(async () => {
@@ -221,6 +233,7 @@ export function CirclesHome({
             blocks.map((block) => (
               <Row
                 key={block.id}
+                icon="person-remove-outline"
                 label={`${block.handle} · ${t("circles.blocks.unblock")}`}
                 onPress={() =>
                   void run(async () => {
@@ -234,19 +247,35 @@ export function CirclesHome({
         ) : null}
       </Section>
 
-      {notice ? <Text style={{ color: theme.text }}>{notice}</Text> : null}
+      {notice ? (
+        <View
+          accessibilityLiveRegion="polite"
+          style={[styles.notice, { backgroundColor: theme.accentSoft }]}
+        >
+          <Ionicons
+            name="information-circle"
+            size={18}
+            color={theme.accent}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
+          <Text style={[typography.subhead, styles.grow, { color: theme.text }]}>{notice}</Text>
+        </View>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { gap: spacing.md },
-  heading: { fontSize: 18, fontWeight: "700" },
-  input: {
-    minHeight: 44,
-    borderWidth: 1,
+  root: { gap: spacing.lg },
+  intro: { lineHeight: 20, paddingHorizontal: spacing.xs },
+  grow: { flex: 1 },
+  empty: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
+  notice: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    padding: spacing.md - 4,
     borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    fontSize: 16,
   },
 });

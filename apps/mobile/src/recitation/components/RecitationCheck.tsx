@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import type { HafalanUnit } from "@waqtu/core";
 import type { File } from "expo-file-system";
 import * as Network from "expo-network";
@@ -5,10 +6,11 @@ import { useEffect, useRef, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 
 import { Row } from "@/components/ui";
+import { MicButton } from "@/hafalan/components/MicButton";
 import { formatSeconds } from "@/hafalan/format";
 import { useTranslation } from "@/i18n";
 import { Button, ButtonRow, Hint, ProgressBar } from "@/ramadhan/components/fields";
-import { spacing, useTheme } from "@/theme";
+import { radius, spacing, tabular, typography, useTheme } from "@/theme";
 import { checkId, checkRecitation, checkView, rangeOf, type CheckView } from "../check";
 import {
   addCheck,
@@ -190,17 +192,20 @@ export function RecitationCheck({
     <View style={styles.box}>
       <Hint>{t("recitation.hint")}</Hint>
 
-      <Text style={[styles.label, { color: theme.muted }]}>{t("recitation.model")}</Text>
-      <View>
-        {MODEL_IDS.map((id) => (
-          <Row
-            key={id}
-            label={t(`recitation.models.${id}`, { mb: megabytes(MODELS[id].bytes) })}
-            selected={id === dev.model}
-            disabled={busy}
-            onPress={() => chooseModel(id)}
-          />
-        ))}
+      <Text style={[typography.overline, { color: theme.muted }]}>{t("recitation.model")}</Text>
+      <View style={[styles.models, { borderColor: theme.separator }]}>
+        <View style={styles.modelRows}>
+          {MODEL_IDS.map((id) => (
+            <Row
+              key={id}
+              icon="hardware-chip-outline"
+              label={t(`recitation.models.${id}`, { mb: megabytes(MODELS[id].bytes) })}
+              selected={id === dev.model}
+              disabled={busy}
+              onPress={() => chooseModel(id)}
+            />
+          ))}
+        </View>
       </View>
 
       {download.status === "absent" ? (
@@ -211,7 +216,7 @@ export function RecitationCheck({
       ) : download.status === "downloading" || download.status === "paused" ? (
         <>
           <ProgressBar fraction={fraction ?? 0} />
-          <Text style={{ color: theme.text }}>
+          <Text style={[typography.subhead, tabular, { color: theme.text }]}>
             {download.status === "downloading"
               ? t("recitation.downloading", {
                   percent,
@@ -240,27 +245,39 @@ export function RecitationCheck({
       ) : download.status === "verifying" ? (
         <>
           <ProgressBar fraction={fraction ?? 0} />
-          <Text style={{ color: theme.text }}>{t("recitation.verifying", { percent })}</Text>
+          <Text style={[typography.subhead, tabular, { color: theme.text }]}>
+            {t("recitation.verifying", { percent })}
+          </Text>
         </>
       ) : download.status === "failed" ? (
         <>
-          <Text style={{ color: theme.danger }}>{t(`recitation.failed.${download.error}`)}</Text>
+          <View style={styles.line}>
+            <Ionicons name="alert-circle" size={18} color={theme.danger} />
+            <Text style={[typography.subhead, styles.grow, { color: theme.danger }]}>
+              {t(`recitation.failed.${download.error}`)}
+            </Text>
+          </View>
           <Button label={t("recitation.retry")} onPress={() => void begin()} />
         </>
       ) : (
         <>
-          <Hint>{t("recitation.ready")}</Hint>
+          <View style={styles.line}>
+            <Ionicons name="checkmark-circle" size={18} color={theme.accent} />
+            <View style={styles.grow}>
+              <Hint>{t("recitation.ready")}</Hint>
+            </View>
+          </View>
           {capture.recording ? (
             <>
-              <Text style={{ color: theme.text, fontWeight: "600" }}>
+              <Text style={[typography.headline, tabular, styles.center, { color: theme.text }]}>
                 {t("recitation.recording", { time: formatSeconds(capture.elapsedSeconds) })}
               </Text>
-              <Button label={t("recitation.stop")} onPress={capture.stop} />
+              <MicButton recording label={t("recitation.stop")} onPress={capture.stop} />
             </>
           ) : phase.kind === "transcribing" ? (
             <>
               <ProgressBar fraction={phase.percent / 100} />
-              <Text style={{ color: theme.text }}>
+              <Text style={[typography.subhead, tabular, { color: theme.text }]}>
                 {t("recitation.transcribing", { percent: Math.round(phase.percent) })}
               </Text>
               <Button
@@ -270,8 +287,8 @@ export function RecitationCheck({
               />
             </>
           ) : (
-            <ButtonRow>
-              <Button
+            <>
+              <MicButton
                 label={t("recitation.start")}
                 onPress={() => {
                   setMessage(null);
@@ -281,35 +298,45 @@ export function RecitationCheck({
                 }}
               />
               <Button tone="plain" label={t("recitation.deleteModel")} onPress={confirmDelete} />
-            </ButtonRow>
+            </>
           )}
         </>
       )}
 
       {capture.problem ? (
-        <Text style={{ color: theme.muted }}>
+        <Text style={[typography.subhead, { color: theme.danger }]}>
           {t(capture.problem === "denied" ? "recitation.recordDenied" : "recitation.recordFailed")}
         </Text>
       ) : null}
       {phase.kind === "failed" ? (
-        <Text style={{ color: theme.danger }}>{t("recitation.transcribeFailed")}</Text>
+        <Text style={[typography.subhead, { color: theme.danger }]}>
+          {t("recitation.transcribeFailed")}
+        </Text>
       ) : null}
 
       {phase.kind === "done" ? (
-        <View style={styles.result}>
-          <Text style={{ color: theme.text, fontWeight: "600" }}>
-            {t("recitation.counts", { ...phase.view.counts })}
-          </Text>
-          {phase.view.jumps.map((j, i) => (
-            <Text key={i} style={{ color: theme.danger }}>
-              {t("recitation.jump", {
-                at: `${j.at.surah}:${j.at.ayah}`,
-                from: `${j.from.surah}:${j.from.ayah}`,
-              })}
+        <View style={[styles.result, { backgroundColor: theme.surfaceAlt }]}>
+          <View style={styles.score}>
+            <Text style={[styles.figure, tabular, { color: theme.countdown }]}>
+              {phase.view.counts.correct}/{phase.view.counts.words}
             </Text>
+            <Text style={[typography.subhead, tabular, styles.grow, { color: theme.text }]}>
+              {t("recitation.counts", { ...phase.view.counts })}
+            </Text>
+          </View>
+          {phase.view.jumps.map((j, i) => (
+            <View key={i} style={styles.line}>
+              <Ionicons name="return-down-forward" size={16} color={theme.danger} />
+              <Text style={[typography.subhead, styles.grow, { color: theme.danger }]}>
+                {t("recitation.jump", {
+                  at: `${j.at.surah}:${j.at.ayah}`,
+                  from: `${j.from.surah}:${j.from.ayah}`,
+                })}
+              </Text>
+            </View>
           ))}
           <Hint>{t("recitation.legend")}</Hint>
-          <Text style={[styles.heard, { color: theme.muted }]}>
+          <Text style={[styles.heard, { color: theme.text }]}>
             {t("recitation.heard", { text: phase.text || "—" })}
           </Text>
           <Hint>
@@ -347,14 +374,20 @@ export function RecitationCheck({
           />
         </ButtonRow>
       ) : null}
-      {message ? <Text style={{ color: theme.muted }}>{message}</Text> : null}
+      {message ? <Text style={[typography.subhead, { color: theme.muted }]}>{message}</Text> : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  box: { gap: spacing.sm },
-  label: { fontSize: 13, fontWeight: "600" },
-  result: { gap: spacing.xs },
-  heard: { writingDirection: "rtl", textAlign: "right", fontSize: 16 },
+  box: { gap: spacing.md - 4 },
+  models: { borderRadius: radius.md, borderWidth: StyleSheet.hairlineWidth, overflow: "hidden" },
+  modelRows: { marginBottom: -1 },
+  line: { flexDirection: "row", alignItems: "flex-start", gap: spacing.sm },
+  grow: { flex: 1 },
+  center: { textAlign: "center" },
+  result: { gap: spacing.sm, padding: spacing.md, borderRadius: radius.md },
+  score: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
+  figure: { fontSize: 30, fontWeight: "800", letterSpacing: -0.5 },
+  heard: { writingDirection: "rtl", textAlign: "right", fontSize: 18, lineHeight: 30 },
 });

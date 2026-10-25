@@ -1,11 +1,11 @@
 import { diffDays, khatamPlan } from "@waqtu/core";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { Section } from "@/components/ui";
 import { useTranslation } from "@/i18n";
-import { useTheme } from "@/theme";
+import { radius, spacing, tabular, typography, useTheme } from "@/theme";
 import { formatCivilDate, formatNumber } from "../format";
 import { toIso } from "../dates";
 import type { RamadhanContext } from "../context";
@@ -19,9 +19,11 @@ import {
   type StoredKhatam,
 } from "../db";
 import { Button, ButtonRow, Heading, Hint, NumberField, Panel, ProgressBar } from "./fields";
+import { IconLine } from "./figures";
 
 const QUICK_ADD = [1, 5, 10] as const;
 
+/** Khatam planner: the target picker, then pages read against the plan with today's pages and quick adds. */
 export function KhatamCard({ ctx, locale }: { ctx: RamadhanContext; locale: string }) {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -88,7 +90,7 @@ export function KhatamCard({ ctx, locale }: { ctx: RamadhanContext; locale: stri
   if (!loaded) return null;
 
   return (
-    <Section title={t("ramadhan.khatam.title")}>
+    <Section title={t("ramadhan.khatam.title")} icon="book-outline">
       <Panel>
         {stored === null || plan === null ? (
           <>
@@ -99,7 +101,7 @@ export function KhatamCard({ ctx, locale }: { ctx: RamadhanContext; locale: stri
                 label="−"
                 onPress={() => setDraftTarget((n) => Math.max(1, n - 1))}
               />
-              <Text style={[styles.target, { color: theme.text }]}>
+              <Text style={[styles.target, tabular, { color: theme.text }]}>
                 {t("ramadhan.khatam.targetValue", { count: draftTarget })}
               </Text>
               <Button
@@ -124,38 +126,49 @@ export function KhatamCard({ ctx, locale }: { ctx: RamadhanContext; locale: stri
           </>
         ) : (
           <>
-            <Heading>
-              {t("ramadhan.khatam.progress", { read: plan.pagesRead, total: plan.totalPages })}
-            </Heading>
+            <View style={styles.progressHead}>
+              <View style={styles.grow}>
+                <Heading>
+                  {t("ramadhan.khatam.progress", { read: plan.pagesRead, total: plan.totalPages })}
+                </Heading>
+              </View>
+              <Text style={[styles.percent, tabular, { color: theme.accent }]}>
+                {Math.round(Math.min(1, plan.pagesRead / plan.totalPages) * 100)}%
+              </Text>
+            </View>
             <ProgressBar fraction={plan.pagesRead / plan.totalPages} />
-            <Hint>{t("ramadhan.khatam.daysLeft", { count: plan.daysLeft })}</Hint>
+            <IconLine icon="hourglass-outline">
+              {t("ramadhan.khatam.daysLeft", { count: plan.daysLeft })}
+            </IconLine>
             {plan.completed ? (
-              <Text style={{ color: theme.accent, fontWeight: "600" }}>
+              <IconLine icon="checkmark-circle" color={theme.accent}>
                 {t("ramadhan.khatam.completed")}
-              </Text>
+              </IconLine>
             ) : ended ? (
-              <Text style={{ color: theme.text }}>
+              <IconLine icon="flag-outline" color={theme.text}>
                 {t("ramadhan.khatam.ended", { pages: plan.pagesRemaining })}
-              </Text>
+              </IconLine>
             ) : (
               <>
-                <Text style={{ color: theme.text, fontSize: 16 }}>
-                  {t("ramadhan.khatam.daily")}:{" "}
-                  {t("ramadhan.khatam.dailyValue", {
-                    pages: plan.dailyTarget,
-                    juz: formatNumber(plan.dailyJuz, locale, 1),
-                  })}
-                </Text>
-                <Text
-                  style={{
-                    color: plan.todayRemaining === 0 ? theme.accent : theme.text,
-                    fontWeight: "600",
-                  }}
+                <View style={[styles.daily, { backgroundColor: theme.surfaceAlt }]}>
+                  <Text style={[typography.overline, { color: theme.muted }]}>
+                    {t("ramadhan.khatam.daily")}
+                  </Text>
+                  <Text style={[typography.headline, tabular, { color: theme.text }]}>
+                    {t("ramadhan.khatam.dailyValue", {
+                      pages: plan.dailyTarget,
+                      juz: formatNumber(plan.dailyJuz, locale, 1),
+                    })}
+                  </Text>
+                </View>
+                <IconLine
+                  icon={plan.todayRemaining === 0 ? "checkmark-circle" : "time-outline"}
+                  color={plan.todayRemaining === 0 ? theme.accent : theme.text}
                 >
                   {plan.todayRemaining === 0
                     ? t("ramadhan.khatam.doneToday")
                     : t("ramadhan.khatam.remainingToday", { pages: plan.todayRemaining })}
-                </Text>
+                </IconLine>
                 {plan.rebalanced ? (
                   <Hint>
                     {t("ramadhan.khatam.rebalanced", {
@@ -204,5 +217,9 @@ export function KhatamCard({ ctx, locale }: { ctx: RamadhanContext; locale: stri
 }
 
 const styles = StyleSheet.create({
-  target: { fontSize: 18, fontWeight: "600", minWidth: 100, textAlign: "center" },
+  target: { ...typography.title, minWidth: 110, textAlign: "center" },
+  progressHead: { flexDirection: "row", alignItems: "flex-end", gap: spacing.sm },
+  grow: { flex: 1 },
+  percent: { fontSize: 28, fontWeight: "800", letterSpacing: -0.5 },
+  daily: { gap: 2, padding: spacing.md - 4, borderRadius: radius.md },
 });

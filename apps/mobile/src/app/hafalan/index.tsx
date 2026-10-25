@@ -1,4 +1,5 @@
 import { ScrollView, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PlanForm } from "@/hafalan/components/PlanForm";
 import { PlanOverview } from "@/hafalan/components/PlanOverview";
@@ -11,13 +12,14 @@ import { spacing, useTheme } from "@/theme";
 /** Plan creation when there is none; otherwise the plan, today's new portion and murojaah, and plan settings. */
 export default function HafalanScreen() {
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const model = useHafalan();
   if (!model) return null;
   const { data } = model;
   return (
     <ScrollView
       style={{ backgroundColor: theme.background }}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={[styles.content, { paddingBottom: spacing.xl + insets.bottom }]}
       keyboardShouldPersistTaps="handled"
     >
       {data ? (
@@ -34,4 +36,6 @@ export default function HafalanScreen() {
   );
 }
 
-const styles = StyleSheet.create({ content: { padding: spacing.md, gap: spacing.lg } });
+const styles = StyleSheet.create({
+  content: { paddingHorizontal: spacing.md + 4, paddingTop: spacing.sm, gap: spacing.lg },
+});

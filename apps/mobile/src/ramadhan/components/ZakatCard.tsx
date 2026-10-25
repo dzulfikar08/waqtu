@@ -1,12 +1,9 @@
 import { zakatFitrah, type Rate } from "@waqtu/core";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useMemo, useState } from "react";
-import { Text, View } from "react-native";
-
 import { Section } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { requestNotificationPermission } from "@/notifications/setup";
-import { useTheme } from "@/theme";
 import type { RamadhanContext } from "../context";
 import { formatNumber, formatRupiah } from "../format";
 import { cancelZakatReminders, scheduleZakatReminders } from "../reminders";
@@ -14,12 +11,12 @@ import { KEYS } from "../settings";
 import { getSetting, setSetting } from "@/db/settings";
 import { useStoredMode } from "../useStoredMode";
 import { useStoredNumber } from "../useStoredNumber";
-import { Button, ButtonRow, Heading, Hint, NumberField, Panel, ToggleRow } from "./fields";
+import { Button, ButtonRow, Hint, NumberField, Panel, ToggleRow } from "./fields";
+import { ResultBox, ResultDetail, ResultFigure } from "./figures";
 
 /** Zakat fitrah calculator and the reminder notifications before Eid. */
 export function ZakatCard({ ctx, locale }: { ctx: RamadhanContext; locale: string }) {
   const { t } = useTranslation();
-  const theme = useTheme();
   const db = useSQLiteContext();
   const { mode, set: setMode } = useStoredMode(db, KEYS.zakatMode);
   const members = useStoredNumber(db, KEYS.zakatMembers, 1);
@@ -81,7 +78,7 @@ export function ZakatCard({ ctx, locale }: { ctx: RamadhanContext; locale: strin
   const priceField = mode === "cash" ? cash : pricePerKg;
 
   return (
-    <Section title={t("ramadhan.zakat.title")}>
+    <Section title={t("ramadhan.zakat.title")} icon="gift-outline">
       <Panel>
         <Hint>{t("ramadhan.zakat.hint")}</Hint>
         <NumberField
@@ -108,8 +105,8 @@ export function ZakatCard({ ctx, locale }: { ctx: RamadhanContext; locale: strin
           onChangeNumber={priceField.set}
         />
         {result ? (
-          <View>
-            <Heading>
+          <ResultBox icon={result.riceKg !== null ? "basket-outline" : "cash-outline"}>
+            <ResultFigure>
               {result.riceKg !== null
                 ? t("ramadhan.zakat.resultRice", {
                     kg: formatNumber(result.riceKg, locale, 3),
@@ -118,14 +115,14 @@ export function ZakatCard({ ctx, locale }: { ctx: RamadhanContext; locale: strin
                 : t("ramadhan.zakat.resultCash", {
                     amount: formatRupiah(result.amount ?? 0, locale),
                   })}
-            </Heading>
+            </ResultFigure>
             {result.riceKg !== null && priced && result.amount !== null ? (
-              <Text style={{ color: theme.text, fontSize: 16 }}>
+              <ResultDetail>
                 {t("ramadhan.zakat.resultAmount", { amount: formatRupiah(result.amount, locale) })}
-              </Text>
+              </ResultDetail>
             ) : null}
             {mode === "cash" && !priced ? <Hint>{t("ramadhan.zakat.needPrice")}</Hint> : null}
-          </View>
+          </ResultBox>
         ) : null}
       </Panel>
       <ToggleRow

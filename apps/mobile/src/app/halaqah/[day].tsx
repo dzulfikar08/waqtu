@@ -1,8 +1,9 @@
 import { useLocalSearchParams } from "expo-router";
 import { ScrollView, StyleSheet, Text } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useTranslation } from "@/i18n";
-import { spacing, useTheme } from "@/theme";
+import { spacing, typography, useTheme } from "@/theme";
 import { SessionView } from "@/halaqah/components/SessionView";
 import { halaqahAvailable } from "@/halaqah/bundled";
 import { dayOf } from "@/halaqah/program";
@@ -13,6 +14,7 @@ export default function HalaqahDayScreen() {
   const { day: param } = useLocalSearchParams<{ day: string }>();
   const { t } = useTranslation();
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const today = useHalaqahToday();
   const done = useHalaqahProgress(today?.program.id ?? "");
   if (!halaqahAvailable())
@@ -25,7 +27,7 @@ export default function HalaqahDayScreen() {
   return (
     <ScrollView
       style={{ backgroundColor: theme.background }}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={[styles.content, { paddingBottom: spacing.xl + insets.bottom }]}
       keyboardShouldPersistTaps="handled"
     >
       {entry ? (
@@ -37,13 +39,13 @@ export default function HalaqahDayScreen() {
           todayKey={today.todayKey}
         />
       ) : (
-        <Text style={{ color: theme.muted }}>{t("halaqah.notFound")}</Text>
+        <Text style={[typography.body, { color: theme.muted }]}>{t("halaqah.notFound")}</Text>
       )}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { padding: spacing.md, gap: spacing.lg },
+  content: { paddingHorizontal: spacing.md + 4, paddingTop: spacing.sm, gap: spacing.lg },
   unavailable: { padding: spacing.lg },
 });

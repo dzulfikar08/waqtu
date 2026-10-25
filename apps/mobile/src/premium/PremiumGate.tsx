@@ -1,10 +1,12 @@
 import { useRouter } from "expo-router";
 import type { ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
+import { PillButton } from "@/components/PillButton";
+import { Card, IconChip } from "@/components/ui";
 import { DEMO_MODE } from "@/demo/mode";
 import { useTranslation } from "@/i18n";
-import { radius, spacing, useTheme } from "@/theme";
+import { spacing, typography, useTheme } from "@/theme";
 
 import { usePremium } from "./usePremium";
 
@@ -20,24 +22,29 @@ export function PremiumGate({ children }: { children: ReactNode }) {
   const theme = useTheme();
   if (premium || DEMO_MODE) return <>{children}</>;
   return (
-    <View style={[styles.box, { backgroundColor: theme.surface, borderColor: theme.border }]}>
-      <Text style={[styles.title, { color: theme.text }]}>{t("premium.locked")}</Text>
-      <Text style={{ color: theme.muted, fontSize: 15 }}>{t("premium.lockedBody")}</Text>
-      <Pressable accessibilityRole="button" onPress={() => router.push("/premium")}>
-        <Text style={{ color: theme.accent, fontSize: 16, fontWeight: "600" }}>
-          {t("premium.see")}
-        </Text>
-      </Pressable>
-    </View>
+    <Card>
+      <View style={styles.body}>
+        <View style={styles.head}>
+          <IconChip icon="diamond" size={44} color={theme.gold} background={theme.goldSoft} />
+          <View style={styles.text}>
+            <Text style={[typography.headline, { color: theme.text }]}>{t("premium.locked")}</Text>
+            <Text style={[typography.subhead, { color: theme.muted }]}>
+              {t("premium.lockedBody")}
+            </Text>
+          </View>
+        </View>
+        <PillButton
+          label={t("premium.see")}
+          icon="sparkles"
+          onPress={() => router.push("/premium")}
+        />
+      </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  box: {
-    borderRadius: radius.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    padding: spacing.md,
-    gap: spacing.sm,
-  },
-  title: { fontSize: 17, fontWeight: "600" },
+  body: { gap: spacing.md },
+  head: { flexDirection: "row", alignItems: "center", gap: spacing.md },
+  text: { flex: 1, gap: 2 },
 });

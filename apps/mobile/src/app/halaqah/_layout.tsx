@@ -12,6 +12,7 @@ export default function HalaqahLayout() {
         headerStyle: { backgroundColor: theme.background },
         headerTintColor: theme.text,
         headerShadowVisible: false,
+        contentStyle: { backgroundColor: theme.background },
       }}
     >
       <Stack.Screen name="index" options={{ title: t("halaqah.title") }} />

@@ -1,7 +1,6 @@
 /** Copy for Circles. Spread into the app locales as the `circles` key. */
 export const circlesId = {
   tab: "Lingkaran",
-  title: "Lingkaran",
   intro:
     "Kelompok kecil, anonim, tanpa kewajiban. Berbagi renungan seperlunya, pergi kapan saja tanpa ada yang tahu.",
   loading: "Memuat…",
@@ -147,7 +146,6 @@ type Widen<T> = { [K in keyof T]: T[K] extends string ? string : Widen<T[K]> };
 
 export const circlesEn: Widen<typeof circlesId> = {
   tab: "Circles",
-  title: "Circles",
   intro:
     "Small, anonymous, no commitment. Share a reflection when you want to, step away any time and nobody is told.",
   loading: "Loading…",

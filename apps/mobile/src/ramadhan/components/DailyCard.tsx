@@ -3,13 +3,14 @@ import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Section } from "@/components/ui";
+import { IconChip, Section } from "@/components/ui";
 import { useTranslation } from "@/i18n";
-import { radius, spacing, useTheme } from "@/theme";
+import { radius, spacing, tabular, typography, useTheme } from "@/theme";
 import { countDaily, DAILY_KEYS, getDaily, setDaily, type DailyChecks, type DailyKey } from "../db";
 import { toIso } from "../dates";
 import type { RamadhanContext } from "../context";
 import { Hint, Panel, ToggleRow } from "./fields";
+import { IconLine } from "./figures";
 
 const EMPTY: DailyChecks = { puasa: false, tarawih: false, tadarus: false, itikaf: false };
 
@@ -49,34 +50,41 @@ export function DailyCard({ ctx, night }: { ctx: RamadhanContext; night: number 
 
   const keys = DAILY_KEYS.filter((k) => k !== "itikaf" || night !== null);
   const day = ramadhanDay(ctx.today, ctx.hijriOffset);
+  const done = keys.filter((key) => checks[key]).length;
 
   return (
     <>
       {night !== null ? (
-        <Section title={t("ramadhan.lastTen.title")}>
+        <Section title={t("ramadhan.lastTen.title")} icon="sparkles">
           <Panel>
-            <View
-              style={[
-                styles.banner,
-                { backgroundColor: theme.background, borderColor: theme.accent },
-              ]}
-            >
-              <Text style={[styles.night, { color: theme.accent }]}>
-                {t("ramadhan.lastTen.night", { night })}
-              </Text>
-              <Text style={{ color: theme.text }}>
-                {t(isOddNight(night) ? "ramadhan.lastTen.odd" : "ramadhan.lastTen.even")}
-              </Text>
+            <View style={[styles.banner, { backgroundColor: theme.goldSoft }]}>
+              <IconChip icon="moon" size={44} color={theme.gold} background={theme.goldSoft} />
+              <View style={styles.bannerText}>
+                <Text style={[typography.title, tabular, { color: theme.gold }]}>
+                  {t("ramadhan.lastTen.night", { night })}
+                </Text>
+                <Text style={[typography.subhead, { color: theme.text }]}>
+                  {t(isOddNight(night) ? "ramadhan.lastTen.odd" : "ramadhan.lastTen.even")}
+                </Text>
+              </View>
             </View>
             <Hint>{t("ramadhan.lastTen.duaLabel")}</Hint>
-            <Text style={[styles.arabic, { color: theme.text }]}>
+            <Text style={[styles.arabic, { color: theme.text, backgroundColor: theme.surfaceAlt }]}>
               {t("ramadhan.lastTen.duaArabic")}
             </Text>
             <Hint>{t("ramadhan.lastTen.duaMeaning")}</Hint>
           </Panel>
         </Section>
       ) : null}
-      <Section title={t("ramadhan.daily.title")}>
+      <Section
+        title={t("ramadhan.daily.title")}
+        icon="checkmark-done-outline"
+        right={
+          <Text style={[typography.footnote, tabular, { color: theme.muted, fontWeight: "700" }]}>
+            {done}/{keys.length}
+          </Text>
+        }
+      >
         {keys.map((key) => (
           <ToggleRow
             key={key}
@@ -86,11 +94,11 @@ export function DailyCard({ ctx, night }: { ctx: RamadhanContext; night: number 
           />
         ))}
         <Panel>
-          <Hint>
+          <IconLine icon={day === null ? "information-circle-outline" : "calendar-outline"}>
             {day === null
               ? t("ramadhan.daily.notRamadhan")
               : t("ramadhan.daily.fastedCount", { count: fasted, year: span.hijriYear })}
-          </Hint>
+          </IconLine>
         </Panel>
       </Section>
     </>
@@ -98,7 +106,21 @@ export function DailyCard({ ctx, night }: { ctx: RamadhanContext; night: number 
 }
 
 const styles = StyleSheet.create({
-  banner: { gap: spacing.xs, padding: spacing.md, borderRadius: radius.md, borderWidth: 1 },
-  night: { fontSize: 20, fontWeight: "700" },
-  arabic: { fontSize: 24, lineHeight: 40, textAlign: "right", writingDirection: "rtl" },
+  banner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md - 4,
+    padding: spacing.md,
+    borderRadius: radius.md,
+  },
+  bannerText: { flex: 1, gap: 2 },
+  arabic: {
+    fontSize: 24,
+    lineHeight: 40,
+    textAlign: "right",
+    writingDirection: "rtl",
+    padding: spacing.md - 4,
+    borderRadius: radius.md,
+    overflow: "hidden",
+  },
 });

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { WebView } from "react-native-webview";
 
+import { radius } from "@/theme";
 import { embedHtml, isEmbedNavigation } from "../embed";
 
 /** YouTube embed on the privacy-enhanced domain. Nothing plays until the user taps play. */
@@ -32,6 +33,11 @@ export function VideoEmbed({ youtubeId }: { youtubeId: string }) {
 }
 
 const styles = StyleSheet.create({
-  frame: { aspectRatio: 16 / 9, backgroundColor: "#000", borderRadius: 12, overflow: "hidden" },
+  frame: {
+    aspectRatio: 16 / 9,
+    backgroundColor: "#000",
+    borderRadius: radius.lg,
+    overflow: "hidden",
+  },
   web: { flex: 1, backgroundColor: "#000" },
 });
