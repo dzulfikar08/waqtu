@@ -75,6 +75,9 @@ struct MenuBarView: View {
 
             Divider()
 
+            // Module windows (halaqah, hafalan, circles); brings its own divider
+            ModulesMenuSection(viewModel: viewModel)
+
             // Pomodoro timer
             PomodoroSection(pomodoroManager: viewModel.pomodoroManager, nextPrayer: viewModel.nextPrayer)
 
