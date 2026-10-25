@@ -300,7 +300,8 @@ export default function PremiumScreen() {
         </View>
       ) : null}
 
-      {userId && !lifetime ? (
+      {/* App Store Guideline 3.1.1: no unlocking via external license keys on iOS. */}
+      {userId && !lifetime && Platform.OS !== "ios" ? (
         <Section title={t("premium.licenseTitle")}>
           <View style={styles.block}>
             <Text style={{ color: theme.muted, fontSize: 14 }}>{t("premium.licenseBody")}</Text>

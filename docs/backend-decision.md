@@ -39,3 +39,21 @@ If the owner confirms any are real users:
 ## Security finding
 
 The Neon `DATABASE_URL` (including the password) is stored as a **plain-text** worker binding and is committed in `wrangler.jsonc` of the private `mutabaah-bhvr` repo. Rotate the Neon password and move it to a secret (or retire the database) regardless of this decision. The value is deliberately not reproduced here.
+
+## Decision record: the Expo app replaces the Swift iPhone app
+
+- **Bundle id.** The Expo app (`apps/mobile`) ships on the existing App Store record `dat.waqtu.ios`
+  (Apple id 6826628861) as the next version, replacing the Swift iPhone app from `apps/apple`. The
+  Swift code keeps building only the Mac app (direct + Mac App Store).
+- **Old widget and watch targets.** The Swift iOS widget and watchOS targets are not shipped with the
+  Expo binary; users who update lose them until equivalents exist in the Expo app. The targets stay in
+  `apps/apple` for reference and CI builds only, and are not submitted again under `dat.waqtu.ios`.
+- **Mac App Store lifetime buyers.** Buyers of the Mac App Store in-app purchase `dat.waqtu.lifetime`
+  keep their Mac unlock, but that purchase does not currently grant premium on the mobile apps (it is
+  not written to the `entitlement` table). **Open owner decision:** whether to honour it on mobile
+  (e.g. verify the Mac receipt server-side and write a lifetime entitlement) or leave it Mac-only.
+- **Submitting.** `apps/mobile/eas.json` `submit.production` targets `ascAppId` 6826628861 and the Play
+  `internal` track. The Play service-account key is read from
+  `apps/mobile/google-play-service-account.json` (git-ignored, never committed); in CI write it from a
+  secret before `eas submit`. The `development` profile builds for physical iPhones;
+  `development-simulator` keeps the simulator build.
