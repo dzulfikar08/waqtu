@@ -30,7 +30,7 @@ struct FardhChecklistView: View {
                     .font(.system(size: 11))
                     .foregroundColor(.waqtuMuted)
                 Spacer()
-                Text("\(doneCount)/5")
+                Text(verbatim: "\(doneCount)/5")
                     .font(.system(size: 11, weight: .semibold))
                     .monospacedDigit()
                     .foregroundColor(doneCount == 5 ? .waqtuPrimary : .waqtuGold)
@@ -59,8 +59,8 @@ private struct FardhChip: View {
 
     private var done: Bool { status == .prayed || status == .late }
 
-    private var shortName: String {
-        PrayerName(rawValue: fardh.logName)?.shortName ?? fardh.logName
+    private var name: String {
+        PrayerName(rawValue: fardh.logName)?.displayName ?? fardh.logName
     }
 
     var body: some View {
@@ -69,7 +69,7 @@ private struct FardhChip: View {
                 Image(systemName: done ? "checkmark.circle.fill" : (status == .missed ? "xmark.circle" : "circle"))
                     .font(.system(size: 16))
                     .foregroundColor(done ? (status == .late ? .waqtuGold : .waqtuPrimary) : (status == .missed ? .red.opacity(0.7) : .waqtuMuted))
-                Text(shortName)
+                Text(name)
                     .font(.system(size: 9, weight: .medium))
                     .foregroundColor(done ? .waqtuText : .waqtuMuted)
             }
@@ -81,7 +81,7 @@ private struct FardhChip: View {
         }
         .buttonStyle(.plain)
         .onHover { isHovering = $0 }
-        .help(done ? "Marked as prayed. Click to undo." : "Mark \(fardh.logName) as prayed")
-        .accessibilityLabel("\(fardh.logName), \(done ? "prayed" : "not yet prayed")")
+        .help(done ? String(localized: "Marked as prayed. Click to undo.") : String(localized: "Mark \(name) as prayed"))
+        .accessibilityLabel(done ? String(localized: "\(name), prayed") : String(localized: "\(name), not yet prayed"))
     }
 }

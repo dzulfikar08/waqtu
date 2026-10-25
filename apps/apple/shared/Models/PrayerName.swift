@@ -9,7 +9,16 @@ public enum PrayerName: String, CaseIterable, Identifiable, Codable {
     case isha = "Isha"
 
     public var id: String { rawValue }
-    public var displayName: String { rawValue }
+    /// Name shown to the user, from the app's string catalog (Indonesian: Subuh, Dzuhur, ...).
+    public var displayName: String {
+        switch self {
+        case .fajr: return String(localized: "Fajr")
+        case .dhuhr: return String(localized: "Dhuhr")
+        case .asr: return String(localized: "Asr")
+        case .maghrib: return String(localized: "Maghrib")
+        case .isha: return String(localized: "Isha")
+        }
+    }
 
     public var iconName: String {
         switch self {

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bahasa Indonesia (DEV-13)
+
+- **Indonesian and English** — The Mac app's menu bar, settings, onboarding, overlay and notifications are translated into Indonesian through a String Catalog (`waqtu/Localizable.xcstrings`). Macs set to Indonesian get Indonesian; everything else stays English. Prayer and mutabaah terms match the mobile app (Subuh, Dzuhur, Ashar, Maghrib, Isya; Istiqamah; Berbuka/Imsak).
+
 ### Kemenag on the Mac (DEV-6)
 
 - **Kemenag RI method** — New "Kemenag RI (Indonesia)" method (Fajr 20°, Isha 18°, ihtiyat, rounding up), identical to the mobile app. A phone set to Kemenag now syncs as Kemenag instead of being mapped to Singapore (which was 2–4 min off). CI compares the app's own calculator against `@waqtu/core` for Kemenag and MWL.

@@ -224,8 +224,8 @@ final class AppSettings {
     }
 
     // Quranic quote
-    static let quranicQuote = "Indeed, prayer is obligatory on the believers at the specified time."
-    static let quranicReference = "— Quran 4:103"
+    static let quranicQuote = String(localized: "Indeed, prayer is obligatory on the believers at the specified time.")
+    static let quranicReference = String(localized: "— Quran 4:103")
 
     // MARK: - Islamic Pomodoro
 
