@@ -19,6 +19,7 @@ struct ModulesMenuSection: View {
                     moduleButton(mstr("modules.halaqah"), systemImage: "play.rectangle", action: openHalaqah)
                 }
                 moduleButton(mstr("modules.hafalan"), systemImage: "book", action: openHafalan)
+                moduleButton(mstr("modules.circles"), systemImage: "person.3", action: openCircles)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
@@ -54,6 +55,13 @@ struct ModulesMenuSection: View {
             HafalanWindowView(model: HafalanModel(
                 text: text,
                 store: HafalanPlanStore(fileURL: HafalanPlanStore.defaultFileURL())))
+        }
+    }
+
+    private func openCircles() {
+        let account = viewModel.account
+        ModuleWindows.shared.open(.circles, title: mstr("modules.circles"), size: NSSize(width: 980, height: 720)) {
+            CirclesWindowView(model: CirclesModel(account: account))
         }
     }
 }
