@@ -19,6 +19,21 @@ export const VOICE_MIME = "audio/mp4";
 
 export type VoiceProblem = "denied" | "failed";
 
+/**
+ * Asks for the microphone and switches the audio session to recording. False when the permission
+ * is denied. Shared by the voice-note recorder and the PCM capture of the recitation check.
+ */
+export async function beginRecordingSession(): Promise<boolean> {
+  const { granted } = await requestRecordingPermissionsAsync();
+  if (!granted) return false;
+  await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
+  return true;
+}
+
+export async function endRecordingSession(): Promise<void> {
+  await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true });
+}
+
 /** One voice note at a time: record, stop (or hit the limit), keep the draft until sent or discarded. */
 export function useVoiceRecorder(maxSeconds: number) {
   const recorder = useAudioRecorder({
@@ -35,12 +50,10 @@ export function useVoiceRecorder(maxSeconds: number) {
     setProblem(null);
     setDraft(null);
     try {
-      const { granted } = await requestRecordingPermissionsAsync();
-      if (!granted) {
+      if (!(await beginRecordingSession())) {
         setProblem("denied");
         return;
       }
-      await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
       await recorder.prepareToRecordAsync();
       recorder.record();
     } catch {
@@ -54,7 +67,7 @@ export function useVoiceRecorder(maxSeconds: number) {
     try {
       const seconds = clampVoiceSeconds(recorder.getStatus().durationMillis / 1000);
       await recorder.stop();
-      await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true });
+      await endRecordingSession();
       if (recorder.uri) setDraft({ uri: recorder.uri, seconds });
       else setProblem("failed");
     } catch {

@@ -3,6 +3,7 @@ import { premiumEn } from "@/premium/strings";
 import { hafalanEn } from "@/hafalan/strings";
 import { halaqahEn } from "@/halaqah/strings";
 import { ramadhanEn } from "@/ramadhan/strings";
+import { aboutEn, recitationEn } from "@/recitation/strings";
 import type { id } from "./id";
 
 type Widen<T> = { [K in keyof T]: T[K] extends string ? string : Widen<T[K]> };
@@ -169,4 +170,6 @@ export const en: Widen<typeof id> = {
   premium: premiumEn,
   halaqah: halaqahEn,
   hafalan: hafalanEn,
+  recitation: recitationEn,
+  about: aboutEn,
 };

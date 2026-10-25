@@ -7,9 +7,9 @@ scoring are out of scope. Everything runs on the phone: recordings never leave t
 `content/quran/README.md`, "Recitation recordings").
 
 Status of this document: model facts below were read from the Hugging Face model cards and the
-Hub API on 2026-10-25. **No model has been run on a phone yet**; the alignment engine and the
-acceptance harness exist and are tested, the on-device part is the remaining work (see
-[What is still missing](#what-is-still-missing-for-the-acceptance-criteria)).
+Hub API on 2026-10-25. The app now has the check behind a developer switch (see
+[In the app](#in-the-app-developer-switch)); **no model has been run on a phone yet**, only through
+whisper.cpp on a Mac (see [What is still missing](#what-is-still-missing-for-the-acceptance-criteria)).
 
 ## Candidate models
 
@@ -70,10 +70,12 @@ whisper.rn**, with the tiny model (q8_0, about 44 MB) as the fallback for low-me
 - Output format: trained on EveryAyah, whose text is imla'i with harakat ("بِسْمِ اللَّهِ الرَّحْمَنِ
   الرَّحِيمِ"), which `normalizeArabic` maps onto the Uthmani text (checked over the whole Quran, see
   below).
-- Convert it ourselves with whisper.cpp's `models/convert-h5-to-ggml.py` from the pinned Tarteel
-  revision rather than ship a third-party conversion that has no card; the Sadr card notes that the
-  source `config.json` carries a wrong `max_length` (1024) and that the standard decoder context
-  (448) has to be used.
+- The app downloads the `sadrapp` conversion, pinned to a commit and checked by SHA-256, rather
+  than converting it ourselves: the Sadr card notes that the source `config.json` carries a wrong
+  `max_length` (1024) and that it was converted with the standard decoder context (448). The
+  `ram-a-dhan` base file shows that mistake: its header declares `n_text_ctx` 1024 while its
+  `decoder.positional_embedding` has 448 rows, and whisper.cpp 1.9.5 refuses to load it (checked
+  on 2026-10-25). Its tiny file (448 and 448) loads and is the fallback.
 - Download it on first use of the feature (not bundled), so the app size does not grow by 82 MB.
 
 Contenders for the device test, same harness: `deepdml/whisper-base-ar-quran-mix-norm` (same size,
@@ -163,12 +165,49 @@ passes only with ≥ 50 recitations, recall ≥ 90% and false flags ≤ 5%.
    than professional qaris, phone microphones) with their expected ranges and every skipped,
    replaced and jumped word labelled by someone who knows the text, plus written consent from the
    reciters. Recordings stay off the repository.
-2. **Model files**: the ggml q8_0 conversion of `tarteel-ai/whisper-base-ar-quran` (and tiny),
-   with SHA-256, hosting for the on-demand download (e.g. R2) and the Apache-2.0 notice in the app's
-   licences screen.
+2. **Model files**: done for the developer build: the pinned ggml q8_0 files with SHA-256 are
+   downloaded straight from Hugging Face (table below) and the Apache-2.0 notice is on the About
+   screen. Hosting our own copy (e.g. R2) before a public release is still open.
 3. **Transcripts**: the 50 recordings transcribed by that model through whisper.cpp with the
    settings the app will use (language `ar`, temperature 0, no prompt), saved as whisper.rn JSON;
-   then the harness run with `--check`.
-4. **Device test**: whisper.rn in a development build on a mid-range Android (e.g. 4 GB RAM,
-   Snapdragon 6-series) in airplane mode: transcription time per half-page unit, peak memory, and
-   the same 50-recording result. Not done here: no model is integrated in the app in this change.
+   then the harness run with `--check`. The app's export produces this manifest for recordings
+   checked on a phone, with `mistakes` left to the labeller.
+4. **Device test**: the developer build on a mid-range Android (e.g. 4 GB RAM, Snapdragon
+   6-series) in airplane mode: transcription time per half-page unit (the app shows it and the
+   export records it as `transcribeSeconds`), peak memory, and the same 50-recording result.
+
+## In the app (developer switch)
+
+`apps/mobile/src/recitation/` (whisper.rn 0.7.4, pinned):
+
+- **Switch**: Settings → About & licences; tapping the version line 7 times shows the developer
+  section with "Check recitation (experimental)" (device-local setting `dev.recitation_check`).
+  Development builds (`__DEV__`) have it on until switched off. The About screen also carries the
+  Apache-2.0 notice of the models.
+- **Models** (`models.ts`), downloaded on first use into `Documents/recitation-models` (out of
+  backups), with a Wi-Fi warning, pause/resume (also across restarts), cancel and delete:
+
+  | Model | File (pinned URL)                                                                                                                                                                                               | Bytes      | SHA-256                                                            |
+  | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------ |
+  | base  | [`sadrapp/whisper-base-ar-quran-ggml@fa7a139…/ggml-model-q8_0.bin`](https://huggingface.co/sadrapp/whisper-base-ar-quran-ggml/resolve/fa7a13981ff68f2a1af37a33e2c35e1238d922d5/ggml-model-q8_0.bin)                                                   | 81,768,585 | `72194195f7d280adebec57acf2c6e01e209484322ec1cec21c275a3c0b1e3d77` |
+  | tiny  | [`ram-a-dhan/tarteel-whisper-quran-ggml@4a96d8b…/tarteel-ai-whisper-tiny-ar-quran-ggml-q8_0.bin`](https://huggingface.co/ram-a-dhan/tarteel-whisper-quran-ggml/resolve/4a96d8bb5535a4b6e6f6abd5655b8711a95ae538/tarteel-ai-whisper-tiny-ar-quran-ggml-q8_0.bin) | 43,537,433 | `ef01ab441b004f9e6f1ea98d397b43452b3a45efab7c3928ab37af655dde8b52` |
+
+  The file is written as `<file>.part`, hashed in 4 MB chunks, and renamed only when the digest
+  matches; a mismatch deletes it.
+- **Check**: on the hafalan unit screen, "Check recitation" records 16-bit PCM with expo-audio's
+  `AudioStream` (whisper.rn reads WAV, not the m4a of the hafalan recorder), transcribes it on the
+  phone (`language: "ar"`, `temperature: 0`, `temperatureInc: 0`, `maxContext: 0`, no prompt),
+  aligns it with `alignRecitation` against the unit's ayat (jump context: the surahs the unit
+  touches) and colours skipped words, replaced words and the ayah where a jump happened. The
+  WAV is deleted after transcription. whisper.rn's `result` glues the 30 s segments together with
+  no space, so the app joins `segments[].text` with spaces instead.
+- **Export**: every check's transcript is kept (`Documents/recitation/checks.json`) and can be
+  shared as a harness manifest (`text` inline, `range`, empty `mistakes` to be labelled; `model`,
+  `seconds`, `recordedAt` and `transcribeSeconds` for reference).
+
+Desktop smoke test of the pinned files (whisper.cpp 1.9.5 `whisper-cli -l ar -tp 0 -tpi 0 -mc 0`,
+Apple Silicon, EveryAyah Alafasy 67:1–3): the base model transcribes the three ayat exactly, the
+tiny one adds a و before 67:3 (وَمَا for مَا); with 67:2 cut out of the audio the base model does not
+write it in, and the alignment reports all 11 words of 67:2 as skipped
+(`apps/mobile/test/fixtures/recitation/whisper-mulk.json`). A professional reciter is the easy
+case; this says nothing yet about memorisers on phone microphones.

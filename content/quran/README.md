@@ -86,3 +86,9 @@ While recording, "Next ayah" stores the second at which each ayah of the unit st
 `hafalan_recording.marks`, a JSON list beginning with 0; see `apps/mobile/src/hafalan/marks.ts`). On
 playback the ayah at the current position is highlighted, and tapping an ayah plays from its mark.
 Recordings without marks play as before, with no highlighting.
+
+The recitation check (developer switch, `apps/mobile/src/recitation/`, see
+`docs/recitation/model-evaluation.md`) records into memory, writes a WAV to the app's cache only for
+whisper.rn to read, and deletes it once transcribed. What it keeps is the transcript text, in
+`Documents/recitation/checks.json` (excluded from backups), until the user shares or deletes it.
+Transcription runs on the phone; the only network use is the one-time model download.

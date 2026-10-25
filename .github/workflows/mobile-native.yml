@@ -1,6 +1,6 @@
-# Unsigned native compile of the Expo app (apps/mobile) on pull requests that touch it: Kotlin/Java and resources on
-# Android, Swift on iOS with and without the opt-in countdown widget extension (WAQTU_IOS_WIDGET=1). CI's `mobile` job
-# only checks that the Android project generates; this one builds it. Nothing is signed or uploaded.
+# Unsigned native compile of the Expo app (apps/mobile) on pull requests that touch it: Kotlin/Java, C++ (whisper.rn)
+# and resources on Android, Swift on iOS with and without the opt-in countdown widget extension (WAQTU_IOS_WIDGET=1).
+# CI's `mobile` job only checks that the Android project generates; this one builds it. Nothing is signed or uploaded.
 name: Mobile native build
 
 on:
@@ -53,6 +53,28 @@ jobs:
           manifest=$(find app/build/intermediates/merged_manifests/debug -name AndroidManifest.xml | head -1)
           grep -q 'dat.waqtu.countdown.WaqtuCountdownWidget' "$manifest"
           grep -q 'android.appwidget.provider' "$manifest"
+      # whisper.rn (on-device recitation check) builds three arm64 variants of whisper.cpp; report what they add.
+      - name: whisper.rn libraries in the APK (size report)
+        working-directory: apps/mobile/android
+        run: |
+          apk=app/build/outputs/apk/debug/app-debug.apk
+          unzip -l "$apk" | grep 'lib/arm64-v8a/librnwhisper' | tee "$RUNNER_TEMP/whisper-libs.txt"
+          test -s "$RUNNER_TEMP/whisper-libs.txt"
+          strip=$(find "$ANDROID_HOME/ndk" -path '*linux-x86_64/bin/llvm-strip' | sort | tail -1)
+          mkdir -p "$RUNNER_TEMP/so"
+          unzip -q -o "$apk" 'lib/arm64-v8a/librnwhisper*' -d "$RUNNER_TEMP/so"
+          {
+            echo "### whisper.rn in the debug APK (arm64-v8a)"
+            echo ""
+            echo "| library | debug (unstripped) | stripped | stripped, gzip -9 |"
+            echo "|---|---:|---:|---:|"
+            for f in "$RUNNER_TEMP"/so/lib/arm64-v8a/librnwhisper*.so; do
+              "$strip" -o "$f.stripped" "$f"
+              echo "| $(basename "$f") | $(stat -c %s "$f") | $(stat -c %s "$f.stripped") | $(gzip -9c "$f.stripped" | wc -c) |"
+            done
+            echo ""
+            echo "Debug APK: $(stat -c %s "$apk") bytes"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
 
   ios:
     runs-on: macos-latest
@@ -90,6 +112,9 @@ jobs:
         run: |
           xcodebuild -list -workspace Waqtu.xcworkspace | tee "$RUNNER_TEMP/targets.txt"
           if [ "$WAQTU_IOS_WIDGET" = "1" ]; then grep -q CountdownWidget "$RUNNER_TEMP/targets.txt"; else ! grep -q CountdownWidget "$RUNNER_TEMP/targets.txt"; fi
+      - name: whisper.rn pod is installed
+        working-directory: apps/mobile/ios
+        run: grep -q 'whisper-rn' Podfile.lock
       - name: xcodebuild (simulator, unsigned)
         working-directory: apps/mobile/ios
         run: |

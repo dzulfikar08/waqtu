@@ -60,6 +60,16 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
+          name="about"
+          options={{
+            headerShown: true,
+            title: t("about.title"),
+            headerStyle: { backgroundColor: theme.background },
+            headerTintColor: theme.text,
+            headerShadowVisible: false,
+          }}
+        />
+        <Stack.Screen
           name="circle/[id]"
           options={{
             headerShown: true,

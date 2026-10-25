@@ -96,6 +96,9 @@ export default function SettingsScreen() {
       </Section>
       {authClient ? <PremiumSection /> : null}
       {authClient ? <AccountSection client={authClient} /> : null}
+      <Section title={t("about.licences")}>
+        <Row label={t("about.row")} onPress={() => router.push("/about")} />
+      </Section>
     </ScrollView>
   );
 }

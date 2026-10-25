@@ -14,6 +14,9 @@ import { QuranCredit } from "@/hafalan/components/QuranCredit";
 import { useHafalan } from "@/hafalan/useHafalan";
 import { useQuranFont } from "@/hafalan/useQuranFont";
 import { Button, ButtonRow, Heading, Hint } from "@/ramadhan/components/fields";
+import type { CheckView } from "@/recitation/check";
+import { RecitationCheck } from "@/recitation/components/RecitationCheck";
+import { useRecitationDev } from "@/recitation/useDevSettings";
 import { Section } from "@/components/ui";
 import { spacing, useTheme } from "@/theme";
 
@@ -43,11 +46,14 @@ export default function UnitScreen() {
   const [graded, setGraded] = useState<{ due: string; dayComplete: boolean } | null>(null);
   const [activeAyah, setActiveAyah] = useState<number | null>(null);
   const seekRef = useRef<SeekToAyah | null>(null);
+  const dev = useRecitationDev();
+  const [check, setCheck] = useState<CheckView | null>(null);
 
   useEffect(() => {
     setMode("show");
     setRevealed(new Set());
     setGraded(null);
+    setCheck(null);
   }, [index]);
 
   const blocks = useMemo(() => (unit ? unitBlocks(unit) : []), [unit]);
@@ -108,6 +114,7 @@ export default function UnitScreen() {
         onReveal={reveal}
         fontFamily={font.family}
         fontSize={FONT_SIZE}
+        check={check}
         activeAyah={activeAyah}
         onAyahPress={recording?.marks.length ? (ayah) => seekRef.current?.(ayah) : undefined}
       />
@@ -207,6 +214,13 @@ export default function UnitScreen() {
           />
         </View>
       </Section>
+      {dev.enabled ? (
+        <Section title={t("recitation.title")}>
+          <View style={styles.panel}>
+            <RecitationCheck key={index} unit={unit} unitIndex={index} onView={setCheck} />
+          </View>
+        </Section>
+      ) : null}
       <QuranCredit />
     </ScrollView>
   );

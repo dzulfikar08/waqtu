@@ -25,6 +25,8 @@ export interface Theme {
   border: string;
   secondary: string;
   danger: string;
+  /** Second-level alert, e.g. a replaced word in the recitation check. */
+  warning: string;
 }
 
 export const lightTheme: Theme = {
@@ -38,6 +40,7 @@ export const lightTheme: Theme = {
   border: "#E1E5EA",
   secondary: palette.secondary,
   danger: "#B3261E",
+  warning: "#B45309",
 };
 
 export const darkTheme: Theme = {
@@ -51,6 +54,7 @@ export const darkTheme: Theme = {
   border: "#2D5F4C",
   secondary: palette.secondary,
   danger: "#FFB4AB",
+  warning: "#FCD34D",
 };
 
 export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 } as const;
