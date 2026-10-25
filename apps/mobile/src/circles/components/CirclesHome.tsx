@@ -89,12 +89,7 @@ export function CirclesHome({
         ) : (
           <Panel>
             <View style={styles.empty}>
-              <IconChip
-                icon="people-outline"
-                size={44}
-                color={rose.base}
-                background={rose.soft}
-              />
+              <IconChip icon="people-outline" size={44} color={rose.base} background={rose.soft} />
               <Text style={[typography.headline, styles.grow, { color: theme.text }]}>
                 {t("circles.home.noCircle")}
               </Text>

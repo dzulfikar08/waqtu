@@ -79,7 +79,9 @@ export default function HalaqahScreen() {
           <View style={[styles.ring, styles.ringInner]} />
         </View>
         <View style={styles.head}>
-          <View style={[styles.badge, { backgroundColor: onSky.glassStrong, borderColor: onSky.line }]}>
+          <View
+            style={[styles.badge, { backgroundColor: onSky.glassStrong, borderColor: onSky.line }]}
+          >
             <Ionicons
               name="school"
               size={24}
@@ -127,7 +129,9 @@ export default function HalaqahScreen() {
               style={[styles.heroButton, { backgroundColor: onSky.text }]}
             >
               <Text style={[styles.heroButtonLabel, { color: theme.dark ? "#2E1F52" : "#7C4DCC" }]}>
-                {done.size === 0 ? t("halaqah.startEarly") : t("halaqah.continueFrom", { day: next })}
+                {done.size === 0
+                  ? t("halaqah.startEarly")
+                  : t("halaqah.continueFrom", { day: next })}
               </Text>
             </PressableScale>
             <Text style={[typography.footnote, { color: onSky.muted, lineHeight: 18 }]}>

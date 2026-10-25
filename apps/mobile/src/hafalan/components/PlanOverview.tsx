@@ -68,7 +68,9 @@ export function PlanOverview({ data }: { data: HafalanData }) {
     >
       <HeroArt />
       <View style={styles.head}>
-        <View style={[styles.badge, { backgroundColor: onSky.glassStrong, borderColor: onSky.line }]}>
+        <View
+          style={[styles.badge, { backgroundColor: onSky.glassStrong, borderColor: onSky.line }]}
+        >
           <Ionicons
             name="book"
             size={24}
@@ -78,7 +80,9 @@ export function PlanOverview({ data }: { data: HafalanData }) {
           />
         </View>
         <View style={styles.grow}>
-          <Text style={[typography.overline, { color: onSky.muted }]}>{t("hafalan.planTitle")}</Text>
+          <Text style={[typography.overline, { color: onSky.muted }]}>
+            {t("hafalan.planTitle")}
+          </Text>
           <Text style={[typography.title, { color: onSky.text }]}>
             {targetLabel(plan.target, t)}
           </Text>

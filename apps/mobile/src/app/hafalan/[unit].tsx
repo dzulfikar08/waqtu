@@ -103,7 +103,13 @@ export default function UnitScreen() {
           ? "checkmark-done"
           : "time-outline";
   const roleHue: Hue =
-    role === "sabaq" ? "hafalan" : role === "murojaah" ? "week" : role === "done" ? "brand" : "neutral";
+    role === "sabaq"
+      ? "hafalan"
+      : role === "murojaah"
+        ? "week"
+        : role === "done"
+          ? "brand"
+          : "neutral";
   const roleTone = hueColors(theme, roleHue);
 
   return (
@@ -254,15 +260,7 @@ export default function UnitScreen() {
                         },
                       ]}
                     >
-                      <Text
-                        style={[
-                          styles.gradeFigure,
-                          tabular,
-                          { color: tone.base },
-                        ]}
-                      >
-                        {g}
-                      </Text>
+                      <Text style={[styles.gradeFigure, tabular, { color: tone.base }]}>{g}</Text>
                       <Text
                         numberOfLines={2}
                         style={[typography.caption, styles.gradeLabel, { color: theme.muted }]}

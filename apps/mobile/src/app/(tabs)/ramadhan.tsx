@@ -168,4 +168,3 @@ const styles = StyleSheet.create({
   captionLine: { flexDirection: "row", alignItems: "center", gap: 5 },
   grow: { flex: 1 },
 });
-

@@ -378,7 +378,13 @@ function WeekHero({
 const styles = StyleSheet.create({
   section: { gap: spacing.sm },
   head: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
-  badge: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center" },
+  badge: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   grow: { flex: 1 },
   strong: { fontWeight: "600" },
   hero: {

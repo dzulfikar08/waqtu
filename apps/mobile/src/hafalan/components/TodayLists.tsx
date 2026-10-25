@@ -95,7 +95,9 @@ function Count({ done, total, hue }: { done: number; total: number; hue: Hue }) 
   const theme = useTheme();
   if (total === 0) return null;
   return (
-    <Text style={[typography.footnote, tabular, styles.count, { color: hueColors(theme, hue).base }]}>
+    <Text
+      style={[typography.footnote, tabular, styles.count, { color: hueColors(theme, hue).base }]}
+    >
       {done}/{total}
     </Text>
   );
