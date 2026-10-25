@@ -45,9 +45,15 @@ final class AppViewModel {
     /// True while calendar access is being refreshed.
     var isRefreshingCalendarAccess: Bool = false
 
-    /// Full access: trial active, trial used (legacy), or valid license.
+    /// Full access: trial active, trial used (legacy), valid license, or premium on the signed-in
+    /// Waqtu account (one subscription unlocks mobile and the Mac).
     var hasAccess: Bool {
-        trialManager.hasAccess || licenseManager.isLicensed
+        trialManager.hasAccess || isPremium
+    }
+
+    /// Paid premium (license key or account entitlement), as opposed to the trial.
+    var isPremium: Bool {
+        licenseManager.isLicensed || account.serverPremium
     }
 
     private var cancellables = Set<AnyCancellable>()
@@ -321,9 +327,7 @@ final class AppViewModel {
     }
 
     private func prayerKey(for prayer: PrayerTime) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return "\(formatter.string(from: prayer.time))-\(prayer.name.rawValue)"
+        "\(FardhMapping.dayKey(for: prayer.time))-\(prayer.name.rawValue)"
     }
 
     /// Push latest prayer times and streaks to shared app group for iOS/watch/widgets.

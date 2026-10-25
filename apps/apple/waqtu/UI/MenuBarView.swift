@@ -33,8 +33,8 @@ struct MenuBarView: View {
 
     private var menuBarContent: some View {
         VStack(spacing: 0) {
-            // Trial banner only when not licensed
-            if !viewModel.licenseManager.isLicensed, viewModel.trialManager.trialDaysRemaining >= 2 {
+            // Trial banner only without paid premium (license or Waqtu account)
+            if !viewModel.isPremium, viewModel.trialManager.trialDaysRemaining >= 2 {
                 TrialBannerView(daysRemaining: viewModel.trialManager.trialDaysRemaining)
             }
 
@@ -94,7 +94,7 @@ struct MenuBarView: View {
         .frame(width: 320)
         .background(Color.waqtuBackground)
         .onAppear {
-            if viewModel.trialManager.shouldShowTrialEndingSoonModal {
+            if !viewModel.isPremium, viewModel.trialManager.shouldShowTrialEndingSoonModal {
                 showTrialEndingSoonModal = true
             }
         }
@@ -828,7 +828,7 @@ struct SettingsView: View {
 
     private var settingsTabs: some View {
         VStack(spacing: 0) {
-            if let vm = viewModel, !vm.licenseManager.isLicensed, vm.trialManager.trialDaysRemaining >= 2 {
+            if let vm = viewModel, !vm.isPremium, vm.trialManager.trialDaysRemaining >= 2 {
                 TrialBannerView(daysRemaining: vm.trialManager.trialDaysRemaining)
             }
             TabView {
@@ -874,7 +874,7 @@ struct SettingsView: View {
                         }
                 }
 
-                AboutSettingsTab(trialManager: viewModel?.trialManager, isLicensed: viewModel?.licenseManager.isLicensed ?? false, onCheckForUpdates: onCheckForUpdates, onResetWaqtu: viewModel.map { vm in { vm.resetAllAndQuit() } })
+                AboutSettingsTab(trialManager: viewModel?.trialManager, isLicensed: viewModel?.licenseManager.isLicensed ?? false, hasAccountPremium: viewModel?.account.serverPremium ?? false, onCheckForUpdates: onCheckForUpdates, onResetWaqtu: viewModel.map { vm in { vm.resetAllAndQuit() } })
                     .tabItem {
                         Label("About", systemImage: "info.circle.fill")
                     }
@@ -1811,6 +1811,8 @@ struct LocationSettingsTab: View {
 struct AboutSettingsTab: View {
     var trialManager: TrialManager?
     var isLicensed: Bool = false
+    /// Premium on the signed-in Waqtu account (e.g. a subscription bought on the phone).
+    var hasAccountPremium: Bool = false
     var onCheckForUpdates: (() -> Void)?
     var onResetWaqtu: (() -> Void)?
     @State private var showResetConfirmation = false
@@ -1921,6 +1923,19 @@ struct AboutSettingsTab: View {
                     .font(.system(size: 12))
                     .foregroundColor(.waqtuPrimary)
                 Text("Lifetime access")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.waqtuText)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Color.waqtuDark.opacity(0.6))
+            .cornerRadius(8)
+        } else if hasAccountPremium {
+            HStack(spacing: 6) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 12))
+                    .foregroundColor(.waqtuPrimary)
+                Text("Premium via your Waqtu account")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(.waqtuText)
             }
