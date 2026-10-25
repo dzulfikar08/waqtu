@@ -187,13 +187,14 @@ passes only with ≥ 50 recitations, recall ≥ 90% and false flags ≤ 5%.
 - **Models** (`models.ts`), downloaded on first use into `Documents/recitation-models` (out of
   backups), with a Wi-Fi warning, pause/resume (also across restarts), cancel and delete:
 
-  | Model | File (pinned URL)                                                                                                                                                                                               | Bytes      | SHA-256                                                            |
-  | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------ |
-  | base  | [`sadrapp/whisper-base-ar-quran-ggml@fa7a139…/ggml-model-q8_0.bin`](https://huggingface.co/sadrapp/whisper-base-ar-quran-ggml/resolve/fa7a13981ff68f2a1af37a33e2c35e1238d922d5/ggml-model-q8_0.bin)                                                   | 81,768,585 | `72194195f7d280adebec57acf2c6e01e209484322ec1cec21c275a3c0b1e3d77` |
+  | Model | File (pinned URL)                                                                                                                                                                                                                                               | Bytes      | SHA-256                                                            |
+  | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------ |
+  | base  | [`sadrapp/whisper-base-ar-quran-ggml@fa7a139…/ggml-model-q8_0.bin`](https://huggingface.co/sadrapp/whisper-base-ar-quran-ggml/resolve/fa7a13981ff68f2a1af37a33e2c35e1238d922d5/ggml-model-q8_0.bin)                                                             | 81,768,585 | `72194195f7d280adebec57acf2c6e01e209484322ec1cec21c275a3c0b1e3d77` |
   | tiny  | [`ram-a-dhan/tarteel-whisper-quran-ggml@4a96d8b…/tarteel-ai-whisper-tiny-ar-quran-ggml-q8_0.bin`](https://huggingface.co/ram-a-dhan/tarteel-whisper-quran-ggml/resolve/4a96d8bb5535a4b6e6f6abd5655b8711a95ae538/tarteel-ai-whisper-tiny-ar-quran-ggml-q8_0.bin) | 43,537,433 | `ef01ab441b004f9e6f1ea98d397b43452b3a45efab7c3928ab37af655dde8b52` |
 
   The file is written as `<file>.part`, hashed in 4 MB chunks, and renamed only when the digest
   matches; a mismatch deletes it.
+
 - **Check**: on the hafalan unit screen, "Check recitation" records 16-bit PCM with expo-audio's
   `AudioStream` (whisper.rn reads WAV, not the m4a of the hafalan recorder), transcribes it on the
   phone (`language: "ar"`, `temperature: 0`, `temperatureInc: 0`, `maxContext: 0`, no prompt),
