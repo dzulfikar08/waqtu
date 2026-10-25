@@ -13,7 +13,7 @@ import {
 } from "@waqtu/core";
 
 import { getEntriesBetween } from "../src/db/entries";
-import { MIGRATIONS } from "../src/db/migrations";
+import { MIGRATIONS, migrate } from "../src/db/migrations";
 import {
   deletePlan,
   deleteRecording,
@@ -28,10 +28,19 @@ import {
   updatePlan,
 } from "../src/hafalan/db";
 import { arabicDigits, formatSeconds, nextTodo, unitLabel, unitRole } from "../src/hafalan/format";
+import {
+  addMark,
+  ayahAt,
+  decodeMarks,
+  encodeMarks,
+  finalMarks,
+  markOf,
+} from "../src/hafalan/marks";
+import { HAFALAN_MIGRATION } from "../src/hafalan/migrations";
 import { SURAH_LOADERS } from "../src/hafalan/surahLoaders";
 import { surahAyahs, unitBlocks, wordCount, wordKeys } from "../src/hafalan/text";
 import { BUILTIN_ITEMS, DEFAULT_ITEMS } from "../src/mutabaah/items";
-import { migratedDb } from "./helpers/sqlite";
+import { asExpoDb, migratedDb, openTestDb } from "./helpers/sqlite";
 
 const verbatim = readFileSync(
   new URL("../../../content/quran/quran-uthmani-1.1.txt", import.meta.url),
@@ -121,6 +130,9 @@ const PLAN: HafalanPlan = {
   deadline: "2027-03-30",
   maxReviewPerDay: 12,
 };
+
+/** Index in `MIGRATIONS` of the step that created the hafalan tables. */
+const HAFALAN_STEP = MIGRATIONS.indexOf(HAFALAN_MIGRATION);
 
 describe("hafalan storage", () => {
   test("migrated: the hafalan tables exist at the current schema version", async () => {
@@ -228,31 +240,101 @@ describe("hafalan storage", () => {
   test("recordings: kept per unit, replaced, deleted; the files to remove are returned", async () => {
     const { db } = await migratedDb();
     await savePlan(db, PLAN);
-    expect(await saveRecording(db, 3, "a.m4a", 40)).toBeNull();
-    expect(await saveRecording(db, 3, "b.m4a", 55)).toBe("a.m4a");
-    expect(await saveRecording(db, 5, "c.m4a", 10)).toBeNull();
+    expect(await saveRecording(db, 3, "a.m4a", 40, [])).toBeNull();
+    expect(await saveRecording(db, 3, "b.m4a", 55, [0, 12, 30])).toBe("a.m4a");
+    expect(await saveRecording(db, 5, "c.m4a", 10, [])).toBeNull();
     expect([...(await getRecordings(db))]).toEqual([
-      [3, { file: "b.m4a", seconds: 55 }],
-      [5, { file: "c.m4a", seconds: 10 }],
+      [3, { file: "b.m4a", seconds: 55, marks: [0, 12, 30] }],
+      [5, { file: "c.m4a", seconds: 10, marks: [] }],
     ]);
     expect(await deleteRecording(db, 3)).toBe("b.m4a");
     expect(await deleteRecording(db, 3)).toBeNull();
     expect((await getRecordings(db)).size).toBe(1);
   });
 
+  test("recording marks: re-recording replaces them, marks past the end or a lone start are dropped", async () => {
+    const { db, raw } = await migratedDb();
+    await saveRecording(db, 2, "a.m4a", 20, [0, 5, 9, 25]);
+    expect((await getRecordings(db)).get(2)?.marks).toEqual([0, 5, 9]);
+    await saveRecording(db, 2, "b.m4a", 8, [0]);
+    expect((await getRecordings(db)).get(2)).toEqual({ file: "b.m4a", seconds: 8, marks: [] });
+    const row = raw.query("SELECT marks FROM hafalan_recording WHERE unit = 2").get() as {
+      marks: string | null;
+    };
+    expect(row.marks).toBeNull();
+  });
+
+  test("a recording made before marks existed survives the upgrade with no marks", async () => {
+    const raw = openTestDb();
+    for (const statements of MIGRATIONS.slice(0, HAFALAN_STEP + 1)) {
+      for (const sql of statements) raw.run(sql);
+    }
+    raw.run(`PRAGMA user_version = ${HAFALAN_STEP + 1}`);
+    raw.run(
+      "INSERT INTO hafalan_recording (unit, file, seconds, created_at) VALUES (1, 'old.m4a', 30, 0)",
+    );
+    const db = asExpoDb(raw);
+    await migrate(db);
+    expect([...(await getRecordings(db))]).toEqual([
+      [1, { file: "old.m4a", seconds: 30, marks: [] }],
+    ]);
+  });
+
   test("replacing or deleting the plan drops progress and returns every recording file", async () => {
     const { db } = await migratedDb();
     await savePlan(db, PLAN);
     await gradeUnitToday(db, 0, 4, "2027-03-01");
-    await saveRecording(db, 0, "x.m4a", 20);
-    await saveRecording(db, 1, "y.m4a", 30);
+    await saveRecording(db, 0, "x.m4a", 20, []);
+    await saveRecording(db, 1, "y.m4a", 30, []);
     const replaced = await savePlan(db, { ...PLAN, target: { kind: "surah", from: 112, to: 112 } });
     expect(replaced.sort()).toEqual(["x.m4a", "y.m4a"]);
     expect(await getStates(db)).toEqual([]);
     expect((await getRecordings(db)).size).toBe(0);
-    await saveRecording(db, 0, "z.m4a", 5);
+    await saveRecording(db, 0, "z.m4a", 5, []);
     expect(await deletePlan(db)).toEqual(["z.m4a"]);
     expect(await getPlan(db)).toBeNull();
+  });
+});
+
+describe("ayah marks", () => {
+  test("Next ayah adds marks in order, up to one per ayah, only after recording started", () => {
+    expect(addMark([], 3, 4)).toEqual([]);
+    let marks = addMark([0], 4, 3);
+    marks = addMark(marks, 2, 3);
+    expect(marks).toEqual([0, 4]);
+    marks = addMark(marks, 4, 3);
+    expect(marks).toEqual([0, 4, 4]);
+    expect(addMark(marks, 9, 3)).toEqual([0, 4, 4]);
+  });
+
+  test("the playback position maps to the ayah being recited", () => {
+    const marks = [0, 5, 12, 20];
+    expect(ayahAt([], 7)).toBeNull();
+    expect(ayahAt(marks, 0)).toBe(0);
+    expect(ayahAt(marks, 4.9)).toBe(0);
+    expect(ayahAt(marks, 5)).toBe(1);
+    expect(ayahAt(marks, 19.99)).toBe(2);
+    expect(ayahAt(marks, 20)).toBe(3);
+    expect(ayahAt(marks, 999)).toBe(3);
+    expect(ayahAt([0, 4, 4, 9], 4)).toBe(2);
+  });
+
+  test("an ayah seeks to its mark; an unmarked ayah does not seek", () => {
+    expect(markOf([0, 5, 12], 1)).toBe(5);
+    expect(markOf([0, 5, 12], 3)).toBeNull();
+    expect(markOf([], 0)).toBeNull();
+  });
+
+  test("stored marks round-trip; damaged values read as none", () => {
+    expect(finalMarks([0, 3, 50], 40)).toEqual([0, 3]);
+    expect(finalMarks([0], 40)).toEqual([]);
+    expect(encodeMarks([])).toBeNull();
+    expect(decodeMarks(encodeMarks([0, 3, 7]))).toEqual([0, 3, 7]);
+    expect(decodeMarks(null)).toEqual([]);
+    expect(decodeMarks("not json")).toEqual([]);
+    expect(decodeMarks("[3, 7]")).toEqual([]);
+    expect(decodeMarks("[0, 7, 3]")).toEqual([]);
+    expect(decodeMarks('[0, "7"]')).toEqual([]);
   });
 });
 

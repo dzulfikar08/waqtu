@@ -15,6 +15,7 @@ import type { SQLiteDatabase } from "expo-sqlite";
 
 import { setEntry } from "../db/entries";
 import { emitDataChanged } from "../db/events";
+import { decodeMarks, encodeMarks, finalMarks, type AyahMarks } from "./marks";
 
 /** Mutabaah item key a cleared hafalan day is recorded under. */
 export const MUROJAAH_ITEM_ID = "murojaah";
@@ -197,21 +198,32 @@ export async function gradeUnitToday(
 export interface StoredRecording {
   file: string;
   seconds: number;
+  /** Start second of each ayah of the unit; empty when the recording has no marks. */
+  marks: AyahMarks;
 }
 
 export async function getRecordings(db: SQLiteDatabase): Promise<Map<number, StoredRecording>> {
-  const rows = await db.getAllAsync<{ unit: number; file: string; seconds: number }>(
-    "SELECT unit, file, seconds FROM hafalan_recording",
+  const rows = await db.getAllAsync<{
+    unit: number;
+    file: string;
+    seconds: number;
+    marks: string | null;
+  }>("SELECT unit, file, seconds, marks FROM hafalan_recording");
+  return new Map(
+    rows.map((r) => [r.unit, { file: r.file, seconds: r.seconds, marks: decodeMarks(r.marks) }]),
   );
-  return new Map(rows.map((r) => [r.unit, { file: r.file, seconds: r.seconds }]));
 }
 
-/** Keeps `file` as the unit's recording; returns the file it replaced (to delete from disk), if any. */
+/**
+ * Keeps `file` (with its ayah `marks`) as the unit's recording; returns the file it replaced (to
+ * delete from disk), if any.
+ */
 export async function saveRecording(
   db: SQLiteDatabase,
   unit: number,
   file: string,
   seconds: number,
+  marks: AyahMarks,
 ): Promise<string | null> {
   let replaced = null as string | null;
   await db.withTransactionAsync(async () => {
@@ -221,11 +233,13 @@ export async function saveRecording(
     );
     replaced = old && old.file !== file ? old.file : null;
     await db.runAsync(
-      `INSERT INTO hafalan_recording (unit, file, seconds, created_at) VALUES (?, ?, ?, ?)
-       ON CONFLICT(unit) DO UPDATE SET file = excluded.file, seconds = excluded.seconds, created_at = excluded.created_at`,
+      `INSERT INTO hafalan_recording (unit, file, seconds, marks, created_at) VALUES (?, ?, ?, ?, ?)
+       ON CONFLICT(unit) DO UPDATE SET file = excluded.file, seconds = excluded.seconds,
+         marks = excluded.marks, created_at = excluded.created_at`,
       unit,
       file,
       seconds,
+      encodeMarks(finalMarks(marks, seconds)),
       Date.now(),
     );
   });

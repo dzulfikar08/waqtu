@@ -33,3 +33,8 @@ export const HAFALAN_MIGRATION: readonly string[] = [
     created_at INTEGER NOT NULL
   )`,
 ];
+
+/** Ayah marks of a recording (JSON list of start seconds per ayah, see marks.ts); NULL when none. */
+export const HAFALAN_MARKS_MIGRATION: readonly string[] = [
+  "ALTER TABLE hafalan_recording ADD COLUMN marks TEXT",
+];

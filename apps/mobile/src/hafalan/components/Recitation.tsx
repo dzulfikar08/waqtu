@@ -1,28 +1,55 @@
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { useSQLiteContext } from "expo-sqlite";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useVoiceRecorder } from "@/circles/useVoiceRecorder";
 import { useTranslation } from "@/i18n";
-import { Button, Hint } from "@/ramadhan/components/fields";
+import { Button, ButtonRow, Hint } from "@/ramadhan/components/fields";
 import { radius, spacing, useTheme } from "@/theme";
 import { deleteRecording, saveRecording, type StoredRecording } from "../db";
 import { formatSeconds } from "../format";
+import { addMark, ayahAt, markOf, type AyahMarks } from "../marks";
 import { keepRecording, recordingUri, removeRecordings } from "../recordings";
 
 const MAX_SECONDS = 180;
 
+/** Plays the saved recording from the start of an ayah of the unit (counted from 0); set while a recording is playable. */
+export type SeekToAyah = (ayah: number) => void;
+
 /**
  * Record a recitation of the unit and listen back. One recording per unit, kept in the app's
  * private folder on this phone only; recording again replaces it and it can be deleted.
+ * "Next ayah" while recording marks where each ayah starts; playback then reports the ayah being
+ * recited through `onActiveAyah` and `seekRef` jumps to an ayah.
  */
-export function Recitation({ unit, saved }: { unit: number; saved: StoredRecording | undefined }) {
+export function Recitation({
+  unit,
+  saved,
+  ayahCount,
+  onActiveAyah,
+  seekRef,
+}: {
+  unit: number;
+  saved: StoredRecording | undefined;
+  ayahCount: number;
+  onActiveAyah: (ayah: number | null) => void;
+  seekRef: RefObject<SeekToAyah | null>;
+}) {
   const db = useSQLiteContext();
   const { t } = useTranslation();
   const theme = useTheme();
   const recorder = useVoiceRecorder(MAX_SECONDS);
   const [failed, setFailed] = useState(false);
+  const [marks, setMarks] = useState<AyahMarks>([]);
+  // Read when the finished draft is saved; the draft effect must not rerun when marks change.
+  const marksRef = useRef(marks);
+  marksRef.current = marks;
+  const [playingAyah, setPlayingAyah] = useState<number | null>(null);
+
+  const active = recorder.recording ? Math.max(0, marks.length - 1) : playingAyah;
+  useEffect(() => onActiveAyah(active), [active, onActiveAyah]);
+  useEffect(() => () => onActiveAyah(null), [onActiveAyah]);
 
   const draft = recorder.draft;
   useEffect(() => {
@@ -31,7 +58,7 @@ export function Recitation({ unit, saved }: { unit: number; saved: StoredRecordi
     void (async () => {
       try {
         const file = await keepRecording(draft.uri, unit);
-        const replaced = await saveRecording(db, unit, file, draft.seconds);
+        const replaced = await saveRecording(db, unit, file, draft.seconds, marksRef.current);
         removeRecordings([replaced]);
       } catch {
         if (!cancelled) setFailed(true);
@@ -64,7 +91,20 @@ export function Recitation({ unit, saved }: { unit: number; saved: StoredRecordi
           <Text style={{ color: theme.text, fontWeight: "600" }}>
             {t("hafalan.recording", { time: formatSeconds(recorder.elapsedSeconds) })}
           </Text>
-          <Button label={t("hafalan.stop")} onPress={() => void recorder.stop()} />
+          <ButtonRow>
+            {ayahCount > 1 ? (
+              <Button
+                tone="plain"
+                label={t("hafalan.nextAyah", {
+                  n: Math.min(marks.length + 1, ayahCount),
+                  total: ayahCount,
+                })}
+                disabled={marks.length >= ayahCount}
+                onPress={() => setMarks((m) => addMark(m, recorder.elapsedSeconds, ayahCount))}
+              />
+            ) : null}
+            <Button label={t("hafalan.stop")} onPress={() => void recorder.stop()} />
+          </ButtonRow>
         </>
       ) : (
         <Button
@@ -72,16 +112,21 @@ export function Recitation({ unit, saved }: { unit: number; saved: StoredRecordi
           tone={saved ? "plain" : "primary"}
           onPress={() => {
             setFailed(false);
+            setMarks([0]);
             void recorder.start();
           }}
         />
       )}
+      {ayahCount > 1 ? <Hint>{t("hafalan.marksHint")}</Hint> : null}
       {problem ? <Text style={{ color: theme.muted }}>{t(`hafalan.${problem}`)}</Text> : null}
       {saved && !recorder.recording ? (
         <SavedPlayer
           key={saved.file}
           name={saved.file}
           seconds={saved.seconds}
+          marks={saved.marks}
+          onAyah={setPlayingAyah}
+          seekRef={seekRef}
           onDelete={() => void remove()}
         />
       ) : null}
@@ -92,10 +137,16 @@ export function Recitation({ unit, saved }: { unit: number; saved: StoredRecordi
 function SavedPlayer({
   name,
   seconds,
+  marks,
+  onAyah,
+  seekRef,
   onDelete,
 }: {
   name: string;
   seconds: number;
+  marks: AyahMarks;
+  onAyah: (ayah: number | null) => void;
+  seekRef: RefObject<SeekToAyah | null>;
   onDelete: () => void;
 }) {
   const { t } = useTranslation();
@@ -110,6 +161,32 @@ function SavedPlayer({
       void player.seekTo(0);
     }
   }, [status.didJustFinish, player]);
+
+  // Before the first play (and after the end) nothing is highlighted; a pause keeps the ayah lit.
+  const ayah = status.playing || status.currentTime > 0 ? ayahAt(marks, status.currentTime) : null;
+  useEffect(() => onAyah(ayah), [ayah, onAyah]);
+  useEffect(() => () => onAyah(null), [onAyah]);
+
+  useEffect(() => {
+    if (marks.length === 0) return;
+    seekRef.current = (index) => {
+      const at = markOf(marks, index);
+      if (at === null) return;
+      void (async () => {
+        try {
+          await setAudioModeAsync({ playsInSilentMode: true, allowsRecording: false });
+          await player.seekTo(at);
+          player.play();
+          setFailed(false);
+        } catch {
+          setFailed(true);
+        }
+      })();
+    };
+    return () => {
+      seekRef.current = null;
+    };
+  }, [marks, player, seekRef]);
 
   const toggle = async () => {
     try {

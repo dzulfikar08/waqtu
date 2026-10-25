@@ -81,3 +81,8 @@ is never uploaded. On iOS the folder is marked `NSURLIsExcludedFromBackupKey` (l
 `apps/mobile/modules/waqtu-backup`, because `expo-file-system` has no API for it), so recordings stay out
 of iCloud and iTunes backups; the mark is applied when a recording is saved and at every launch for a
 folder that already exists. Android backups are off for the whole app (`allowBackup: false`).
+
+While recording, "Next ayah" stores the second at which each ayah of the unit starts (column
+`hafalan_recording.marks`, a JSON list beginning with 0; see `apps/mobile/src/hafalan/marks.ts`). On
+playback the ayah at the current position is highlighted, and tapping an ayah plays from its mark.
+Recordings without marks play as before, with no highlighting.
