@@ -10,11 +10,12 @@ const TARGETS = {
   today: "/",
   week: "/week",
   ramadhan: "/ramadhan",
+  circles: "/circles",
   settings: "/settings",
 } as const;
 
 /**
- * `waqtu://demo?lang=id|en&to=today|week|ramadhan|settings`: loads the demo data and opens a tab. Only the screenshot build
+ * `waqtu://demo?lang=id|en&to=today|week|ramadhan|circles|settings`: loads the demo data and opens a tab. Only the screenshot build
  * (EXPO_PUBLIC_DEMO_MODE=1) does this; every other build bounces to the home tab.
  */
 export default function DemoRoute() {

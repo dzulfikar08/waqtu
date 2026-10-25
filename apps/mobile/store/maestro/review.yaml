@@ -1,0 +1,69 @@
+# Design review shots, not store screenshots: the rest of the Today checklist, Circles and the lower half of Settings, so
+# a visual change can be checked on every tab in light and dark. Same demo build and data as screens.yaml.
+#
+#   maestro test --test-output-dir <dir> -e APP_ID=dat.waqtu.app -e LOCALE=en store/maestro/review.yaml
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+    permissions:
+      all: allow
+- extendedWaitUntil:
+    visible: ".*(Hari ini|Today|isn't responding).*"
+    timeout: 60000
+- tapOn:
+    text: Wait
+    optional: true
+- extendedWaitUntil:
+    visible: ".*(Hari ini|Today).*"
+    timeout: 60000
+- waitForAnimationToEnd
+
+- openLink: waqtu://demo?lang=${LOCALE}&to=today
+- extendedWaitUntil:
+    visible: ".*(Next prayer|Sholat berikutnya|Open in.*).*"
+    timeout: 60000
+- tapOn:
+    text: Open
+    optional: true
+- extendedWaitUntil:
+    visible: ".*(Next prayer|Sholat berikutnya).*"
+    timeout: 60000
+- waitForAnimationToEnd
+- scroll
+- scroll
+- waitForAnimationToEnd
+- takeScreenshot: ${LOCALE}-21-checklist-more
+- scroll
+- scroll
+- waitForAnimationToEnd
+- takeScreenshot: ${LOCALE}-22-checklist-end
+
+- openLink: waqtu://demo?lang=${LOCALE}&to=circles
+- extendedWaitUntil:
+    visible: ".*(Lingkaran|Circles|Open in.*).*"
+    timeout: 30000
+- tapOn:
+    text: Open
+    optional: true
+- extendedWaitUntil:
+    visible: ".*(Lingkaran|Circles).*"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ${LOCALE}-23-circles
+
+- openLink: waqtu://demo?lang=${LOCALE}&to=settings
+- extendedWaitUntil:
+    visible: ".*(Bahasa|Language|Open in.*).*"
+    timeout: 30000
+- tapOn:
+    text: Open
+    optional: true
+- extendedWaitUntil:
+    visible: ".*(Bahasa|Language).*"
+    timeout: 30000
+- waitForAnimationToEnd
+- scroll
+- scroll
+- waitForAnimationToEnd
+- takeScreenshot: ${LOCALE}-24-settings-more

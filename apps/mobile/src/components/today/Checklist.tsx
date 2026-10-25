@@ -6,7 +6,9 @@ import { itemLabel } from "@/components/itemLabel";
 import { setEntry } from "@/db/entries";
 import { useTranslation } from "@/i18n";
 import { FLAG, clampCount, toggleFardh, type FardhAction, type ItemDef } from "@/mutabaah/items";
-import { radius, spacing, useTheme } from "@/theme";
+import { spacing, tabular, typography, useTheme } from "@/theme";
+
+import { CheckCircle, Divider, Pill, StepButton } from "../ui";
 
 interface Props {
   items: readonly ItemDef[];
@@ -15,6 +17,11 @@ interface Props {
   /** "HH:mm" per prayer id, shown on the fardh rows. */
   prayerTimes: Readonly<Record<string, string | null>> | null;
 }
+
+const BOX = 26;
+const GAP = 14;
+/** Where a row's text starts: the chips and separators line up with it. */
+const TEXT_INSET = spacing.md + BOX + GAP;
 
 export function Checklist({ items, day, entries, prayerTimes }: Props) {
   const db = useSQLiteContext();
@@ -27,63 +34,46 @@ export function Checklist({ items, day, entries, prayerTimes }: Props) {
   );
 
   if (items.length === 0) {
-    return <Text style={{ color: theme.muted, padding: spacing.md }}>{t("mutabaah.empty")}</Text>;
+    return (
+      <Text style={[typography.subhead, { color: theme.muted, padding: spacing.md }]}>
+        {t("mutabaah.empty")}
+      </Text>
+    );
   }
 
   return (
     <View>
-      {items.map((item) => {
+      {items.map((item, index) => {
         const value = entries.get(item.id) ?? 0;
         const name = itemLabel(item, t);
-        if (item.kind === "fardh") {
-          return (
+        const row =
+          item.kind === "fardh" ? (
             <FardhRow
-              key={item.id}
               name={name}
               time={prayerTimes?.[item.id] ?? null}
               value={value}
               onAction={(action) => write(item.id, toggleFardh(value, action))}
             />
-          );
-        }
-        if (item.kind === "count") {
-          return (
+          ) : item.kind === "count" ? (
             <CountRow
-              key={item.id}
               name={name}
               value={value}
               onChange={(next) => write(item.id, clampCount(next))}
             />
+          ) : (
+            <CheckRow
+              name={name}
+              done={value > 0}
+              onToggle={() => write(item.id, value > 0 ? 0 : 1)}
+            />
           );
-        }
         return (
-          <CheckRow
-            key={item.id}
-            name={name}
-            done={value > 0}
-            onToggle={() => write(item.id, value > 0 ? 0 : 1)}
-          />
+          <View key={item.id}>
+            {index > 0 ? <Divider inset={TEXT_INSET} /> : null}
+            {row}
+          </View>
         );
       })}
-    </View>
-  );
-}
-
-function Box({ checked }: { checked: boolean }) {
-  const theme = useTheme();
-  return (
-    <View
-      style={[
-        styles.box,
-        {
-          borderColor: checked ? theme.accent : theme.border,
-          backgroundColor: checked ? theme.accent : "transparent",
-        },
-      ]}
-    >
-      {checked ? (
-        <Text style={{ color: theme.accentText, fontSize: 16, fontWeight: "700" }}>✓</Text>
-      ) : null}
     </View>
   );
 }
@@ -97,10 +87,12 @@ function CheckRow({ name, done, onToggle }: { name: string; done: boolean; onTog
       accessibilityState={{ checked: done }}
       accessibilityLabel={done ? t("mutabaah.unmark", { name }) : t("mutabaah.markDone", { name })}
       onPress={onToggle}
-      style={[styles.row, { borderColor: theme.border }]}
+      style={({ pressed }) => [styles.row, pressed ? { backgroundColor: theme.surfaceAlt } : null]}
     >
-      <Box checked={done} />
-      <Text style={[styles.label, { color: theme.text }]}>{name}</Text>
+      <CheckCircle checked={done} size={BOX} />
+      <Text style={[typography.body, styles.grow, { color: done ? theme.muted : theme.text }]}>
+        {name}
+      </Text>
     </Pressable>
   );
 }
@@ -117,52 +109,30 @@ function CountRow({
   const { t } = useTranslation();
   const theme = useTheme();
   return (
-    <View style={[styles.row, { borderColor: theme.border }]}>
-      <Box checked={value > 0} />
+    <View style={styles.row}>
+      <CheckCircle checked={value > 0} size={BOX} />
       <View style={styles.grow}>
-        <Text style={[styles.label, { color: theme.text }]}>{name}</Text>
-        <Text style={{ color: theme.muted, fontSize: 13 }}>
+        <Text style={[typography.body, { color: theme.text }]}>{name}</Text>
+        <Text
+          style={[typography.footnote, tabular, { color: value > 0 ? theme.accent : theme.muted }]}
+        >
           {t("mutabaah.pages", { n: value })}
         </Text>
       </View>
-      <Stepper
-        label={t("mutabaah.decrease", { name })}
-        symbol="−"
-        disabled={value <= 0}
-        onPress={() => onChange(value - 1)}
-      />
-      <Stepper
-        label={t("mutabaah.increase", { name })}
-        symbol="+"
-        onPress={() => onChange(value + 1)}
-      />
+      <View style={styles.stepper}>
+        <StepButton
+          label={t("mutabaah.decrease", { name })}
+          symbol="−"
+          disabled={value <= 0}
+          onPress={() => onChange(value - 1)}
+        />
+        <StepButton
+          label={t("mutabaah.increase", { name })}
+          symbol="+"
+          onPress={() => onChange(value + 1)}
+        />
+      </View>
     </View>
-  );
-}
-
-function Stepper({
-  label,
-  symbol,
-  onPress,
-  disabled,
-}: {
-  label: string;
-  symbol: string;
-  onPress: () => void;
-  disabled?: boolean;
-}) {
-  const theme = useTheme();
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      accessibilityState={{ disabled }}
-      disabled={disabled}
-      onPress={onPress}
-      style={[styles.stepper, { borderColor: theme.border, opacity: disabled ? 0.4 : 1 }]}
-    >
-      <Text style={{ color: theme.text, fontSize: 20 }}>{symbol}</Text>
-    </Pressable>
   );
 }
 
@@ -181,7 +151,7 @@ function FardhRow({
   const theme = useTheme();
   const done = (value & FLAG.DONE) !== 0;
   return (
-    <View style={[styles.fardh, { borderColor: theme.border }]}>
+    <View style={styles.fardh}>
       <Pressable
         accessibilityRole="checkbox"
         accessibilityState={{ checked: done }}
@@ -191,51 +161,32 @@ function FardhRow({
         onPress={() => onAction("done")}
         style={styles.fardhTop}
       >
-        <Box checked={done} />
-        <Text style={[styles.label, styles.grow, { color: theme.text }]}>{name}</Text>
-        {time ? <Text style={{ color: theme.muted, fontSize: 15 }}>{time}</Text> : null}
+        <CheckCircle checked={done} size={BOX} />
+        <Text style={[typography.body, styles.grow, { color: theme.text, fontWeight: "600" }]}>
+          {name}
+        </Text>
+        {time ? (
+          <Text style={[typography.callout, tabular, { color: theme.muted }]}>{time}</Text>
+        ) : null}
       </Pressable>
       <View style={styles.chips}>
-        <Chip
+        <Pill
           label={t("mutabaah.onTime")}
           on={(value & FLAG.ONTIME) !== 0}
           onPress={() => onAction("ontime")}
         />
-        <Chip
+        <Pill
           label={t("mutabaah.jamaah")}
           on={(value & FLAG.JAMAAH) !== 0}
           onPress={() => onAction("jamaah")}
         />
-        <Chip
+        <Pill
           label={t("mutabaah.qadha")}
           on={(value & FLAG.QADHA) !== 0}
           onPress={() => onAction("qadha")}
         />
       </View>
     </View>
-  );
-}
-
-function Chip({ label, on, onPress }: { label: string; on: boolean; onPress: () => void }) {
-  const theme = useTheme();
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ selected: on }}
-      onPress={onPress}
-      hitSlop={6}
-      style={[
-        styles.chip,
-        {
-          borderColor: on ? theme.accent : theme.border,
-          backgroundColor: on ? theme.accent : "transparent",
-        },
-      ]}
-    >
-      <Text style={{ color: on ? theme.accentText : theme.text, fontSize: 13, fontWeight: "600" }}>
-        {label}
-      </Text>
-    </Pressable>
   );
 }
 
@@ -246,42 +197,23 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: GAP,
   },
-  fardh: {
+  fardh: { paddingTop: spacing.xs, paddingBottom: spacing.md - 2 },
+  fardhTop: {
+    minHeight: 48,
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.sm,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: GAP,
+  },
+  chips: {
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: spacing.sm,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingLeft: TEXT_INSET,
+    paddingRight: spacing.md,
   },
-  fardhTop: { minHeight: 44, flexDirection: "row", alignItems: "center", gap: spacing.md },
-  chips: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, paddingLeft: 36 + spacing.md },
-  chip: {
-    minHeight: 32,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  box: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    borderWidth: 2,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  label: { fontSize: 16, flexShrink: 1 },
   grow: { flex: 1 },
-  stepper: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  stepper: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
 });
