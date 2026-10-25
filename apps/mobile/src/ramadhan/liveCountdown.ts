@@ -3,8 +3,11 @@ import type { SQLiteDatabase } from "expo-sqlite";
 import { Platform } from "react-native";
 
 import WaqtuCountdown from "../../modules/waqtu-countdown";
+import { readPrayerConfig } from "./prayerConfig";
 import { KEYS } from "./settings";
+import { countdownWidgetSchedule } from "./widgetSchedule";
 import { getSetting, setSetting } from "@/db/settings";
+import { i18n } from "@/i18n/core";
 
 export interface LiveCountdownCopy {
   /** e.g. "Menuju berbuka". */
@@ -81,4 +84,19 @@ export async function hideLiveCountdown(db: SQLiteDatabase): Promise<void> {
     // The system already ended it (target reached or user dismissed).
   }
   await setSetting(db, KEYS.liveActivityId, null);
+}
+
+/**
+ * Hands the home-screen widget the next days of imsak and maghrib (translated in the current
+ * language), or clears it while no location is set. The widget advances through them on its own.
+ * On iOS the widget extension exists only in builds with WAQTU_IOS_WIDGET=1; otherwise this is
+ * a harmless write nobody reads.
+ */
+export async function syncCountdownWidget(db: SQLiteDatabase): Promise<void> {
+  if (!WaqtuCountdown) return;
+  const config = await readPrayerConfig(db);
+  const t = (key: string, options?: Record<string, string>) => i18n.t(key, options);
+  WaqtuCountdown.setWidgetSchedule(
+    JSON.stringify(config ? countdownWidgetSchedule(config, new Date(), t) : []),
+  );
 }

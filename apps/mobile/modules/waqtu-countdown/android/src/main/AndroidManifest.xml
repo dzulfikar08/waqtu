@@ -1,1 +1,18 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <!-- Home-screen sahur/iftar countdown; merged into the app manifest by autolinking. -->
+    <receiver
+      android:name="dat.waqtu.countdown.WaqtuCountdownWidget"
+      android:exported="false"
+      android:label="@string/waqtu_countdown_widget_label">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+        <action android:name="android.intent.action.TIME_SET" />
+        <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+      </intent-filter>
+      <meta-data
+        android:name="android.appwidget.provider"
+        android:resource="@xml/waqtu_countdown_widget_info" />
+    </receiver>
+  </application>
+</manifest>
