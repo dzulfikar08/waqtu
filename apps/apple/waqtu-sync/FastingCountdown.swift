@@ -48,19 +48,19 @@ struct FastingCountdown: Equatable {
 
     var label: String {
         switch target {
-        case .imsak: return "Imsak"
-        case .maghrib: return "Iftar"
+        case .imsak: return String(localized: "Imsak")
+        case .maghrib: return String(localized: "Iftar")
         }
     }
 
-    /// Menu bar title, e.g. "Iftar 2h 14m" or "Imsak 14m 05s".
+    /// Menu bar title, e.g. "Iftar 2h 14m" or "Imsak 14m 05s" (Indonesian: "Berbuka 2j 14m").
     func title(at now: Date) -> String {
         let total = secondsRemaining(at: now)
         let hours = total / 3600
         let minutes = (total % 3600) / 60
         let seconds = total % 60
-        if hours > 0 { return "\(label) \(hours)h \(String(format: "%02d", minutes))m" }
-        return "\(label) \(minutes)m \(String(format: "%02d", seconds))s"
+        if hours > 0 { return String(localized: "\(label) \(hours)h \(String(format: "%02d", minutes))m") }
+        return String(localized: "\(label) \(minutes)m \(String(format: "%02d", seconds))s")
     }
 
     /// What to count down to at `now`: imsak until it passes, then maghrib (iftar), then the next

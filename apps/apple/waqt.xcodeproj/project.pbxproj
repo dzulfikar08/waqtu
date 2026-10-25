@@ -15,6 +15,7 @@
 		664A82B75B1FC2E095D5F546 /* waqtu-mac-widget in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E25A23E603463AFFEA2FAB02 /* waqtu-mac-widget */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7CB78973DC80F3385AC757EE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E814699275DB5EF2E2B6AC60 /* Foundation.framework */; };
 		913CA09F6A43B2B77132976B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0A98A87F32902589F60A5DB /* Foundation.framework */; };
+		9B37D4768EC32F546FBF75FC /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = 1333C6AA761E8AC4FC22AEC1 /* Adhan */; };
 		AA447E9D2F417E8200A6E861 /* Adhan in Frameworks */ = {isa = PBXBuildFile; productRef = 1333C6AA761E8AC4FC22AEC1 /* Adhan */; };
 		AA50DE822F4174E2006EDD6E /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = AA50DE812F4174E2006EDD6E /* Sparkle */; };
 		C17B4582B11CD69A2CDDEDCF /* waqtu-widget in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 47D6F5E916FFD6DA5FC1879D /* waqtu-widget */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -145,6 +146,17 @@
 			);
 			target = FED58D04EF35838AF8144A21 /* waqtu-widget */;
 		};
+		BDBF78B7E506807F37DFA30C /* Exceptions for "shared" folder in "waqtuTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Core/AppGroup.swift,
+				Core/SharedDataBridge.swift,
+				Core/SharedSettings.swift,
+				Core/StreakSyncManager.swift,
+				Resources/WaqtuColors.swift,
+			);
+			target = AA40DE922F4174E3006EDD6D /* waqtuTests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -218,6 +230,14 @@
 			exceptions = (
 			);
 			path = "waqtu-sync";
+			sourceTree = "<group>";
+		};
+		42CBAE97749EF8D0AC282CEF /* shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BDBF78B7E506807F37DFA30C /* Exceptions for "shared" folder in "waqtuTests" target */,
+			);
+			path = shared;
 			sourceTree = "<group>";
 		};
 		AA40DE962F4174E3006EDD6D /* waqtuTests */ = {
@@ -305,6 +325,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9B37D4768EC32F546FBF75FC /* Adhan in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -375,6 +396,7 @@
 				88F976BBAE5A4CFDC5BEDFBB /* macos-widget */,
 				3B87E626326006D1F430CA36 /* shared */,
 				93B740C16A1438F2EF0A3F9C /* ios-uitests */,
+				42CBAE97749EF8D0AC282CEF /* shared */,
 				7BDA627D22F2BC56549EBBC1 /* BundledContent */,
 			);
 			sourceTree = "<group>";
@@ -581,8 +603,12 @@
 			fileSystemSynchronizedGroups = (
 				AA40DE962F4174E3006EDD6D /* waqtuTests */,
 				7C0A5E1D4F2B4A9C8E3D1B01 /* waqtu-sync */,
+				42CBAE97749EF8D0AC282CEF /* shared */,
 			);
 			name = waqtuTests;
+			packageProductDependencies = (
+				1333C6AA761E8AC4FC22AEC1 /* Adhan */,
+			);
 			productName = waqtuTests;
 			productReference = AA40DE932F4174E3006EDD6D /* waqtuTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -676,6 +702,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				id,
 				Base,
 			);
 			mainGroup = AA40DE7D2F4174E2006EDD6D;

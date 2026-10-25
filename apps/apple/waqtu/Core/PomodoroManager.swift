@@ -9,10 +9,10 @@ enum PomodoroPhase: String {
 
     var displayName: String {
         switch self {
-        case .idle: return "Pomodoro"
-        case .focus: return "Focus"
-        case .shortBreak: return "Break"
-        case .longBreak: return "Long Break"
+        case .idle: return String(localized: "Pomodoro")
+        case .focus: return String(localized: "Focus")
+        case .shortBreak: return String(localized: "Break")
+        case .longBreak: return String(localized: "Long Break")
         }
     }
 
@@ -123,8 +123,8 @@ final class PomodoroManager {
                 // Too close to salah — don't start; nudge the user to wait.
                 phase = .idle
                 fireReminder(
-                    title: "\(np.name.displayName) soon",
-                    body: "Only a few minutes until \(np.name.displayName). Focus after salah."
+                    title: String(localized: "\(np.name.displayName) soon"),
+                    body: String(localized: "Only a few minutes until \(np.name.displayName). Focus after salah.")
                 )
                 return
             }
@@ -142,7 +142,7 @@ final class PomodoroManager {
         if settings.intentionDua {
             fireReminder(
                 title: "Niyyah — بِسْمِ اللَّهِ",
-                body: "Begin with intention. Dedicate this focus to Allah."
+                body: String(localized: "Begin with intention. Dedicate this focus to Allah.")
             )
         }
     }
@@ -177,7 +177,7 @@ final class PomodoroManager {
     // MARK: - Reminder content
 
     private func fireBreakReminder(isLong: Bool) {
-        var title = isLong ? "Long break" : "Break"
+        var title = isLong ? String(localized: "Long break") : String(localized: "Break")
         var body: String
 
         if settings.verseBreak {
@@ -185,15 +185,15 @@ final class PomodoroManager {
             title = v.name
             body = "\(v.arabic)\n\(v.transliteration)\n\(v.meaning)"
         } else if settings.dhikrBreaks {
-            title = "Dhikr"
+            title = String(localized: "Dhikr")
             body = "سُبْحَانَ اللَّهِ ×٣٣  •  الْحَمْدُ لِلَّهِ ×٣٣  •  اللَّهُ أَكْبَرُ ×٣٤"
         } else if settings.intentionDua {
             title = "Alhamdulillah"
-            body = "الْحَمْدُ لِلَّهِ — Praise be to Allah. Rest well."
+            body = String(localized: "الْحَمْدُ لِلَّهِ — Praise be to Allah. Rest well.")
         } else {
             body = isLong
-                ? "Focus session complete. Take a longer break."
-                : "Focus session complete. Take a breather."
+                ? String(localized: "Focus session complete. Take a longer break.")
+                : String(localized: "Focus session complete. Take a breather.")
         }
         fireReminder(title: title, body: body)
     }
@@ -250,31 +250,31 @@ final class PomodoroManager {
             name: "Surah Al-Ikhlas",
             arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ • اللَّهُ الصَّمَدُ",
             transliteration: "Qul huwa Allāhu aḥad • Allāhu ṣ-ṣamad",
-            meaning: "Say: He is Allah, the One. Allah, the Eternal Refuge."
+            meaning: String(localized: "Say: He is Allah, the One. Allah, the Eternal Refuge.")
         ),
         Verse(
             name: "Surah Al-Kawthar",
             arabic: "إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ",
             transliteration: "Innā aʿṭaynāka al-kawthar",
-            meaning: "Indeed, We have granted you al-Kawthar."
+            meaning: String(localized: "Indeed, We have granted you al-Kawthar.")
         ),
         Verse(
             name: "Surah Al-Asr",
             arabic: "وَالْعَصْرِ • إِنَّ الْإِنسَانَ لَفِي خُسْرٍ",
             transliteration: "Wal-ʿaṣr • Inna al-insāna lafī khusr",
-            meaning: "By time. Indeed, mankind is in loss."
+            meaning: String(localized: "By time. Indeed, mankind is in loss.")
         ),
         Verse(
             name: "Surah Al-Falaq",
             arabic: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ",
             transliteration: "Qul aʿūdhu bi-rabbi al-falaq",
-            meaning: "Say: I seek refuge in the Lord of daybreak."
+            meaning: String(localized: "Say: I seek refuge in the Lord of daybreak.")
         ),
         Verse(
             name: "Surah An-Nas",
             arabic: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ",
             transliteration: "Qul aʿūdhu bi-rabbi an-nās",
-            meaning: "Say: I seek refuge in the Lord of mankind."
+            meaning: String(localized: "Say: I seek refuge in the Lord of mankind.")
         )
     ]
 }

@@ -34,13 +34,14 @@ final class AppViewModel {
     var nextPrayer: PrayerTime?
     var countdown: Int = 0
     var overlayWindow: NSWindow?
+    @ObservationIgnored private var imsakiyahWindow: ImsakiyahWindow?
 
     /// Menu bar title during Ramadhan ("Iftar 2h 14m"); nil outside Ramadhan or when turned off.
     var fastingTitle: String?
     @ObservationIgnored private var fastingInputs: FastingInputs?
 
     /// Human-readable location used for prayer times (city, country or "Manual: Mecca").
-    var locationDisplay: String = "Getting location..."
+    var locationDisplay: String = String(localized: "Getting location...")
 
     /// True while a "Locate Me" refresh is in progress.
     var isRefreshingLocation: Bool = false
@@ -99,10 +100,12 @@ final class AppViewModel {
             if changes.prayerSettings {
                 // Also pushes the log to the shared container.
                 self.calculatePrayers()
-            } else if changes.prayerLog {
+            } else if changes.prayerLog || changes.checklist {
                 self.pushToSharedContainer()
             }
         }
+        // Checklist edits move the streak shown by the widgets.
+        syncController.onLocalChecklistChange = { [weak self] in self?.pushToSharedContainer() }
         setupLocationUpdates()
         calculatePrayers()
         setupTimer()
@@ -165,7 +168,7 @@ final class AppViewModel {
     /// Forces a fresh location fix. Call when user taps "Locate Me".
     func refreshLocation() {
         guard settings.autoDetectLocation else { return }
-        locationDisplay = "Updating..."
+        locationDisplay = String(localized: "Updating...")
         locationManager.refreshLocation()
     }
 
@@ -208,7 +211,7 @@ final class AppViewModel {
                     }
                 } else {
                     self.locationDisplay = self.settings.autoDetectLocation
-                        ? "Location unavailable"
+                        ? String(localized: "Location unavailable")
                         : self.formatCoordinates(lat: lat, lon: lon)
                 }
             }
@@ -360,32 +363,31 @@ final class AppViewModel {
             nextPrayer: nextPrayer,
             locationLabel: locationDisplay
         )
+        let streak = syncController.streak
+        let week = syncController.week
         sharedBridge.pushStreakData(
-            currentStreak: streakManager.currentStreak,
-            bestStreak: streakManager.bestStreak,
-            todayPrayed: streakManager.todayPrayedCount,
-            weeklyGrid: mapWeeklyGrid()
+            currentStreak: streak.current,
+            bestStreak: streak.best,
+            todayPrayed: week.last?.fardhDone ?? 0,
+            weeklyGrid: week.map(Self.dot(for:))
         )
     }
 
-    private func mapWeeklyGrid() -> [StreakData.DayDot] {
-        streakManager.weeklyGrid.map { item in
-            StreakData.DayDot(
-                date: "",
-                label: item.label,
-                status: mapDotStatus(item.status),
-                isToday: item.isToday
-            )
+    /// Widget dot: the streak number follows the phone's rules, the dots stay about the five
+    /// fardhu (what `StreakData` and the phone's one-time import of it expect).
+    private static func dot(for day: MutabaahStreakModel.Day) -> StreakData.DayDot {
+        let status: StreakData.DayDot.DotStatus
+        switch day.fardhDone {
+        case Fardh.allCases.count...: status = .complete
+        case 1...: status = .partial
+        default: status = .empty
         }
-    }
-
-    private func mapDotStatus(_ status: String) -> StreakData.DayDot.DotStatus {
-        switch status {
-        case "●": return .complete
-        case "◐": return .partial
-        case "○": return .missed
-        default: return .empty
-        }
+        return StreakData.DayDot(
+            date: day.date,
+            label: MutabaahStreakModel.englishWeekday(day.date),
+            status: status,
+            isToday: day.isToday
+        )
     }
 
     private func showOverlay(for prayer: PrayerTime) {
@@ -514,8 +516,8 @@ final class AppViewModel {
     /// Show a gentle local notification reminding the user they committed to pray.
     private func deliverStillWorkingNotification(for prayer: PrayerName) {
         let content = UNMutableNotificationContent()
-        content.title = "Still at your Mac?"
-        content.body = "You tapped \"I am going to pray\" for \(prayer.displayName) but your Mac is still active. Don't forget your commitment."
+        content.title = String(localized: "Still at your Mac?")
+        content.body = String(localized: "You tapped \"I am going to pray\" for \(prayer.displayName) but your Mac is still active. Don't forget your commitment.")
         content.sound = .default
 
         let request = UNNotificationRequest(
@@ -524,19 +526,6 @@ final class AppViewModel {
             trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
         )
         UNUserNotificationCenter.current().add(request)
-    }
-
-    /// Menu bar checklist tap: marks the prayer prayed, or clears it when it already is.
-    /// The edit reaches the account through `streakManager.onLocalChange`.
-    func toggleFardh(_ fardh: Fardh) {
-        let name = fardh.logName
-        switch streakManager.statusFor(prayer: name) {
-        case .prayed, .late:
-            streakManager.clearPrayer(prayer: name)
-        case .missed, .none:
-            streakManager.markPrayed(prayer: name)
-        }
-        pushToSharedContainer()
     }
 
     func resetShownPrayers() {
@@ -631,6 +620,41 @@ final class AppViewModel {
         AppDelegate.applyLaunchAtLogin(false)
         try? calendarManager.deleteAllWaqtuEvents()
         NSApplication.shared.terminate(nil)
+    }
+
+    /// The current or next Ramadhan and its month table at this Mac's location, with the prayer
+    /// settings and the account's moon-sighting correction. Nil when the times cannot be computed.
+    func imsakiyah() -> (span: Ramadhan.Span, table: Imsakiyah.Table)? {
+        let offset = syncController.hijriOffset
+        guard let span = Ramadhan.currentOrNext(on: Date(), hijriOffset: offset) else { return nil }
+        // Same location as the prayer times: the detected fix, else the manual coordinates.
+        let detected = settings.autoDetectLocation ? locationManager.locationForGeocoding?.coordinate : nil
+        guard let table = Imsakiyah.table(
+            hijriYear: span.hijriYear,
+            hijriOffset: offset,
+            latitude: detected?.latitude ?? settings.manualLatitude,
+            longitude: detected?.longitude ?? settings.manualLongitude,
+            timeZone: .current,
+            method: settings.calculationMethod,
+            madhab: settings.madhab,
+            highLatitudeRule: settings.highLatitudeRule,
+            adjustments: PrayerAdjustmentsData(
+                fajr: settings.adjustmentFajr,
+                sunrise: settings.adjustmentSunrise,
+                dhuhr: settings.adjustmentDhuhr,
+                asr: settings.adjustmentAsr,
+                maghrib: settings.adjustmentMaghrib,
+                isha: settings.adjustmentIsha
+            )
+        ) else { return nil }
+        return (span, table)
+    }
+
+    func showImsakiyah() {
+        let window = imsakiyahWindow ?? ImsakiyahWindow(viewModel: self)
+        imsakiyahWindow = window
+        NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
     }
 
     func showTestOverlay() {

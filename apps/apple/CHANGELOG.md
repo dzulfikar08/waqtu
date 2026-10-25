@@ -2,6 +2,27 @@
 
 ## Unreleased
 
+### Imsakiyah on the Mac (DEV-13)
+
+- **Ramadhan month table** — Menu bar → Imsakiyah opens the table for the current or next Ramadhan: imsak (fajr − 10 min), Subuh, Dzuhur, Ashar, Maghrib, Isya for every day, today highlighted, with the start date, the day of Ramadhan and Idul Fitri. Uses the Mac's location, calculation method (incl. Kemenag), madhab, minute corrections and the moon-sighting correction synced from the phone; numbers match `@waqtu/core`'s `imsakiyahTable`.
+
+### Same streak as the phone (DEV-13)
+
+- **One streak rule everywhere** — The Mac's streak is now computed from the synced checklist with the phone's rules: a day counts when at least the chosen number of practices is recorded, missed days within the weekly grace are forgiven, and paused days (illness, travel, excuse) neither count nor break it. The old Mac-only rule (all five prayers every day, no grace) is gone, so both devices show the same number.
+- **Streak settings sync** — Grace per week, the daily minimum and pauses live in Settings → Mutabaah and in the menu bar, stored in the account's `streak` setting shared with the phone.
+- Widgets keep the five-prayer dots; their streak numbers follow the new rule.
+
+### Full mutabaah checklist on the Mac (DEV-13)
+
+- **Every practice** — The menu bar shows the whole mutabaah checklist, not only the five fardhu: rawatib, dhuha, tahajjud, tilawah pages, dzikir pagi/petang, sedekah, puasa sunnah, and your own practices. Fardhu chips mark a prayer done on time; right-click toggles on time, in congregation (jamaah) or made up (qadha), the same flags as the phone.
+- **Any day** — Step back through previous days or pick one from a calendar to fill in what you missed.
+- **Settings → Mutabaah** — Remove practices, add built-ins back (including halaqah and murojaah), or create your own checkbox or counter practice.
+- **Same data as the phone** — Entries and the item list are stored with the phone's item ids, values and `items` setting, so edits made on either device show up on the other after sync. Works signed out too; the checklist uploads on the first sign-in.
+
+### Bahasa Indonesia (DEV-13)
+
+- **Indonesian and English** — The Mac app's menu bar, settings, onboarding, overlay and notifications are translated into Indonesian through a String Catalog (`waqtu/Localizable.xcstrings`). Macs set to Indonesian get Indonesian; everything else stays English. Prayer and mutabaah terms match the mobile app (Subuh, Dzuhur, Ashar, Maghrib, Isya; Istiqamah; Berbuka/Imsak).
+
 ### Waqtu Premium subscription replaces lifetime (DEV-12, DEV-13)
 
 - **Mac App Store build** — The lifetime purchase (`dat.waqtu.lifetime`) is replaced by the auto-renewing subscriptions `dat.waqtu.mac.premium.monthly` and `.yearly` (StoreKit 2: purchase, restore, `Transaction.updates`, `currentEntitlements`). Each active subscription is also sent to the signed-in Waqtu account (`POST /v1/billing/apple`), so it unlocks the phone apps too. Settings → Upgrade shows the prices from the App Store, Restore Purchases, Manage Subscription, terms and privacy links.
@@ -22,6 +43,7 @@
 - **Fix: non-Gregorian system calendars** — Prayer log day keys and Ramadhan detection always use Gregorian dates, so an Islamic, Buddhist or Japanese system calendar no longer writes Hijri-year keys into the synced log.
 - **Fix: "still working" no longer erases the phone's record** — The "missed" the Mac infers after "I am going to pray" stays on this Mac and is never synced over a done/jamaah record made on the phone.
 - Unit tests for the sync merge, mapping, settings whitelist and Ramadhan countdown run in CI (`xcodebuild test`, scheme `waqtu`).
+- Imsakiyah engine for the Ramadhan month table: Hijri month start/length, current-or-next Ramadhan and the daily imsak…isha table, ported from `@waqtu/core` and tested in CI against fixtures generated from it (`scripts/imsakiyah-fixtures.ts`).
 
 ## 1.1.0 (May 2026)
 

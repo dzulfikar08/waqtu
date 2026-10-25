@@ -18,6 +18,7 @@ extension Color {
 struct MenuBarView: View {
     @Bindable var viewModel: AppViewModel
     @State private var showTrialEndingSoonModal = false
+    @Environment(\.openSettings) private var openSettings
 
     init(viewModel: AppViewModel) {
         self.viewModel = viewModel
@@ -62,16 +63,17 @@ struct MenuBarView: View {
 
             Divider()
 
-            // Today's fardhu checklist (marks prayed locally and syncs with the account)
-            FardhChecklistView(
-                streakManager: viewModel.streakManager,
-                onToggle: { viewModel.toggleFardh($0) }
-            )
+            // Mutabaah checklist for any day (stored in the account replica, syncs with the phone)
+            MutabaahChecklistView(sync: viewModel.syncController, onManage: {
+                SettingsView.requestedPane = SettingsView.Pane.mutabaah
+                NSApp.activate(ignoringOtherApps: true)
+                openSettings()
+            })
 
             Divider()
 
-            // Streak report
-            StreakReportView(streakManager: viewModel.streakManager)
+            // Streak (the phone's rules over the synced checklist)
+            StreakReportView(sync: viewModel.syncController)
 
             Divider()
 
@@ -86,7 +88,8 @@ struct MenuBarView: View {
             // Controls
             ControlsSection(
                 overlayEnabled: $viewModel.settings.overlayEnabled,
-                onTestOverlay: { viewModel.showTestOverlay() }
+                onTestOverlay: { viewModel.showTestOverlay() },
+                onImsakiyah: { viewModel.showImsakiyah() }
             )
 
             Divider()
@@ -115,7 +118,7 @@ struct TrialBannerView: View {
     let daysRemaining: Int
 
     var body: some View {
-        Text("\(daysRemaining) day\(daysRemaining == 1 ? "" : "s") remaining")
+        Text("\(daysRemaining) days remaining")
             .font(.system(size: 11))
             .foregroundColor(.waqtuMuted)
             .frame(maxWidth: .infinity)
@@ -221,9 +224,9 @@ struct NextPrayerHeader: View {
         let hours = countdown / 3600
         let minutes = (countdown % 3600) / 60
         if hours > 0 {
-            return "\(hours)h \(minutes)m"
+            return String(localized: "\(hours)h \(minutes)m")
         }
-        return "\(minutes)m"
+        return String(localized: "\(minutes)m")
     }
 }
 
@@ -239,7 +242,7 @@ struct LocationDisplayView: View {
         let formatter = DateFormatter()
         formatter.calendar = calendar
         formatter.dateFormat = "d MMMM yyyy"
-        formatter.locale = Locale(identifier: "en")
+        formatter.locale = AppLanguage.locale
         return formatter.string(from: Date())
     }
 
@@ -332,31 +335,27 @@ struct PrayerRow: View {
 }
 
 // MARK: - Streak Report
+/// The phone's StreakCard (apps/mobile/src/components/today/StreakCard.tsx): forgiving copy, never a
+/// loss message, plus the last 7 days and the pause switch.
 struct StreakReportView: View {
-    let streakManager: PrayerStreakManager
+    let sync: MutabaahSyncController
     @State private var isExpanded = false
 
-    private let prayerOrder: [String] = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"]
-    private let prayerIcons: [String: String] = [
-        "Fajr": "moon.stars.fill",
-        "Dhuhr": "sun.max.fill",
-        "Asr": "sun.haze.fill",
-        "Maghrib": "sunset.fill",
-        "Isha": "moon.fill"
-    ]
-
     var body: some View {
+        let _ = sync.revision
+        let streak = sync.streak
+
         VStack(spacing: 0) {
             // Header row — tappable to expand/collapse
             Button(action: { withAnimation(.easeInOut(duration: 0.2)) { isExpanded.toggle() } }) {
                 HStack(spacing: 8) {
-                    Text("🔥")
+                    Text(verbatim: "🔥")
                         .font(.system(size: 13))
-                    Text("Streak \(streakManager.currentStreak)d")
+                    Text("Consistency: \(streak.current) days")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(.waqtuGold)
-                    if streakManager.bestStreak > 0 {
-                        Text("· Best \(streakManager.bestStreak)d")
+                    if streak.best > streak.current {
+                        Text("· Longest \(streak.best) days")
                             .font(.system(size: 11))
                             .foregroundColor(.waqtuMuted)
                     }
@@ -375,90 +374,63 @@ struct StreakReportView: View {
                 Divider()
                     .padding(.horizontal, 12)
 
-                VStack(spacing: 6) {
-                    // Today's prayer status
-                    ForEach(prayerOrder, id: \.self) { prayerName in
-                        prayerStatusRow(name: prayerName)
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(lines(streak), id: \.self) { line in
+                        Text(line)
+                            .font(.system(size: 11))
+                            .foregroundColor(.waqtuText)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
 
-                    // Weekly mini-grid
                     HStack(spacing: 4) {
-                        ForEach(streakManager.weeklyGrid, id: \.label) { day in
+                        ForEach(sync.week, id: \.date) { day in
                             VStack(spacing: 2) {
-                                Text(day.label.prefix(1).uppercased())
+                                Text(AppLanguage.weekdayInitial(englishShortName: MutabaahStreakModel.englishWeekday(day.date)))
                                     .font(.system(size: 9))
                                     .foregroundColor(day.isToday ? .waqtuGold : .waqtuMuted)
-                                Text(day.status)
+                                Text(verbatim: symbol(day))
                                     .font(.system(size: 13))
-                                    .foregroundColor(day.isToday ? .waqtuGold : .waqtuMuted)
+                                    .foregroundColor(day.counted ? .waqtuPrimary : (day.isToday ? .waqtuGold : .waqtuMuted))
                             }
                             .frame(maxWidth: .infinity)
                         }
                     }
-                    .padding(.horizontal, 16)
                     .padding(.top, 4)
 
-                    // Week summary
-                    let week = streakManager.weeklyStats
-                    if week.total > 0 {
-                        Text("This week: \(week.prayed)/\(week.total) (\(Int(Double(week.prayed) / Double(week.total) * 100))%)")
-                            .font(.system(size: 10))
-                            .foregroundColor(.waqtuMuted)
+                    Button(sync.pauseActive ? String(localized: "End pause") : String(localized: "Pause (illness, travel, excuse)")) {
+                        sync.togglePause()
                     }
+                    .font(.system(size: 11))
+                    .buttonStyle(.plain)
+                    .foregroundColor(.waqtuPrimary)
                 }
+                .padding(.horizontal, 16)
                 .padding(.vertical, 8)
             }
         }
     }
 
-    @ViewBuilder
-    private func prayerStatusRow(name: String) -> some View {
-        let status = streakManager.statusFor(prayer: name)
-        let hasPassed: Bool = {
-            // Check if this prayer's time has passed today
-            let icon = prayerIcons[name] ?? "circle"
-            return status != nil || icon.isEmpty == false // simplified: show all
-        }()
-
-        HStack(spacing: 8) {
-            Image(systemName: prayerIcons[name] ?? "circle")
-                .font(.system(size: 11))
-                .foregroundColor(status == .prayed ? .waqtuPrimary : .waqtuMuted)
-                .frame(width: 16)
-
-            Text(name)
-                .font(.system(size: 12))
-                .foregroundColor(.waqtuText)
-
-            Spacer()
-
-            statusBadge(status)
+    /// Same lines, same order, same conditions as the phone's StreakCard.
+    private func lines(_ streak: StreakResult) -> [String] {
+        var out: [String] = []
+        if streak.paused {
+            out.append(String(localized: "Paused. These days don't count and don't break your streak."))
+        } else if streak.current == 0 {
+            out.append(String(localized: "Start anywhere. One practice today already counts."))
+        } else {
+            out.append(String(localized: "Slow and steady. What matters is to keep going."))
         }
-        .padding(.horizontal, 16)
+        if streak.forgiven > 0 { out.append(String(localized: "\(streak.forgiven) missed days forgiven")) }
+        if streak.current > 0 && !streak.paused { out.append(String(localized: "Grace left this week: \(streak.graceLeft) days")) }
+        if !streak.countedToday && streak.current > 0 && !streak.paused { out.append(String(localized: "Today is still open.")) }
+        return out
     }
 
-    @ViewBuilder
-    private func statusBadge(_ status: PrayerLogEntry.Status?) -> some View {
-        if let status {
-            switch status {
-            case .prayed:
-                Text("Prayed")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.waqtuPrimary)
-            case .missed:
-                Text("Missed")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.red.opacity(0.8))
-            case .late:
-                Text("Late")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.waqtuGold)
-            }
-        } else {
-            Text("—")
-                .font(.system(size: 10))
-                .foregroundColor(.waqtuMuted)
-        }
+    /// ● counted, ◐ something recorded, ‖ paused, · nothing.
+    private func symbol(_ day: MutabaahStreakModel.Day) -> String {
+        if day.counted { return "●" }
+        if day.paused { return "‖" }
+        return day.done > 0 ? "◐" : "·"
     }
 }
 
@@ -466,6 +438,7 @@ struct StreakReportView: View {
 struct ControlsSection: View {
     @Binding var overlayEnabled: Bool
     let onTestOverlay: () -> Void
+    let onImsakiyah: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -495,6 +468,22 @@ struct ControlsSection: View {
                         .foregroundColor(.waqtuPrimary)
                         .font(.system(size: 12))
                     Text("Test Overlay")
+                        .font(.system(size: 13))
+                        .foregroundColor(.waqtuText)
+                    Spacer()
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .buttonStyle(ControlRowButtonStyle())
+
+            // Ramadhan month table
+            Button(action: onImsakiyah) {
+                HStack {
+                    Image(systemName: "calendar")
+                        .foregroundColor(.waqtuPrimary)
+                        .font(.system(size: 12))
+                    Text("Imsakiyah")
                         .font(.system(size: 13))
                         .foregroundColor(.waqtuText)
                     Spacer()
@@ -593,7 +582,7 @@ struct PomodoroSection: View {
                     Button {
                         pomodoroManager.isPaused ? pomodoroManager.resume() : pomodoroManager.pause()
                     } label: {
-                        Label(pomodoroManager.isPaused ? "Resume" : "Pause",
+                        Label(pomodoroManager.isPaused ? String(localized: "Resume") : String(localized: "Pause"),
                               systemImage: pomodoroManager.isPaused ? "play.fill" : "pause.fill")
                             .font(.system(size: 12, weight: .medium))
                     }
@@ -679,7 +668,7 @@ struct PomodoroSettingsTab: View {
                 HStack {
                     Text("Cycles before long break")
                     Spacer()
-                    Text("\(settings.cyclesBeforeLongBreak)")
+                    Text(verbatim: "\(settings.cyclesBeforeLongBreak)")
                         .foregroundColor(.waqtuPrimary)
                         .monospacedDigit()
                     Slider(value: Binding(
@@ -799,6 +788,27 @@ struct SettingsView: View {
     var viewModel: AppViewModel?
     var onCheckForUpdates: (() -> Void)?
     @State private var showAudioBrowser = false
+    @AppStorage(SettingsView.selectedTabKey) private var selectedTab = Pane.general
+
+    /// Tab ids for `TabView(selection:)`; the menu bar's "Manage checklist" opens `mutabaah`.
+    enum Pane {
+        static let general = "general"
+        static let prayerTimes = "prayerTimes"
+        static let mutabaah = "mutabaah"
+        static let pomodoro = "pomodoro"
+        static let location = "location"
+        static let account = "account"
+        static let slack = "slack"
+        static let upgrade = "upgrade"
+        static let about = "about"
+    }
+
+    private static let selectedTabKey = "settingsSelectedTab"
+
+    static var requestedPane: String {
+        get { UserDefaults.standard.string(forKey: selectedTabKey) ?? Pane.general }
+        set { UserDefaults.standard.set(newValue, forKey: selectedTabKey) }
+    }
 
     init(settings: AppSettings, viewModel: AppViewModel? = nil, onCheckForUpdates: (() -> Void)? = nil) {
         self.settings = settings
@@ -834,26 +844,38 @@ struct SettingsView: View {
             if let vm = viewModel, !vm.isPremium, vm.trialManager.trialDaysRemaining >= 2 {
                 TrialBannerView(daysRemaining: vm.trialManager.trialDaysRemaining)
             }
-            TabView {
+            TabView(selection: $selectedTab) {
                 GeneralSettingsTab(settings: settings, viewModel: viewModel)
                     .tabItem {
                         Label("General", systemImage: "gearshape.fill")
                     }
+                    .tag(Pane.general)
 
                 PrayerTimesSettingsTab(settings: settings, viewModel: viewModel)
                     .tabItem {
                         Label("Prayer Times", systemImage: "clock.fill")
                     }
+                    .tag(Pane.prayerTimes)
+
+                if let vm = viewModel {
+                    MutabaahSettingsTab(sync: vm.syncController)
+                        .tabItem {
+                            Label("Mutabaah", systemImage: "checklist")
+                        }
+                        .tag(Pane.mutabaah)
+                }
 
                 PomodoroSettingsTab(settings: settings, onBrowse: { showAudioBrowser = true })
                     .tabItem {
                         Label("Pomodoro", systemImage: "timer.fill")
                     }
+                    .tag(Pane.pomodoro)
 
                 LocationSettingsTab(settings: settings, viewModel: viewModel)
                     .tabItem {
                         Label("Location", systemImage: "location.fill")
                     }
+                    .tag(Pane.location)
 
                 if let vm = viewModel {
                     AccountSettingsTab(
@@ -864,22 +886,26 @@ struct SettingsView: View {
                     .tabItem {
                         Label("Account", systemImage: "person.crop.circle.fill")
                     }
+                    .tag(Pane.account)
 
                     SlackSettingsTab(settings: settings, slackManager: vm.slackManager)
                         .tabItem {
                             Label("Slack", systemImage: "message.fill")
                         }
+                        .tag(Pane.slack)
 
                     UpgradeSettingsTab(viewModel: vm)
                         .tabItem {
                             Label("Upgrade", systemImage: "crown.fill")
                         }
+                        .tag(Pane.upgrade)
                 }
 
                 AboutSettingsTab(trialManager: viewModel?.trialManager, hasStoreSubscription: viewModel?.hasStoreSubscription ?? false, hasAccountPremium: viewModel?.account.serverPremium ?? false, onCheckForUpdates: onCheckForUpdates, onResetWaqtu: viewModel.map { vm in { vm.resetAllAndQuit() } })
                     .tabItem {
                         Label("About", systemImage: "info.circle.fill")
                     }
+                    .tag(Pane.about)
             }
         }
     }
@@ -1134,7 +1160,7 @@ struct SlackSettingsTab: View {
                                 .textFieldStyle(.roundedBorder)
                                 .focused($isTokenFocused)
 
-                            Button(slackManager.isConnected ? "Update" : "Connect") {
+                            Button(slackManager.isConnected ? String(localized: "Update") : String(localized: "Connect")) {
                                 saveToken()
                             }
                             .buttonStyle(.borderedProminent)
@@ -1226,27 +1252,27 @@ struct PrayerTimesSettingsTab: View {
     var viewModel: AppViewModel?
 
     private static let calculationMethods: [(id: String, label: String)] = [
-        ("muslimWorldLeague", "Muslim World League"),
-        ("moonsightingCommittee", "Moonsighting Committee (North America, UK)"),
-        ("northAmerica", "ISNA (North America)"),
-        ("egyptian", "Egyptian General Authority"),
-        ("karachi", "University of Islamic Sciences, Karachi"),
-        ("ummAlQura", "Umm al-Qura (Makkah)"),
-        ("dubai", "Dubai (UAE)"),
-        ("qatar", "Qatar"),
-        ("kuwait", "Kuwait"),
-        ("kemenag", "Kemenag RI (Indonesia)"),
-        ("singapore", "Singapore / Malaysia (MUIS / JAKIM)"),
-        ("tehran", "Tehran"),
-        ("turkey", "Turkey (Diyanet)"),
-        ("other", "Custom (angles)"),
+        ("muslimWorldLeague", String(localized: "Muslim World League")),
+        ("moonsightingCommittee", String(localized: "Moonsighting Committee (North America, UK)")),
+        ("northAmerica", String(localized: "ISNA (North America)")),
+        ("egyptian", String(localized: "Egyptian General Authority")),
+        ("karachi", String(localized: "University of Islamic Sciences, Karachi")),
+        ("ummAlQura", String(localized: "Umm al-Qura (Makkah)")),
+        ("dubai", String(localized: "Dubai (UAE)")),
+        ("qatar", String(localized: "Qatar")),
+        ("kuwait", String(localized: "Kuwait")),
+        ("kemenag", String(localized: "Kemenag RI (Indonesia)")),
+        ("singapore", String(localized: "Singapore / Malaysia (MUIS / JAKIM)")),
+        ("tehran", String(localized: "Tehran")),
+        ("turkey", String(localized: "Turkey (Diyanet)")),
+        ("other", String(localized: "Custom (angles)")),
     ]
 
     private static let highLatitudeRules: [(id: String, label: String)] = [
-        ("auto", "Auto (recommended for location)"),
-        ("middleOfTheNight", "Middle of the night"),
-        ("seventhOfTheNight", "Seventh of the night (above 48° latitude)"),
-        ("twilightAngle", "Twilight angle"),
+        ("auto", String(localized: "Auto (recommended for location)")),
+        ("middleOfTheNight", String(localized: "Middle of the night")),
+        ("seventhOfTheNight", String(localized: "Seventh of the night (above 48° latitude)")),
+        ("twilightAngle", String(localized: "Twilight angle")),
     ]
 
     var body: some View {
@@ -1331,7 +1357,7 @@ struct PrayerTimesSettingsTab: View {
 
 // MARK: - Adjustment Row (stepper for -60 to +60)
 struct AdjustmentRow: View {
-    let label: String
+    let label: LocalizedStringKey
     @Binding var value: Int
     var onChange: (() -> Void)?
 
@@ -1348,7 +1374,7 @@ struct AdjustmentRow: View {
                 .buttonStyle(.bordered)
                 .frame(width: 28)
                 .disabled(value <= -60)
-                Text("\(value >= 0 ? "+" : "")\(value)")
+                Text(verbatim: "\(value >= 0 ? "+" : "")\(value)")
                     .font(.system(.body, design: .monospaced))
                     .foregroundColor(.waqtuPrimary)
                     .frame(width: 36, alignment: .center)
@@ -1554,9 +1580,9 @@ struct CalendarProtectionSection: View {
     let onRemoveAllWaqtuEvents: () -> Void
 
     private var selectedCalendarTitle: String {
-        if settings.calendarProtectionCalendarId.isEmpty { return "Default" }
+        if settings.calendarProtectionCalendarId.isEmpty { return String(localized: "Default") }
         let allCalendars = calendarsGroupedBySource.flatMap(\.calendars)
-        return allCalendars.first(where: { $0.calendarIdentifier == settings.calendarProtectionCalendarId })?.title ?? "Default"
+        return allCalendars.first(where: { $0.calendarIdentifier == settings.calendarProtectionCalendarId })?.title ?? String(localized: "Default")
     }
 
     var body: some View {
@@ -1579,7 +1605,7 @@ struct CalendarProtectionSection: View {
                     Image(systemName: effectiveAccess ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
                         .font(.system(size: 12))
                         .foregroundColor(effectiveAccess ? .waqtuPrimary : .waqtuGold)
-                    Text(effectiveAccess ? "Calendar access granted" : "Calendar access denied — enable in System Settings → Privacy & Security → Calendars")
+                    Text(effectiveAccess ? String(localized: "Calendar access granted") : String(localized: "Calendar access denied — enable in System Settings → Privacy & Security → Calendars"))
                         .font(.caption)
                         .foregroundColor(effectiveAccess ? .waqtuMuted : .waqtuGold)
                 }
@@ -1789,7 +1815,7 @@ struct AboutSettingsTab: View {
     private var versionString: String {
         let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
-        return "Version \(short) (\(build))"
+        return String(localized: "Version \(short) (\(build))")
     }
 
     var body: some View {
@@ -1799,7 +1825,7 @@ struct AboutSettingsTab: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 80, height: 80)
-            Text("Waqtu")
+            Text(verbatim: "Waqtu")
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(.waqtuText)
             Text("Prayer times for your day")
@@ -1823,7 +1849,7 @@ struct AboutSettingsTab: View {
                     NSWorkspace.shared.open(url)
                 }
             } label: {
-                Text("getwaqtu.com")
+                Text(verbatim: "getwaqtu.com")
                     .font(.system(size: 13))
                     .foregroundColor(.waqtuPrimary)
             }
@@ -1913,7 +1939,7 @@ struct AboutSettingsTab: View {
             .background(Color.waqtuDark.opacity(0.6))
             .cornerRadius(8)
         } else if let trial = trialManager, trial.hasAccess, trial.isTrialActive, trial.trialDaysRemaining > 0 {
-            Text("\(trial.trialDaysRemaining) day\(trial.trialDaysRemaining == 1 ? "" : "s") left in trial")
+            Text("\(trial.trialDaysRemaining) days left in trial")
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(.waqtuGold)
                 .padding(.horizontal, 12)
