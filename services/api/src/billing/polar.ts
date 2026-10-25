@@ -13,7 +13,7 @@ const TOLERANCE_MS = 5 * 60 * 1000;
 export type PolarPlan = "monthly" | "yearly";
 
 export interface PolarEnv {
-  /** Also used by the Mac license routes; checkout needs the checkouts:write + customer_sessions:write scopes. */
+  /** Checkout needs the checkouts:write + customer_sessions:write scopes. */
   POLAR_ACCESS_TOKEN?: string;
   POLAR_WEBHOOK_SECRET?: string;
   /** "sandbox" talks to sandbox-api.polar.sh; anything else is production. */
@@ -48,7 +48,7 @@ export function polarConfig(env: PolarEnv): PolarConfig | null {
   };
 }
 
-/** Which plan a Polar product sells; null = not a Waqtu Premium product (the org also sells the Mac license). */
+/** Which plan a Polar product sells; null = not a Waqtu Premium product. */
 export function polarProductPlan(
   config: Pick<PolarConfig, "productIds">,
   productId: string | null | undefined,

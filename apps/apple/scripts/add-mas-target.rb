@@ -3,7 +3,7 @@
 #
 # Differences from the direct-distribution "waqtu" target:
 #   - No Sparkle (banned under MAS sandbox). Uses #if canImport(Sparkle) in source.
-#   - MAS compilation flag -> StoreKit 2 licensing instead of Polar.sh.
+#   - MAS compilation flag -> StoreKit 2 Premium subscriptions (MacStoreSubscription).
 #   - Sandbox + network entitlements, LSUIElement, Apple Distribution signing.
 #
 # Usage: ruby scripts/add-mas-target.rb

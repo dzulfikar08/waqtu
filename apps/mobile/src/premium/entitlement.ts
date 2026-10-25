@@ -1,8 +1,8 @@
-export type EntitlementSource = "apple" | "google" | "polar" | "license";
+export type EntitlementSource = "apple" | "google" | "polar";
 
-const SOURCES: readonly EntitlementSource[] = ["apple", "google", "polar", "license"];
+const SOURCES: readonly EntitlementSource[] = ["apple", "google", "polar"];
 
-/** What `GET /v1/entitlement` returns. `expiresAt` null with `premium` true means lifetime. */
+/** What `GET /v1/entitlement` returns. `expiresAt` null with `premium` true means no expiry. */
 export interface Entitlement {
   premium: boolean;
   source: EntitlementSource | null;
@@ -35,7 +35,7 @@ export function parseEntitlement(value: unknown): Entitlement | null {
 /**
  * Premium for `userId` right now. The cached answer only counts for the account it was fetched for
  * and stops counting once its paid period has ended, so an offline phone never keeps premium past
- * the expiry the server reported. Lifetime (`expiresAt` null) never lapses.
+ * the expiry the server reported. An entitlement without `expiresAt` never lapses.
  */
 export function isPremium(
   cache: CachedEntitlement | null,

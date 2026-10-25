@@ -15,10 +15,15 @@ describe("existing release routes", () => {
     expect(xml).toContain("https://example.test/Waqtu-1.0.0.dmg");
   });
 
-  it("POST /license/activate without config returns the existing 500 JSON", async () => {
-    const res = await api("/license/activate", { json: { key: "x", device_id: "y" } });
+  it("keeps /license/validate for installed pre-subscription Mac builds", async () => {
+    const res = await api("/license/validate", { json: { key: "x", activation_id: "y" } });
     expect(res.status).toBe(500);
     expect(await res.json()).toEqual({ valid: false, error: "License server not configured" });
+  });
+
+  it("no longer activates license keys", async () => {
+    const res = await api("/license/activate", { json: { key: "x", device_id: "y" } });
+    expect(res.status).toBe(404);
   });
 
   it("unknown /v1 paths are 404 JSON, other paths fall through", async () => {

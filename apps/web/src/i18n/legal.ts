@@ -127,9 +127,9 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
         heading: "Pembayaran dan Premium",
         items: [
           "<strong>App Store dan Google Play.</strong> Pembayaran diproses Apple atau Google; kami tidak melihat data kartumu. Server kami memverifikasi pembelian ke Apple atau Google dan menyimpan catatan hak Premium yang terhubung ke akunmu: sumber pembelian, ID produk, ID transaksi atau pesanan, lingkungan (produksi atau uji), waktu berakhir, dan status pengembalian dana.",
-          "<strong>Mac, unduhan langsung.</strong> Pembayaran lewat Polar. Polar menerima email dan namamu saat checkout dan mengirim kunci lisensi. Saat aktivasi, aplikasi Mac mengirim kunci lisensi dan ID acak perangkat ke layanan lisensi kami, yang memeriksanya ke Polar. Jika kamu menautkan kunci ke akun Waqtu, kami menyimpan catatan lisensi itu beserta referensi pelanggan Polar.",
+          "<strong>Polar.</strong> Jika kamu berlangganan lewat checkout Polar yang dibuka dari aplikasi Waqtu saat sudah masuk, Polar memproses pembayaran dan menerima email dan namamu. Kami menyimpan catatan langganan itu di akunmu beserta referensi pelanggan Polar.",
           "<strong>Mac, Mac App Store.</strong> Pembelian ditangani Apple.",
-          "Pembeli lisensi Mac seumur hidup mendapat Premium seumur hidup di ponsel jika kuncinya ditautkan ke akun.",
+          "Satu langganan Premium berlaku di semua perangkat tempat kamu masuk dengan akun Waqtu yang sama, termasuk Mac versi unduhan langsung.",
         ],
       },
       {
@@ -145,13 +145,12 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
         items: [
           "<strong>Analitik situs.</strong> getwaqtu.com memuat skrip One Dollar Stats untuk menghitung kunjungan halaman dan klik tombol, serta kedalaman gulir. Menurut dokumentasi mereka, pengunjung dibedakan lewat hash gabungan alamat IP, user agent, dan tanggal hari itu. Kode situs kami tidak memasang cookie atau memakai localStorage.",
           "<strong>Daftar tunggu.</strong> Kami menyimpan email, jenis perangkat dan kota jika kamu mengisinya, bahasa halaman, dan waktu pendaftaran, hanya untuk mengabari rilis. Alamat IP-mu tidak disimpan; hash bergaram darinya dipakai paling lama 20 menit untuk membatasi pendaftaran berulang. Entri bertahan sampai kamu minta dihapus.",
-          "<strong>Checkout web.</strong> Halaman pembayaran dikelola Polar. Situs kami tidak menyimpan data pembayaran.",
         ],
       },
       {
         heading: "Pihak yang memproses data",
         paragraphs: [
-          "Kami tidak menjual atau menyewakan datamu. Data hanya sampai ke pihak berikut sebatas yang dijelaskan di atas: Cloudflare (hosting server, basis data D1, dan penyimpanan R2), Apple dan Google (masuk dan pembelian), Polar (pembayaran dan lisensi Mac), Expo (pembaruan aplikasi ponsel), One Dollar Stats (analitik situs), YouTube (video halaqah), serta Slack dan Google Calendar jika kamu menyambungkannya.",
+          "Kami tidak menjual atau menyewakan datamu. Data hanya sampai ke pihak berikut sebatas yang dijelaskan di atas: Cloudflare (hosting server, basis data D1, dan penyimpanan R2), Apple dan Google (masuk dan pembelian), Polar (pembayaran langganan lewat checkout Polar), Expo (pembaruan aplikasi ponsel), One Dollar Stats (analitik situs), YouTube (video halaqah), serta Slack dan Google Calendar jika kamu menyambungkannya.",
         ],
       },
       {
@@ -163,7 +162,7 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
           "<strong>Aplikasi Mac belum punya tombol hapus akun.</strong> Hapus lewat aplikasi ponsel, atau kirim email ke " +
             mail +
             ".",
-          "<strong>Daftar tunggu, lisensi, dan permintaan lain:</strong> kirim email ke " +
+          "<strong>Daftar tunggu dan permintaan lain:</strong> kirim email ke " +
             mail +
             ". Kami membalas dalam 30 hari.",
         ],
@@ -268,9 +267,9 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
         heading: "Payments and Premium",
         items: [
           "<strong>App Store and Google Play.</strong> Apple or Google processes the payment; we never see your card details. Our server verifies the purchase with Apple or Google and stores an entitlement record linked to your account: purchase source, product ID, transaction or order ID, environment (production or test), expiry time, and refund status.",
-          "<strong>Mac, direct download.</strong> Payment goes through Polar. Polar receives your email and name at checkout and issues a license key. On activation the Mac app sends the license key and a random device ID to our license service, which checks it with Polar. If you link the key to a Waqtu account, we store that license record along with the Polar customer reference.",
+          "<strong>Polar.</strong> If you subscribe through a Polar checkout opened from a signed-in Waqtu app, Polar processes the payment and receives your email and name. We store that subscription record on your account along with the Polar customer reference.",
           "<strong>Mac, Mac App Store.</strong> Apple handles the purchase.",
-          "Buyers of the lifetime Mac license get lifetime Premium on their phone when the key is linked to their account.",
+          "One Premium subscription works on every device where you sign in with the same Waqtu account, including the direct-download Mac app.",
         ],
       },
       {
@@ -286,13 +285,12 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
         items: [
           "<strong>Site analytics.</strong> getwaqtu.com loads the One Dollar Stats script to count page views, button clicks and scroll depth. According to their documentation, visitors are told apart by a hash of IP address, user agent and the current day. Our site code sets no cookies and uses no localStorage.",
           "<strong>Waitlist.</strong> We store your email, your device type and city if you fill them in, the page language, and the sign-up time, only to tell you about the release. Your IP address is not stored; a salted hash of it is kept for at most 20 minutes to limit repeated sign-ups. Entries stay until you ask us to delete them.",
-          "<strong>Web checkout.</strong> The payment page is run by Polar. Our site stores no payment data.",
         ],
       },
       {
         heading: "Who processes data",
         paragraphs: [
-          "We do not sell or rent your data. It reaches the following parties only as described above: Cloudflare (server hosting, D1 database and R2 storage), Apple and Google (sign-in and purchases), Polar (payments and Mac licenses), Expo (phone app updates), One Dollar Stats (site analytics), YouTube (halaqah videos), and Slack and Google Calendar if you connect them.",
+          "We do not sell or rent your data. It reaches the following parties only as described above: Cloudflare (server hosting, D1 database and R2 storage), Apple and Google (sign-in and purchases), Polar (subscription payments through a Polar checkout), Expo (phone app updates), One Dollar Stats (site analytics), YouTube (halaqah videos), and Slack and Google Calendar if you connect them.",
         ],
       },
       {
@@ -304,7 +302,7 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
           "<strong>The Mac app has no delete-account button yet.</strong> Delete through the phone app, or email " +
             mail +
             ".",
-          "<strong>Waitlist, licenses and other requests:</strong> email " +
+          "<strong>Waitlist and other requests:</strong> email " +
             mail +
             ". We reply within 30 days.",
         ],
@@ -347,7 +345,7 @@ export const terms: Record<LegalLocale, LegalDoc> = {
   id: {
     title: "Syarat Layanan Waqtu",
     description:
-      "Syarat memakai Waqtu di Mac, iPhone, dan Android: langganan Premium, perpanjangan otomatis, pembatalan lewat toko, lisensi Mac lewat Polar, dan aturan Lingkaran.",
+      "Syarat memakai Waqtu di Mac, iPhone, dan Android: langganan Premium, perpanjangan otomatis, pembatalan lewat toko, Premium di Mac lewat akun Waqtu, dan aturan Lingkaran.",
     updatedLabel: "Terakhir diperbarui",
     intro: [
       'Dengan mengunduh atau memakai Waqtu (aplikasi Mac, iPhone, atau Android) kamu menyetujui syarat ini. Kalau tidak setuju, jangan pakai aplikasinya. Cara kami menangani datamu dijelaskan di <a href="/privacy">Kebijakan Privasi</a>.',
@@ -356,13 +354,13 @@ export const terms: Record<LegalLocale, LegalDoc> = {
       {
         heading: "Yang gratis dan yang Premium",
         paragraphs: [
-          "Waktu sholat, pengingat adzan, dan mutabaah dasar gratis. Premium membuka fitur tambahan yang tercantum di layar Premium dalam aplikasi. Daftar fitur dan harga di layar itu dan di halaman toko adalah yang berlaku untukmu saat membeli.",
+          "Waktu sholat, mutabaah di perangkat, dasar-dasar Ramadhan, program halaqah, dan hafalan gratis. Premium membuka sinkron antarperangkat, Lingkaran, dan fitur lain yang tercantum di layar Premium dalam aplikasi. Daftar fitur dan harga di layar itu dan di halaman toko adalah yang berlaku untukmu saat membeli.",
         ],
       },
       {
-        heading: "Langganan di iPhone dan Android",
+        heading: "Langganan di iPhone, Android, dan Mac App Store",
         items: [
-          "Premium dijual sebagai langganan bulanan atau tahunan lewat App Store atau Google Play. Harga ditampilkan toko dalam mata uangmu sebelum kamu membeli.",
+          "Premium dijual sebagai langganan bulanan atau tahunan lewat App Store, Google Play, atau edisi Mac App Store. Harga ditampilkan toko dalam mata uangmu sebelum kamu membeli. Situs getwaqtu.com tidak menjual apa pun.",
           "Pembayaran dibebankan ke akun Apple atau Google-mu saat pembelian dikonfirmasi.",
           "Langganan diperpanjang otomatis kecuali kamu membatalkannya paling lambat 24 jam sebelum periode berjalan berakhir. Akunmu ditagih untuk perpanjangan dalam 24 jam sebelum periode berakhir, dengan harga periode yang sama.",
           "Kamu membatalkan dan mengelola langganan di toko, bukan lewat kami: di iPhone lewat Pengaturan, nama kamu, Langganan; di Android lewat Google Play, Pembayaran dan langganan, Langganan. Setelah dibatalkan, Premium tetap aktif sampai periode yang sudah dibayar habis.",
@@ -373,13 +371,9 @@ export const terms: Record<LegalLocale, LegalDoc> = {
       {
         heading: "Waqtu untuk Mac",
         items: [
-          "Waqtu untuk Mac yang diunduh langsung dijual lewat Polar sebagai lisensi seumur hidup untuk satu Mac. Polar memproses pembayaran; kunci lisensi dikirim setelah pembayaran dikonfirmasi.",
-          "Lisensi bersifat pribadi. Jangan membagikan, menjual ulang, membongkar aplikasi, atau menghindari verifikasi lisensi.",
-          "Tidak puas? Kirim email ke " +
-            mail +
-            " dalam 30 hari sejak pembelian untuk pengembalian dana penuh, tanpa perlu alasan. Setelah itu penjualan bersifat final. Jika pembayaran dikembalikan lewat Polar, lisensinya dicabut.",
-          "Versi Mac App Store dibeli dan dikelola lewat Apple, dengan syarat toko Apple.",
-          "Pemilik lisensi Mac seumur hidup mendapat Premium seumur hidup di ponsel setelah menautkan kunci di layar Premium.",
+          "Waqtu untuk Mac yang diunduh langsung bisa dicoba gratis. Premium di Mac berasal dari akun Waqtu dengan langganan aktif: berlangganan di iPhone atau Android, lalu masuk dengan akun yang sama di Mac.",
+          "Jangan membongkar aplikasi atau menghindari pemeriksaan Premium.",
+          "Versi Mac App Store dibeli dan dikelola lewat Apple, dengan syarat toko Apple. Langganan di sana juga berlaku di perangkat lain lewat akun Waqtu-mu.",
         ],
       },
       {
@@ -421,7 +415,7 @@ export const terms: Record<LegalLocale, LegalDoc> = {
       {
         heading: "Penghentian",
         paragraphs: [
-          "Kamu bisa berhenti memakai Waqtu kapan saja. Kami bisa menghentikan akses ke akun atau lisensi yang melanggar syarat ini. Lisensi Mac yang dicabut berhenti berlaku di aplikasi.",
+          "Kamu bisa berhenti memakai Waqtu kapan saja. Kami bisa menghentikan akses ke akun yang melanggar syarat ini.",
         ],
       },
       {
@@ -443,7 +437,7 @@ export const terms: Record<LegalLocale, LegalDoc> = {
   en: {
     title: "Waqtu Terms of Service",
     description:
-      "Terms for using Waqtu on Mac, iPhone and Android: Premium subscriptions, auto-renewal, cancelling through the store, Mac licenses through Polar, and Circles rules.",
+      "Terms for using Waqtu on Mac, iPhone and Android: Premium subscriptions, auto-renewal, cancelling through the store, Premium on the Mac through your Waqtu account, and Circles rules.",
     updatedLabel: "Last updated",
     intro: [
       'By downloading or using Waqtu (the Mac, iPhone or Android app) you agree to these terms. If you do not agree, do not use the app. How we handle your data is described in the <a href="/en/privacy">Privacy Policy</a>.',
@@ -452,13 +446,13 @@ export const terms: Record<LegalLocale, LegalDoc> = {
       {
         heading: "What is free and what is Premium",
         paragraphs: [
-          "Prayer times, adhan reminders and the basic mutabaah checklist are free. Premium unlocks extra features listed on the Premium screen in the app. The feature list and price on that screen and on the store page are what apply to you when you buy.",
+          "Prayer times, mutabaah on the device, Ramadhan basics, the halaqah program and hafalan are free. Premium unlocks sync across devices, Circles and any other features listed on the Premium screen in the app. The feature list and price on that screen and on the store page are what apply to you when you buy.",
         ],
       },
       {
-        heading: "Subscriptions on iPhone and Android",
+        heading: "Subscriptions on iPhone, Android and the Mac App Store",
         items: [
-          "Premium is sold as a monthly or yearly subscription through the App Store or Google Play. The store shows the price in your currency before you buy.",
+          "Premium is sold as a monthly or yearly subscription through the App Store, Google Play or the Mac App Store edition. The store shows the price in your currency before you buy. The getwaqtu.com website does not sell anything.",
           "Payment is charged to your Apple or Google account when the purchase is confirmed.",
           "The subscription renews automatically unless you cancel it at least 24 hours before the current period ends. Your account is charged for renewal within 24 hours before the period ends, at the price of the same period.",
           "You cancel and manage the subscription in the store, not through us: on iPhone in Settings, your name, Subscriptions; on Android in Google Play, Payments and subscriptions, Subscriptions. After you cancel, Premium stays active until the paid period ends.",
@@ -469,13 +463,9 @@ export const terms: Record<LegalLocale, LegalDoc> = {
       {
         heading: "Waqtu for Mac",
         items: [
-          "Waqtu for Mac downloaded directly is sold through Polar as a lifetime license for one Mac. Polar processes the payment; the license key is sent once payment is confirmed.",
-          "The license is personal. Do not share it, resell it, reverse engineer the app, or bypass license verification.",
-          "Not satisfied? Email " +
-            mail +
-            " within 30 days of purchase for a full refund, no reason needed. After that, sales are final. If a payment is refunded through Polar, the license is revoked.",
-          "The Mac App Store version is bought and managed through Apple, under Apple's store terms.",
-          "Owners of the lifetime Mac license get lifetime Premium on their phone after linking the key on the Premium screen.",
+          "Waqtu for Mac downloaded directly can be tried for free. Premium on the Mac comes from a Waqtu account with an active subscription: subscribe on iPhone or Android, then sign in with the same account on the Mac.",
+          "Do not reverse engineer the app or bypass the Premium check.",
+          "The Mac App Store version is bought and managed through Apple, under Apple's store terms. A subscription there also applies on your other devices through your Waqtu account.",
         ],
       },
       {
@@ -515,7 +505,7 @@ export const terms: Record<LegalLocale, LegalDoc> = {
       {
         heading: "Termination",
         paragraphs: [
-          "You can stop using Waqtu at any time. We may end access to an account or license that breaks these terms. A revoked Mac license stops working in the app.",
+          "You can stop using Waqtu at any time. We may end access to an account that breaks these terms.",
         ],
       },
       {
@@ -540,12 +530,12 @@ export const support: Record<LegalLocale, SupportDoc> = {
   id: {
     title: "Bantuan Waqtu",
     description:
-      "Hubungi Waqtu dan temukan jawaban untuk pertanyaan umum: menghapus akun, membatalkan langganan, notifikasi adzan, lisensi Mac, dan Lingkaran.",
+      "Hubungi Waqtu dan temukan jawaban untuk pertanyaan umum: menghapus akun, membatalkan langganan, notifikasi adzan, Premium di Mac, dan Lingkaran.",
     intro:
       "Tanya langsung lewat email. Jawaban untuk pertanyaan yang paling sering datang ada di bawah.",
     contactHeading: "Hubungi kami",
     contactBody:
-      "Tulis versi aplikasi dan jenis perangkatmu (misalnya Android 15 atau macOS 15) supaya kami bisa mengecek lebih cepat. Jangan kirim kunci lisensi atau kata sandi di email kecuali kami memintanya.",
+      "Tulis versi aplikasi dan jenis perangkatmu (misalnya Android 15 atau macOS 15) supaya kami bisa mengecek lebih cepat. Jangan kirim kata sandi di email.",
     contactCta: "Kirim email",
     faqHeading: "Pertanyaan umum",
     linksHeading: "Dokumen",
@@ -566,9 +556,9 @@ export const support: Record<LegalLocale, SupportDoc> = {
           "Masuk ke akun Waqtu di Pengaturan, buka layar Premium, lalu ketuk Pulihkan pembelian. Pastikan kamu memakai akun Apple atau Google yang sama dengan saat membeli.",
       },
       {
-        question: "Saya punya lisensi Waqtu Mac. Bagaimana mendapat Premium di ponsel?",
+        question: "Bagaimana mendapat Premium di Mac?",
         answer:
-          "Masuk ke akun Waqtu, buka layar Premium, isi kunci lisensi di bagian Tautkan lisensi. Premium aktif seumur hidup untuk akun itu.",
+          "Berlangganan di iPhone atau Android (atau di edisi Mac App Store), lalu masuk dengan akun Waqtu yang sama di aplikasi Mac. Satu langganan berlaku di semua perangkatmu.",
       },
       {
         question: "Notifikasi adzan tidak berbunyi tepat waktu.",
@@ -610,11 +600,11 @@ export const support: Record<LegalLocale, SupportDoc> = {
   en: {
     title: "Waqtu Support",
     description:
-      "Contact Waqtu and find answers to common questions: deleting your account, cancelling a subscription, adhan notifications, Mac licenses and Circles.",
+      "Contact Waqtu and find answers to common questions: deleting your account, cancelling a subscription, adhan notifications, Premium on the Mac and Circles.",
     intro: "Ask by email. Answers to the questions that come up most often are below.",
     contactHeading: "Contact us",
     contactBody:
-      "Include your app version and device (for example Android 15 or macOS 15) so we can check faster. Do not send license keys or passwords by email unless we ask for them.",
+      "Include your app version and device (for example Android 15 or macOS 15) so we can check faster. Do not send passwords by email.",
     contactCta: "Send an email",
     faqHeading: "Common questions",
     linksHeading: "Documents",
@@ -635,9 +625,9 @@ export const support: Record<LegalLocale, SupportDoc> = {
           "Sign in to your Waqtu account in Settings, open the Premium screen, and tap Restore purchases. Make sure you use the same Apple or Google account you bought with.",
       },
       {
-        question: "I have a Waqtu Mac license. How do I get Premium on my phone?",
+        question: "How do I get Premium on my Mac?",
         answer:
-          "Sign in to your Waqtu account, open the Premium screen, and enter the license key under Link license. Premium becomes lifetime for that account.",
+          "Subscribe on iPhone or Android (or in the Mac App Store edition), then sign in with the same Waqtu account in the Mac app. One subscription works on all your devices.",
       },
       {
         question: "Adhan notifications do not ring on time.",
