@@ -3,6 +3,7 @@ import Combine
 import AppKit
 import CoreLocation
 import UserNotifications
+import Adhan
 
 @Observable
 final class AppViewModel {
@@ -31,6 +32,7 @@ final class AppViewModel {
     var nextPrayer: PrayerTime?
     var countdown: Int = 0
     var overlayWindow: NSWindow?
+    @ObservationIgnored private var imsakiyahWindow: ImsakiyahWindow?
 
     /// Menu bar title during Ramadhan ("Iftar 2h 14m"); nil outside Ramadhan or when turned off.
     var fastingTitle: String?
@@ -600,6 +602,40 @@ final class AppViewModel {
         AppDelegate.applyLaunchAtLogin(false)
         try? calendarManager.deleteAllWaqtuEvents()
         NSApplication.shared.terminate(nil)
+    }
+
+    /// The current or next Ramadhan and its month table at this Mac's location, with the prayer
+    /// settings and the account's moon-sighting correction. Nil when the times cannot be computed.
+    func imsakiyah() -> (span: Ramadhan.Span, table: Imsakiyah.Table)? {
+        let offset = syncController.hijriOffset
+        guard let span = Ramadhan.currentOrNext(on: Date(), hijriOffset: offset) else { return nil }
+        let coordinates = calculator.getCoordinates()
+        guard let table = Imsakiyah.table(
+            hijriYear: span.hijriYear,
+            hijriOffset: offset,
+            latitude: coordinates.latitude,
+            longitude: coordinates.longitude,
+            timeZone: .current,
+            method: settings.calculationMethod,
+            madhab: settings.madhab,
+            highLatitudeRule: settings.highLatitudeRule,
+            adjustments: PrayerAdjustmentsData(
+                fajr: settings.adjustmentFajr,
+                sunrise: settings.adjustmentSunrise,
+                dhuhr: settings.adjustmentDhuhr,
+                asr: settings.adjustmentAsr,
+                maghrib: settings.adjustmentMaghrib,
+                isha: settings.adjustmentIsha
+            )
+        ) else { return nil }
+        return (span, table)
+    }
+
+    func showImsakiyah() {
+        let window = imsakiyahWindow ?? ImsakiyahWindow(viewModel: self)
+        imsakiyahWindow = window
+        NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
     }
 
     func showTestOverlay() {

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Imsakiyah on the Mac (DEV-13)
+
+- **Ramadhan month table** — Menu bar → Imsakiyah opens the table for the current or next Ramadhan: imsak (fajr − 10 min), Subuh, Dzuhur, Ashar, Maghrib, Isya for every day, today highlighted, with the start date, the day of Ramadhan and Idul Fitri. Uses the Mac's location, calculation method (incl. Kemenag), madhab, minute corrections and the moon-sighting correction synced from the phone; numbers match `@waqtu/core`'s `imsakiyahTable`.
+
 ### Same streak as the phone (DEV-13)
 
 - **One streak rule everywhere** — The Mac's streak is now computed from the synced checklist with the phone's rules: a day counts when at least the chosen number of practices is recorded, missed days within the weekly grace are forgiven, and paused days (illness, travel, excuse) neither count nor break it. The old Mac-only rule (all five prayers every day, no grace) is gone, so both devices show the same number.

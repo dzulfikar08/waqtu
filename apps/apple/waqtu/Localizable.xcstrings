@@ -840,6 +840,36 @@
         }
       }
     },
+    "Date" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tgl"
+          }
+        }
+      }
+    },
+    "Day" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hr"
+          }
+        }
+      }
+    },
+    "Day %lld of Ramadan %lldH" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hari ke-%1$lld Ramadhan %2$lldH"
+          }
+        }
+      }
+    },
     "Decrease %@" : {
       "localizations" : {
         "id" : {
@@ -966,6 +996,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Otoritas Survei Umum Mesir"
+          }
+        }
+      }
+    },
+    "Eid al-Fitr %@" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Idul Fitri %@"
           }
         }
       }
@@ -1298,6 +1338,29 @@
     },
     "Imsak" : {
       "shouldTranslate" : false
+    },
+    "Imsak is 10 minutes before Fajr. Times use your location, calculation method and corrections from Settings." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imsak 10 menit sebelum Subuh. Waktu mengikuti lokasi, metode perhitungan, dan koreksi di Pengaturan."
+          }
+        }
+      }
+    },
+    "Imsakiyah" : {
+      "shouldTranslate" : false
+    },
+    "Imsakiyah Ramadan %lldH" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imsakiyah Ramadhan %lldH"
+          }
+        }
+      }
     },
     "In congregation" : {
       "localizations" : {
@@ -1910,6 +1973,16 @@
         }
       }
     },
+    "Prayer times are not available at this location." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waktu shalat tidak tersedia di lokasi ini."
+          }
+        }
+      }
+    },
     "Prayer times for your day" : {
       "localizations" : {
         "id" : {
@@ -1979,6 +2052,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ayat Al-Qur'an saat istirahat"
+          }
+        }
+      }
+    },
+    "Ramadan %lldH starts %@" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ramadhan %1$lldH mulai %2$@"
           }
         }
       }
