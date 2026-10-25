@@ -1,0 +1,70 @@
+# Over-the-air update for Waqtu (apps/mobile): publishes the current JS bundle and assets to EAS Update, channel `production`,
+# so installed release builds pick it up without a store build. Phones download it in the background on launch and run it
+# on the next launch (expo-updates defaults).
+#
+# Only JS/asset changes reach phones: runtimeVersion uses the `fingerprint` policy, so a commit that changes native code
+# (native modules, app config plugins, permissions, SDK upgrades) gets a new runtime version that no installed build has,
+# and the update is simply not offered to them. Ship those with Release Android / Release iOS instead.
+#
+# Manual only (Actions tab -> "OTA update" -> Run workflow). Uses EXPO_TOKEN from the `release` environment.
+name: OTA update
+
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: "Update message (shown in the EAS dashboard)"
+        type: string
+        required: true
+      platform:
+        description: "Platforms to publish"
+        type: choice
+        options: [all, android, ios]
+        default: all
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ota-update
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: release
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      MESSAGE: ${{ inputs.message }}
+      PLATFORM: ${{ inputs.platform }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.4
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # `eas update` does not read build-profile env from eas.json; the bundle must embed the same public env as the
+      # production build, or the API URL is missing and sign-in, sync and circles disappear.
+      - name: Production public env
+        working-directory: apps/mobile
+        run: |
+          api=$(jq -er '.build.production.env.EXPO_PUBLIC_API_URL' eas.json)
+          echo "EXPO_PUBLIC_API_URL=$api" >> "$GITHUB_ENV"
+
+      - name: Publish to channel production
+        working-directory: apps/mobile
+        run: |
+          bunx eas-cli@latest update --channel production --platform "$PLATFORM" --message "$MESSAGE" --non-interactive \
+            | tee "$RUNNER_TEMP/update.log"
+          { echo '### OTA update'; echo '```'; tail -n 30 "$RUNNER_TEMP/update.log"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

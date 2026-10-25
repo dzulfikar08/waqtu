@@ -1,0 +1,52 @@
+# Publishes the universal APK of a Release Android run as a GitHub pre-release asset, so a test phone can download and
+# install it directly (browser, or `adb shell am start -a android.intent.action.VIEW -d <url>`), with no computer in between.
+#
+# Manual only. `run_id` defaults to the latest successful Release Android run on master.
+name: Sideload APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Release Android run id (empty = latest successful on master)"
+        type: string
+        required: false
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RUN_ID: ${{ inputs.run_id }}
+    steps:
+      - name: Pick the run
+        run: |
+          if [ -z "$RUN_ID" ]; then
+            RUN_ID=$(gh run list -w release-android.yml -b master -s success -L 1 --json databaseId --jq '.[0].databaseId')
+          fi
+          [ -n "$RUN_ID" ] || { echo "no successful Release Android run"; exit 1; }
+          echo "RUN_ID=$RUN_ID" >> "$GITHUB_ENV"
+
+      - name: Download the APK
+        run: |
+          gh run download "$RUN_ID" -p 'waqtu-android-[0-9]*' -D apk
+          find apk -name '*universal.apk' -exec mv {} "waqtu-$RUN_ID.apk" \;
+          test -s "waqtu-$RUN_ID.apk"
+          sha256sum "waqtu-$RUN_ID.apk" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish pre-release
+        run: |
+          tag="sideload-$RUN_ID"
+          sha=$(gh run view "$RUN_ID" --json headSha --jq .headSha)
+          gh release delete "$tag" --yes --cleanup-tag 2>/dev/null || true
+          gh release create "$tag" "waqtu-$RUN_ID.apk" --prerelease --target "$sha" \
+            --title "Android test build (run $RUN_ID)" \
+            --notes "Universal APK from Release Android run $RUN_ID (commit $sha), signed with the upload key. For test phones only; store users get the Play build."
+          url="https://github.com/$GH_REPO/releases/download/$tag/waqtu-$RUN_ID.apk"
+          echo "$url" | tee -a "$GITHUB_STEP_SUMMARY"

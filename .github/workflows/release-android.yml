@@ -126,6 +126,15 @@ jobs:
             --bundle="$RUNNER_TEMP/waqtu-android-production.aab" --output="$RUNNER_TEMP/universal.apks" \
             --ks=release.jks --ks-pass="pass:$STORE_PASSWORD" --ks-key-alias="$KEY_ALIAS" --key-pass="pass:$KEY_PASSWORD"
           unzip -p "$RUNNER_TEMP/universal.apks" universal.apk > "$RUNNER_TEMP/waqtu-android-production-universal.apk"
+          # Split APKs for a typical arm64 phone (about a third of the universal APK), installed with
+          # `adb install-multiple waqtu-arm64/*.apk`; published as their own small artifact.
+          echo '{"supportedAbis":["arm64-v8a"],"supportedLocales":["id","en"],"screenDensity":480,"sdkVersion":34}' > "$RUNNER_TEMP/arm64.json"
+          java -jar "$RUNNER_TEMP/bundletool.jar" build-apks --device-spec="$RUNNER_TEMP/arm64.json" \
+            --bundle="$RUNNER_TEMP/waqtu-android-production.aab" --output="$RUNNER_TEMP/arm64.apks" \
+            --ks=release.jks --ks-pass="pass:$STORE_PASSWORD" --ks-key-alias="$KEY_ALIAS" --key-pass="pass:$KEY_PASSWORD"
+          java -jar "$RUNNER_TEMP/bundletool.jar" extract-apks --apks="$RUNNER_TEMP/arm64.apks" \
+            --device-spec="$RUNNER_TEMP/arm64.json" --output-dir="$RUNNER_TEMP/waqtu-arm64"
+          du -ch "$RUNNER_TEMP"/waqtu-arm64/*.apk | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Checksum
         run: sha256sum "$RUNNER_TEMP"/waqtu-android-* | tee -a "$GITHUB_STEP_SUMMARY"
@@ -135,6 +144,15 @@ jobs:
         with:
           name: waqtu-android-${{ github.run_number }}
           path: ${{ runner.temp }}/waqtu-android-*
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload arm64 phone APKs
+        if: env.PROFILE == 'production'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: waqtu-android-arm64-${{ github.run_number }}
+          path: ${{ runner.temp }}/waqtu-arm64/*.apk
           if-no-files-found: error
           retention-days: 30
 
