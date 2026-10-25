@@ -2,7 +2,6 @@ import type { BottomTabBarProps } from "expo-router/js-tabs";
 import { CommonActions } from "expo-router/react-navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import {
-  AccessibilityInfo,
   Animated,
   Easing,
   Keyboard,
@@ -16,6 +15,7 @@ import {
 } from "react-native";
 
 import { PressableScale } from "@/components/ui";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { HIT, hueColors, useTheme, type Hue } from "@/theme";
 
 import { useReportTabBarInset } from "./tabBarInset";
@@ -52,20 +52,6 @@ function useAndroidKeyboardOpen(): boolean {
     };
   }, []);
   return open;
-}
-
-function useReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    let live = true;
-    void AccessibilityInfo.isReduceMotionEnabled().then((value) => live && setReduced(value));
-    const sub = AccessibilityInfo.addEventListener("reduceMotionChanged", setReduced);
-    return () => {
-      live = false;
-      sub.remove();
-    };
-  }, []);
-  return reduced;
 }
 
 /** One tab: the active wash fades and settles in behind the icon and label. */

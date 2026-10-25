@@ -1,15 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState, type ReactNode } from "react";
-import {
-  Animated,
-  Easing,
-  StyleSheet,
-  Text,
-  View,
-  type StyleProp,
-  type ViewStyle,
-} from "react-native";
+import type { ReactNode } from "react";
+import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
 
+import { HeroGlow } from "@/components/HeroGlow";
 import { PressableScale, type IconName } from "@/components/ui";
 import { onSky, radius, spacing, typography, useTheme } from "@/theme";
 
@@ -103,56 +96,16 @@ export function GlowHero({
   );
 }
 
-/** The corner art: a glow, two glass rings that breathe slowly, and the glyph in a frosted disc. */
+/** The corner art: the glow and breathing rings, with the glyph in a frosted disc. */
 function HeroArt({ icon }: { icon: IconName }) {
-  const [breath] = useState(() => new Animated.Value(0));
-  useEffect(() => {
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(breath, {
-          toValue: 1,
-          duration: 2600,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-        Animated.timing(breath, {
-          toValue: 0,
-          duration: 2600,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-      ]),
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [breath]);
-  const ring = (from: number, to: number) => ({
-    transform: [{ scale: breath.interpolate({ inputRange: [0, 1], outputRange: [from, to] }) }],
-  });
   return (
-    <View
-      pointerEvents="none"
-      accessible={false}
-      importantForAccessibility="no-hide-descendants"
-      style={StyleSheet.absoluteFill}
-    >
-      <View
-        style={[
-          styles.glow,
-          {
-            experimental_backgroundImage:
-              "radial-gradient(circle at center, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0) 68%)",
-          },
-        ]}
-      />
-      <Animated.View style={[styles.ring, styles.ringOuter, ring(1, 1.06)]} />
-      <Animated.View style={[styles.ring, styles.ringInner, ring(1.04, 0.98)]} />
+    <HeroGlow breathe>
       <View style={[styles.disc, { backgroundColor: onSky.glass, borderColor: onSky.line }]}>
         <View style={[styles.discInner, { backgroundColor: onSky.glassStrong }]}>
           <Ionicons name={icon} size={34} color={onSky.text} />
         </View>
       </View>
-    </View>
+    </HeroGlow>
   );
 }
 
@@ -200,17 +153,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   head: { gap: spacing.xs, paddingRight: 92, minHeight: 72, justifyContent: "center" },
-  glow: {
-    position: "absolute",
-    width: 240,
-    height: 240,
-    top: -100,
-    right: -90,
-    borderRadius: 120,
-  },
-  ring: { position: "absolute", borderWidth: 1, borderColor: "rgba(255,255,255,0.18)" },
-  ringOuter: { width: 200, height: 200, borderRadius: 100, top: -66, right: -66 },
-  ringInner: { width: 136, height: 136, borderRadius: 68, top: -34, right: -34 },
   disc: {
     position: "absolute",
     top: spacing.md,

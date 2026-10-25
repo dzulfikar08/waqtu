@@ -5,6 +5,7 @@ import { useEffect, useState, type ComponentProps } from "react";
 import { Animated, Easing, Linking, StyleSheet, Text, View } from "react-native";
 
 import { useNow } from "@/hooks/useMutabaah";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useTranslation } from "@/i18n";
 import { CITIES } from "@/prayer/cities";
 import {
@@ -27,6 +28,7 @@ import {
   useTheme,
 } from "@/theme";
 
+import { HeroGlow } from "../HeroGlow";
 import { Card, Divider, PressableScale, ProgressTrack, Row } from "../ui";
 
 type GlyphName = ComponentProps<typeof MaterialCommunityIcons>["name"];
@@ -87,9 +89,10 @@ const STARS: readonly { top: `${number}%`; left: `${number}%`; size: number }[] 
  */
 export function SkyArt({ period }: { period: DayPeriod }) {
   const night = period === "isha" || period === "fajr";
+  const reduced = useReducedMotion();
   const [twinkle] = useState(() => new Animated.Value(0));
   useEffect(() => {
-    if (!night) return;
+    if (!night || reduced) return;
     const loop = Animated.loop(
       Animated.sequence([
         Animated.timing(twinkle, {
@@ -108,25 +111,9 @@ export function SkyArt({ period }: { period: DayPeriod }) {
     );
     loop.start();
     return () => loop.stop();
-  }, [night, twinkle]);
-  const glow = night ? "rgba(214,222,255,0.40)" : "rgba(255,238,196,0.62)";
+  }, [night, reduced, twinkle]);
   return (
-    <View
-      pointerEvents="none"
-      accessible={false}
-      importantForAccessibility="no-hide-descendants"
-      style={StyleSheet.absoluteFill}
-    >
-      <View
-        style={[
-          styles.glow,
-          {
-            experimental_backgroundImage: `radial-gradient(circle at center, ${glow} 0%, rgba(255,255,255,0) 68%)`,
-          },
-        ]}
-      />
-      <View style={[styles.ring, styles.ringOuter]} />
-      <View style={[styles.ring, styles.ringInner]} />
+    <HeroGlow breathe glow={night ? "rgba(214,222,255,0.40)" : "rgba(255,238,196,0.62)"}>
       <MaterialCommunityIcons
         name={SKY_BODY[period]}
         size={84}
@@ -154,7 +141,7 @@ export function SkyArt({ period }: { period: DayPeriod }) {
             />
           ))
         : null}
-    </View>
+    </HeroGlow>
   );
 }
 
@@ -457,17 +444,6 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     overflow: "hidden",
   },
-  glow: {
-    position: "absolute",
-    width: 260,
-    height: 260,
-    top: -110,
-    right: -90,
-    borderRadius: 130,
-  },
-  ring: { position: "absolute", borderWidth: 1, borderColor: "rgba(255,255,255,0.16)" },
-  ringOuter: { width: 210, height: 210, borderRadius: 105, top: -86, right: -64 },
-  ringInner: { width: 150, height: 150, borderRadius: 75, top: -56, right: -34 },
   body: { position: "absolute", top: 4, right: 14 },
   star: { position: "absolute", backgroundColor: "#FFFFFF" },
   skyHead: { gap: 0, paddingRight: 96 },

@@ -14,6 +14,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useTabBarInset } from "@/components/tabbar/tabBarInset";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import {
   HIT,
   cardChrome,
@@ -443,10 +444,11 @@ export function StepperRow({
 /** Round checkbox: an outlined ring when off, a filled accent disc with a check when on; pops when it changes. */
 export function CheckCircle({ checked, size = 26 }: { checked: boolean; size?: number }) {
   const theme = useTheme();
+  const reduced = useReducedMotion();
   const [scale] = useState(() => new Animated.Value(1));
   const first = useRef(true);
   useEffect(() => {
-    if (first.current) {
+    if (first.current || reduced) {
       first.current = false;
       return;
     }
@@ -459,7 +461,7 @@ export function CheckCircle({ checked, size = 26 }: { checked: boolean; size?: n
     });
     run.start();
     return () => run.stop();
-  }, [checked, scale]);
+  }, [checked, scale, reduced]);
   return (
     <Animated.View
       style={{
@@ -495,8 +497,13 @@ export function ProgressTrack({
   height?: number;
 }) {
   const clamped = Math.min(1, Math.max(0, value));
-  const [progress] = useState(() => new Animated.Value(0));
+  const reduced = useReducedMotion();
+  const [progress] = useState(() => new Animated.Value(reduced ? clamped : 0));
   useEffect(() => {
+    if (reduced) {
+      progress.setValue(clamped);
+      return;
+    }
     const run = Animated.timing(progress, {
       toValue: clamped,
       duration: 700,
@@ -505,7 +512,7 @@ export function ProgressTrack({
     });
     run.start();
     return () => run.stop();
-  }, [clamped, progress]);
+  }, [clamped, progress, reduced]);
   const gradient = fill.startsWith("linear-gradient");
   return (
     <View

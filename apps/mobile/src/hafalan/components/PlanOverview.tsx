@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { surahInfo, type HafalanTarget } from "@waqtu/core";
 import { StyleSheet, Text, View } from "react-native";
 
+import { HeroGlow } from "@/components/HeroGlow";
 import { ProgressTrack, type IconName } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { onSky, radius, spacing, tabular, typography, useTheme } from "@/theme";
@@ -66,7 +67,7 @@ export function PlanOverview({ data }: { data: HafalanData }) {
         },
       ]}
     >
-      <HeroArt />
+      <HeroGlow breathe glow="rgba(186,240,255,0.45)" />
       <View style={styles.head}>
         <View
           style={[styles.badge, { backgroundColor: onSky.glassStrong, borderColor: onSky.line }]}
@@ -122,30 +123,6 @@ export function PlanOverview({ data }: { data: HafalanData }) {
   );
 }
 
-/** A soft glow and two glass rings in the hero's top-right corner. Hidden from screen readers. */
-function HeroArt() {
-  return (
-    <View
-      pointerEvents="none"
-      accessible={false}
-      importantForAccessibility="no-hide-descendants"
-      style={StyleSheet.absoluteFill}
-    >
-      <View
-        style={[
-          styles.glow,
-          {
-            experimental_backgroundImage:
-              "radial-gradient(circle at center, rgba(186,240,255,0.45) 0%, rgba(255,255,255,0) 68%)",
-          },
-        ]}
-      />
-      <View style={[styles.ring, styles.ringOuter]} />
-      <View style={[styles.ring, styles.ringInner]} />
-    </View>
-  );
-}
-
 /** One status line under the progress bar: a small glyph and its text, white on the hero. */
 function Line({ icon, text, strong }: { icon: IconName; text: string; strong?: boolean }) {
   return (
@@ -178,17 +155,6 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     overflow: "hidden",
   },
-  glow: {
-    position: "absolute",
-    width: 240,
-    height: 240,
-    top: -110,
-    right: -90,
-    borderRadius: 120,
-  },
-  ring: { position: "absolute", borderWidth: 1, borderColor: "rgba(255,255,255,0.16)" },
-  ringOuter: { width: 200, height: 200, borderRadius: 100, top: -86, right: -64 },
-  ringInner: { width: 140, height: 140, borderRadius: 70, top: -56, right: -34 },
   head: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
   badge: {
     width: 48,

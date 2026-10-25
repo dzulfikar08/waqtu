@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { HeroGlow } from "@/components/HeroGlow";
 import { IconChip, PressableScale, ProgressTrack } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { Hint } from "@/ramadhan/components/fields";
@@ -60,24 +61,7 @@ export default function HalaqahScreen() {
           },
         ]}
       >
-        <View
-          pointerEvents="none"
-          accessible={false}
-          importantForAccessibility="no-hide-descendants"
-          style={StyleSheet.absoluteFill}
-        >
-          <View
-            style={[
-              styles.glow,
-              {
-                experimental_backgroundImage:
-                  "radial-gradient(circle at center, rgba(236,214,255,0.45) 0%, rgba(255,255,255,0) 68%)",
-              },
-            ]}
-          />
-          <View style={[styles.ring, styles.ringOuter]} />
-          <View style={[styles.ring, styles.ringInner]} />
-        </View>
+        <HeroGlow breathe glow="rgba(236,214,255,0.45)" />
         <View style={styles.head}>
           <View
             style={[styles.badge, { backgroundColor: onSky.glassStrong, borderColor: onSky.line }]}
@@ -188,17 +172,6 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     overflow: "hidden",
   },
-  glow: {
-    position: "absolute",
-    width: 240,
-    height: 240,
-    top: -110,
-    right: -90,
-    borderRadius: 120,
-  },
-  ring: { position: "absolute", borderWidth: 1, borderColor: "rgba(255,255,255,0.16)" },
-  ringOuter: { width: 200, height: 200, borderRadius: 100, top: -86, right: -64 },
-  ringInner: { width: 140, height: 140, borderRadius: 70, top: -56, right: -34 },
   badge: {
     width: 48,
     height: 48,

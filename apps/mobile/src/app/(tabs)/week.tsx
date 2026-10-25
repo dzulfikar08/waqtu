@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 
+import { HeroGlow } from "@/components/HeroGlow";
 import { itemLabel } from "@/components/itemLabel";
 import {
   Card,
@@ -13,6 +14,7 @@ import {
   type IconName,
 } from "@/components/ui";
 import { useMutabaah } from "@/hooks/useMutabaah";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useTranslation } from "@/i18n";
 import { civilOf, type DayKey } from "@/mutabaah/dates";
 import type { DaySummary } from "@/mutabaah/week";
@@ -264,8 +266,13 @@ function WeekHero({
 }) {
   const { i18n } = useTranslation();
   const theme = useTheme();
-  const [grow] = useState(() => new Animated.Value(0));
+  const reduced = useReducedMotion();
+  const [grow] = useState(() => new Animated.Value(reduced ? 1 : 0));
   useEffect(() => {
+    if (reduced) {
+      grow.setValue(1);
+      return;
+    }
     const run = Animated.timing(grow, {
       toValue: 1,
       duration: 900,
@@ -274,7 +281,7 @@ function WeekHero({
     });
     run.start();
     return () => run.stop();
-  }, [grow]);
+  }, [grow, reduced]);
   const [from, to] = HERO[theme.dark ? 1 : 0];
   const step = 0.4 / Math.max(1, days.length - 1);
   return (
@@ -289,24 +296,7 @@ function WeekHero({
         },
       ]}
     >
-      <View
-        pointerEvents="none"
-        accessible={false}
-        importantForAccessibility="no-hide-descendants"
-        style={StyleSheet.absoluteFill}
-      >
-        <View
-          style={[
-            styles.glow,
-            {
-              experimental_backgroundImage:
-                "radial-gradient(circle at center, rgba(214,222,255,0.42) 0%, rgba(255,255,255,0) 68%)",
-            },
-          ]}
-        />
-        <View style={[styles.ring, styles.ringOuter]} />
-        <View style={[styles.ring, styles.ringInner]} />
-      </View>
+      <HeroGlow breathe glow="rgba(214,222,255,0.42)" />
       <View style={styles.head}>
         <View style={[styles.badge, { backgroundColor: onSky.glassStrong }]}>
           <Ionicons
@@ -393,17 +383,6 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     overflow: "hidden",
   },
-  glow: {
-    position: "absolute",
-    width: 260,
-    height: 260,
-    top: -120,
-    right: -100,
-    borderRadius: 130,
-  },
-  ring: { position: "absolute", borderWidth: 1, borderColor: "rgba(255,255,255,0.16)" },
-  ringOuter: { width: 210, height: 210, borderRadius: 105, top: -96, right: -74 },
-  ringInner: { width: 150, height: 150, borderRadius: 75, top: -66, right: -44 },
   figure: { flex: 1, fontSize: 24, fontWeight: "800", letterSpacing: -0.3 },
   message: { lineHeight: 20 },
   bars: {
