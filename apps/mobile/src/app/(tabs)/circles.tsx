@@ -93,7 +93,8 @@ function Loaded({ api }: { api: CirclesApi }) {
   ) : (
     <CirclesHome api={api} profile={profile} circles={circles} reload={state.reload} />
   );
-  // The server refuses joins and posts with `premium_required` while the switch is on.
+  // Circles are Premium: the server refuses joins and posts with `premium_required` while
+  // `CIRCLES_REQUIRES_PREMIUM` is on, which it always is in production.
   return config.requiresPremium ? <PremiumGate>{content}</PremiumGate> : content;
 }
 

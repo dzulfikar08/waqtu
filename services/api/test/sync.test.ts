@@ -67,6 +67,18 @@ describe("auth gating", () => {
   });
 });
 
+describe("premium", () => {
+  // Sync is a Premium feature, gated in the apps, not here: the Mac app syncs during its free trial
+  // (a local trial the server cannot see), and a first sign-in uploads the device's log before the
+  // app has read the account's entitlement. A 403 here would break both (docs/backend-decision.md).
+  it("lets a signed-in account without premium push and pull", async () => {
+    const user = await createUser("sync-free");
+    const { res } = await push(user, { entries: [entry(1, now())] });
+    expect(res.status).toBe(200);
+    expect((await pull(user)).entries).toHaveLength(1);
+  });
+});
+
 describe("POST /v1/sync validation", () => {
   it("rejects invalid payloads with 400", async () => {
     const user = await createUser("invalid");

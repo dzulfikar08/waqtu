@@ -59,28 +59,6 @@ describe("resolveEntitlement", () => {
     expect(view.premium).toBe(true);
     expect(view.source).toBe("google");
   });
-
-  it("lifetime outranks every dated period and never expires", () => {
-    const rows = [
-      { source: "polar" as const, expires_at: NOW + 365 * DAY },
-      { source: "license" as const, expires_at: null },
-    ];
-    const view = resolveEntitlement(rows, NOW);
-    expect(view).toEqual({ premium: true, source: "license", expiresAt: null });
-    expect(resolveEntitlement(rows, NOW + 100 * 365 * DAY).premium).toBe(true);
-  });
-
-  it("keeps lifetime premium after every subscription lapsed", () => {
-    const view = resolveEntitlement(
-      [
-        { source: "apple", expires_at: NOW - 400 * DAY },
-        { source: "license", expires_at: null },
-      ],
-      NOW,
-    );
-    expect(view.premium).toBe(true);
-    expect(view.source).toBe("license");
-  });
 });
 
 const write = (userId: string, overrides: Partial<EntitlementWrite> = {}): EntitlementWrite => ({

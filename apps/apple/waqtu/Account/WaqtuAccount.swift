@@ -26,6 +26,11 @@ final class WaqtuAccount {
 
     /// Called after sign-in, sign-out and when the server rejects the session.
     @ObservationIgnored var onSessionChange: (() -> Void)?
+    /// Latest App Store subscription transaction this Mac holds (Mac App Store build); submitted to
+    /// the account whenever someone is signed in so premium follows the account to the phone.
+    @ObservationIgnored private var appStoreTransaction: String?
+    /// Transactions this session already linked; launch and foreground refreshes repeat them.
+    @ObservationIgnored private var linkedTransactions: Set<String> = []
 
     let api: WaqtuAPIClient
     private let keychain: KeychainStore
@@ -127,6 +132,29 @@ final class WaqtuAccount {
         self.user = user
         onSessionChange?()
         await refreshEntitlement()
+        await linkAppStoreTransaction()
+    }
+
+    /// Hands an App Store subscription transaction (JWS) to the account. Signed out, it waits for
+    /// the next sign-in. A subscription already linked to another Waqtu account stays there (409)
+    /// and still unlocks this Mac through StoreKit.
+    @MainActor
+    func submitAppStoreTransaction(_ signedTransaction: String) async {
+        appStoreTransaction = signedTransaction
+        await linkAppStoreTransaction()
+    }
+
+    @MainActor
+    private func linkAppStoreTransaction() async {
+        guard let token, let signed = appStoreTransaction, !linkedTransactions.contains(signed) else { return }
+        do {
+            let entitlement = try await api.submitAppleTransaction(token: token, signedTransaction: signed)
+            guard self.token == token else { return }
+            linkedTransactions.insert(signed)
+            setServerPremium(entitlement.premium)
+        } catch {
+            if isUnauthorized(error), self.token == token { sessionExpired() }
+        }
     }
 
     /// Re-reads the account's premium status. Network failures keep the cached value; a rejected
@@ -175,6 +203,7 @@ final class WaqtuAccount {
         token = nil
         user = nil
         setServerPremium(false)
+        linkedTransactions.removeAll()
     }
 }
 

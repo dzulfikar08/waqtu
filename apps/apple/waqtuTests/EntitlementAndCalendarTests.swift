@@ -2,7 +2,8 @@
 //  EntitlementAndCalendarTests.swift
 //  waqtuTests
 //
-//  `GET /v1/entitlement` decoding and Gregorian civil dates under non-Gregorian system calendars.
+//  `GET /v1/entitlement` decoding, the App Store account token and Gregorian civil dates under
+//  non-Gregorian system calendars.
 //
 
 import Foundation
@@ -15,9 +16,9 @@ struct AccountEntitlementTests {
         #expect(entitlement == AccountEntitlement(premium: true, source: "google", expiresAt: "2027-03-01T00:00:00.000Z"))
     }
 
-    @Test func decodesLifetimeAndNeverPremium() throws {
-        let lifetime = try AccountEntitlement.decode(Data(#"{"premium":true,"source":"license","expiresAt":null}"#.utf8))
-        #expect(lifetime.premium && lifetime.source == "license" && lifetime.expiresAt == nil)
+    @Test func decodesAMacAppStoreSubscriptionAndNeverPremium() throws {
+        let mac = try AccountEntitlement.decode(Data(#"{"premium":true,"source":"apple","expiresAt":"2027-01-01T00:00:00.000Z"}"#.utf8))
+        #expect(mac.premium && mac.source == "apple")
         let none = try AccountEntitlement.decode(Data(#"{"premium":false,"source":null,"expiresAt":null}"#.utf8))
         #expect(none == AccountEntitlement(premium: false, source: nil, expiresAt: nil))
     }
@@ -26,6 +27,15 @@ struct AccountEntitlementTests {
         #expect(throws: WaqtuAPIError.invalidResponse) {
             try AccountEntitlement.decode(Data(#"{"error":"unauthorized"}"#.utf8))
         }
+    }
+}
+
+struct AppleAccountTokenTests {
+    // Same vectors as services/api/test/apple.test.ts and apps/mobile/test/premium.test.ts: the
+    // server refuses a purchase whose appAccountToken is not the signed-in account's.
+    @Test func matchesTheServerToken() {
+        #expect(AppleAccountToken.uuid(forUserId: "u1").uuidString.lowercased() == "9e06e6d6-1126-521a-9511-b7cf7cf56f56")
+        #expect(AppleAccountToken.uuid(forUserId: "user-7f3c9a2e").uuidString.lowercased() == "113d974f-b307-5679-90ee-46873dc02d81")
     }
 }
 

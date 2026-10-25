@@ -2,8 +2,8 @@
 //  WaqtuAPI.swift
 //  waqtu
 //
-//  HTTP client for services/api: better-auth sign-in (bearer plugin), /v1/me, /v1/sync and the
-//  license link. Authenticates with `Authorization: Bearer <session token>`; the token is the
+//  HTTP client for services/api: better-auth sign-in (bearer plugin), /v1/me, /v1/sync, the
+//  entitlement and the App Store subscription link. Authenticates with `Authorization: Bearer <session token>`; the token is the
 //  better-auth session cookie value, which the server's bearer plugin accepts.
 //
 
@@ -44,12 +44,12 @@ struct AccountUser: Codable, Equatable {
 }
 
 /// `GET /v1/entitlement` (services/api/src/billing/entitlement.ts `EntitlementView`): premium from
-/// any source the account holds (App Store, Play, Polar subscription, Mac license key).
+/// any subscription the account holds (App Store on iPhone or Mac, Play, Polar).
 struct AccountEntitlement: Decodable, Equatable {
     let premium: Bool
-    /// "apple" | "google" | "polar" | "license"; nil when the account never held premium.
+    /// "apple" | "google" | "polar"; nil when the account never held premium.
     let source: String?
-    /// ISO time premium ends; nil for lifetime premium and for accounts that never held premium.
+    /// ISO time premium ends; nil for accounts that never held premium.
     let expiresAt: String?
 
     static func decode(_ data: Data) throws -> AccountEntitlement {
@@ -65,8 +65,6 @@ enum WaqtuAPIError: Error, LocalizedError, Equatable {
     case http(status: Int, message: String?)
     case invalidResponse
     case missingToken
-    /// The endpoint does not exist on the server (404).
-    case notAvailable
 
     var errorDescription: String? {
         switch self {
@@ -76,8 +74,6 @@ enum WaqtuAPIError: Error, LocalizedError, Equatable {
             return "Unexpected response from the server."
         case .missingToken:
             return "The server did not return a session."
-        case .notAvailable:
-            return "Not available yet."
         }
     }
 
@@ -248,16 +244,16 @@ final class WaqtuAPIClient {
         return try AccountEntitlement.decode(data)
     }
 
-    /// Links the Polar license key to the signed-in account (`POST /v1/entitlement/link-license`).
-    /// Throws `.notAvailable` when the server has no such endpoint.
-    func linkLicense(token: String, key: String) async throws -> Bool {
-        let (data, http) = try await perform("/v1/entitlement/link-license", method: "POST", token: token, body: ["key": key])
-        if http.statusCode == 404 { throw WaqtuAPIError.notAvailable }
-        guard (200..<300).contains(http.statusCode) else {
-            throw WaqtuAPIError.http(status: http.statusCode, message: Self.errorMessage(data))
-        }
-        let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
-        return (obj?["premium"] as? Bool) ?? false
+    /// Links a verified App Store subscription transaction (StoreKit 2 `jwsRepresentation`) to the
+    /// signed-in account (`POST /v1/billing/apple`) and returns the account's premium status.
+    func submitAppleTransaction(token: String, signedTransaction: String) async throws -> AccountEntitlement {
+        let (data, _) = try checked(try await perform(
+            "/v1/billing/apple",
+            method: "POST",
+            token: token,
+            body: ["signedTransaction": signedTransaction]
+        ))
+        return try AccountEntitlement.decode(data)
     }
 }
 

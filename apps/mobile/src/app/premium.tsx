@@ -9,7 +9,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 
@@ -49,12 +48,11 @@ export default function PremiumScreen() {
   const [plansFailed, setPlansFailed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<Message | null>(null);
-  const [licenseKey, setLicenseKey] = useState("");
-  const [circlesPremium, setCirclesPremium] = useState(false);
+  // Circles are Premium; the server's `requiresPremium` (from `CIRCLES_REQUIRES_PREMIUM`) can drop them.
+  const [circlesPremium, setCirclesPremium] = useState(true);
 
   const api = authClient && userId ? premiumApiFor(authClient) : null;
   const store = t(Platform.OS === "ios" ? "premium.storeApple" : "premium.storeGoogle");
-  const lifetime = premium && entitlement?.expiresAt === null;
 
   const reloadPlans = useCallback(() => {
     setPlansFailed(false);
@@ -70,7 +68,7 @@ export default function PremiumScreen() {
     if (STORE_AVAILABLE && !premium) reloadPlans();
   }, [premium, reloadPlans]);
 
-  // Circles join the list only while the server switch `CIRCLES_REQUIRES_PREMIUM` is on.
+  // Circles leave the list only if the server reports `CIRCLES_REQUIRES_PREMIUM` off.
   useEffect(() => {
     if (!circlesApi || !userId) return;
     let live = true;
@@ -133,34 +131,11 @@ export default function PremiumScreen() {
       return { text: t("premium.nothingToRestore"), tone: "ok" };
     });
 
-  const linkLicense = () =>
-    run(async () => {
-      if (!api || !userId || licenseKey.trim() === "") return null;
-      try {
-        await storeEntitlement(db, userId, await api.linkLicense(licenseKey.trim()));
-      } catch (error) {
-        if (error instanceof PremiumApiError) {
-          if (error.code === "invalid_license") {
-            return { text: t("premium.licenseInvalid"), tone: "problem" };
-          }
-          if (error.code === "license_unreachable") {
-            return { text: t("premium.licenseUnreachable"), tone: "problem" };
-          }
-          if (error.code === "linked_to_other_account") {
-            return { text: t("premium.linkedElsewhere"), tone: "problem" };
-          }
-        }
-        throw error;
-      }
-      setLicenseKey("");
-      return { text: t("premium.licenseLinked"), tone: "ok" };
-    });
-
   const date = (iso: string) =>
     new Intl.DateTimeFormat(i18n.language, { dateStyle: "long" }).format(new Date(iso));
 
   const status = () => {
-    if (lifetime) return t("premium.statusLifetime");
+    if (premium && !entitlement?.expiresAt) return t("premium.statusActive");
     if (premium && entitlement?.expiresAt) {
       return t("premium.statusActiveUntil", { date: date(entitlement.expiresAt) });
     }
@@ -178,8 +153,6 @@ export default function PremiumScreen() {
         return t("premium.sourceGoogle");
       case "polar":
         return t("premium.sourcePolar");
-      case "license":
-        return t("premium.sourceLicense");
       default:
         return null;
     }
@@ -318,25 +291,6 @@ export default function PremiumScreen() {
           </View>
         </View>
       ) : null}
-
-      {/* App Store Guideline 3.1.1: no unlocking via external license keys on iOS. */}
-      {userId && !lifetime && Platform.OS !== "ios" ? (
-        <Section title={t("premium.licenseTitle")}>
-          <View style={styles.block}>
-            <Text style={{ color: theme.muted, fontSize: 14 }}>{t("premium.licenseBody")}</Text>
-            <TextInput
-              value={licenseKey}
-              onChangeText={setLicenseKey}
-              placeholder={t("premium.licensePlaceholder")}
-              placeholderTextColor={theme.muted}
-              autoCapitalize="characters"
-              autoCorrect={false}
-              style={[styles.input, { color: theme.text, borderColor: theme.border }]}
-            />
-            {secondary(t("premium.licenseLink"), () => void linkLicense())}
-          </View>
-        </Section>
-      ) : null}
     </ScrollView>
   );
 }
@@ -366,11 +320,4 @@ const styles = StyleSheet.create({
   },
   links: { flexDirection: "row", gap: spacing.md },
   link: { fontSize: 14, textDecorationLine: "underline" },
-  input: {
-    minHeight: 48,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    paddingHorizontal: spacing.md,
-    fontSize: 16,
-  },
 });

@@ -2,7 +2,7 @@
 //  KeychainStore.swift
 //  waqtu
 //
-//  Generic-password Keychain items for the account session (same approach as LicenseManager).
+//  Generic-password Keychain items for the account session.
 //
 
 import Foundation

@@ -8,8 +8,8 @@ import tailwindcss from "@tailwindcss/vite";
 // https://astro.build/config
 export default defineConfig({
   site: "https://getwaqtu.com",
-  // Static output: the whole site prerenders at build time, except the Polar payment
-  // endpoints and /api/waitlist, which opt out with `export const prerender = false`.
+  // Static output: the whole site prerenders at build time, except /api/waitlist,
+  // which opts out with `export const prerender = false`. The site sells nothing.
   output: "static",
   adapter: cloudflare({
     imageService: "passthrough",

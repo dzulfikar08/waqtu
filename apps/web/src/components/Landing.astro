@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import WaitlistForm from "./WaitlistForm.astro";
-import { landing, REPO_URL, type Locale } from "../i18n/landing";
+import { landing, REPO_URL, APP_STORE_URL, PLAY_STORE_URL, type Locale } from "../i18n/landing";
 import { ramadhan1448 } from "../lib/ramadhan";
 
 interface Props {
@@ -84,14 +84,13 @@ const nav = [
 >
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(schema)} />
   {
-    /* The Mac landing used to live here. Old Polar return URLs (/?checkout=...) and links
-       (/#download, /#pricing) are static-page requests, so only the browser can forward them. */
+    /* The Mac landing used to live here. Old links (/#download, /#pricing) are
+       static-page requests, so only the browser can forward them. */
   }
   <script slot="head" is:inline>
     (function () {
       var l = location;
-      if (/[?&]checkout=/.test(l.search)) l.replace("/mac" + l.search + l.hash);
-      else if (l.hash === "#download" || l.hash === "#pricing") l.replace("/mac" + l.hash);
+      if (l.hash === "#download" || l.hash === "#pricing") l.replace("/mac" + l.hash);
     })();
   </script>
 
@@ -304,6 +303,52 @@ const nav = [
             {t.privacy.policy}
           </a>
         </div>
+      </div>
+    </section>
+
+    <!-- Premium -->
+    <section id="premium" class="px-6 py-20 sm:px-10 md:px-14 md:py-28">
+      <div class="mx-auto max-w-6xl">
+        <h2 class="font-display max-w-2xl text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">
+          {t.premium.title}
+        </h2>
+        <p class="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--waqtu-muted)]">{t.premium.body}</p>
+        <div class="mt-10 grid gap-6 md:grid-cols-2">
+          <div class="neu-card p-8">
+            <h3 class="font-display text-lg font-semibold text-[var(--waqtu-text)]">{t.premium.freeTitle}</h3>
+            <ul class="mt-4 space-y-2 text-[var(--waqtu-muted)]">
+              {t.premium.free.map((item) => <li>{item}</li>)}
+            </ul>
+          </div>
+          <div class="neu-card p-8">
+            <h3 class="font-display text-lg font-semibold text-[var(--waqtu-text)]">{t.premium.premiumTitle}</h3>
+            <p class="mt-2 font-semibold text-[var(--waqtu-gold)]">{t.premium.price}</p>
+            <ul class="mt-4 space-y-2 text-[var(--waqtu-muted)]">
+              {t.premium.premium.map((item) => <li>{item}</li>)}
+            </ul>
+          </div>
+        </div>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a
+            href={APP_STORE_URL}
+            rel="noopener"
+            class="neu-btn px-6 py-3 font-semibold"
+            data-s-event="store_click"
+            data-s-event-props={JSON.stringify({ location: "premium", store: "app_store" })}
+          >
+            {t.premium.appStore}
+          </a>
+          <a
+            href={PLAY_STORE_URL}
+            rel="noopener"
+            class="neu-btn-secondary px-6 py-3 font-semibold"
+            data-s-event="store_click"
+            data-s-event-props={JSON.stringify({ location: "premium", store: "google_play" })}
+          >
+            {t.premium.googlePlay}
+          </a>
+        </div>
+        <p class="mt-4 max-w-2xl text-sm leading-relaxed text-[var(--waqtu-muted)]">{t.premium.note}</p>
       </div>
     </section>
 
