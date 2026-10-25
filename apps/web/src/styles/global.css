@@ -22,7 +22,7 @@
   --waqtu-primary-soft: #3d7a60;
   --waqtu-light: #5a9b7f;
 
-  /* gold — voucher + price only */
+  /* gold — accents and price only */
   --waqtu-gold: #a6743a;
   --waqtu-gold-dim: #8a5f30;
 
@@ -232,71 +232,6 @@ body::before {
   background: var(--waqtu-bg-2);
   box-shadow: var(--neu-shadow-inset);
   border: 1px solid var(--waqtu-border);
-}
-
-/* ============================= voucher coupon ============================= */
-.voucher-box {
-  background: rgba(47, 107, 82, 0.05);
-  border: 2px dashed rgba(47, 107, 82, 0.3);
-  position: relative;
-  padding: 14px 16px;
-  overflow: hidden;
-}
-.voucher-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-}
-.voucher-code {
-  font-family: "Courier New", Courier, monospace;
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: var(--waqtu-gold);
-}
-.voucher-label {
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--waqtu-muted);
-}
-.voucher-dash {
-  width: 2px;
-  height: 20px;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(47, 107, 82, 0.3),
-    rgba(47, 107, 82, 0.3) 4px,
-    transparent 4px,
-    transparent 8px
-  );
-}
-.voucher-copy-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--waqtu-primary) 0%, #5a9b7f 100%);
-  color: var(--waqtu-bg);
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(74, 139, 111, 0.25);
-  border: none;
-  cursor: pointer;
-}
-.voucher-copy-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(74, 139, 111, 0.35);
-  background: linear-gradient(135deg, #5a9b7f 0%, var(--waqtu-primary) 100%);
-}
-.voucher-note {
-  font-size: 0.75rem;
-  color: var(--waqtu-muted);
-  text-align: center;
 }
 
 /* ============================= FAQ accordion ============================= */

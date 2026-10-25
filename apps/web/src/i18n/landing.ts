@@ -8,6 +8,8 @@ export type Locale = "id" | "en";
 
 export const REPO_URL = "https://github.com/dzulfikar08/waqtu";
 export const SUPPORT_EMAIL = "dzulfikar.at@gmail.com";
+export const APP_STORE_URL = "https://apps.apple.com/id/app/id6826628861";
+export const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=dat.waqtu.app";
 
 export interface LandingCopy {
   htmlLang: string;
@@ -71,6 +73,18 @@ export interface LandingCopy {
     paragraphs: string[];
     github: string;
     policy: string;
+  };
+  premium: {
+    title: string;
+    body: string;
+    freeTitle: string;
+    free: string[];
+    premiumTitle: string;
+    price: string;
+    premium: string[];
+    appStore: string;
+    googlePlay: string;
+    note: string;
   };
   mac: { title: string; body: string; cta: string };
   faq: { heading: string; items: { question: string; answer: string }[] };
@@ -192,8 +206,26 @@ const id: LandingCopy = {
   },
   mac: {
     title: "Pakai Mac? Waqtu sudah ada di sana.",
-    body: "Waqtu untuk Mac menaruh hitung mundur sholat di menu bar, memblokir kalender kerjamu saat waktu sholat, dan mengatur status Slack. Bayar sekali, tanpa langganan.",
+    body: "Waqtu untuk Mac menaruh hitung mundur sholat di menu bar, memblokir kalender kerjamu saat waktu sholat, dan mengatur status Slack. Coba gratis dulu; Premium ikut dari akun Waqtu-mu.",
     cta: "Lihat Waqtu untuk Mac (halaman bahasa Inggris)",
+  },
+  premium: {
+    title: "Inti gratis. Premium untuk yang mau lebih.",
+    body: "Satu langganan Waqtu Premium berlaku di semua perangkat lewat akun Waqtu-mu: iPhone, Android, dan Mac.",
+    freeTitle: "Gratis",
+    free: [
+      "Waktu sholat",
+      "Mutabaah di perangkatmu",
+      "Dasar-dasar Ramadhan",
+      "Program halaqah",
+      "Hafalan",
+    ],
+    premiumTitle: "Waqtu Premium",
+    price: "Rp 29.000/bulan atau Rp 249.000/tahun",
+    premium: ["Sinkron antarperangkat", "Lingkaran: gabung lingkaran halaqah dan berbagi kiriman"],
+    appStore: "App Store (iPhone)",
+    googlePlay: "Google Play (Android)",
+    note: "Langganan dibeli di App Store atau Google Play, atau di edisi Mac App Store. Situs ini tidak menjual apa pun. Di Mac versi unduhan langsung, masuk dengan akun Waqtu yang berlangganan untuk membuka Premium.",
   },
   faq: {
     heading: "Pertanyaan yang sering muncul",
@@ -206,7 +238,7 @@ const id: LandingCopy = {
       {
         question: "Berapa harganya?",
         answer:
-          "Harga untuk iOS dan Android belum diumumkan. Waqtu untuk Mac dijual sekali bayar tanpa langganan.",
+          "Waktu sholat, mutabaah di perangkat, dasar-dasar Ramadhan, program halaqah, dan hafalan gratis. Waqtu Premium (sinkron antarperangkat dan Lingkaran) Rp 29.000/bulan atau Rp 249.000/tahun, dibeli di App Store, Google Play, atau edisi Mac App Store. Satu langganan berlaku di semua perangkat lewat akun Waqtu-mu.",
       },
       {
         question: "Apa itu halaqah asinkron?",
@@ -363,8 +395,26 @@ const en: LandingCopy = {
   },
   mac: {
     title: "On a Mac? Waqtu is already there.",
-    body: "Waqtu for Mac puts the prayer countdown in your menu bar, blocks your work calendar during salah, and sets your Slack status. Pay once, no subscription.",
+    body: "Waqtu for Mac puts the prayer countdown in your menu bar, blocks your work calendar during salah, and sets your Slack status. Try it free; Premium comes with your Waqtu account.",
     cta: "See Waqtu for Mac",
+  },
+  premium: {
+    title: "Free at the core. Premium if you want more.",
+    body: "One Waqtu Premium subscription works on every device through your Waqtu account: iPhone, Android and Mac.",
+    freeTitle: "Free",
+    free: [
+      "Prayer times",
+      "Mutabaah on your device",
+      "Ramadhan basics",
+      "Halaqah program",
+      "Hafalan",
+    ],
+    premiumTitle: "Waqtu Premium",
+    price: "Rp 29.000/month or Rp 249.000/year",
+    premium: ["Sync across devices", "Circles: join halaqah circles and post"],
+    appStore: "App Store (iPhone)",
+    googlePlay: "Google Play (Android)",
+    note: "Subscriptions are bought in the App Store or Google Play, or in the Mac App Store edition. This website does not sell anything. On the direct-download Mac app, sign in with a subscribed Waqtu account to unlock Premium.",
   },
   faq: {
     heading: "Frequently asked questions",
@@ -377,7 +427,7 @@ const en: LandingCopy = {
       {
         question: "How much does it cost?",
         answer:
-          "Pricing for iOS and Android has not been announced. Waqtu for Mac is a one-time purchase with no subscription.",
+          "Prayer times, mutabaah on the device, Ramadhan basics, the halaqah program and hafalan are free. Waqtu Premium (sync across devices and Circles) is Rp 29.000/month or Rp 249.000/year, bought in the App Store, Google Play or the Mac App Store edition. One subscription works on every device through your Waqtu account.",
       },
       {
         question: "What is asynchronous halaqah?",

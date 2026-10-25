@@ -1,8 +1,7 @@
 /**
  * Waqtu site interactivity — vanilla TS, zero framework.
  * Wires up: header scroll state, mobile menu, FAQ accordion, media lightbox,
- * voucher copy-to-clipboard, Polar checkout, checkout-success banner,
- * and One Dollar Stats scroll-depth events.
+ * download links, and One Dollar Stats scroll-depth events.
  * Analytics clicks fire automatically via the `data-s-event` attributes.
  */
 
@@ -101,74 +100,6 @@ function initLightbox() {
   });
 }
 
-// ---------- voucher copy ----------
-function initVoucher() {
-  const buttons = document.querySelectorAll<HTMLElement>("[data-voucher]");
-  if (!buttons.length) return;
-  buttons.forEach((btn) => {
-    const label = btn.querySelector<HTMLElement>("[data-voucher-label]");
-    btn.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText("WAQTU299");
-        if (label) label.textContent = "Copied!";
-        stonks()?.event("voucher_copied", { code: "WAQTU299" });
-        setTimeout(() => {
-          if (label) label.textContent = btn.dataset.voucherText || "Copy";
-        }, 2000);
-      } catch {
-        /* clipboard unavailable */
-      }
-    });
-  });
-}
-
-// ---------- Polar checkout ----------
-function initCheckout() {
-  const buttons = document.querySelectorAll<HTMLButtonElement>("[data-checkout]");
-  if (!buttons.length) return;
-
-  buttons.forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const tier = (btn.dataset.checkout || "PRO_LIFETIME") as "PRO_LIFETIME" | "PRO_MONTHLY";
-      stonks()?.event("checkout_start", { tier });
-      btn.dataset.loading = "true";
-      const text = btn.querySelector<HTMLElement>("[data-checkout-text]");
-      const original = text?.textContent ?? "";
-      if (text) text.textContent = "Redirecting...";
-
-      try {
-        const res = await fetch("/api/payments/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ tier }),
-        });
-        if (!res.ok) throw new Error("Failed to create checkout session");
-        const { url } = (await res.json()) as { url: string };
-        stonks()?.event("checkout_redirect", { tier });
-        window.location.href = url;
-      } catch (err) {
-        stonks()?.event("checkout_error", {
-          tier,
-          error: err instanceof Error ? err.message : "Failed to create checkout",
-        });
-        btn.dataset.loading = "false";
-        if (text) text.textContent = original;
-      }
-    });
-  });
-}
-
-// ---------- checkout success banner ----------
-function initCheckoutSuccess() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("checkout") !== "success") return;
-  const banner = document.getElementById("checkout-success");
-  if (banner) banner.dataset.show = "true";
-  stonks()?.event("checkout_success_return");
-  document.getElementById("download")?.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
 // ---------- scroll-depth analytics ----------
 function initScrollDepth() {
   const milestones = [25, 50, 75, 100];
@@ -198,9 +129,6 @@ function init() {
   initMobileMenu();
   initFaq();
   initLightbox();
-  initVoucher();
-  initCheckout();
-  initCheckoutSuccess();
   initScrollDepth();
   initDownloadLinks();
 }
