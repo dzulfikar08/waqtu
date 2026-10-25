@@ -13,11 +13,15 @@ import { ACTION_DONE, isPrayerNotificationData } from "./prayer";
  */
 const TASK_NAME = "waqtu-notification-response";
 
-/** "Sudah sholat ✓": records the prayer in SQLite. Idempotent, so receiving it twice is harmless. */
-async function handleResponse(response: Notifications.NotificationResponse): Promise<void> {
-  if (response.actionIdentifier !== ACTION_DONE) return;
+/**
+ * "Sudah sholat ✓": records the prayer in SQLite. Idempotent, so receiving it twice is harmless.
+ * Returns false for any other response (e.g. a tapped halaqah nudge, which the app handles once
+ * its screens exist), so that response is left in place for it.
+ */
+async function handleResponse(response: Notifications.NotificationResponse): Promise<boolean> {
+  if (response.actionIdentifier !== ACTION_DONE) return false;
   const data = response.notification.request.content.data;
-  if (!isPrayerNotificationData(data)) return;
+  if (!isPrayerNotificationData(data)) return false;
   const db = await openDatabaseAsync(DATABASE_NAME);
   try {
     await migrate(db);
@@ -25,6 +29,7 @@ async function handleResponse(response: Notifications.NotificationResponse): Pro
   } finally {
     await db.closeAsync();
   }
+  return true;
 }
 
 TaskManager.defineTask<Notifications.NotificationTaskPayload>(
@@ -47,7 +52,9 @@ void Notifications.registerTaskAsync(TASK_NAME).catch(() => {});
 // App alive (foreground, or iOS waking it for the action): the response arrives as an event.
 Notifications.addNotificationResponseReceivedListener((response) => {
   void handleResponse(response)
-    .then(() => Notifications.clearLastNotificationResponse())
+    .then((handled) => {
+      if (handled) Notifications.clearLastNotificationResponse();
+    })
     .catch(() => {});
 });
 
@@ -55,6 +62,8 @@ Notifications.addNotificationResponseReceivedListener((response) => {
 const pending = Notifications.getLastNotificationResponse();
 if (pending) {
   void handleResponse(pending)
-    .then(() => Notifications.clearLastNotificationResponse())
+    .then((handled) => {
+      if (handled) Notifications.clearLastNotificationResponse();
+    })
     .catch(() => {});
 }

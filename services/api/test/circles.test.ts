@@ -624,6 +624,37 @@ describe("voice notes", () => {
     await call(owner, "DELETE", `/${circle.id}/posts/${created.body.post.id}`);
     expect(await env.CIRCLE_MEDIA.head(key)).toBeNull();
   });
+
+  test("a shared halaqah voice reflection: stored in R2, linked to its day, played back by members", async () => {
+    const owner = await member("akhwat");
+    const friend = await member("akhwat");
+    const circle = await privateCircle(owner);
+    await joinCode(friend, circle.inviteCode);
+    const media = (await (
+      await upload(owner, circle.id, audio(300), "audio/mp4", "45")
+    ).json()) as {
+      mediaId: string;
+    };
+    expect(await env.CIRCLE_MEDIA.head(`circle/${circle.id}/${media.mediaId}`)).not.toBeNull();
+
+    const created = await call(owner, "POST", `/${circle.id}/posts`, {
+      text: "refleksi hari ke-12",
+      mediaId: media.mediaId,
+      halaqahDayId: "ramadhan-1448:12",
+    });
+    expect(created.status).toBe(201);
+    expect(created.body.post).toMatchObject({
+      kind: "voice",
+      halaqahDayId: "ramadhan-1448:12",
+      media: { id: media.mediaId, durationSeconds: 45 },
+    });
+
+    const feed = await call(friend, "GET", `/${circle.id}/feed`);
+    expect(feed.body.posts[0]).toMatchObject({ halaqahDayId: "ramadhan-1448:12", mine: false });
+    const played = await api(`/v1/circles/${circle.id}/media/${media.mediaId}`, { user: friend });
+    expect(played.status).toBe(200);
+    expect((await played.arrayBuffer()).byteLength).toBe(300);
+  });
 });
 
 describe("weekly summary share", () => {

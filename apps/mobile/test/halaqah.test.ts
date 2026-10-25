@@ -4,14 +4,26 @@ import programJson from "../../../content/halaqah/ramadhan-1448/program.json";
 import { bundledProgram } from "../src/halaqah/bundled";
 import {
   completeDay,
+  deleteVoiceReflection,
   getProgress,
   getReflection,
+  getVoiceReflection,
   HALAQAH_ITEM_ID,
   saveReflection,
+  saveVoiceReflection,
   uncompleteDay,
 } from "../src/halaqah/db";
 import { embedHtml, embedUrl, isEmbedNavigation } from "../src/halaqah/embed";
-import { isReleasable, parseProgram, ProgramError, YOUTUBE_ID } from "../src/halaqah/program";
+import { HALAQAH_VOICE_MIGRATION } from "../src/halaqah/migrations";
+import { formatNudgeTime, parseNudgeTime, planNudges } from "../src/halaqah/nudge";
+import {
+  halaqahRef,
+  isReleasable,
+  parseHalaqahRef,
+  parseProgram,
+  ProgramError,
+  YOUTUBE_ID,
+} from "../src/halaqah/program";
 import { nextUncompletedDay, programPosition } from "../src/halaqah/schedule";
 import { getEntriesBetween } from "../src/db/entries";
 import { MIGRATIONS } from "../src/db/migrations";
@@ -39,7 +51,7 @@ describe("bundled program", () => {
     for (const d of program.days) {
       expect(d.summary.length).toBeGreaterThan(0);
       expect(d.reflectionPrompt.length).toBeGreaterThan(0);
-      expect(d.amalan.length).toBeGreaterThan(0);
+      expect(d.amalan?.length).toBeGreaterThan(0);
       expect(d.title.id.length).toBeGreaterThan(0);
       expect(d.title.en.length).toBeGreaterThan(0);
     }
@@ -107,6 +119,35 @@ describe("parseProgram rejects bad content", () => {
     const json = clone();
     json.days[0].madhhab_note_id = null;
     expect(parseProgram(json).days[0].madhhabNote).toBeNull();
+  });
+
+  test("amalan is optional: null or absent reads as null, an empty one is rejected", () => {
+    const json = clone();
+    json.days[0].amalan_id = null;
+    delete json.days[1].amalan_id;
+    const program = parseProgram(json);
+    expect(program.days[0].amalan).toBeNull();
+    expect(program.days[1].amalan).toBeNull();
+    expect(program.days[2].amalan).toBe(json.days[2].amalan_id);
+    fails((j) => (j.days[3].amalan_id = " "), /amalan_id/);
+  });
+});
+
+describe("halaqah reference on circle posts", () => {
+  // services/api/src/circles/validate.ts REF_RE
+  const SERVER_REF = /^[A-Za-z0-9._:-]{1,64}$/;
+
+  test("program and day round-trip and fit the server's pattern", () => {
+    const ref = halaqahRef("ramadhan-1448", 12);
+    expect(ref).toBe("ramadhan-1448:12");
+    expect(SERVER_REF.test(ref)).toBe(true);
+    expect(parseHalaqahRef(ref)).toEqual({ programId: "ramadhan-1448", day: 12 });
+  });
+
+  test("other references read as null", () => {
+    for (const ref of ["2027-02-08", "ramadhan-1448", "ramadhan-1448:0", "x:1:2", "A:1"]) {
+      expect(parseHalaqahRef(ref)).toBeNull();
+    }
   });
 });
 
@@ -235,8 +276,8 @@ describe("completion and reflections (real migrations, SQLite)", () => {
     to: string,
   ) => getEntriesBetween(db, from, to);
 
-  test("the halaqah migration is the latest step", () => {
-    expect(MIGRATIONS.length).toBeGreaterThanOrEqual(4);
+  test("the halaqah voice migration is a migration step", () => {
+    expect(MIGRATIONS).toContain(HALAQAH_VOICE_MIGRATION);
   });
 
   test("Selesai records progress and a dirty `halaqah` mutabaah entry on today's date", async () => {
@@ -290,5 +331,109 @@ describe("completion and reflections (real migrations, SQLite)", () => {
     const rows = raw.query("SELECT item_id FROM entries").all();
     expect(rows).toEqual([{ item_id: "halaqah" }]);
     expect(JSON.stringify(raw.query("SELECT * FROM settings").all())).not.toContain("pribadi");
+  });
+});
+
+describe("voice reflections (real migrations, SQLite)", () => {
+  const PROGRAM = "ramadhan-1448";
+
+  test("one recording per day: saved, replaced (old file returned), deleted", async () => {
+    const { db } = await migratedDb();
+    expect(await getVoiceReflection(db, PROGRAM, 2)).toBeNull();
+    expect(await saveVoiceReflection(db, PROGRAM, 2, { file: "a.m4a", seconds: 12.4 })).toBeNull();
+    expect(await getVoiceReflection(db, PROGRAM, 2)).toEqual({ file: "a.m4a", seconds: 12 });
+    expect(await saveVoiceReflection(db, PROGRAM, 2, { file: "b.m4a", seconds: 30 })).toBe("a.m4a");
+    expect(await getVoiceReflection(db, PROGRAM, 2)).toEqual({ file: "b.m4a", seconds: 30 });
+    expect(await getVoiceReflection(db, PROGRAM, 3)).toBeNull();
+    expect(await deleteVoiceReflection(db, PROGRAM, 2)).toBe("b.m4a");
+    expect(await getVoiceReflection(db, PROGRAM, 2)).toBeNull();
+    expect(await deleteVoiceReflection(db, PROGRAM, 2)).toBeNull();
+  });
+
+  test("voice reflections never enter the sync tables", async () => {
+    const { db, raw } = await migratedDb();
+    await saveVoiceReflection(db, PROGRAM, 1, { file: "pribadi.m4a", seconds: 5 });
+    expect(raw.query("SELECT * FROM entries").all()).toEqual([]);
+    expect(JSON.stringify(raw.query("SELECT * FROM settings").all())).not.toContain("pribadi");
+  });
+});
+
+describe("daily nudge", () => {
+  // Ramadhan 1448 = 2027-02-08..03-08 (29 days) under offset 0; WIB is UTC+7 all year.
+  const program = { hijriYear: 1448, totalDays: 30 };
+  const plan = (
+    now: string,
+    done: [number, string][],
+    days = 3,
+    zone = "Asia/Jakarta",
+    p = program,
+  ) =>
+    planNudges({
+      now: new Date(now),
+      zone,
+      time: { hour: 16, minute: 0 },
+      hijriOffset: 0,
+      program: p,
+      done: new Map(done),
+      days,
+    }).map((n) => ({ at: n.at.toISOString(), kind: n.kind, day: n.day }));
+
+  test("time setting: HH:MM only", () => {
+    expect(parseNudgeTime("05:30")).toEqual({ hour: 5, minute: 30 });
+    expect(parseNudgeTime("23:59")).toEqual({ hour: 23, minute: 59 });
+    for (const raw of [null, "", "24:00", "7:00", "07:60", "x"])
+      expect(parseNudgeTime(raw)).toBeNull();
+    expect(formatNudgeTime({ hour: 7, minute: 5 })).toBe("07:05");
+  });
+
+  test("during Ramadhan: one nudge a day at the chosen local time, for that day's talk", () => {
+    expect(plan("2027-02-08T03:00:00Z", [])).toEqual([
+      { at: "2027-02-08T09:00:00.000Z", kind: "today", day: 1 },
+      { at: "2027-02-09T09:00:00.000Z", kind: "today", day: 2 },
+      { at: "2027-02-10T09:00:00.000Z", kind: "today", day: 3 },
+    ]);
+  });
+
+  test("a time already past today starts tomorrow", () => {
+    expect(plan("2027-02-08T10:00:00Z", [], 2)).toEqual([
+      { at: "2027-02-09T09:00:00.000Z", kind: "today", day: 2 },
+    ]);
+  });
+
+  test("no nudge on a day a session was already finished", () => {
+    expect(plan("2027-02-08T03:00:00Z", [[1, "2027-02-08"]], 2)).toEqual([
+      { at: "2027-02-09T09:00:00.000Z", kind: "today", day: 2 },
+    ]);
+  });
+
+  test("a day read ahead points to the first open talk, not to anything missed", () => {
+    expect(plan("2027-02-08T03:00:00Z", [[2, "2027-02-01"]], 2)).toEqual([
+      { at: "2027-02-08T09:00:00.000Z", kind: "today", day: 1 },
+      { at: "2027-02-09T09:00:00.000Z", kind: "continue", day: 1 },
+    ]);
+  });
+
+  test("before Ramadhan only for someone who started early", () => {
+    expect(plan("2026-10-25T03:00:00Z", [])).toEqual([]);
+    expect(plan("2026-10-25T03:00:00Z", [[1, "2026-10-20"]], 1)).toEqual([
+      { at: "2026-10-25T09:00:00.000Z", kind: "continue", day: 2 },
+    ]);
+  });
+
+  test("stops when the program's Ramadhan ends and once every day is done", () => {
+    expect(plan("2027-03-07T03:00:00Z", [], 5)).toEqual([
+      { at: "2027-03-07T09:00:00.000Z", kind: "today", day: 28 },
+      { at: "2027-03-08T09:00:00.000Z", kind: "today", day: 29 },
+    ]);
+    const all = Array.from({ length: 30 }, (_, i): [number, string] => [i + 1, "2027-02-01"]);
+    expect(plan("2027-02-10T03:00:00Z", all)).toEqual([]);
+  });
+
+  test("follows the zone's clock across a DST change", () => {
+    const later = { hijriYear: 1449, totalDays: 30 };
+    expect(plan("2027-03-27T12:00:00Z", [[1, "2027-01-01"]], 2, "Europe/London", later)).toEqual([
+      { at: "2027-03-27T16:00:00.000Z", kind: "continue", day: 2 },
+      { at: "2027-03-28T15:00:00.000Z", kind: "continue", day: 2 },
+    ]);
   });
 });
