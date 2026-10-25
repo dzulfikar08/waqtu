@@ -3,6 +3,7 @@ import { Fragment } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useTranslation } from "@/i18n";
+import type { CheckView } from "@/recitation/check";
 import { arabicDigits } from "../format";
 import { wordKey, type UnitBlock } from "../text";
 import { radius, spacing, useTheme } from "@/theme";
@@ -14,6 +15,8 @@ export type TestMode = "show" | "hide" | "letters";
  * that is not in `revealed` is covered (or shown by its first letters); tapping a word reveals it.
  * `activeAyah` (counted from 0 within the unit) is the ayah the recording is at, drawn in the
  * accent colour; with `onAyahPress`, tapping an ayah (other than a covered word) jumps to it.
+ * `check` (the developer recitation check) colours skipped words (underlined) and replaced words,
+ * and the number of an ayah where the reciter jumped to another ayah.
  */
 export function UnitText({
   blocks,
@@ -24,6 +27,7 @@ export function UnitText({
   fontSize,
   activeAyah,
   onAyahPress,
+  check,
 }: {
   blocks: readonly UnitBlock[];
   mode: TestMode;
@@ -33,6 +37,7 @@ export function UnitText({
   fontSize: number;
   activeAyah: number | null;
   onAyahPress: ((ayah: number) => void) | undefined;
+  check?: CheckView | null;
 }) {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
@@ -76,6 +81,7 @@ export function UnitText({
                 {ayah.words.map((word, i) => {
                   const key = wordKey(ayah.index, i);
                   const open = mode === "show" || revealed.has(key);
+                  const flag = open ? check?.words.get(key) : undefined;
                   const space = i < ayah.words.length - 1 ? " " : "";
                   return (
                     <Fragment key={key}>
@@ -83,15 +89,27 @@ export function UnitText({
                         onPress={open ? undefined : () => onReveal(key)}
                         accessibilityRole={open ? undefined : "button"}
                         accessibilityLabel={open ? undefined : t("hafalan.hiddenWord")}
-                        style={open ? undefined : { backgroundColor: theme.border }}
+                        style={
+                          !open
+                            ? { backgroundColor: theme.border }
+                            : flag === "skipped"
+                              ? { color: theme.danger, textDecorationLine: "underline" }
+                              : flag === "substituted"
+                                ? { color: theme.warning }
+                                : undefined
+                        }
                       >
                         {open ? word : mode === "letters" ? `${firstLetters(word)}…` : maskOf(word)}
                       </Text>
                       {space}
                     </Fragment>
                   );
-                })}
-                {` \uFD3F${arabicDigits(ayah.ayah)}\uFD3E `}
+                })}{" "}
+                <Text
+                  style={check?.jumpAyahs.has(ayah.index) ? { color: theme.danger } : undefined}
+                >
+                  {`\uFD3F${arabicDigits(ayah.ayah)}\uFD3E`}
+                </Text>{" "}
               </Text>
             ))}
           </Text>

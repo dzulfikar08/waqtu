@@ -3,6 +3,7 @@ import { premiumId } from "@/premium/strings";
 import { hafalanId } from "@/hafalan/strings";
 import { halaqahId } from "@/halaqah/strings";
 import { ramadhanId } from "@/ramadhan/strings";
+import { aboutId, recitationId } from "@/recitation/strings";
 
 export const id = {
   tabs: { today: "Hari ini", week: "Pekan", settings: "Pengaturan" },
@@ -166,4 +167,6 @@ export const id = {
   premium: premiumId,
   halaqah: halaqahId,
   hafalan: hafalanId,
+  recitation: recitationId,
+  about: aboutId,
 } as const;
