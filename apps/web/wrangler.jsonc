@@ -2,10 +2,6 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   // Keep the original worker name: the package was renamed to @waqtu/web, which would otherwise deploy a new worker.
   "name": "waqtu-landing-astro",
-  "vars": {
-    "POLAR_PRODUCT_PRO_LIFETIME": "85947e3a-6eab-4057-950e-dbb7f4f0d34d",
-    "POLAR_PRODUCT_PRO_MONTHLY": "",
-  },
   "d1_databases": [
     {
       "binding": "WAITLIST_DB",

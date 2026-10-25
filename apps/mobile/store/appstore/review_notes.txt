@@ -6,10 +6,10 @@ How to review:
 3. Ramadan tab: it shows during Ramadan and the 7 days before it. At any other time open it from Settings > "Ramadan: imsakiyah, khatam, zakat".
 4. Settings: language (Indonesian or English), calculation method, time adjustments, adhan notifications.
 
-Account: Sign in with Apple and Sign in with Google are optional and only enable sync and the Circles tab. Circles also requires Waqtu Premium, so a reviewer without an active subscription sees the "Circles is a premium feature" message.
+Account: Sign in with Apple and Sign in with Google are optional and only needed for the Premium features. Sync across devices and Circles (joining and posting in halaqah circles) both require an active Waqtu Premium subscription. To test: sign in, open the Circles tab and see the "Premium feature" message with a "See Premium" link to the paywall; subscribe there with a sandbox account, then Circles opens and Settings > Account shows "Sync now". Prayer times, mutabaah on the device, Ramadan basics, the halaqah program and hafalan stay free without an account.
 Account deletion: Settings > Account > Delete account (signed-in users), with a confirmation dialog. It deletes the account and its server data.
 
-In-app purchase: Waqtu Premium auto-renewing subscriptions (group "Waqtu Premium": dat.waqtu.premium.monthly, dat.waqtu.premium.yearly). The paywall is Settings > Waqtu Premium. The subscription is tied to the signed-in account, so the purchase flow asks the reviewer to sign in with Apple first. Restore Purchases is on the same screen. The paywall links the privacy policy and terms.
+In-app purchase: Waqtu Premium auto-renewing subscriptions (group "Waqtu Premium": dat.waqtu.premium.monthly at Rp 29.000/month, dat.waqtu.premium.yearly at Rp 249.000/year). The same subscription also unlocks the Waqtu Mac app when the user signs in there with the same Waqtu account. The paywall is Settings > Waqtu Premium. The subscription is tied to the signed-in account, so the purchase flow asks the reviewer to sign in with Apple first. Restore Purchases is on the same screen. The paywall links the privacy policy and terms.
 
 Location: used only to calculate prayer times and never leaves the device. Microphone: used only when the user records a voice note in a circle. Notifications: adhan reminders.
 

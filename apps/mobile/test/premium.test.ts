@@ -36,9 +36,9 @@ describe("isPremium", () => {
     expect(isPremium(cached(active), "u1", NOW + DAY)).toBe(false);
   });
 
-  test("lifetime never lapses", () => {
-    const lifetime: Entitlement = { premium: true, source: "license", expiresAt: null };
-    expect(isPremium(cached(lifetime), "u1", NOW + 100 * 365 * DAY)).toBe(true);
+  test("an entitlement without expiry never lapses", () => {
+    const open: Entitlement = { premium: true, source: "polar", expiresAt: null };
+    expect(isPremium(cached(open), "u1", NOW + 100 * 365 * DAY)).toBe(true);
   });
 
   test("another account's cache, a signed-out phone and no cache are free", () => {
@@ -68,7 +68,7 @@ describe("entitlement parsing", () => {
       "premium",
       {},
       { premium: "yes", source: null, expiresAt: null },
-      { premium: true, source: "bank", expiresAt: null },
+      { premium: true, source: "license", expiresAt: null },
       { premium: true, source: "apple", expiresAt: "not a date" },
       { premium: true, source: "apple", expiresAt: 5 },
     ]) {
@@ -141,12 +141,14 @@ describe("premium api client", () => {
   }
 
   test("reads the entitlement with the session cookie", async () => {
-    const t = withFetch(() => Response.json({ premium: true, source: "license", expiresAt: null }));
+    const t = withFetch(() =>
+      Response.json({ premium: true, source: "apple", expiresAt: "2026-11-01T00:00:00.000Z" }),
+    );
     try {
       expect(await t.api.getEntitlement()).toEqual({
         premium: true,
-        source: "license",
-        expiresAt: null,
+        source: "apple",
+        expiresAt: "2026-11-01T00:00:00.000Z",
       });
       expect(t.calls[0]).toMatchObject({
         url: "https://api.example.test/v1/entitlement",
@@ -165,11 +167,9 @@ describe("premium api client", () => {
     try {
       expect((await t.api.submitGoogle("play-token-123")).pending).toBe(true);
       await t.api.submitApple("signed.jws.value");
-      await t.api.linkLicense("WAQTU-KEY");
       expect(t.calls.map((c) => [c.url, c.body])).toEqual([
         ["https://api.example.test/v1/billing/google", { purchaseToken: "play-token-123" }],
         ["https://api.example.test/v1/billing/apple", { signedTransaction: "signed.jws.value" }],
-        ["https://api.example.test/v1/entitlement/link-license", { key: "WAQTU-KEY" }],
       ]);
     } finally {
       t.restore();

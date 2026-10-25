@@ -10,12 +10,35 @@ const schema = {
       applicationCategory: "LifestyleApplication",
       description:
         "Prayer times in your Mac menu bar. Calendar blocks during prayers. Teams shows you as busy.",
-      offers: {
-        "@type": "Offer",
-        price: "2.99",
-        priceCurrency: "USD",
-        availability: "https://schema.org/InStock",
-      },
+      // Waqtu Premium is a store subscription; the app itself is free to download.
+      offers: [
+        {
+          "@type": "Offer",
+          name: "Waqtu Premium (monthly)",
+          price: "29000",
+          priceCurrency: "IDR",
+          priceSpecification: {
+            "@type": "UnitPriceSpecification",
+            price: "29000",
+            priceCurrency: "IDR",
+            referenceQuantity: { "@type": "QuantitativeValue", value: 1, unitCode: "MON" },
+          },
+          availability: "https://schema.org/InStock",
+        },
+        {
+          "@type": "Offer",
+          name: "Waqtu Premium (yearly)",
+          price: "249000",
+          priceCurrency: "IDR",
+          priceSpecification: {
+            "@type": "UnitPriceSpecification",
+            price: "249000",
+            priceCurrency: "IDR",
+            referenceQuantity: { "@type": "QuantitativeValue", value: 1, unitCode: "ANN" },
+          },
+          availability: "https://schema.org/InStock",
+        },
+      ],
       author: { "@type": "Person", name: "Dzulfikar Ats Tsauri", url: "https://getwaqtu.com" },
       publisher: { "@id": "https://getwaqtu.com/#organization" },
     },
@@ -67,15 +90,15 @@ const schema = {
           name: "Is there a free trial?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Yes. Download Waqtu and try it free. Use code WAQTU299 at checkout for lifetime access at $2.99.",
+            text: "Yes. Download Waqtu and try it free on your Mac. After the trial, Premium comes from your Waqtu account: subscribe once (Rp 29.000/month or Rp 249.000/year) and it unlocks every device you sign in on.",
           },
         },
         {
           "@type": "Question",
-          name: "How do refunds work?",
+          name: "How do I subscribe, and how do refunds work?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Contact us within 30 days for a full refund. No questions asked.",
+            text: "Waqtu Premium is sold in the App Store (iPhone), Google Play (Android) and the Mac App Store edition of Waqtu. The website does not sell anything. Billing, cancelling and refunds are handled by Apple or Google under their store rules.",
           },
         },
         {

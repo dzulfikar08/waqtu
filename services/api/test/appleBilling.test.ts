@@ -1,12 +1,15 @@
 import { env } from "cloudflare:workers";
 import { beforeAll, describe, expect, it } from "vitest";
-import { APPLE_BUNDLE_ID, APPLE_PRODUCT_IDS, appleAccountToken } from "../src/billing/apple";
+import { APPLE_IOS_APP, APPLE_MAC_APP, appleAccountToken } from "../src/billing/apple";
 import { createBillingHandler, type BillingHandler } from "../src/billing/routes";
 import { createTestAppleChain, type TestAppleChain } from "./appleChain";
 import { createUser, type TestUser } from "./helpers";
 
 const DAY = 86_400_000;
-const [MONTHLY, YEARLY] = APPLE_PRODUCT_IDS;
+const APPLE_BUNDLE_ID = APPLE_IOS_APP.bundleId;
+const [MONTHLY, YEARLY] = APPLE_IOS_APP.productIds as [string, string];
+const MAC_BUNDLE_ID = APPLE_MAC_APP.bundleId;
+const [MAC_MONTHLY, MAC_YEARLY] = APPLE_MAC_APP.productIds as [string, string];
 
 let chain: TestAppleChain;
 let handle: BillingHandler;
@@ -62,8 +65,8 @@ async function notification(
       subtype: extra.subtype,
       signedDate: extra.signedDate ?? Date.now(),
       data: {
-        bundleId: APPLE_BUNDLE_ID,
-        appAppleId: 6826628861,
+        bundleId: tx.bundleId,
+        ...(tx.bundleId === APPLE_BUNDLE_ID ? { appAppleId: 6826628861 } : {}),
         environment: tx.environment,
         signedTransactionInfo: await chain.sign(tx),
         ...(extra.renewal ? { signedRenewalInfo: await chain.sign(extra.renewal) } : {}),
@@ -146,6 +149,46 @@ describe("POST /v1/billing/apple", () => {
     expect(taken!.status).toBe(409);
     expect(await taken!.json()).toEqual({ error: "linked_to_other_account" });
     expect((await entitlementOf(other)).premium).toBe(false);
+  });
+
+  it("grants premium for the Mac App Store subscription (bundle dat.waqtu)", async () => {
+    const user = await createUser("apple-mac");
+    for (const [original, productId] of [
+      ["orig-mac-monthly", MAC_MONTHLY],
+      ["orig-mac-yearly", MAC_YEARLY],
+    ] as const) {
+      const tx = transaction(original, {
+        bundleId: MAC_BUNDLE_ID,
+        productId,
+        appAccountToken: await appleAccountToken(user.id),
+      });
+      const res = await post(
+        "/v1/billing/apple",
+        { signedTransaction: await chain.sign(tx) },
+        user,
+      );
+      expect(res!.status).toBe(200);
+      expect(await res!.json()).toMatchObject({ premium: true, source: "apple" });
+    }
+    expect((await entitlementOf(user)).premium).toBe(true);
+    const row = await env.APP_DB.prepare(
+      "SELECT product_id FROM entitlement WHERE source = 'apple' AND external_id = 'orig-mac-yearly'",
+    ).first<{ product_id: string }>();
+    expect(row!.product_id).toBe(MAC_YEARLY);
+  });
+
+  it("refuses the retired Mac lifetime purchase and cross-app products", async () => {
+    const user = await createUser("apple-mac-reject");
+    for (const overrides of [
+      { bundleId: MAC_BUNDLE_ID, productId: "dat.waqtu.lifetime", expiresDate: undefined },
+      { bundleId: MAC_BUNDLE_ID, productId: MONTHLY },
+      { bundleId: APPLE_BUNDLE_ID, productId: MAC_MONTHLY },
+    ]) {
+      const jws = await chain.sign(transaction("orig-mac-reject", overrides));
+      const res = await post("/v1/billing/apple", { signedTransaction: jws }, user);
+      expect(res!.status, JSON.stringify(overrides)).toBe(400);
+    }
+    expect((await entitlementOf(user)).premium).toBe(false);
   });
 });
 
@@ -309,6 +352,42 @@ describe("POST /v1/billing/apple/notifications", () => {
     expect(row).toBeNull();
   });
 
+  it("renews a Mac App Store subscription from the Mac app's notifications", async () => {
+    const user = await createUser("apple-mac-renew");
+    const tx = transaction("orig-mac-renew", {
+      bundleId: MAC_BUNDLE_ID,
+      productId: MAC_MONTHLY,
+      appAccountToken: await appleAccountToken(user.id),
+    });
+    await post("/v1/billing/apple", { signedTransaction: await chain.sign(tx) }, user);
+    const renewedUntil = Date.now() + 60 * DAY;
+    const res = await post(
+      "/v1/billing/apple/notifications",
+      await notification(
+        "DID_RENEW",
+        { ...tx, transactionId: `${tx.transactionId}-2`, expiresDate: renewedUntil },
+        { signedDate: Date.now() + 1000 },
+      ),
+    );
+    expect(res!.status).toBe(200);
+    expect((await entitlementOf(user)).expiresAt).toBe(new Date(renewedUntil).toISOString());
+  });
+
+  it("refuses a notification whose transaction belongs to the other app", async () => {
+    const tx = transaction("orig-mixed", { bundleId: APPLE_BUNDLE_ID, productId: MONTHLY });
+    const payload = await chain.sign({
+      notificationType: "DID_RENEW",
+      signedDate: Date.now(),
+      data: {
+        bundleId: MAC_BUNDLE_ID,
+        environment: "Production",
+        signedTransactionInfo: await chain.sign(tx),
+      },
+    });
+    const res = await post("/v1/billing/apple/notifications", { signedPayload: payload });
+    expect(res!.status).toBe(400);
+  });
+
   it("checks the App Store app id of Production notifications when APPLE_APP_ID is set", async () => {
     const send = async (appAppleId: number) => {
       const tx = transaction("orig-appid");
@@ -333,5 +412,32 @@ describe("POST /v1/billing/apple/notifications", () => {
     };
     expect((await send(1234))!.status).toBe(400);
     expect((await send(6826628861))!.status).toBe(200);
+  });
+
+  it("checks the Mac app's App Store id when APPLE_MAC_APP_ID is set", async () => {
+    const send = async (appAppleId: number) => {
+      const tx = transaction("orig-mac-appid", { bundleId: MAC_BUNDLE_ID, productId: MAC_MONTHLY });
+      const payload = await chain.sign({
+        notificationType: "DID_RENEW",
+        signedDate: Date.now(),
+        data: {
+          bundleId: MAC_BUNDLE_ID,
+          appAppleId,
+          environment: "Production",
+          signedTransactionInfo: await chain.sign(tx),
+        },
+      });
+      return handle(
+        new Request("http://localhost/v1/billing/apple/notifications", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ signedPayload: payload }),
+        }),
+        { ...env, APPLE_MAC_APP_ID: "1111111111" },
+      );
+    };
+    // The iPhone app's id is not the Mac app's.
+    expect((await send(6826628861))!.status).toBe(400);
+    expect((await send(1111111111))!.status).toBe(200);
   });
 });
