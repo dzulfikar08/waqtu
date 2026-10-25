@@ -69,6 +69,34 @@
         }
       }
     },
+    "%lld days left in trial. Subscribe anytime to keep access." : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld day left in trial. Subscribe anytime to keep access."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld days left in trial. Subscribe anytime to keep access."
+                }
+              }
+            }
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sisa uji coba %lld hari. Berlangganan kapan saja agar akses tetap terbuka."
+          }
+        }
+      }
+    },
     "%lld min" : {
       "localizations" : {
         "id" : {
@@ -372,6 +400,16 @@
         }
       }
     },
+    "All settings will be reset to defaults, Waqtu events will be removed from your calendar, and the app will quit. Your subscription is not affected. Reopen Waqtu to start fresh." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Semua pengaturan kembali ke bawaan, acara Waqtu dihapus dari kalendermu, lalu aplikasi keluar. Langgananmu tidak terpengaruh. Buka lagi Waqtu untuk memulai dari awal."
+          }
+        }
+      }
+    },
     "Apply Location" : {
       "localizations" : {
         "id" : {
@@ -652,6 +690,16 @@
         }
       }
     },
+    "Check again" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Periksa lagi"
+          }
+        }
+      }
+    },
     "Check for Updates…" : {
       "localizations" : {
         "id" : {
@@ -718,6 +766,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Menghapus semua pengaturan dan acara kalender, lalu keluar. Pakai untuk memperbaiki masalah akses kalender. Lisensimu tetap tersimpan."
+          }
+        }
+      }
+    },
+    "Clears all settings and calendar events, then quits. Use to fix calendar access issues. Your subscription is not affected." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menghapus semua pengaturan dan acara kalender, lalu keluar. Pakai untuk memperbaiki masalah akses kalender. Langgananmu tidak terpengaruh."
           }
         }
       }
@@ -1190,6 +1248,16 @@
         }
       }
     },
+    "Got it" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mengerti"
+          }
+        }
+      }
+    },
     "Grace left this week: %lld days" : {
       "localizations" : {
         "en" : {
@@ -1302,6 +1370,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saya akan sholat"
+          }
+        }
+      }
+    },
+    "I subscribed: check again" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saya sudah berlangganan: periksa lagi"
           }
         }
       }
@@ -1628,6 +1706,16 @@
     "Maghrib" : {
       "shouldTranslate" : false
     },
+    "Manage Subscription" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kelola Langganan"
+          }
+        }
+      }
+    },
     "Manage checklist" : {
       "localizations" : {
         "id" : {
@@ -1698,6 +1786,16 @@
         }
       }
     },
+    "More about Waqtu Premium" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selengkapnya tentang Waqtu Premium"
+          }
+        }
+      }
+    },
     "Morning dhikr" : {
       "localizations" : {
         "id" : {
@@ -1763,6 +1861,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hari berikutnya"
+          }
+        }
+      }
+    },
+    "No Waqtu Premium on this account yet. A subscription bought in Waqtu on your iPhone or Android unlocks this Mac too." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akun ini belum memiliki Waqtu Premium. Langganan yang dibeli di Waqtu untuk iPhone atau Android juga membuka Mac ini."
           }
         }
       }
@@ -1910,6 +2018,16 @@
         }
       }
     },
+    "Payment is charged to your Apple ID. The subscription renews automatically unless cancelled at least 24 hours before the end of the period; manage or cancel it in your App Store account settings." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pembayaran dibebankan ke Apple ID-mu. Langganan diperpanjang otomatis kecuali dibatalkan paling lambat 24 jam sebelum periode berakhir; kelola atau batalkan di pengaturan akun App Store."
+          }
+        }
+      }
+    },
     "Play Adhan sound" : {
       "localizations" : {
         "id" : {
@@ -2003,12 +2121,32 @@
         }
       }
     },
+    "Premium via the Mac App Store" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premium lewat Mac App Store"
+          }
+        }
+      }
+    },
     "Premium via your Waqtu account" : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Premium lewat akun Waqtu-mu"
+          }
+        }
+      }
+    },
+    "Premium via your Waqtu account. Manage the subscription where you bought it." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premium lewat akun Waqtu-mu. Kelola langganan di tempat kamu membelinya."
           }
         }
       }
@@ -2226,6 +2364,16 @@
         }
       }
     },
+    "Restore Purchases" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pulihkan Pembelian"
+          }
+        }
+      }
+    },
     "Resume" : {
       "localizations" : {
         "id" : {
@@ -2379,12 +2527,32 @@
         }
       }
     },
+    "Sign in to sync your prayer checklist and prayer settings with Waqtu on your iPhone or Android, and to use the Waqtu Premium you subscribed to there. Your location is never uploaded." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masuk untuk menyinkronkan mutabaah dan pengaturan sholat dengan Waqtu di iPhone atau Android, dan untuk memakai Waqtu Premium yang kamu langgani di sana. Lokasimu tidak pernah diunggah."
+          }
+        }
+      }
+    },
     "Sign in to sync your prayer checklist and prayer settings with Waqtu on your iPhone or Android. Your location is never uploaded." : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Masuk untuk menyinkronkan mutabaah dan pengaturan sholat dengan Waqtu di iPhone atau Android. Lokasimu tidak pernah diunggah."
+          }
+        }
+      }
+    },
+    "Sign in under Account before subscribing so Premium also unlocks Waqtu on your iPhone or Android." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masuk di Akun sebelum berlangganan agar Premium juga membuka Waqtu di iPhone atau Android-mu."
           }
         }
       }
@@ -2562,6 +2730,56 @@
         }
       }
     },
+    "Subscribe in Waqtu on your iPhone or Android phone (Rp 29.000/month or Rp 249.000/year), then sign in here under Account with the same Waqtu account." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berlangganan di Waqtu pada iPhone atau ponsel Android (Rp 29.000/bulan atau Rp 249.000/tahun), lalu masuk di sini lewat Akun dengan akun Waqtu yang sama."
+          }
+        }
+      }
+    },
+    "Subscribe monthly: %@/month" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berlangganan bulanan: %@/bulan"
+          }
+        }
+      }
+    },
+    "Subscribe to Waqtu Premium or sign in with your Waqtu account to keep using Waqtu." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berlangganan Waqtu Premium atau masuk dengan akun Waqtu-mu untuk terus memakai Waqtu."
+          }
+        }
+      }
+    },
+    "Subscribe yearly: %@/year" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berlangganan tahunan: %@/tahun"
+          }
+        }
+      }
+    },
+    "Subscribed in the Mac App Store." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berlangganan lewat Mac App Store."
+          }
+        }
+      }
+    },
     "Sunrise" : {
       "localizations" : {
         "id" : {
@@ -2708,6 +2926,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hari ini masih terbuka."
+          }
+        }
+      }
+    },
+    "Trial ending soon" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uji coba segera berakhir"
           }
         }
       }
@@ -2868,12 +3096,65 @@
         }
       }
     },
+    "Waqtu Premium" : {
+      "shouldTranslate" : false
+    },
+    "Waqtu Premium is active on this account." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waqtu Premium aktif di akun ini."
+          }
+        }
+      }
+    },
+    "Waqtu Premium is active." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waqtu Premium aktif."
+          }
+        }
+      }
+    },
+    "Waqtu Premium is one subscription for your Mac, iPhone and Android, kept by your Waqtu account. It includes sync across your devices and Circles." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waqtu Premium adalah satu langganan untuk Mac, iPhone, dan Android, tersimpan di akun Waqtu-mu. Termasuk sinkron antarperangkat dan Lingkaran."
+          }
+        }
+      }
+    },
     "Waqtu account" : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Akun Waqtu"
+          }
+        }
+      }
+    },
+    "Waqtu for Android" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waqtu untuk Android"
+          }
+        }
+      }
+    },
+    "Waqtu for iPhone" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waqtu untuk iPhone"
           }
         }
       }
@@ -2954,6 +3235,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Amalan buatan sendiri"
+          }
+        }
+      }
+    },
+    "Your trial ends tomorrow. Subscribe to Waqtu Premium, or sign in with a subscribed Waqtu account, to keep using Waqtu." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uji cobamu berakhir besok. Berlangganan Waqtu Premium, atau masuk dengan akun Waqtu yang berlangganan, untuk terus memakai Waqtu."
+          }
+        }
+      }
+    },
+    "Your trial has ended" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masa uji coba berakhir"
           }
         }
       }
