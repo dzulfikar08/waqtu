@@ -72,8 +72,8 @@ struct MenuBarView: View {
 
             Divider()
 
-            // Streak report
-            StreakReportView(streakManager: viewModel.streakManager)
+            // Streak (the phone's rules over the synced checklist)
+            StreakReportView(sync: viewModel.syncController)
 
             Divider()
 
@@ -331,31 +331,27 @@ struct PrayerRow: View {
 }
 
 // MARK: - Streak Report
+/// The phone's StreakCard (apps/mobile/src/components/today/StreakCard.tsx): forgiving copy, never a
+/// loss message, plus the last 7 days and the pause switch.
 struct StreakReportView: View {
-    let streakManager: PrayerStreakManager
+    let sync: MutabaahSyncController
     @State private var isExpanded = false
 
-    private let prayerOrder: [String] = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"]
-    private let prayerIcons: [String: String] = [
-        "Fajr": "moon.stars.fill",
-        "Dhuhr": "sun.max.fill",
-        "Asr": "sun.haze.fill",
-        "Maghrib": "sunset.fill",
-        "Isha": "moon.fill"
-    ]
-
     var body: some View {
+        let _ = sync.revision
+        let streak = sync.streak
+
         VStack(spacing: 0) {
             // Header row — tappable to expand/collapse
             Button(action: { withAnimation(.easeInOut(duration: 0.2)) { isExpanded.toggle() } }) {
                 HStack(spacing: 8) {
                     Text(verbatim: "🔥")
                         .font(.system(size: 13))
-                    Text("Streak \(streakManager.currentStreak)d")
+                    Text("Consistency: \(streak.current) days")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(.waqtuGold)
-                    if streakManager.bestStreak > 0 {
-                        Text("· Best \(streakManager.bestStreak)d")
+                    if streak.best > streak.current {
+                        Text("· Longest \(streak.best) days")
                             .font(.system(size: 11))
                             .foregroundColor(.waqtuMuted)
                     }
@@ -374,90 +370,63 @@ struct StreakReportView: View {
                 Divider()
                     .padding(.horizontal, 12)
 
-                VStack(spacing: 6) {
-                    // Today's prayer status
-                    ForEach(prayerOrder, id: \.self) { prayerName in
-                        prayerStatusRow(name: prayerName)
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(lines(streak), id: \.self) { line in
+                        Text(line)
+                            .font(.system(size: 11))
+                            .foregroundColor(.waqtuText)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
 
-                    // Weekly mini-grid
                     HStack(spacing: 4) {
-                        ForEach(streakManager.weeklyGrid, id: \.label) { day in
+                        ForEach(sync.week, id: \.date) { day in
                             VStack(spacing: 2) {
-                                Text(AppLanguage.weekdayInitial(englishShortName: day.label))
+                                Text(AppLanguage.weekdayInitial(englishShortName: MutabaahStreakModel.englishWeekday(day.date)))
                                     .font(.system(size: 9))
                                     .foregroundColor(day.isToday ? .waqtuGold : .waqtuMuted)
-                                Text(day.status)
+                                Text(verbatim: symbol(day))
                                     .font(.system(size: 13))
-                                    .foregroundColor(day.isToday ? .waqtuGold : .waqtuMuted)
+                                    .foregroundColor(day.counted ? .waqtuPrimary : (day.isToday ? .waqtuGold : .waqtuMuted))
                             }
                             .frame(maxWidth: .infinity)
                         }
                     }
-                    .padding(.horizontal, 16)
                     .padding(.top, 4)
 
-                    // Week summary
-                    let week = streakManager.weeklyStats
-                    if week.total > 0 {
-                        Text("This week: \(week.prayed)/\(week.total) (\(Int(Double(week.prayed) / Double(week.total) * 100))%)")
-                            .font(.system(size: 10))
-                            .foregroundColor(.waqtuMuted)
+                    Button(sync.pauseActive ? String(localized: "End pause") : String(localized: "Pause (illness, travel, excuse)")) {
+                        sync.togglePause()
                     }
+                    .font(.system(size: 11))
+                    .buttonStyle(.plain)
+                    .foregroundColor(.waqtuPrimary)
                 }
+                .padding(.horizontal, 16)
                 .padding(.vertical, 8)
             }
         }
     }
 
-    @ViewBuilder
-    private func prayerStatusRow(name: String) -> some View {
-        let status = streakManager.statusFor(prayer: name)
-        let hasPassed: Bool = {
-            // Check if this prayer's time has passed today
-            let icon = prayerIcons[name] ?? "circle"
-            return status != nil || icon.isEmpty == false // simplified: show all
-        }()
-
-        HStack(spacing: 8) {
-            Image(systemName: prayerIcons[name] ?? "circle")
-                .font(.system(size: 11))
-                .foregroundColor(status == .prayed ? .waqtuPrimary : .waqtuMuted)
-                .frame(width: 16)
-
-            Text(PrayerName(rawValue: name)?.displayName ?? name)
-                .font(.system(size: 12))
-                .foregroundColor(.waqtuText)
-
-            Spacer()
-
-            statusBadge(status)
+    /// Same lines, same order, same conditions as the phone's StreakCard.
+    private func lines(_ streak: StreakResult) -> [String] {
+        var out: [String] = []
+        if streak.paused {
+            out.append(String(localized: "Paused. These days don't count and don't break your streak."))
+        } else if streak.current == 0 {
+            out.append(String(localized: "Start anywhere. One practice today already counts."))
+        } else {
+            out.append(String(localized: "Slow and steady. What matters is to keep going."))
         }
-        .padding(.horizontal, 16)
+        if streak.forgiven > 0 { out.append(String(localized: "\(streak.forgiven) missed days forgiven")) }
+        if streak.current > 0 && !streak.paused { out.append(String(localized: "Grace left this week: \(streak.graceLeft) days")) }
+        if !streak.countedToday && streak.current > 0 && !streak.paused { out.append(String(localized: "Today is still open.")) }
+        return out
     }
 
-    @ViewBuilder
-    private func statusBadge(_ status: PrayerLogEntry.Status?) -> some View {
-        if let status {
-            switch status {
-            case .prayed:
-                Text("Prayed")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.waqtuPrimary)
-            case .missed:
-                Text("Missed")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.red.opacity(0.8))
-            case .late:
-                Text("Late")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.waqtuGold)
-            }
-        } else {
-            Text(verbatim: "—")
-                .font(.system(size: 10))
-                .foregroundColor(.waqtuMuted)
-        }
+    /// ● counted, ◐ something recorded, ‖ paused, · nothing.
+    private func symbol(_ day: MutabaahStreakModel.Day) -> String {
+        if day.counted { return "●" }
+        if day.paused { return "‖" }
+        return day.done > 0 ? "◐" : "·"
     }
 }
 

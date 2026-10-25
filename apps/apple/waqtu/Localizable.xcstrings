@@ -79,6 +79,34 @@
         }
       }
     },
+    "%lld missed days forgiven" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld missed day forgiven"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld missed days forgiven"
+                }
+              }
+            }
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld hari terlewat dimaafkan"
+          }
+        }
+      }
+    },
     "%lld pages" : {
       "localizations" : {
         "en" : {
@@ -235,6 +263,34 @@
     },
     ":pray:" : {
       "shouldTranslate" : false
+    },
+    "A day counts with at least %lld practices recorded" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "A day counts with at least %lld practice recorded"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "A day counts with at least %lld practices recorded"
+                }
+              }
+            }
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hari dihitung jika minimal %lld amalan tercatat"
+          }
+        }
+      }
     },
     "About" : {
       "localizations" : {
@@ -696,6 +752,44 @@
         }
       }
     },
+    "Consistency streak" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rangkaian istiqamah"
+          }
+        }
+      }
+    },
+    "Consistency: %lld days" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Consistency: %lld day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Consistency: %lld days"
+                }
+              }
+            }
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Istiqamah: %lld hari"
+          }
+        }
+      }
+    },
     "Counter" : {
       "localizations" : {
         "id" : {
@@ -896,6 +990,16 @@
         }
       }
     },
+    "End pause" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akhiri jeda"
+          }
+        }
+      }
+    },
     "Enter coordinates if auto-detect is unavailable. Example: Mecca 21.4225, 39.8262" : {
       "localizations" : {
         "id" : {
@@ -1042,6 +1146,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mencari lokasi…"
+          }
+        }
+      }
+    },
+    "Grace left this week: %lld days" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Grace left this week: %lld day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Grace left this week: %lld days"
+                }
+              }
+            }
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sisa kelonggaran pekan ini: %lld hari"
+          }
+        }
+      }
+    },
+    "Grace per week: %lld days" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Grace per week: %lld day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Grace per week: %lld days"
+                }
+              }
+            }
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kelonggaran per pekan: %lld hari"
           }
         }
       }
@@ -1231,16 +1391,6 @@
     },
     "Kuwait" : {
       "shouldTranslate" : false
-    },
-    "Late" : {
-      "localizations" : {
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terlambat"
-          }
-        }
-      }
     },
     "Latitude" : {
       "localizations" : {
@@ -1475,16 +1625,6 @@
         }
       }
     },
-    "Missed" : {
-      "localizations" : {
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terlewat"
-          }
-        }
-      }
-    },
     "Moonsighting Committee (North America, UK)" : {
       "localizations" : {
         "id" : {
@@ -1677,12 +1817,32 @@
         }
       }
     },
+    "Pause (illness, travel, excuse)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mulai jeda (sakit, safar, uzur)"
+          }
+        }
+      }
+    },
     "Paused" : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dijeda"
+          }
+        }
+      }
+    },
+    "Paused. These days don't count and don't break your streak." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeda aktif. Hari-hari ini tidak dihitung dan tidak memutus rangkaianmu."
           }
         }
       }
@@ -1716,16 +1876,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nama amalan, mis. Baca Al-Mulk"
-          }
-        }
-      }
-    },
-    "Prayed" : {
-      "localizations" : {
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sudah sholat"
           }
         }
       }
@@ -2209,6 +2359,16 @@
     "Slack" : {
       "shouldTranslate" : false
     },
+    "Slow and steady. What matters is to keep going." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pelan-pelan, yang penting terus berjalan."
+          }
+        }
+      }
+    },
     "Snooze" : {
       "localizations" : {
         "id" : {
@@ -2235,6 +2395,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Jalankan Waqtu otomatis saat kamu login."
+          }
+        }
+      }
+    },
+    "Start anywhere. One practice today already counts." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mulai dari mana pun. Satu amalan hari ini sudah berarti."
           }
         }
       }
@@ -2305,16 +2475,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Berhenti sebelum %@"
-          }
-        }
-      }
-    },
-    "Streak %lldd" : {
-      "localizations" : {
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Istiqamah %lld hari"
           }
         }
       }
@@ -2429,16 +2589,6 @@
         }
       }
     },
-    "This week: %lld/%lld (%lld%%)" : {
-      "localizations" : {
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pekan ini: %1$lld/%2$lld (%3$lld%%)"
-          }
-        }
-      }
-    },
     "This will delete all prayer block events created by Waqtu from your calendar. Your other events are not affected." : {
       "localizations" : {
         "id" : {
@@ -2465,6 +2615,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hari ini"
+          }
+        }
+      }
+    },
+    "Today is still open." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hari ini masih terbuka."
           }
         }
       }
@@ -2718,7 +2878,7 @@
     "xoxp-..." : {
       "shouldTranslate" : false
     },
-    "· Best %lldd" : {
+    "· Longest %lld days" : {
       "localizations" : {
         "id" : {
           "stringUnit" : {

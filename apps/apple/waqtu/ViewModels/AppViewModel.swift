@@ -80,7 +80,7 @@ final class AppViewModel {
             if changes.prayerSettings {
                 // Also pushes the log to the shared container.
                 self.calculatePrayers()
-            } else if changes.prayerLog {
+            } else if changes.prayerLog || changes.checklist {
                 self.pushToSharedContainer()
             }
         }
@@ -343,32 +343,31 @@ final class AppViewModel {
             nextPrayer: nextPrayer,
             locationLabel: locationDisplay
         )
+        let streak = syncController.streak
+        let week = syncController.week
         sharedBridge.pushStreakData(
-            currentStreak: streakManager.currentStreak,
-            bestStreak: streakManager.bestStreak,
-            todayPrayed: streakManager.todayPrayedCount,
-            weeklyGrid: mapWeeklyGrid()
+            currentStreak: streak.current,
+            bestStreak: streak.best,
+            todayPrayed: week.last?.fardhDone ?? 0,
+            weeklyGrid: week.map(Self.dot(for:))
         )
     }
 
-    private func mapWeeklyGrid() -> [StreakData.DayDot] {
-        streakManager.weeklyGrid.map { item in
-            StreakData.DayDot(
-                date: "",
-                label: item.label,
-                status: mapDotStatus(item.status),
-                isToday: item.isToday
-            )
+    /// Widget dot: the streak number follows the phone's rules, the dots stay about the five
+    /// fardhu (what `StreakData` and the phone's one-time import of it expect).
+    private static func dot(for day: MutabaahStreakModel.Day) -> StreakData.DayDot {
+        let status: StreakData.DayDot.DotStatus
+        switch day.fardhDone {
+        case Fardh.allCases.count...: status = .complete
+        case 1...: status = .partial
+        default: status = .empty
         }
-    }
-
-    private func mapDotStatus(_ status: String) -> StreakData.DayDot.DotStatus {
-        switch status {
-        case "●": return .complete
-        case "◐": return .partial
-        case "○": return .missed
-        default: return .empty
-        }
+        return StreakData.DayDot(
+            date: day.date,
+            label: MutabaahStreakModel.englishWeekday(day.date),
+            status: status,
+            isToday: day.isToday
+        )
     }
 
     private func showOverlay(for prayer: PrayerTime) {
