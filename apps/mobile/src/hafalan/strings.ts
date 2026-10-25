@@ -89,6 +89,9 @@ export const hafalanId = {
     "Dengarkan bacaanmu sendiri. Rekaman hanya tersimpan di ponsel ini: tidak diunggah dan tidak ikut cadangan perangkat (iCloud, iTunes).",
   record: "Rekam",
   stop: "Berhenti",
+  nextAyah: "Ayat berikutnya ({{n}}/{{total}})",
+  marksHint:
+    "Saat merekam, ketuk Ayat berikutnya tiap kali mulai ayat baru. Saat diputar, ayat yang sedang dibaca ditandai warna, dan ketuk ayat untuk memutar dari ayat itu.",
   recording: "Merekam {{time}}",
   play: "Putar",
   pause: "Jeda",
@@ -191,6 +194,9 @@ export const hafalanEn: Widen<typeof hafalanId> = {
     "Listen to your own recitation. The recording stays on this phone: it is never uploaded and is left out of device backups (iCloud, iTunes).",
   record: "Record",
   stop: "Stop",
+  nextAyah: "Next ayah ({{n}}/{{total}})",
+  marksHint:
+    "While recording, tap Next ayah each time you start a new ayah. On playback the ayah being recited is highlighted, and tapping an ayah plays from there.",
   recording: "Recording {{time}}",
   play: "Play",
   pause: "Pause",

@@ -1,11 +1,11 @@
 import { canGrade, newUnitState } from "@waqtu/core";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useTranslation } from "@/i18n";
-import { Recitation } from "@/hafalan/components/Recitation";
+import { Recitation, type SeekToAyah } from "@/hafalan/components/Recitation";
 import { UnitText, type TestMode } from "@/hafalan/components/UnitText";
 import { gradeUnitToday } from "@/hafalan/db";
 import { nextTodo, unitLabel, unitRole } from "@/hafalan/format";
@@ -41,6 +41,8 @@ export default function UnitScreen() {
   const [mode, setMode] = useState<TestMode>("show");
   const [revealed, setRevealed] = useState<ReadonlySet<string>>(new Set());
   const [graded, setGraded] = useState<{ due: string; dayComplete: boolean } | null>(null);
+  const [activeAyah, setActiveAyah] = useState<number | null>(null);
+  const seekRef = useRef<SeekToAyah | null>(null);
 
   useEffect(() => {
     setMode("show");
@@ -61,6 +63,8 @@ export default function UnitScreen() {
   const gradable = canGrade(state, data.today) && graded === null;
   const next = nextTodo(data.portion, index);
   const nextHidden = keys.find((k) => !revealed.has(k));
+  const recording = data.recordings.get(index);
+  const ayahCount = unit.end - unit.start + 1;
 
   const changeMode = (m: TestMode) => {
     setMode(m);
@@ -104,6 +108,8 @@ export default function UnitScreen() {
         onReveal={reveal}
         fontFamily={font.family}
         fontSize={FONT_SIZE}
+        activeAyah={activeAyah}
+        onAyahPress={recording?.marks.length ? (ayah) => seekRef.current?.(ayah) : undefined}
       />
 
       <Section title={t("hafalan.test")}>
@@ -191,7 +197,14 @@ export default function UnitScreen() {
 
       <Section title={t("hafalan.recitation")}>
         <View style={styles.panel}>
-          <Recitation unit={index} saved={data.recordings.get(index)} />
+          <Recitation
+            key={index}
+            unit={index}
+            saved={recording}
+            ayahCount={ayahCount}
+            onActiveAyah={setActiveAyah}
+            seekRef={seekRef}
+          />
         </View>
       </Section>
       <QuranCredit />

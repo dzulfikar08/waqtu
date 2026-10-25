@@ -12,6 +12,8 @@ export type TestMode = "show" | "hide" | "letters";
 /**
  * A unit of the mushaf in Uthmani script, right to left. In `hide` and `letters` mode every word
  * that is not in `revealed` is covered (or shown by its first letters); tapping a word reveals it.
+ * `activeAyah` (counted from 0 within the unit) is the ayah the recording is at, drawn in the
+ * accent colour; with `onAyahPress`, tapping an ayah (other than a covered word) jumps to it.
  */
 export function UnitText({
   blocks,
@@ -20,6 +22,8 @@ export function UnitText({
   onReveal,
   fontFamily,
   fontSize,
+  activeAyah,
+  onAyahPress,
 }: {
   blocks: readonly UnitBlock[];
   mode: TestMode;
@@ -27,6 +31,8 @@ export function UnitText({
   onReveal: (key: string) => void;
   fontFamily: string | undefined;
   fontSize: number;
+  activeAyah: number | null;
+  onAyahPress: ((ayah: number) => void) | undefined;
 }) {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
@@ -37,6 +43,7 @@ export function UnitText({
     color: theme.text,
     writingDirection: "rtl" as const,
   };
+  const first = blocks[0]?.ayahs[0]?.index ?? 0;
   return (
     <View style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.border }]}>
       {blocks.map((block) => (
@@ -61,7 +68,11 @@ export function UnitText({
           ) : null}
           <Text style={[quran, styles.verses]}>
             {block.ayahs.map((ayah) => (
-              <Fragment key={ayah.index}>
+              <Text
+                key={ayah.index}
+                onPress={onAyahPress ? () => onAyahPress(ayah.index - first) : undefined}
+                style={ayah.index - first === activeAyah ? { color: theme.accent } : undefined}
+              >
                 {ayah.words.map((word, i) => {
                   const key = wordKey(ayah.index, i);
                   const open = mode === "show" || revealed.has(key);
@@ -81,7 +92,7 @@ export function UnitText({
                   );
                 })}
                 {` \uFD3F${arabicDigits(ayah.ayah)}\uFD3E `}
-              </Fragment>
+              </Text>
             ))}
           </Text>
         </View>
