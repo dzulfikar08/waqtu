@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import HeroAppMock from "../components/HeroAppMock.astro";
+import { APP_STORE_URL, PLAY_STORE_URL } from "../i18n/landing";
 
 const features = [
   {
@@ -46,8 +47,8 @@ const features = [
     icon: "shield",
   },
   {
-    title: "No ads, no subscriptions",
-    description: "Pay once, own it forever. No subscriptions, no ad banners, no upsells. Ever.",
+    title: "No ads, no tracking",
+    description: "No ad banners and no trackers. Try it free; one optional Premium subscription covers all your devices.",
     icon: "ban",
   },
 ];
@@ -76,11 +77,12 @@ const faqs = [
   {
     question: "Is there a free trial?",
     answer:
-      "Yes. Download Waqtu and try it free. When you're ready, use code WAQTU299 at checkout for lifetime access at $2.99.",
+      "Yes. Download Waqtu and try it free on your Mac. After the trial, Premium comes from your Waqtu account: subscribe once (Rp 29.000/month or Rp 249.000/year) and it unlocks every device you sign in on.",
   },
   {
-    question: "How do refunds work?",
-    answer: "Not satisfied? Contact us within 30 days for a full refund. No questions asked.",
+    question: "How do I subscribe, and how do refunds work?",
+    answer:
+      "Waqtu Premium is sold in the App Store (iPhone), Google Play (Android) and the Mac App Store edition of Waqtu. The website does not sell anything. Billing, cancelling and refunds are handled by Apple or Google under their store rules.",
   },
   {
     question: "How is Waqtu different from other prayer apps?",
@@ -109,15 +111,15 @@ const faqs = [
   },
 ];
 
-const pricingFeatures = [
-  "Prayer times in your menu bar",
-  "Calendar protection (Exchange, iCloud, default)",
-  "Calm full-screen reminders",
-  "Focus timer with murattal, dzikir & sholawat",
-  "Works completely offline",
-  "Lifetime updates",
-  "30-day money-back guarantee",
+const freeFeatures = [
+  "Prayer times",
+  "Mutabaah on the device",
+  "Ramadhan basics",
+  "Halaqah program",
+  "Hafalan",
 ];
+
+const premiumFeatures = ["Sync across all your devices", "Circles: join halaqah circles and post"];
 
 const guides = [
   {
@@ -146,7 +148,7 @@ const guides = [
   },
 ];
 
-const trust = ["No ads", "No tracking", "Works offline", "macOS 12+", "30-day refund"];
+const trust = ["No ads", "No tracking", "Works offline", "macOS 12+", "Free trial"];
 ---
 
 <BaseLayout canonical="/mac">
@@ -168,9 +170,8 @@ const trust = ["No ads", "No tracking", "Works offline", "macOS 12+", "30-day re
         <a href="#pricing" class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)] transition-colors" data-s-event="nav_click" data-s-event-props='{"destination":"pricing"}'>Pricing</a>
         <a href="#faq" class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)] transition-colors" data-s-event="nav_click" data-s-event-props='{"destination":"faq"}'>FAQ</a>
         <a href="/en/" class="text-[var(--waqtu-muted)] hover:text-[var(--waqtu-text)] transition-colors" data-s-event="nav_click" data-s-event-props='{"destination":"mobile"}'>iOS &amp; Android</a>
-        <a href="#pricing" class="neu-btn inline-flex items-center gap-2 px-5 py-2.5 font-medium text-[var(--waqtu-bg)]" data-s-event="cta_click" data-s-event-props='{"location":"header","text":"Get Waqtu"}'>
-          <span>Get Waqtu —</span>
-          <span class="font-mono font-bold">$2.99</span>
+        <a href="#download" class="neu-btn inline-flex items-center gap-2 px-5 py-2.5 font-medium text-[var(--waqtu-bg)]" data-s-event="cta_click" data-s-event-props='{"location":"header","text":"Try Waqtu free"}'>
+          <span>Try Waqtu free</span>
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M19 12l-7 7-7-7" /></svg>
         </a>
       </nav>
@@ -186,9 +187,8 @@ const trust = ["No ads", "No tracking", "Works offline", "macOS 12+", "30-day re
           <a href="#pricing" data-nav class="text-3xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors py-2">Pricing</a>
           <a href="#faq" data-nav class="text-3xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors py-2">FAQ</a>
           <a href="/en/" data-nav class="text-3xl font-medium text-[var(--waqtu-text)] hover:text-[var(--waqtu-primary)] transition-colors py-2">iOS &amp; Android</a>
-          <a href="#pricing" data-nav class="neu-btn mt-4 inline-flex items-center gap-2 px-10 py-4 text-xl font-medium text-[var(--waqtu-bg)]">
-            <span>Get Waqtu —</span>
-            <span class="font-mono font-bold">$2.99</span>
+          <a href="#download" data-nav class="neu-btn mt-4 inline-flex items-center gap-2 px-10 py-4 text-xl font-medium text-[var(--waqtu-bg)]">
+            <span>Try Waqtu free</span>
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M19 12l-7 7-7-7" /></svg>
           </a>
         </nav>
@@ -201,13 +201,6 @@ const trust = ["No ads", "No tracking", "Works offline", "macOS 12+", "30-day re
       <!-- ===== HERO ===== -->
       <section class="px-6 pb-28 sm:px-10 md:px-14 md:pb-40">
         <div class="flex flex-col items-center text-center">
-          <button data-voucher data-voucher-text="WAQTU299" class="animate-fade-up mb-8 inline-flex items-center gap-2.5 rounded-full px-5 py-2.5 cursor-pointer transition-all hover:scale-105" style="animation-delay:0ms; opacity:0; background: linear-gradient(145deg, rgba(212, 165, 116, 0.12), rgba(212, 165, 116, 0.06)); box-shadow: 0 2px 8px rgba(22,32,28,0.08), 0 1px 2px rgba(22,32,28,0.05), 0 0 0 1px rgba(166,116,58,0.25) inset;" data-s-event="voucher_click" data-s-event-props='{"location":"hero_badge","code":"WAQTU299"}'>
-            <span class="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--waqtu-gold)]">Limited offer</span>
-            <span class="h-3 w-px bg-[var(--waqtu-gold)]/30"></span>
-            <span data-voucher-label class="font-mono text-sm font-bold text-[var(--waqtu-gold)]">WAQTU299</span>
-            <span class="text-xs text-[var(--waqtu-muted)]">&rarr; $2.99</span>
-          </button>
-
           <h1 class="font-display max-w-3xl text-4xl font-semibold leading-[1.1] tracking-tight text-[var(--waqtu-text)] sm:text-5xl md:text-[3.5rem] md:leading-[1.08]">
             Prayer Times in Your Mac Menu Bar
           </h1>
@@ -220,9 +213,8 @@ const trust = ["No ads", "No tracking", "Works offline", "macOS 12+", "30-day re
           </p>
 
           <div class="animate-fade-up mt-10 flex flex-wrap items-center justify-center gap-4" style="animation-delay:240ms; opacity:0;">
-            <a href="#pricing" class="neu-btn group inline-flex items-center gap-2 px-7 py-3.5 font-medium text-[var(--waqtu-bg)]" data-s-event="cta_click" data-s-event-props='{"location":"hero","text":"Get Waqtu — $2.99"}'>
-              <span>Get Waqtu —</span>
-              <span class="font-mono font-bold">$2.99</span>
+            <a href="#download" class="neu-btn group inline-flex items-center gap-2 px-7 py-3.5 font-medium text-[var(--waqtu-bg)]" data-s-event="cta_click" data-s-event-props='{"location":"hero","text":"Try Waqtu free"}'>
+              <span>Try Waqtu free</span>
               <svg class="h-4 w-4 transition-transform group-hover:translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M19 12l-7 7-7-7" /></svg>
             </a>
             <a href="#features" class="text-[var(--waqtu-muted)] transition-colors hover:text-[var(--waqtu-text)]" data-s-event="nav_click" data-s-event-props='{"destination":"features","location":"hero"}'>See how it works</a>
@@ -340,7 +332,7 @@ const trust = ["No ads", "No tracking", "Works offline", "macOS 12+", "30-day re
                 <tr><td>Pomodoro with murattal &amp; dzikir</td><td class="waqtu-col"><span class="check">&#10003;</span></td><td><span class="dash">&mdash;</span></td><td><span class="dash">&mdash;</span></td><td><span class="dash">&mdash;</span></td></tr>
                 <tr><td>Works offline</td><td class="waqtu-col"><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td><td><span class="dash">&mdash;</span></td></tr>
                 <tr><td>No ads or tracking</td><td class="waqtu-col"><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td><td><span class="check">&#10003;</span></td></tr>
-                <tr><td>Price</td><td class="waqtu-col price-label">$2.99</td><td>$3.99</td><td>Free</td><td>Free</td></tr>
+                <tr><td>Price</td><td class="waqtu-col price-label">Free trial, then Rp 29.000/mo</td><td>Free / $3.99</td><td>Free</td><td>Free</td></tr>
               </tbody>
             </table>
           </div>
@@ -375,33 +367,19 @@ const trust = ["No ads", "No tracking", "Works offline", "macOS 12+", "30-day re
       <!-- ===== PRICING ===== -->
       <section id="pricing" class="relative z-10 section-tint-1 px-6 py-24 sm:px-10 md:px-14 md:py-32">
         <div class="mx-auto max-w-lg">
-          <h2 class="font-display mb-12 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">One payment. Yours forever.</h2>
+          <h2 class="font-display mb-12 text-center text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">One subscription. Every device.</h2>
           <div class="neu-card p-8 sm:p-10">
-            <h3 class="font-display text-center text-lg font-semibold text-[var(--waqtu-text)]">Lifetime Access</h3>
-            <p class="mt-4 text-center text-sm text-[var(--waqtu-muted)]">No subscription. One payment, forever.</p>
-            <div class="mt-6 flex items-baseline justify-center gap-3">
-              <span class="font-display text-4xl font-bold text-[var(--waqtu-text)]">$9.99</span>
-              <span class="text-lg text-[var(--waqtu-muted)] line-through">$14.99</span>
+            <h3 class="font-display text-center text-lg font-semibold text-[var(--waqtu-text)]">Waqtu Premium</h3>
+            <p class="mt-4 text-center text-sm text-[var(--waqtu-muted)]">One subscription on your Waqtu account unlocks Mac, iPhone and Android.</p>
+            <div class="mt-6 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-1">
+              <span class="font-display text-4xl font-bold text-[var(--waqtu-text)]">Rp 29.000</span>
+              <span class="text-lg text-[var(--waqtu-muted)]">/ month</span>
             </div>
-            <p class="mt-3 text-center text-xs text-[var(--waqtu-muted)]">30-day money-back guarantee &middot; Works offline &middot; No tracking</p>
+            <p class="mt-2 text-center text-sm text-[var(--waqtu-muted)]">or <span class="font-semibold text-[var(--waqtu-gold)]">Rp 249.000 / year</span></p>
 
-            <div class="mt-6">
-              <div class="voucher-box rounded-lg">
-                <div class="voucher-content">
-                  <span class="voucher-label">CODE</span>
-                  <div class="voucher-dash"></div>
-                  <span class="voucher-code">WAQTU299</span>
-                  <div class="voucher-dash"></div>
-                  <button data-voucher data-voucher-text="Copy" class="voucher-copy-btn" data-s-event="voucher_copy" data-s-event-props='{"location":"pricing_card","code":"WAQTU299"}'>
-                    <span data-voucher-label>Copy</span>
-                  </button>
-                </div>
-              </div>
-              <p class="mt-3 voucher-note">Enter at checkout — price drops to <span class="font-semibold text-[var(--waqtu-gold)]">$2.99</span></p>
-            </div>
-
-            <ul class="mt-8 space-y-3">
-              {pricingFeatures.map((feature) => (
+            <p class="mt-8 text-sm font-medium text-[var(--waqtu-text)]">Premium</p>
+            <ul class="mt-3 space-y-3">
+              {premiumFeatures.map((feature) => (
                 <li class="flex items-start gap-2">
                   <svg class="mt-0.5 h-4 w-4 shrink-0 text-[var(--waqtu-primary)]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
                   <span class="text-sm text-[var(--waqtu-muted)]">{feature}</span>
@@ -409,12 +387,23 @@ const trust = ["No ads", "No tracking", "Works offline", "macOS 12+", "30-day re
               ))}
             </ul>
 
-            <button data-checkout="PRO_LIFETIME" class="neu-btn mt-8 block w-full px-6 py-3.5 text-center font-medium text-[var(--waqtu-bg)] disabled:opacity-50" data-s-event="cta_click" data-s-event-props='{"location":"pricing","text":"Get lifetime access — $2.99","tier":"lifetime"}'>
-              <span data-checkout-text>Get lifetime access — <span class="font-mono font-bold">$2.99</span></span>
-            </button>
+            <p class="mt-6 text-sm font-medium text-[var(--waqtu-text)]">Free for everyone</p>
+            <ul class="mt-3 space-y-3">
+              {freeFeatures.map((feature) => (
+                <li class="flex items-start gap-2">
+                  <svg class="mt-0.5 h-4 w-4 shrink-0 text-[var(--waqtu-muted)]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                  <span class="text-sm text-[var(--waqtu-muted)]">{feature}</span>
+                </li>
+              ))}
+            </ul>
 
-            <p class="mt-3 text-center text-xs text-[var(--waqtu-muted)]">You&rsquo;ll enter your email at checkout. Your license key will be sent there.</p>
-            <p class="mt-4 text-center text-sm text-[var(--waqtu-muted)]">Not sure? <a href="#download" class="text-[var(--waqtu-primary)] hover:underline">Try free first</a></p>
+            <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a href={APP_STORE_URL} target="_blank" rel="noopener" class="neu-btn block flex-1 px-6 py-3.5 text-center font-medium text-[var(--waqtu-bg)]" data-s-event="store_click" data-s-event-props='{"location":"pricing","store":"app_store"}'>App Store (iPhone)</a>
+              <a href={PLAY_STORE_URL} target="_blank" rel="noopener" class="neu-btn-secondary block flex-1 px-6 py-3.5 text-center font-medium text-[var(--waqtu-text)]" data-s-event="store_click" data-s-event-props='{"location":"pricing","store":"google_play"}'>Google Play (Android)</a>
+            </div>
+
+            <p class="mt-4 text-center text-xs text-[var(--waqtu-muted)]">On the Mac: download Waqtu below and try it free. For Premium, sign in with your Waqtu account after subscribing on iPhone or Android, or subscribe in the Mac App Store edition. Billing and refunds are handled by Apple or Google.</p>
+            <p class="mt-4 text-center text-sm text-[var(--waqtu-muted)]"><a href="#download" class="text-[var(--waqtu-primary)] hover:underline">Try free on your Mac</a></p>
           </div>
         </div>
       </section>
@@ -460,10 +449,6 @@ const trust = ["No ads", "No tracking", "Works offline", "macOS 12+", "30-day re
       <!-- ===== DOWNLOAD CTA ===== -->
       <section id="download" class="relative z-10 section-tint-1 px-6 py-24 sm:px-10 md:px-14 md:py-32">
         <div class="neu-card mx-auto max-w-2xl rounded-[24px] p-10 text-center sm:p-14">
-          <div id="checkout-success" data-show="false" class="checkout-success hidden mb-6 flex items-center justify-center gap-2 rounded-2xl px-4 py-3 sm:mb-8">
-            <svg class="h-5 w-5 text-[var(--waqtu-primary)]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
-            <p class="text-sm font-medium text-[var(--waqtu-text)]">Purchase confirmed. Check your email for your license key, then download below.</p>
-          </div>
           <h2 class="font-display text-2xl font-semibold tracking-tight text-[var(--waqtu-text)] sm:text-3xl">Start today</h2>
           <p class="mt-3 text-[var(--waqtu-muted)]">Free to try. No account needed. macOS 12+.</p>
           <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4">
@@ -471,8 +456,8 @@ const trust = ["No ads", "No tracking", "Works offline", "macOS 12+", "30-day re
               Download Waqtu
               <svg class="h-4 w-4 transition-transform group-hover:translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
             </a>
-            <a href="#pricing" class="neu-btn-secondary inline-flex items-center gap-2 px-8 py-4 font-medium text-[var(--waqtu-text)] sm:px-10" data-s-event="cta_click" data-s-event-props='{"location":"download_cta","text":"Lifetime access — $2.99"}'>
-              Lifetime access — <span class="font-mono font-bold">$2.99</span>
+            <a href="#pricing" class="neu-btn-secondary inline-flex items-center gap-2 px-8 py-4 font-medium text-[var(--waqtu-text)] sm:px-10" data-s-event="cta_click" data-s-event-props='{"location":"download_cta","text":"See Premium"}'>
+              See Premium
             </a>
           </div>
         </div>
@@ -554,11 +539,5 @@ const trust = ["No ads", "No tracking", "Works offline", "macOS 12+", "30-day re
     opacity: 1;
     pointer-events: auto;
     display: flex;
-  }
-
-  /* checkout success banner */
-  .checkout-success[data-show="true"] {
-    display: flex !important;
-    background: linear-gradient(145deg, rgba(74, 139, 111, 0.15), rgba(74, 139, 111, 0.08));
   }
 </style>

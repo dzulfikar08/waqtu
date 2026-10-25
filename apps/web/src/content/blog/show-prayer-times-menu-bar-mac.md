@@ -48,7 +48,7 @@ If your team uses Slack, add a Slack User OAuth Token in Settings &rarr; Slack. 
 
 ## You&rsquo;re set
 
-That&rsquo;s it. You now have a live prayer countdown in your menu bar, your calendar protected during salah, and — if you enabled it — a Slack status that tells your team you&rsquo;re praying. No ads, no tracking, no subscription.
+That&rsquo;s it. You now have a live prayer countdown in your menu bar, your calendar protected during salah, and — if you enabled it — a Slack status that tells your team you&rsquo;re praying. No ads, no tracking.
 
 ## Frequently asked questions
 
@@ -56,7 +56,7 @@ That&rsquo;s it. You now have a live prayer countdown in your menu bar, your cal
 
 **Will it drain my battery?** No. The menu bar countdown is lightweight and updates quietly in the background.
 
-**Is there a cost?** Waqtu is free to try. When you&rsquo;re ready, use code `WAQTU299` for lifetime access at $2.99.
+**Is there a cost?** Waqtu is free to try. Waqtu Premium is Rp 29.000/month or Rp 249.000/year, and one subscription on your Waqtu account covers Mac, iPhone and Android.
 
 <div class="neu-card p-6 mt-10">
   <p class="font-medium text-[var(--waqtu-text)]">Get prayer times in your menu bar</p>
