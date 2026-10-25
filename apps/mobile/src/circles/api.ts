@@ -39,6 +39,8 @@ export interface CirclesApiOptions {
   fetchImpl?: typeof fetch;
   /** Reads a local file (a recorded voice note) as a body. */
   readBlob?: (uri: string) => Promise<Blob>;
+  /** Called when the server refuses a join or post with 403 `premium_required` (opens the paywall). */
+  onPremiumRequired?: () => void;
 }
 
 export type CirclesApi = ReturnType<typeof createCirclesApi>;
@@ -69,6 +71,7 @@ export function createCirclesApi(options: CirclesApiOptions) {
     } catch {
       // Not JSON; the status is enough.
     }
+    if (res.status === 403 && code === "premium_required") options.onPremiumRequired?.();
     const retry = Number(res.headers.get("retry-after"));
     throw new CirclesHttpError(
       res.status,

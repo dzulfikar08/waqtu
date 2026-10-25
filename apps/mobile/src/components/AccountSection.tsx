@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import { Alert, Text } from "react-native";
@@ -7,6 +8,7 @@ import { appleSignInAvailable, signInWithApple, signInWithGoogle } from "@/auth/
 import { Row, Section } from "@/components/ui";
 import { useSyncState } from "@/hooks/useSyncState";
 import { useTranslation } from "@/i18n";
+import { usePremium } from "@/premium/usePremium";
 import { syncNow } from "@/sync/run";
 import { forgetAccount } from "@/sync/sqliteStore";
 import { spacing, useTheme } from "@/theme";
@@ -18,6 +20,8 @@ export function AccountSection({ client }: { client: AuthClient }) {
   const theme = useTheme();
   const sync = useSyncState();
   const { data: session } = client.useSession();
+  const { premium } = usePremium();
+  const router = useRouter();
   const [apple, setApple] = useState(false);
   const [failed, setFailed] = useState(false);
   const [deleteError, setDeleteError] = useState<"stale" | "failed" | null>(null);
@@ -79,11 +83,15 @@ export function AccountSection({ client }: { client: AuthClient }) {
             onPress={() => {}}
             disabled
           />
-          <Row
-            label={`${t("sync.now")} · ${syncLabel()}`}
-            onPress={() => void syncNow(db, client, session.user.id, true)}
-            disabled={sync.status === "syncing"}
-          />
+          {premium ? (
+            <Row
+              label={`${t("sync.now")} · ${syncLabel()}`}
+              onPress={() => void syncNow(db, client, session.user.id, true)}
+              disabled={sync.status === "syncing"}
+            />
+          ) : (
+            <Row label={t("sync.premium")} onPress={() => router.push("/premium")} />
+          )}
           <Row label={t("settings.signOut")} onPress={() => void run(() => client.signOut())} />
           <Row label={t("settings.deleteAccount")} onPress={confirmDelete} destructive />
         </>

@@ -125,6 +125,7 @@ export type ErrorKey =
   | "suspended"
   | "summaryOptIn"
   | "tooLarge"
+  | "premiumRequired"
   | "network"
   | "generic";
 
@@ -150,6 +151,8 @@ export function errorKey(status: number | null, code: string | null): ErrorKey {
       return "suspended";
     case "summary_opt_in_required":
       return "summaryOptIn";
+    case "premium_required":
+      return "premiumRequired";
     case "payload_too_large":
       return "tooLarge";
     case "not_found":

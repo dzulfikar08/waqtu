@@ -1,7 +1,9 @@
 import { env } from "cloudflare:workers";
 import { beforeEach, describe, expect, test } from "vitest";
 
+import { writeEntitlement } from "../src/billing/entitlement";
 import { sweepOrphanUploads } from "../src/circles/cleanup";
+import { handleCircles } from "../src/circles/router";
 import { api, createUser, type TestUser } from "./helpers";
 
 const WIPE = [
@@ -1100,5 +1102,80 @@ describe("media cleanup", () => {
     );
     await Promise.all(waits);
     expect(await env.CIRCLE_MEDIA.head(stale.key)).toBeNull();
+  });
+});
+
+describe("premium gate (CIRCLES_REQUIRES_PREMIUM=true)", () => {
+  const premiumEnv = { ...env, CIRCLES_REQUIRES_PREMIUM: "true" };
+
+  const gated = async (user: TestUser, method: string, path: string, json?: unknown) => {
+    const res = await handleCircles(
+      new Request(`http://localhost/v1/circles${path}`, {
+        method,
+        headers: { "content-type": "application/json" },
+        body: json === undefined ? undefined : JSON.stringify(json),
+      }),
+      premiumEnv,
+      user.id,
+      new URL(`http://localhost/v1/circles${path}`),
+    );
+    const text = await res.text();
+    return { status: res.status, body: text ? JSON.parse(text) : null };
+  };
+
+  const subscribe = (user: TestUser) =>
+    writeEntitlement(
+      env.APP_DB,
+      {
+        userId: user.id,
+        source: "apple",
+        externalId: `orig-${crypto.randomUUID()}`,
+        productId: "dat.waqtu.premium.monthly",
+        environment: "production",
+        expiresAt: Date.now() + 30 * 86_400_000,
+        signedAt: Date.now(),
+      },
+      Date.now(),
+    );
+
+  test("config reports the flag", async () => {
+    const user = await member("ikhwan");
+    expect((await gated(user, "GET", "/config")).body.requiresPremium).toBe(true);
+  });
+
+  test("free accounts cannot join, create or post, but can still read", async () => {
+    const owner = await member("ikhwan");
+    // Joined while circles were free.
+    const circle = await privateCircle(owner);
+    const premiumRequired = { status: 403, body: { error: "premium_required" } };
+
+    expect(await gated(owner, "POST", "/join")).toEqual(premiumRequired);
+    expect(await gated(owner, "POST", "/join-private", { code: circle.inviteCode })).toEqual(
+      premiumRequired,
+    );
+    expect(await gated(owner, "POST", "/private", { name: "Lagi" })).toEqual(premiumRequired);
+    expect(await gated(owner, "POST", `/${circle.id}/posts`, { text: "salam" })).toEqual(
+      premiumRequired,
+    );
+    expect(await gated(owner, "POST", `/${circle.id}/summary`, {})).toEqual(premiumRequired);
+    expect(await gated(owner, "PUT", `/${circle.id}/media`)).toEqual(premiumRequired);
+
+    expect((await gated(owner, "GET", "")).status).toBe(200);
+    expect((await gated(owner, "GET", `/${circle.id}/feed`)).status).toBe(200);
+  });
+
+  test("premium accounts join and post as usual", async () => {
+    const user = await member("akhwat");
+    await subscribe(user);
+    const created = await gated(user, "POST", "/private", { name: "Premium" });
+    expect(created.status).toBe(201);
+    const posted = await gated(user, "POST", `/${created.body.circle.id}/posts`, { text: "salam" });
+    expect(posted.status).toBe(201);
+    expect((await gated(user, "POST", "/join")).status).toBeLessThan(300);
+  });
+
+  test("with the flag off, free accounts are not checked", async () => {
+    const user = await member("ikhwan");
+    expect((await join(user)).status).toBeLessThan(300);
   });
 });
