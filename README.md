@@ -48,6 +48,14 @@ GitHub Actions builds everything; no local Mac is needed.
 - **Release macOS** (`release-macos.yml`, manual): runs `apps/apple/scripts/release.sh` → Developer ID
   sign, notarize, DMG, Sparkle sign, upload to R2, record in D1. Secrets are listed at the top of the
   workflow and live in the `release` environment.
+- **Release Android** (`release-android.yml`, manual): `eas build --local` → signed AAB (optional Play upload to
+  internal/alpha/beta), a universal APK, and a small `waqtu-android-arm64-*` artifact of split APKs for sideloading a
+  test phone with `adb install-multiple *.apk`.
+- **Release iOS** (`release-ios.yml`, manual): signed IPA, optional TestFlight upload.
+- **OTA update** (`ota-update.yml`, manual): publishes the JS bundle to EAS Update channel `production`. Installed
+  release builds download it on launch and run it on the next launch. Only JS/asset changes: the `fingerprint`
+  runtime version means a native change is never offered to an older build; ship those with the release workflows.
+  `gh workflow run ota-update.yml -f message="..."`.
 
 ## Premium
 
