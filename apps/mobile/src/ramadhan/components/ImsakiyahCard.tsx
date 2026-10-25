@@ -67,7 +67,7 @@ export function ImsakiyahCard({ ctx, config }: { ctx: RamadhanContext; config: P
   };
 
   return (
-    <Section title={t("ramadhan.imsakiyah.title")} icon="calendar-outline">
+    <Section title={t("ramadhan.imsakiyah.title")} icon="calendar-outline" hue="prayer">
       <Panel>
         <ImsakiyahTable
           ref={captureTarget}

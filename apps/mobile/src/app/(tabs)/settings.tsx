@@ -51,10 +51,11 @@ export default function SettingsScreen() {
 
   return (
     <Screen title={t("tabs.settings")}>
-      <Section title={t("settings.language")} icon="language">
+      <Section title={t("settings.language")} icon="language" hue="week">
         <Row
           label={t("settings.languageAuto")}
           icon="phone-portrait-outline"
+          hue="week"
           selected={pref === "auto"}
           onPress={() => choose("auto")}
         />
@@ -63,6 +64,7 @@ export default function SettingsScreen() {
             key={locale}
             label={LOCALE_NAMES[locale]}
             icon="globe-outline"
+            hue="week"
             selected={pref === locale}
             onPress={() => void choose(locale)}
           />
@@ -70,11 +72,12 @@ export default function SettingsScreen() {
       </Section>
       <PrayerSettingsSection />
       <StreakSettingsSection />
-      <Section title={t("settings.notifications")} icon="notifications">
+      <Section title={t("settings.notifications")} icon="notifications" hue="halaqah">
         {notifications === "granted" ? (
           <Row
             label={t("settings.notificationsGranted")}
             icon="notifications-outline"
+            hue="halaqah"
             selected
             onPress={() => {}}
             disabled
@@ -83,6 +86,7 @@ export default function SettingsScreen() {
           <Row
             label={t("settings.notificationsOpenSettings")}
             icon="notifications-off-outline"
+            hue="halaqah"
             chevron
             onPress={() => void Linking.openSettings()}
           />
@@ -90,6 +94,7 @@ export default function SettingsScreen() {
           <Row
             label={t("settings.notificationsAsk")}
             icon="notifications-outline"
+            hue="halaqah"
             onPress={() => void askNotifications()}
           />
         )}
@@ -97,33 +102,37 @@ export default function SettingsScreen() {
           <Row
             label={t("settings.exactAlarm")}
             icon="alarm-outline"
+            hue="halaqah"
             chevron
             onPress={openExactAlarmSettings}
           />
         )}
       </Section>
-      <Section title={t("ramadhan.tab")} icon="moon">
+      <Section title={t("ramadhan.tab")} icon="moon" hue="ramadhan">
         <Row
           label={t("ramadhan.settingsRow")}
           icon="moon-outline"
+          hue="ramadhan"
           chevron
           onPress={() => router.push("/ramadhan")}
         />
       </Section>
-      <Section title={t("hafalan.title")} icon="book">
+      <Section title={t("hafalan.title")} icon="book" hue="hafalan">
         <Row
           label={t("hafalan.settingsRow")}
           icon="book-outline"
+          hue="hafalan"
           chevron
           onPress={() => router.push("/hafalan")}
         />
       </Section>
       {authClient ? <PremiumSection /> : null}
       {authClient ? <AccountSection client={authClient} /> : null}
-      <Section title={t("about.licences")} icon="information-circle">
+      <Section title={t("about.licences")} icon="information-circle" hue="neutral">
         <Row
           label={t("about.row")}
           icon="document-text-outline"
+          hue="neutral"
           chevron
           onPress={() => router.push("/about")}
         />

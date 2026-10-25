@@ -11,9 +11,10 @@ export function HalaqahTodayRow() {
   const today = useHalaqahToday();
   if (today?.position.kind !== "during") return null;
   return (
-    <Section title={t("halaqah.title")} icon="people-circle-outline">
+    <Section title={t("halaqah.title")} icon="people-circle-outline" hue="halaqah">
       <Row
         icon="play-circle"
+        hue="halaqah"
         chevron
         label={`${t("halaqah.todayTitle")} · ${t("halaqah.dayN", { day: today.position.day })}`}
         onPress={() => router.push("/halaqah")}

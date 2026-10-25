@@ -1,10 +1,10 @@
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Card, IconChip, SectionTitle } from "@/components/ui";
+import { Card, IconChip, ProgressTrack, SectionTitle } from "@/components/ui";
 import { useTranslation } from "@/i18n";
-import { Button, ProgressBar } from "@/ramadhan/components/fields";
-import { spacing, tabular, typography, useTheme } from "@/theme";
+import { Button } from "@/ramadhan/components/fields";
+import { hueColors, spacing, tabular, typography, useTheme } from "@/theme";
 import { dayOf } from "../program";
 import { useHalaqahProgress, useHalaqahToday } from "../useHalaqah";
 import { useLang } from "./SessionView";
@@ -17,6 +17,7 @@ export function HalaqahCard() {
   const router = useRouter();
   const { t } = useTranslation();
   const theme = useTheme();
+  const violet = hueColors(theme, "halaqah");
   const lang = useLang();
   const today = useHalaqahToday();
   const done = useHalaqahProgress(today?.program.id ?? "");
@@ -26,19 +27,19 @@ export function HalaqahCard() {
   const day = position.kind === "during" ? dayOf(program, position.day) : null;
   return (
     <View style={styles.section}>
-      <SectionTitle title={t("halaqah.title")} icon="school-outline" />
-      <Card>
+      <SectionTitle title={t("halaqah.title")} icon="school-outline" hue="halaqah" />
+      <Card hue="halaqah">
         <View style={styles.head}>
           <IconChip
             icon={day ? "play" : "school"}
             size={48}
-            color={theme.gold}
-            background={theme.goldSoft}
+            color={violet.base}
+            background={violet.soft}
           />
           <View style={styles.grow}>
             {day ? (
               <>
-                <Text style={[typography.overline, tabular, { color: theme.accent }]}>
+                <Text style={[typography.overline, tabular, { color: violet.base }]}>
                   {t("halaqah.dayN", { day: day.day })}
                 </Text>
                 <Text style={[typography.headline, { color: theme.text }]}>{day.title[lang]}</Text>
@@ -57,7 +58,11 @@ export function HalaqahCard() {
         </View>
         {day ? (
           <View style={styles.progress}>
-            <ProgressBar fraction={done.size / program.totalDays} />
+            <ProgressTrack
+              value={done.size / program.totalDays}
+              fill={violet.base}
+              track={violet.soft}
+            />
             <Text style={[typography.footnote, tabular, { color: theme.muted }]}>
               {t("halaqah.progress", { done: done.size, total: program.totalDays })}
             </Text>

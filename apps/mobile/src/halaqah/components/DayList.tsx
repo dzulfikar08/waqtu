@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Section } from "@/components/ui";
 import { useTranslation } from "@/i18n";
-import { spacing, tabular, typography, useTheme } from "@/theme";
+import { hueColors, spacing, tabular, typography, useTheme } from "@/theme";
 import type { Program } from "../program";
 import { useLang } from "./SessionView";
 
@@ -12,7 +12,7 @@ const BADGE = 36;
 
 /**
  * Every program day grouped by week; any of them opens. Each row leads with the day number in a
- * round badge: filled accent once completed, ringed for today, a soft wash otherwise. Missed days
+ * round violet badge: filled once completed, ringed for today, a soft wash otherwise. Missed days
  * carry nothing.
  */
 export function DayList({
@@ -28,11 +28,14 @@ export function DayList({
   const router = useRouter();
   const { t } = useTranslation();
   const theme = useTheme();
+  const violet = hueColors(theme, "halaqah");
+  /** The day number on a filled violet badge: white on the deep light-mode violet, dark on the pale dark-mode one. */
+  const onViolet = theme.dark ? theme.background : "#FFFFFF";
   const lang = useLang();
   return (
     <>
       {program.phases.map((phase) => (
-        <Section key={phase.id} title={phase.title[lang]} icon="calendar-outline">
+        <Section key={phase.id} title={phase.title[lang]} icon="calendar-outline" hue="halaqah">
           {program.days
             .filter((d) => d.day >= phase.from && d.day <= phase.to)
             .map((d) => {
@@ -51,7 +54,7 @@ export function DayList({
                     styles.row,
                     {
                       borderColor: theme.separator,
-                      backgroundColor: pressed ? theme.surfaceAlt : "transparent",
+                      backgroundColor: pressed ? violet.soft : "transparent",
                     },
                   ]}
                 >
@@ -59,8 +62,8 @@ export function DayList({
                     style={[
                       styles.badge,
                       {
-                        backgroundColor: finished ? theme.accent : theme.accentSoft,
-                        borderColor: isToday ? theme.accent : "transparent",
+                        backgroundColor: finished ? violet.base : violet.soft,
+                        borderColor: isToday ? violet.base : "transparent",
                       },
                     ]}
                   >
@@ -68,7 +71,7 @@ export function DayList({
                       style={[
                         styles.badgeNumber,
                         tabular,
-                        { color: finished ? theme.accentText : theme.accent },
+                        { color: finished ? onViolet : violet.base },
                       ]}
                     >
                       {d.day}
@@ -79,7 +82,7 @@ export function DayList({
                       style={[
                         typography.caption,
                         styles.dayLine,
-                        { color: isToday ? theme.accent : theme.muted },
+                        { color: isToday ? violet.base : theme.muted },
                       ]}
                     >
                       {dayLine}

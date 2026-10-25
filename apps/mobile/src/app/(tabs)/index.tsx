@@ -4,7 +4,7 @@ import { useEffect, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Checklist } from "@/components/today/Checklist";
-import { LocationPrompt, NextPrayerCard, PrayerTimesList } from "@/components/today/PrayerCards";
+import { LocationPrompt, NextPrayerHero, PrayerTimesList } from "@/components/today/PrayerCards";
 import { StreakCard } from "@/components/today/StreakCard";
 import { Screen, Section, SectionTitle } from "@/components/ui";
 import { HafalanCard } from "@/hafalan/components/HafalanCard";
@@ -12,10 +12,10 @@ import { HalaqahTodayRow } from "@/halaqah/components/HalaqahTodayRow";
 import { useMutabaah, useNow } from "@/hooks/useMutabaah";
 import { formatHijri } from "@/lib/hijri";
 import { useTranslation } from "@/i18n";
-import { FLAG } from "@/mutabaah/items";
 import { refreshLocationIfStale } from "@/prayer/location";
+import { periodAt, periodForHour } from "@/prayer/period";
 import { nextSlot, timesFor } from "@/prayer/schedule";
-import { spacing, tabular, typography, useTheme } from "@/theme";
+import { prayerTone, skyWash, spacing, typography, useTheme } from "@/theme";
 
 const MS_DAY = 86_400_000;
 
@@ -42,6 +42,11 @@ export default function TodayScreen() {
     () => (settings && location ? nextSlot(settings, location, now) : null),
     [settings, location, now],
   );
+  const span = useMemo(
+    () => (settings && location ? periodAt(settings, location, now) : null),
+    [settings, location, now],
+  );
+  const period = span?.period ?? periodForHour(now.getHours());
 
   const gregorian = new Intl.DateTimeFormat(i18n.language, {
     weekday: "long",
@@ -53,10 +58,11 @@ export default function TodayScreen() {
     i18n.language,
   );
 
+  const tone = prayerTone(period, theme.dark);
   const eyebrow = location?.name ? (
-    <View style={styles.eyebrow}>
-      <Ionicons name="location" size={14} color={theme.accent} />
-      <Text style={[typography.subhead, { color: theme.muted, fontWeight: "600" }]}>
+    <View style={[styles.place, { backgroundColor: `${tone}${theme.dark ? "2E" : "1F"}` }]}>
+      <Ionicons name="location" size={13} color={tone} />
+      <Text style={[typography.footnote, { color: theme.text, fontWeight: "700" }]}>
         {location.name}
       </Text>
     </View>
@@ -67,26 +73,22 @@ export default function TodayScreen() {
       <Text style={[typography.callout, { color: theme.gold, fontWeight: "600" }]}>{hijri}</Text>
     </View>
   ) : null;
-
-  const done = model
-    ? model.items.filter((item) => {
-        const value = model.todayEntries.get(item.id) ?? 0;
-        return item.kind === "fardh" ? (value & FLAG.DONE) !== 0 : value > 0;
-      }).length
-    : 0;
+  const backdrop = skyWash(period, theme.dark);
 
   return (
-    <Screen title={gregorian} eyebrow={eyebrow} caption={caption}>
+    <Screen title={gregorian} eyebrow={eyebrow} caption={caption} backdrop={backdrop}>
       {!model ? (
         <Text style={{ color: theme.muted }}>{t("today.loading")}</Text>
       ) : (
         <>
           {location ? (
             <>
-              {next ? <NextPrayerCard slot={next} now={now} timeZone={location.timeZone} /> : null}
+              {next ? (
+                <NextPrayerHero slot={next} span={span} timeZone={location.timeZone} />
+              ) : null}
               {times ? (
                 <View style={styles.block}>
-                  <SectionTitle title={t("today.times")} icon="time-outline" />
+                  <SectionTitle title={t("today.times")} icon="time-outline" hue="prayer" />
                   <PrayerTimesList
                     times={times}
                     highlight={next && next.day === model.today ? next.prayer : null}
@@ -96,24 +98,12 @@ export default function TodayScreen() {
               ) : null}
             </>
           ) : (
-            <LocationPrompt />
+            <LocationPrompt period={period} />
           )}
-          <StreakCard streak={model.streak} />
+          <StreakCard streak={model.streak} days={model.week.days} today={model.today} />
           <HalaqahTodayRow />
           <HafalanCard />
-          <Section
-            title={t("today.checklist")}
-            icon="checkbox-outline"
-            right={
-              model.items.length > 0 ? (
-                <Text
-                  style={[typography.footnote, tabular, { color: theme.accent, fontWeight: "700" }]}
-                >
-                  {done}/{model.items.length}
-                </Text>
-              ) : null
-            }
-          >
+          <Section title={t("today.checklist")} icon="checkbox-outline" hue="brand">
             <Checklist
               items={model.items}
               day={model.today}
@@ -129,5 +119,15 @@ export default function TodayScreen() {
 
 const styles = StyleSheet.create({
   eyebrow: { flexDirection: "row", alignItems: "center", gap: 5, marginVertical: 2 },
+  place: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    marginBottom: spacing.xs,
+  },
   block: { gap: spacing.sm },
 });

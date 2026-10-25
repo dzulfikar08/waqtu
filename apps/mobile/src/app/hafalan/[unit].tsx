@@ -20,7 +20,7 @@ import type { CheckView } from "@/recitation/check";
 import { RecitationCheck } from "@/recitation/components/RecitationCheck";
 import { useRecitationDev } from "@/recitation/useDevSettings";
 import { IconChip, PressableScale, Section, type IconName } from "@/components/ui";
-import { HIT, radius, spacing, tabular, typography, useTheme } from "@/theme";
+import { HIT, hueColors, radius, spacing, tabular, typography, useTheme, type Hue } from "@/theme";
 
 const FONT_SIZE = 30;
 const MODES: readonly TestMode[] = ["show", "hide", "letters"];
@@ -29,6 +29,11 @@ const MODE_LABEL = {
   hide: "hafalan.modeHide",
   letters: "hafalan.modeLetters",
 } as const;
+
+/** A grade's colour: amber for a forgotten unit (0–2), blue for a shaky pass (3), the brand green for a sound one. */
+function gradeHue(grade: number): Hue {
+  return grade <= 2 ? "streak" : grade === 3 ? "prayer" : "brand";
+}
 
 /** One unit: the text with a hide-and-reveal self-test, the self-grade, and a recitation recording. */
 export default function UnitScreen() {
@@ -97,6 +102,15 @@ export default function UnitScreen() {
         : role === "done"
           ? "checkmark-done"
           : "time-outline";
+  const roleHue: Hue =
+    role === "sabaq"
+      ? "hafalan"
+      : role === "murojaah"
+        ? "week"
+        : role === "done"
+          ? "brand"
+          : "neutral";
+  const roleTone = hueColors(theme, roleHue);
 
   return (
     <ScrollView
@@ -104,7 +118,7 @@ export default function UnitScreen() {
       contentContainerStyle={[styles.content, { paddingBottom: spacing.xl + insets.bottom }]}
     >
       <View style={styles.header}>
-        <IconChip icon={roleIcon} size={44} />
+        <IconChip icon={roleIcon} size={44} color={roleTone.base} background={roleTone.soft} />
         <View style={styles.grow}>
           <Text style={[typography.title, { color: theme.text }]}>{unitLabel(unit)}</Text>
           <Text style={[typography.subhead, tabular, { color: theme.muted }]}>
@@ -134,7 +148,7 @@ export default function UnitScreen() {
         onAyahPress={recording?.marks.length ? (ayah) => seekRef.current?.(ayah) : undefined}
       />
 
-      <Section title={t("hafalan.test")} icon="eye-off-outline">
+      <Section title={t("hafalan.test")} icon="eye-off-outline" hue="hafalan">
         <View style={styles.panel}>
           <View style={[styles.segments, { backgroundColor: theme.surfaceAlt }]}>
             {MODES.map((m) => (
@@ -191,7 +205,7 @@ export default function UnitScreen() {
         </View>
       </Section>
 
-      <Section title={t("hafalan.grade")} icon="ribbon-outline">
+      <Section title={t("hafalan.grade")} icon="ribbon-outline" hue="hafalan">
         <View style={styles.panel}>
           {graded ? (
             <>
@@ -229,7 +243,7 @@ export default function UnitScreen() {
               <Hint>{gradable ? t("hafalan.gradeHint") : t("hafalan.unitDone")}</Hint>
               <View style={styles.grades}>
                 {([0, 1, 2, 3, 4, 5] as const).map((g) => {
-                  const good = g >= 3;
+                  const tone = hueColors(theme, gradeHue(g));
                   return (
                     <PressableScale
                       key={g}
@@ -241,20 +255,12 @@ export default function UnitScreen() {
                       style={[
                         styles.gradeCell,
                         {
-                          backgroundColor: good ? theme.accentSoft : theme.surfaceAlt,
-                          borderColor: good ? theme.accent : theme.border,
+                          backgroundColor: tone.soft,
+                          borderColor: tone.base,
                         },
                       ]}
                     >
-                      <Text
-                        style={[
-                          styles.gradeFigure,
-                          tabular,
-                          { color: good ? theme.accent : theme.text },
-                        ]}
-                      >
-                        {g}
-                      </Text>
+                      <Text style={[styles.gradeFigure, tabular, { color: tone.base }]}>{g}</Text>
                       <Text
                         numberOfLines={2}
                         style={[typography.caption, styles.gradeLabel, { color: theme.muted }]}
@@ -270,7 +276,7 @@ export default function UnitScreen() {
         </View>
       </Section>
 
-      <Section title={t("hafalan.recitation")} icon="mic-outline">
+      <Section title={t("hafalan.recitation")} icon="mic-outline" hue="hafalan">
         <View style={styles.panel}>
           <Recitation
             key={index}
@@ -283,7 +289,7 @@ export default function UnitScreen() {
         </View>
       </Section>
       {dev.enabled ? (
-        <Section title={t("recitation.title")} icon="pulse-outline">
+        <Section title={t("recitation.title")} icon="pulse-outline" hue="hafalan">
           <View style={styles.panel}>
             <RecitationCheck key={index} unit={unit} unitIndex={index} onView={setCheck} />
           </View>

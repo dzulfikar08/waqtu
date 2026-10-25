@@ -40,10 +40,10 @@ GitHub Actions builds everything; no local Mac is needed.
   unsigned `xcodebuild` of the macOS and iOS apps on `macos-latest`.
 - **Store screenshots** (`store-screenshots.yml`, manual): builds the phone app with `EXPO_PUBLIC_DEMO_MODE=1`
   (frozen clock, Jakarta, Ramadan day 5, demo data loaded by
-  `waqtu://demo?lang=id|en&to=today|week|ramadhan|circles|settings`), then Maestro
+  `waqtu://demo?lang=id|en&to=today|week|ramadhan|circles|settings`, `&loc=none` for no location), then Maestro
   (`apps/mobile/store/maestro/screens.yaml`) captures id + en screenshots (light theme) on Android emulators (Pixel 6,
   Pixel 7 Pro) and a 6.9" iPhone simulator. Each artifact also holds design review shots under `review/{dark,light}`
-  (the store screens in dark plus `review.yaml`: checklist, Circles, lower Settings). Output is the `screenshots-*`
+  (the store screens in dark plus `review.yaml`: Today without a location, checklist, Circles, lower Settings). Output is the `screenshots-*`
   artifacts. Store listing text lives in `apps/mobile/store/`. No secrets needed, and no other build sets the demo flag.
 - **Release macOS** (`release-macos.yml`, manual): runs `apps/apple/scripts/release.sh` → Developer ID
   sign, notarize, DMG, Sparkle sign, upload to R2, record in D1. Secrets are listed at the top of the

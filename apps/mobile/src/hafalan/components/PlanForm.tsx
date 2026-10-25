@@ -13,7 +13,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { Row, Section, type IconName } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { Button, Hint, NumberField, Panel } from "@/ramadhan/components/fields";
-import { radius, spacing, tabular, typography, useTheme } from "@/theme";
+import { hueColors, radius, spacing, tabular, typography, useTheme } from "@/theme";
 import { savePlan, planUnits } from "../db";
 import { pagesSpanned, targetFromInput } from "../format";
 import { removeRecordings } from "../recordings";
@@ -30,6 +30,7 @@ export function PlanForm({ today }: { today: IsoDay }) {
   const db = useSQLiteContext();
   const { t } = useTranslation();
   const theme = useTheme();
+  const hafalan = hueColors(theme, "hafalan");
   const [kind, setKind] = useState<HafalanTarget["kind"]>("juz");
   const [from, setFrom] = useState<number | null>(30);
   const [to, setTo] = useState<number | null>(null);
@@ -57,11 +58,12 @@ export function PlanForm({ today }: { today: IsoDay }) {
   };
 
   return (
-    <Section title={t("hafalan.newPlan")} icon="add-circle-outline">
+    <Section title={t("hafalan.newPlan")} icon="add-circle-outline" hue="hafalan">
       {KINDS.map((k) => (
         <Row
           key={k}
           icon={KIND_ICON[k]}
+          hue="hafalan"
           label={t(`hafalan.kind.${k}`)}
           selected={kind === k}
           onPress={() => {
@@ -84,8 +86,8 @@ export function PlanForm({ today }: { today: IsoDay }) {
           </View>
         ) : null}
         {preview && dayCount !== null ? (
-          <View style={[styles.preview, { backgroundColor: theme.surfaceAlt }]}>
-            <Text style={[typography.headline, tabular, { color: theme.accent }]}>
+          <View style={[styles.preview, { backgroundColor: hafalan.soft }]}>
+            <Text style={[typography.headline, tabular, { color: hafalan.base }]}>
               {t("hafalan.perDay", { count: Math.ceil(preview.units / dayCount) })}
             </Text>
             <Text style={[typography.subhead, tabular, { color: theme.text }]}>

@@ -73,7 +73,7 @@ export default function ItemsScreen() {
           {t("items.fardhNote")}
         </Text>
       </View>
-      <Section title={t("items.active")} icon="list">
+      <Section title={t("items.active")} icon="list" hue="brand">
         {items.map((item) => {
           const label = itemLabel(item, t);
           return (
@@ -99,7 +99,7 @@ export default function ItemsScreen() {
       </Section>
 
       {missingBuiltins(items).length > 0 ? (
-        <Section title={t("items.available")} icon="add-circle">
+        <Section title={t("items.available")} icon="add-circle" hue="brand">
           {missingBuiltins(items).map((item) => {
             const label = itemLabel(item, t);
             return (
@@ -114,7 +114,7 @@ export default function ItemsScreen() {
         </Section>
       ) : null}
 
-      <Section title={t("items.custom")} icon="create">
+      <Section title={t("items.custom")} icon="create" hue="neutral">
         <View style={styles.form}>
           <TextInput
             value={name}

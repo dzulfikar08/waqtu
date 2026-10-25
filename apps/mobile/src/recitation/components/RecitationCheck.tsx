@@ -5,12 +5,12 @@ import * as Network from "expo-network";
 import { useEffect, useRef, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 
-import { Row } from "@/components/ui";
+import { ProgressTrack, Row } from "@/components/ui";
 import { MicButton } from "@/hafalan/components/MicButton";
 import { formatSeconds } from "@/hafalan/format";
 import { useTranslation } from "@/i18n";
-import { Button, ButtonRow, Hint, ProgressBar } from "@/ramadhan/components/fields";
-import { radius, spacing, tabular, typography, useTheme } from "@/theme";
+import { Button, ButtonRow, Hint } from "@/ramadhan/components/fields";
+import { hueColors, radius, spacing, tabular, typography, useTheme } from "@/theme";
 import { checkId, checkRecitation, checkView, rangeOf, type CheckView } from "../check";
 import {
   addCheck,
@@ -58,6 +58,7 @@ export function RecitationCheck({
 }) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const hafalan = hueColors(theme, "hafalan");
   const dev = useRecitationDev();
   const model = MODELS[dev.model];
   const download = useModelState(dev.model);
@@ -199,6 +200,7 @@ export function RecitationCheck({
             <Row
               key={id}
               icon="hardware-chip-outline"
+              hue="hafalan"
               label={t(`recitation.models.${id}`, { mb: megabytes(MODELS[id].bytes) })}
               selected={id === dev.model}
               disabled={busy}
@@ -215,7 +217,7 @@ export function RecitationCheck({
         />
       ) : download.status === "downloading" || download.status === "paused" ? (
         <>
-          <ProgressBar fraction={fraction ?? 0} />
+          <ProgressTrack value={fraction ?? 0} fill={hafalan.base} track={hafalan.soft} />
           <Text style={[typography.subhead, tabular, { color: theme.text }]}>
             {download.status === "downloading"
               ? t("recitation.downloading", {
@@ -244,7 +246,7 @@ export function RecitationCheck({
         </>
       ) : download.status === "verifying" ? (
         <>
-          <ProgressBar fraction={fraction ?? 0} />
+          <ProgressTrack value={fraction ?? 0} fill={hafalan.base} track={hafalan.soft} />
           <Text style={[typography.subhead, tabular, { color: theme.text }]}>
             {t("recitation.verifying", { percent })}
           </Text>
@@ -276,7 +278,7 @@ export function RecitationCheck({
             </>
           ) : phase.kind === "transcribing" ? (
             <>
-              <ProgressBar fraction={phase.percent / 100} />
+              <ProgressTrack value={phase.percent / 100} fill={hafalan.base} track={hafalan.soft} />
               <Text style={[typography.subhead, tabular, { color: theme.text }]}>
                 {t("recitation.transcribing", { percent: Math.round(phase.percent) })}
               </Text>
@@ -315,9 +317,9 @@ export function RecitationCheck({
       ) : null}
 
       {phase.kind === "done" ? (
-        <View style={[styles.result, { backgroundColor: theme.surfaceAlt }]}>
+        <View style={[styles.result, { backgroundColor: hafalan.soft }]}>
           <View style={styles.score}>
-            <Text style={[styles.figure, tabular, { color: theme.countdown }]}>
+            <Text style={[styles.figure, tabular, { color: hafalan.base }]}>
               {phase.view.counts.correct}/{phase.view.counts.words}
             </Text>
             <Text style={[typography.subhead, tabular, styles.grow, { color: theme.text }]}>

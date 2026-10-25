@@ -4,10 +4,20 @@ import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { SkyArt } from "@/components/today/PrayerCards";
 import { Card, Divider, IconChip } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { requestNotificationPermission } from "@/notifications/setup";
-import { spacing, tabular, typography, useTheme } from "@/theme";
+import {
+  hueColors,
+  onSky,
+  radius,
+  skyGradient,
+  spacing,
+  tabular,
+  typography,
+  useTheme,
+} from "@/theme";
 import { formatCountdown } from "../dates";
 import { hideLiveCountdown, showLiveCountdown } from "../liveCountdown";
 import { KEYS } from "../settings";
@@ -15,8 +25,9 @@ import { getSetting, setSetting } from "@/db/settings";
 import { Hint, Panel, ToggleRow } from "./fields";
 
 /**
- * The fasting hero, as Today's next-prayer card: an iftar or sahur badge, the time it counts to and the live
- * countdown in large digits (gold on dark, teal on light), with the lock-screen countdown switch beneath.
+ * The fasting hero, as Today's next-prayer card: on the sunset sky while counting to iftar and the dawn sky while
+ * counting to imsak, an iftar or sahur badge, the time it counts to and the live countdown in large white digits,
+ * with the lock-screen countdown switch beneath on the card.
  */
 export function CountdownCard({
   now,
@@ -78,27 +89,33 @@ export function CountdownCard({
     await setSetting(db, KEYS.liveCountdown, next ? "1" : "0");
   };
 
+  const period = countdown?.phase === "sahur" ? "fajr" : "maghrib";
+  const gold = hueColors(theme, "ramadhan");
+
   return (
-    <Card padded={false}>
-      <View style={styles.hero}>
-        {countdown ? (
-          <>
-            <View style={styles.heroTop}>
-              <IconChip
-                icon={countdown.phase === "sahur" ? "moon" : "restaurant"}
-                size={48}
-                color={theme.countdown}
-                background={theme.dark ? theme.goldSoft : theme.accentSoft}
-              />
-              <View style={styles.grow}>
-                <Text style={[typography.overline, { color: theme.muted }]}>
-                  {t(
-                    countdown.phase === "sahur"
-                      ? "ramadhan.countdown.sahur"
-                      : "ramadhan.countdown.fasting",
-                  )}
-                </Text>
-                <Text style={[typography.headline, tabular, { color: theme.text }]}>
+    <Card padded={false} hue="ramadhan">
+      {countdown ? (
+        <View
+          style={[styles.sky, { experimental_backgroundImage: skyGradient(period, theme.dark) }]}
+        >
+          <SkyArt period={period} />
+          <View style={styles.heroTop}>
+            <IconChip
+              icon={countdown.phase === "sahur" ? "moon" : "restaurant"}
+              size={48}
+              color={onSky.text}
+              background={onSky.glassStrong}
+            />
+            <View style={styles.heroText}>
+              <Text style={[typography.overline, { color: onSky.muted }]}>
+                {t(
+                  countdown.phase === "sahur"
+                    ? "ramadhan.countdown.sahur"
+                    : "ramadhan.countdown.fasting",
+                )}
+              </Text>
+              <View style={[styles.glassPill, { backgroundColor: onSky.glass }]}>
+                <Text style={[typography.headline, tabular, { color: onSky.text }]}>
                   {t("ramadhan.countdown.at", {
                     prayer: t(`ramadhan.countdown.${countdown.target}`),
                     time: formatLocalTime(countdown.at, timeZone),
@@ -106,30 +123,27 @@ export function CountdownCard({
                 </Text>
               </View>
             </View>
-            <Text
-              accessibilityRole="timer"
-              style={[styles.clock, tabular, { color: theme.countdown }]}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-            >
-              {formatCountdown(+countdown.at - +now)}
-            </Text>
-          </>
-        ) : (
-          <View style={styles.heroTop}>
-            <IconChip
-              icon="time-outline"
-              size={40}
-              color={theme.muted}
-              background={theme.surfaceAlt}
-            />
+          </View>
+          <Text
+            accessibilityRole="timer"
+            style={[styles.clock, tabular, { color: onSky.text }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
+            {formatCountdown(+countdown.at - +now)}
+          </Text>
+        </View>
+      ) : (
+        <>
+          <View style={[styles.hero, styles.heroTop]}>
+            <IconChip icon="time-outline" size={40} color={gold.base} background={gold.soft} />
             <View style={styles.grow}>
               <Hint>{t("ramadhan.noPrayerTimes")}</Hint>
             </View>
           </View>
-        )}
-      </View>
-      <Divider />
+          <Divider />
+        </>
+      )}
       <View style={styles.rows}>
         <ToggleRow
           label={t("ramadhan.countdown.live")}
@@ -155,10 +169,17 @@ export function CountdownCard({
 }
 
 const styles = StyleSheet.create({
-  hero: { padding: spacing.md + 2, gap: spacing.sm },
+  hero: { padding: spacing.md + 2 },
+  sky: { padding: spacing.md + 4, paddingTop: spacing.md + 6, gap: spacing.sm, overflow: "hidden" },
   heroTop: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
-  grow: { flex: 1, gap: 2 },
-  clock: { fontSize: 52, fontWeight: "800", letterSpacing: -1 },
+  heroText: { flex: 1, gap: 4, paddingRight: 72, alignItems: "flex-start" },
+  grow: { flex: 1 },
+  glassPill: {
+    paddingHorizontal: spacing.sm + 2,
+    paddingVertical: 3,
+    borderRadius: radius.pill,
+  },
+  clock: { fontSize: 56, fontWeight: "800", letterSpacing: -1.2, marginTop: spacing.xs },
   // Clips the last row's hairline against the card's edge.
   rows: { marginBottom: -1 },
 });

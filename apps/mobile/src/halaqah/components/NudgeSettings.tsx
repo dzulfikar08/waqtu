@@ -55,7 +55,7 @@ export function NudgeSettings() {
   };
 
   return (
-    <Section title={t("halaqah.nudge.section")} icon="notifications-outline">
+    <Section title={t("halaqah.nudge.section")} icon="notifications-outline" hue="halaqah">
       <ToggleRow
         label={t("halaqah.nudge.toggle")}
         hint={time ? t("halaqah.nudge.at", { time: formatNudgeTime(time) }) : undefined}

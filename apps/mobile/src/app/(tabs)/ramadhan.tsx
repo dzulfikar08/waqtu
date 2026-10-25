@@ -18,7 +18,7 @@ import { Row, Screen, Section } from "@/components/ui";
 import { HalaqahCard } from "@/halaqah/components/HalaqahCard";
 import { useTranslation } from "@/i18n";
 import { PremiumGate } from "@/premium/PremiumGate";
-import { typography, useTheme } from "@/theme";
+import { hueWash, typography, useTheme } from "@/theme";
 import { CountdownCard } from "@/ramadhan/components/CountdownCard";
 import { DailyCard } from "@/ramadhan/components/DailyCard";
 import { Hint, Panel } from "@/ramadhan/components/fields";
@@ -127,18 +127,21 @@ export default function RamadhanScreen() {
     </View>
   );
 
+  const backdrop = hueWash(theme, "ramadhan");
+
   return (
-    <Screen title={t("ramadhan.tab")} caption={caption}>
+    <Screen title={t("ramadhan.tab")} caption={caption} backdrop={backdrop}>
       {config ? (
         <CountdownCard now={now} countdown={countdown} timeZone={config.timeZone} />
       ) : (
-        <Section title={t("ramadhan.tab")} icon="location-outline">
+        <Section title={t("ramadhan.tab")} icon="location-outline" hue="ramadhan">
           <Panel>
             <Hint>{t("ramadhan.needLocation")}</Hint>
           </Panel>
           <Row
             label={t("tabs.settings")}
             icon="settings-outline"
+            hue="ramadhan"
             chevron
             onPress={() => router.push("/settings")}
           />

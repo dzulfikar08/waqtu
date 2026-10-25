@@ -1,9 +1,12 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { formatLocalTime } from "@waqtu/core";
 import { useSQLiteContext } from "expo-sqlite";
-import { useState, type ComponentProps } from "react";
-import { Linking, StyleSheet, Text, View } from "react-native";
+import { useEffect, useState, type ComponentProps } from "react";
+import { Animated, Easing, Linking, StyleSheet, Text, View } from "react-native";
 
+import { useNow } from "@/hooks/useMutabaah";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useTranslation } from "@/i18n";
 import { CITIES } from "@/prayer/cities";
 import {
   getLocationPermission,
@@ -11,11 +14,22 @@ import {
   saveCurrentLocation,
   type LocationPermission,
 } from "@/prayer/location";
+import { periodProgress, type DayPeriod, type PeriodSpan } from "@/prayer/period";
 import { countdownParts, type PrayerSlot } from "@/prayer/schedule";
-import { useTranslation } from "@/i18n";
-import { radius, spacing, tabular, typography, useTheme } from "@/theme";
+import {
+  onSky,
+  prayerTone,
+  radius,
+  skyGradient,
+  skyTone,
+  spacing,
+  tabular,
+  typography,
+  useTheme,
+} from "@/theme";
 
-import { Card, Divider, IconChip, PressableScale, Row } from "../ui";
+import { HeroGlow } from "../HeroGlow";
+import { Card, Divider, PressableScale, ProgressTrack, Row } from "../ui";
 
 type GlyphName = ComponentProps<typeof MaterialCommunityIcons>["name"];
 
@@ -49,67 +63,187 @@ export function PrayerGlyph({
   );
 }
 
+/** The body in the sky of each part of the day: the rising sun, the high sun, the setting sun, the moon. */
+const SKY_BODY: Record<DayPeriod, GlyphName> = {
+  fajr: "weather-sunset-up",
+  sunrise: "weather-sunny",
+  dhuhr: "white-balance-sunny",
+  asr: "weather-sunny",
+  maghrib: "weather-sunset-down",
+  isha: "moon-waning-crescent",
+};
+
+/** Star positions (percent of the card) for the night and dawn skies. */
+const STARS: readonly { top: `${number}%`; left: `${number}%`; size: number }[] = [
+  { top: "12%", left: "48%", size: 3 },
+  { top: "22%", left: "62%", size: 2 },
+  { top: "8%", left: "70%", size: 2 },
+  { top: "34%", left: "54%", size: 2 },
+  { top: "18%", left: "38%", size: 2 },
+  { top: "44%", left: "66%", size: 3 },
+];
+
 /**
- * The next prayer, as the Mac popover's header and the iOS companion's card: the prayer's glyph and name, the live
- * countdown in large digits (gold on dark, teal on light) and the prayer's clock time.
+ * Decoration of a sky card, drawn behind its content: a soft glow and the sun or moon of the part of the day in the top
+ * right corner, and twinkling stars at night and dawn. Hidden from screen readers.
  */
-export function NextPrayerCard({
+export function SkyArt({ period }: { period: DayPeriod }) {
+  const night = period === "isha" || period === "fajr";
+  const reduced = useReducedMotion();
+  const [twinkle] = useState(() => new Animated.Value(0));
+  useEffect(() => {
+    if (!night || reduced) return;
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(twinkle, {
+          toValue: 1,
+          duration: 1800,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(twinkle, {
+          toValue: 0,
+          duration: 1800,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [night, reduced, twinkle]);
+  return (
+    <HeroGlow breathe glow={night ? "rgba(214,222,255,0.40)" : "rgba(255,238,196,0.62)"}>
+      <MaterialCommunityIcons
+        name={SKY_BODY[period]}
+        size={84}
+        color="rgba(255,255,255,0.92)"
+        style={styles.body}
+      />
+      {night
+        ? STARS.map((star, index) => (
+            <Animated.View
+              key={`${star.top}-${star.left}`}
+              style={[
+                styles.star,
+                {
+                  top: star.top,
+                  left: star.left,
+                  width: star.size,
+                  height: star.size,
+                  borderRadius: star.size / 2,
+                  opacity: twinkle.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: index % 2 === 0 ? [0.9, 0.35] : [0.35, 0.9],
+                  }),
+                },
+              ]}
+            />
+          ))
+        : null}
+    </HeroGlow>
+  );
+}
+
+/** Hours, minutes and seconds until `ms` has passed, as "1:05:09". */
+function clock(ms: number): string {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+/**
+ * The next prayer on the sky of the current part of the day (dawn violet, morning blue, bright noon, amber afternoon,
+ * sunset rose, indigo night; dimmed in dark mode): its name, a live seconds countdown, its clock time, and how far the
+ * current part of the day has run.
+ */
+export function NextPrayerHero({
   slot,
-  now,
+  span,
   timeZone,
 }: {
   slot: PrayerSlot;
-  now: Date;
+  span: PeriodSpan | null;
   timeZone: string;
 }) {
   const { t } = useTranslation();
   const theme = useTheme();
-  const { hours, minutes } = countdownParts(slot.at.getTime() - now.getTime());
+  const now = useNow(1000);
+  const left = slot.at.getTime() - now.getTime();
+  const { hours, minutes } = countdownParts(left);
   const time =
     hours > 0
       ? t("today.countdownHm", { h: hours, m: minutes })
       : t("today.countdownM", { m: minutes });
-  const at = formatLocalTime(slot.at, timeZone);
+  const period = span?.period ?? slot.prayer;
   return (
-    <Card style={styles.hero}>
-      <View style={styles.heroTop}>
-        <View
-          style={[
-            styles.heroGlyph,
-            { backgroundColor: theme.dark ? theme.goldSoft : theme.accentSoft },
-          ]}
-        >
-          <PrayerGlyph prayer={slot.prayer} size={26} color={theme.countdown} />
-        </View>
-        <View style={styles.grow}>
-          <Text style={[typography.footnote, { color: theme.muted, fontWeight: "600" }]}>
-            {t("today.next")}
-          </Text>
-          <Text style={[typography.title, { color: theme.text }]}>
-            {t(`prayers.${slot.prayer}`)}
-          </Text>
-        </View>
-        <View style={[styles.timeBadge, { backgroundColor: theme.surfaceAlt }]}>
-          <Text style={[typography.headline, tabular, { color: theme.text }]}>{at}</Text>
-        </View>
+    <View
+      style={[
+        styles.sky,
+        {
+          experimental_backgroundImage: skyGradient(period, theme.dark),
+          boxShadow: theme.dark
+            ? "0 10px 24px -12px rgba(0,0,0,0.6)"
+            : `0 14px 28px -14px ${skyTone(period, false)}`,
+        },
+      ]}
+    >
+      <SkyArt period={period} />
+      <View style={styles.skyHead}>
+        <Text style={[typography.subhead, { color: onSky.muted, fontWeight: "600" }]}>
+          {t("today.next")}
+        </Text>
+        <Text style={[styles.skyName, { color: onSky.text }]}>{t(`prayers.${slot.prayer}`)}</Text>
       </View>
       <Text
+        accessibilityLabel={t("today.in", { time })}
         accessibilityLiveRegion="polite"
-        style={[styles.countdown, tabular, { color: theme.countdown }]}
+        style={[styles.skyCountdown, tabular, { color: onSky.text }]}
         numberOfLines={1}
         adjustsFontSizeToFit
       >
-        {t("today.in", { time })}
+        {clock(left)}
       </Text>
-    </Card>
+      <View style={styles.skyMeta}>
+        <View style={[styles.glassPill, { backgroundColor: onSky.glassStrong }]}>
+          <MaterialCommunityIcons name="clock-outline" size={15} color={onSky.text} />
+          <Text style={[typography.callout, tabular, { color: onSky.text, fontWeight: "700" }]}>
+            {formatLocalTime(slot.at, timeZone)}
+          </Text>
+        </View>
+        <Text style={[typography.subhead, styles.grow, { color: onSky.muted }]} numberOfLines={1}>
+          {t("today.in", { time })}
+        </Text>
+      </View>
+      {span ? (
+        <View style={styles.skyProgress}>
+          <ProgressTrack
+            value={periodProgress(span, now)}
+            fill="rgba(255,255,255,0.95)"
+            track={onSky.glass}
+            height={6}
+          />
+          <View style={styles.skyEnds}>
+            <Text style={[typography.caption, tabular, { color: onSky.muted }]}>
+              {t(`prayers.${span.period}`)} {formatLocalTime(span.start, timeZone)}
+            </Text>
+            <Text style={[typography.caption, tabular, { color: onSky.muted }]}>
+              {t(`prayers.${span.next}`)} {formatLocalTime(span.end, timeZone)}
+            </Text>
+          </View>
+        </View>
+      ) : null}
+    </View>
   );
 }
 
 const LIST = ["fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha"] as const;
 
 /**
- * Today's times, one row per prayer with its glyph and the time right-aligned in even digits. Prayers already past are
- * dimmed; the next one sits on a soft accent wash with a "Next prayer" caption, as in the iOS companion.
+ * Today's times, one row per prayer with its glyph in the prayer's own colour and the time right-aligned in even
+ * digits. Prayers already past are dimmed; the next one sits on a wash of its colour with a "Next prayer" caption.
  */
 export function PrayerTimesList({
   times,
@@ -129,17 +263,20 @@ export function PrayerTimesList({
       {LIST.map((name, index) => {
         const isNext = index === nextIndex;
         const passed = allPassed || (nextIndex >= 0 && index < nextIndex);
-        const tone = isNext ? theme.accent : passed ? theme.faint : theme.text;
+        const own = prayerTone(name, theme.dark);
+        const tone = isNext ? own : passed ? theme.faint : theme.text;
         return (
           <View key={name}>
-            {index > 0 ? <Divider inset={spacing.md + 28 + 12} /> : null}
-            <View style={[styles.timeRow, isNext ? { backgroundColor: theme.accentSoft } : null]}>
-              <View style={styles.timeGlyph}>
-                <PrayerGlyph
-                  prayer={name}
-                  size={22}
-                  color={isNext ? theme.accent : passed ? theme.faint : theme.muted}
-                />
+            {index > 0 ? <Divider inset={spacing.md + 32 + 12} /> : null}
+            <View style={[styles.timeRow, isNext ? { backgroundColor: `${own}1F` } : null]}>
+              {isNext ? <View style={[styles.nextBar, { backgroundColor: own }]} /> : null}
+              <View
+                style={[
+                  styles.timeGlyph,
+                  { backgroundColor: passed ? "transparent" : `${own}${theme.dark ? "29" : "1A"}` },
+                ]}
+              >
+                <PrayerGlyph prayer={name} size={19} color={passed ? theme.faint : own} />
               </View>
               <View style={styles.grow}>
                 <Text
@@ -151,7 +288,7 @@ export function PrayerTimesList({
                   {t(`prayers.${name}`)}
                 </Text>
                 {isNext ? (
-                  <Text style={[typography.caption, { color: theme.accent, fontWeight: "600" }]}>
+                  <Text style={[typography.caption, { color: own, fontWeight: "600" }]}>
                     {t("today.next")}
                   </Text>
                 ) : null}
@@ -173,8 +310,11 @@ export function PrayerTimesList({
   );
 }
 
-/** Shown until a location exists: the phone's position (with permission) or a city from the list. */
-export function LocationPrompt() {
+/**
+ * Shown until a location exists, on the sky of the phone's hour: a pin in rings, why the location is needed, and the
+ * two ways to set it (the phone's position, with permission, or a city from the list).
+ */
+export function LocationPrompt({ period }: { period: DayPeriod }) {
   const db = useSQLiteContext();
   const { t } = useTranslation();
   const theme = useTheme();
@@ -191,116 +331,189 @@ export function LocationPrompt() {
   };
 
   return (
-    <Card style={styles.prompt}>
-      <View style={styles.heroTop}>
-        <IconChip icon="location" size={40} />
-        <Text style={[typography.headline, styles.grow, { color: theme.text }]}>
-          {t("today.locationTitle")}
-        </Text>
+    <View
+      style={[
+        styles.sky,
+        {
+          experimental_backgroundImage: skyGradient(period, theme.dark),
+          boxShadow: theme.dark
+            ? "0 10px 24px -12px rgba(0,0,0,0.6)"
+            : `0 14px 28px -14px ${skyTone(period, false)}`,
+        },
+      ]}
+    >
+      <SkyArt period={period} />
+      <View style={[styles.pin, { backgroundColor: onSky.glassStrong, borderColor: onSky.line }]}>
+        <View style={[styles.pinInner, { backgroundColor: onSky.text }]}>
+          <MaterialCommunityIcons
+            name="map-marker-radius"
+            size={28}
+            color={skyTone(period, false)}
+          />
+        </View>
       </View>
-      <Text style={[typography.subhead, { color: theme.muted, lineHeight: 20 }]}>
+      <Text style={[typography.title, { color: onSky.text }]}>{t("today.locationTitle")}</Text>
+      <Text style={[typography.subhead, { color: onSky.muted, lineHeight: 20 }]}>
         {t("today.locationBody")}
       </Text>
       {failed ? (
-        <Text style={[typography.subhead, { color: theme.danger }]}>
-          {t("today.locationFailed")}
-        </Text>
+        <View style={[styles.glassNote, { backgroundColor: onSky.glassStrong }]}>
+          <MaterialCommunityIcons name="alert-circle-outline" size={16} color={onSky.text} />
+          <Text style={[typography.subhead, styles.grow, { color: onSky.text }]}>
+            {t("today.locationFailed")}
+          </Text>
+        </View>
       ) : null}
       <View style={styles.buttons}>
-        <Button label={t("today.useGps")} primary onPress={() => void useGps()} />
-        <Button label={t("today.pickCity")} onPress={() => setPicking((p) => !p)} />
+        <SkyButton
+          label={t("today.useGps")}
+          icon="crosshairs-gps"
+          primary
+          tone={skyTone(period, false)}
+          onPress={() => void useGps()}
+        />
+        <SkyButton
+          label={t("today.pickCity")}
+          icon="city-variant-outline"
+          tone={skyTone(period, false)}
+          onPress={() => setPicking((p) => !p)}
+        />
         {permission === "denied" ? (
-          <Button
+          <SkyButton
             label={t("today.openSystemSettings")}
+            icon="cog-outline"
+            tone={skyTone(period, false)}
             onPress={() => void Linking.openSettings()}
           />
         ) : null}
       </View>
       {picking ? (
-        <View style={[styles.cityList, { borderColor: theme.separator }]}>
+        <View style={[styles.cityList, { backgroundColor: theme.surface }]}>
           {CITIES.map((city) => (
-            <Row key={city.id} label={city.name} onPress={() => void saveCity(db, city)} />
+            <Row
+              key={city.id}
+              icon="location-outline"
+              hue="prayer"
+              label={city.name}
+              onPress={() => void saveCity(db, city)}
+            />
           ))}
         </View>
       ) : null}
-    </Card>
+    </View>
   );
 }
 
-function Button({
+/** A button on a sky card: solid white (primary) or frosted glass. */
+function SkyButton({
   label,
+  icon,
   onPress,
   primary,
+  tone,
 }: {
   label: string;
+  icon: GlyphName;
   onPress: () => void;
   primary?: boolean;
+  /** The sky's colour, for the primary button's text. */
+  tone: string;
 }) {
-  const theme = useTheme();
+  const color = primary ? tone : onSky.text;
   return (
     <PressableScale
       accessibilityRole="button"
       onPress={onPress}
       style={[
         styles.button,
-        {
-          backgroundColor: primary ? theme.accent : "transparent",
-          borderColor: primary ? theme.accent : theme.border,
-        },
+        primary
+          ? { backgroundColor: onSky.text, borderColor: onSky.text }
+          : { backgroundColor: onSky.shade, borderColor: onSky.line },
       ]}
     >
-      <Text
-        style={[
-          typography.callout,
-          { color: primary ? theme.accentText : theme.text, fontWeight: "600" },
-        ]}
-      >
-        {label}
-      </Text>
+      <MaterialCommunityIcons name={icon} size={18} color={color} />
+      <Text style={[typography.callout, { color, fontWeight: "700" }]}>{label}</Text>
     </PressableScale>
   );
 }
 
 const styles = StyleSheet.create({
-  hero: {},
-  heroTop: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
-  heroGlyph: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
+  sky: {
+    borderRadius: radius.lg + 4,
+    padding: spacing.md + 4,
+    gap: spacing.sm,
+    overflow: "hidden",
   },
-  timeBadge: {
+  body: { position: "absolute", top: 4, right: 14 },
+  star: { position: "absolute", backgroundColor: "#FFFFFF" },
+  skyHead: { gap: 0, paddingRight: 96 },
+  skyName: { fontSize: 34, fontWeight: "800", letterSpacing: -0.6 },
+  skyCountdown: { fontSize: 52, fontWeight: "800", letterSpacing: -1.2, marginTop: spacing.xs },
+  skyMeta: { flexDirection: "row", alignItems: "center", gap: spacing.sm + 2 },
+  glassPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
     paddingHorizontal: spacing.md - 4,
     paddingVertical: 6,
     borderRadius: radius.pill,
   },
-  countdown: { fontSize: 40, fontWeight: "800", letterSpacing: -0.8, marginTop: spacing.xs },
+  skyProgress: { gap: 6, marginTop: spacing.sm },
+  skyEnds: { flexDirection: "row", justifyContent: "space-between" },
   grow: { flex: 1 },
   timeRow: {
-    minHeight: 52,
+    minHeight: 54,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
   },
-  timeGlyph: { width: 28, alignItems: "center" },
-  prompt: {},
-  buttons: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, marginTop: spacing.xs },
-  button: {
-    minHeight: 44,
-    paddingHorizontal: spacing.md + 2,
-    borderRadius: radius.pill,
-    borderWidth: 1.5,
+  nextBar: { position: "absolute", left: 0, top: 10, bottom: 10, width: 3, borderRadius: 2 },
+  timeGlyph: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
   },
+  pin: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.xs,
+  },
+  pinInner: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  glassNote: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    padding: spacing.sm + 2,
+    borderRadius: radius.md,
+  },
+  buttons: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, marginTop: spacing.xs },
+  button: {
+    minHeight: 46,
+    paddingHorizontal: spacing.md + 2,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+  },
   cityList: {
     marginTop: spacing.sm,
-    borderRadius: radius.md,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: radius.md + 4,
     overflow: "hidden",
   },
 });

@@ -18,8 +18,8 @@ export function HafalanCard() {
   const { data } = model;
   if (!data) {
     return (
-      <Section title={t("hafalan.todayRowTitle")} icon="book-outline">
-        <Row icon="book" label={t("hafalan.todayRowBody")} onPress={open} chevron />
+      <Section title={t("hafalan.todayRowTitle")} icon="book-outline" hue="hafalan">
+        <Row icon="book" hue="hafalan" label={t("hafalan.todayRowBody")} onPress={open} chevron />
       </Section>
     );
   }
@@ -40,8 +40,16 @@ export function HafalanCard() {
     <Section
       title={`${t("hafalan.cardTitle")} · ${targetLabel(data.plan.target, t)}`}
       icon="book-outline"
+      hue="hafalan"
     >
-      <Row icon="book" label={line} selected={portion.complete} onPress={open} chevron />
+      <Row
+        icon="book"
+        hue="hafalan"
+        label={line}
+        selected={portion.complete}
+        onPress={open}
+        chevron
+      />
     </Section>
   );
 }

@@ -34,10 +34,11 @@ export function PrayerSettingsSection() {
 
   return (
     <>
-      <Section title={t("prayerSettings.location")} icon="location">
+      <Section title={t("prayerSettings.location")} icon="location" hue="prayer">
         <Row
           label={place}
           icon="location-outline"
+          hue="prayer"
           onPress={() => {}}
           selected={settings.location !== null}
           disabled
@@ -45,6 +46,7 @@ export function PrayerSettingsSection() {
         <Row
           label={t("today.useGps")}
           icon="navigate-outline"
+          hue="prayer"
           onPress={() => {
             setGpsFailed(false);
             void saveCurrentLocation(db, { ask: true }).then((result) =>
@@ -55,6 +57,7 @@ export function PrayerSettingsSection() {
         <Row
           label={t("today.pickCity")}
           icon="business-outline"
+          hue="prayer"
           onPress={() => setPicking((p) => !p)}
         />
         {picking
@@ -77,7 +80,7 @@ export function PrayerSettingsSection() {
         ) : null}
       </Section>
 
-      <Section title={t("prayerSettings.method")} icon="calculator">
+      <Section title={t("prayerSettings.method")} icon="calculator" hue="prayer">
         {METHOD_IDS.map((id) => (
           <Row
             key={id}
@@ -88,7 +91,7 @@ export function PrayerSettingsSection() {
         ))}
       </Section>
 
-      <Section title={t("prayerSettings.asr")} icon="partly-sunny">
+      <Section title={t("prayerSettings.asr")} icon="partly-sunny" hue="streak">
         {ASR_MADHABS.map((id) => (
           <Row
             key={id}
@@ -99,7 +102,7 @@ export function PrayerSettingsSection() {
         ))}
       </Section>
 
-      <Section title={t("prayerSettings.offsets")} icon="options">
+      <Section title={t("prayerSettings.offsets")} icon="options" hue="neutral">
         {OFFSET_PRAYERS.map((prayer) => (
           <StepperRow
             key={prayer}

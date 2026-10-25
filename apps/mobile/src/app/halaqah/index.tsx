@@ -1,11 +1,13 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Card, IconChip } from "@/components/ui";
+import { HeroGlow } from "@/components/HeroGlow";
+import { IconChip, PressableScale, ProgressTrack } from "@/components/ui";
 import { useTranslation } from "@/i18n";
-import { Button, Hint, ProgressBar } from "@/ramadhan/components/fields";
-import { radius, spacing, tabular, typography, useTheme } from "@/theme";
+import { Hint } from "@/ramadhan/components/fields";
+import { HIT, onSky, radius, spacing, tabular, typography, useTheme } from "@/theme";
 import { DayList } from "@/halaqah/components/DayList";
 import { NudgeSettings } from "@/halaqah/components/NudgeSettings";
 import { SessionView, useLang } from "@/halaqah/components/SessionView";
@@ -13,6 +15,12 @@ import { halaqahAvailable } from "@/halaqah/bundled";
 import { dayOf } from "@/halaqah/program";
 import { nextUncompletedDay } from "@/halaqah/schedule";
 import { useHalaqahProgress, useHalaqahToday } from "@/halaqah/useHalaqah";
+
+/** The halaqah hero's violet-to-plum gradient: [light, dark]. */
+const HERO = {
+  light: "linear-gradient(145deg, #7C4DCC 0%, #B23A8F 100%)",
+  dark: "linear-gradient(145deg, #2E1F52 0%, #41183A 100%)",
+} as const;
 
 /**
  * During Ramadhan: today's talk, then every day for catch-up. Outside Ramadhan: the program
@@ -42,47 +50,80 @@ export default function HalaqahScreen() {
       contentContainerStyle={[styles.content, { paddingBottom: spacing.xl + insets.bottom }]}
       keyboardShouldPersistTaps="handled"
     >
-      <Card>
+      <View
+        style={[
+          styles.hero,
+          {
+            experimental_backgroundImage: theme.dark ? HERO.dark : HERO.light,
+            boxShadow: theme.dark
+              ? "0 10px 24px -12px rgba(0,0,0,0.6)"
+              : "0 14px 28px -14px rgba(124,77,204,0.55)",
+          },
+        ]}
+      >
+        <HeroGlow breathe glow="rgba(236,214,255,0.45)" />
         <View style={styles.head}>
-          <IconChip icon="school" size={48} color={theme.gold} background={theme.goldSoft} />
+          <View
+            style={[styles.badge, { backgroundColor: onSky.glassStrong, borderColor: onSky.line }]}
+          >
+            <Ionicons
+              name="school"
+              size={24}
+              color={onSky.text}
+              accessibilityElementsHidden
+              importantForAccessibility="no"
+            />
+          </View>
           <View style={styles.grow}>
-            <Text style={[typography.title, { color: theme.text }]}>{program.title[lang]}</Text>
+            <Text style={[typography.title, { color: onSky.text }]}>{program.title[lang]}</Text>
             {position.kind === "before" ? (
-              <Text style={[typography.subhead, tabular, { color: theme.muted }]}>
+              <Text style={[typography.subhead, tabular, { color: onSky.muted }]}>
                 {position.daysUntil === null
                   ? t("halaqah.forYear", { year: program.hijriYear })
                   : t("halaqah.beforeRamadhan", { count: position.daysUntil })}
               </Text>
             ) : null}
             {position.kind === "after" ? (
-              <Text style={[typography.subhead, tabular, { color: theme.muted }]}>
+              <Text style={[typography.subhead, tabular, { color: onSky.muted }]}>
                 {t("halaqah.afterRamadhan", { year: program.hijriYear })}
               </Text>
             ) : null}
           </View>
         </View>
         <View style={styles.figureRow}>
-          <Text style={[styles.figure, tabular, { color: theme.countdown }]}>
+          <Text style={[styles.figure, tabular, { color: onSky.text }]}>
             {done.size}
-            <Text style={[styles.total, { color: theme.muted }]}>/{program.totalDays}</Text>
+            <Text style={[styles.total, { color: onSky.muted }]}>/{program.totalDays}</Text>
           </Text>
-          <View style={styles.grow}>
-            <Hint>{t("halaqah.progress", { done: done.size, total: program.totalDays })}</Hint>
-          </View>
+          <Text style={[typography.footnote, styles.grow, { color: onSky.muted, lineHeight: 18 }]}>
+            {t("halaqah.progress", { done: done.size, total: program.totalDays })}
+          </Text>
         </View>
-        <ProgressBar fraction={done.size / program.totalDays} />
+        <ProgressTrack
+          value={done.size / program.totalDays}
+          fill="rgba(255,255,255,0.95)"
+          track={onSky.glass}
+          height={8}
+        />
         {!todayDay && next !== null ? (
           <View style={styles.start}>
-            <Button
-              label={
-                done.size === 0 ? t("halaqah.startEarly") : t("halaqah.continueFrom", { day: next })
-              }
+            <PressableScale
+              accessibilityRole="button"
               onPress={() => router.push({ pathname: "/halaqah/[day]", params: { day: next } })}
-            />
-            <Hint>{t("halaqah.openAnyTime")}</Hint>
+              style={[styles.heroButton, { backgroundColor: onSky.text }]}
+            >
+              <Text style={[styles.heroButtonLabel, { color: theme.dark ? "#2E1F52" : "#7C4DCC" }]}>
+                {done.size === 0
+                  ? t("halaqah.startEarly")
+                  : t("halaqah.continueFrom", { day: next })}
+              </Text>
+            </PressableScale>
+            <Text style={[typography.footnote, { color: onSky.muted, lineHeight: 18 }]}>
+              {t("halaqah.openAnyTime")}
+            </Text>
           </View>
         ) : null}
-      </Card>
+      </View>
 
       {todayDay ? (
         <SessionView
@@ -125,10 +166,33 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: spacing.md + 4, paddingTop: spacing.sm, gap: spacing.lg },
   head: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
   grow: { flex: 1, gap: 2 },
+  hero: {
+    borderRadius: radius.lg + 4,
+    padding: spacing.md + 4,
+    gap: spacing.sm,
+    overflow: "hidden",
+  },
+  badge: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   figureRow: { flexDirection: "row", alignItems: "center", gap: spacing.md, marginTop: spacing.sm },
-  figure: { fontSize: 40, fontWeight: "800", letterSpacing: -0.8 },
-  total: { fontSize: 20, fontWeight: "700", letterSpacing: 0 },
+  figure: { fontSize: 48, fontWeight: "800", letterSpacing: -1 },
+  total: { fontSize: 22, fontWeight: "700", letterSpacing: 0 },
   start: { gap: spacing.sm, marginTop: spacing.sm },
+  heroButton: {
+    alignSelf: "flex-start",
+    minHeight: HIT,
+    paddingHorizontal: spacing.md + 4,
+    borderRadius: radius.pill,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  heroButtonLabel: { ...typography.callout, fontWeight: "700" },
   banner: {
     flexDirection: "row",
     alignItems: "center",

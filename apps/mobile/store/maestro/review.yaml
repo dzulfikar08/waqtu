@@ -1,5 +1,5 @@
-# Design review shots, not store screenshots: the rest of the Today checklist, Circles and the lower half of Settings, so
-# a visual change can be checked on every tab in light and dark. Same demo build and data as screens.yaml.
+# Design review shots, not store screenshots: Today without a location, the rest of the Today checklist, Circles and the
+# lower half of Settings, so a visual change can be checked on every tab in light and dark. Same demo build and data as screens.yaml.
 #
 #   maestro test --test-output-dir <dir> -e APP_ID=dat.waqtu.app -e LOCALE=en store/maestro/review.yaml
 appId: ${APP_ID}
@@ -18,6 +18,20 @@ appId: ${APP_ID}
     visible: ".*(Hari ini|Today).*"
     timeout: 60000
 - waitForAnimationToEnd
+
+# First run: no location yet.
+- openLink: waqtu://demo?lang=${LOCALE}&to=today&loc=none
+- extendedWaitUntil:
+    visible: ".*(Set a location|Atur lokasi|Open in.*).*"
+    timeout: 60000
+- tapOn:
+    text: Open
+    optional: true
+- extendedWaitUntil:
+    visible: ".*(Set a location|Atur lokasi).*"
+    timeout: 60000
+- waitForAnimationToEnd
+- takeScreenshot: ${LOCALE}-20-no-location
 
 - openLink: waqtu://demo?lang=${LOCALE}&to=today
 - extendedWaitUntil:

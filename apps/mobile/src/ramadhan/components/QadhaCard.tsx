@@ -5,7 +5,7 @@ import { StyleSheet, View } from "react-native";
 
 import { Divider, IconChip, Section } from "@/components/ui";
 import { useTranslation } from "@/i18n";
-import { spacing } from "@/theme";
+import { hueColors, spacing, useTheme } from "@/theme";
 import type { RamadhanContext } from "../context";
 import { addQadha, getQadhaTotals, undoQadha, type QadhaTotals } from "../db";
 import { formatNumber, formatRupiah } from "../format";
@@ -38,7 +38,7 @@ export function QadhaCard({ ctx, locale }: { ctx: RamadhanContext; locale: strin
   const remainingDays = t("ramadhan.qadha.days", { count: totals.remaining });
 
   return (
-    <Section title={t("ramadhan.qadha.title")} icon="calendar-clear-outline">
+    <Section title={t("ramadhan.qadha.title")} icon="calendar-clear-outline" hue="streak">
       <Panel>
         <StatRow>
           <Stat
@@ -46,9 +46,10 @@ export function QadhaCard({ ctx, locale }: { ctx: RamadhanContext; locale: strin
             value={totals.remaining}
             accessibilityLabel={`${t("ramadhan.qadha.remaining")}: ${remainingDays}`}
             highlight
+            hue="streak"
           />
-          <Stat label={t("ramadhan.qadha.owed")} value={totals.owed} />
-          <Stat label={t("ramadhan.qadha.madeUp")} value={totals.madeUp} />
+          <Stat label={t("ramadhan.qadha.owed")} value={totals.owed} hue="streak" />
+          <Stat label={t("ramadhan.qadha.madeUp")} value={totals.madeUp} hue="streak" />
         </StatRow>
         {totals.owed === 0 ? <Hint>{t("ramadhan.qadha.none")}</Hint> : null}
         <NumberField label={t("ramadhan.qadha.count")} value={count} onChangeNumber={setCount} />
@@ -82,6 +83,7 @@ export function QadhaCard({ ctx, locale }: { ctx: RamadhanContext; locale: strin
 function FidyahPanel({ remaining, locale }: { remaining: number; locale: string }) {
   const { t } = useTranslation();
   const db = useSQLiteContext();
+  const amber = hueColors(useTheme(), "streak");
   const { mode, set: setMode } = useStoredMode(db, KEYS.fidyahMode);
   const kg = useStoredNumber(db, KEYS.fidyahKg, FIDYAH_MUD_RICE_KG);
   const pricePerKg = useStoredNumber(db, KEYS.fidyahPrice, null);
@@ -108,7 +110,7 @@ function FidyahPanel({ remaining, locale }: { remaining: number; locale: string 
   return (
     <Panel>
       <View style={styles.heading}>
-        <IconChip icon="basket-outline" />
+        <IconChip icon="basket-outline" color={amber.base} background={amber.soft} />
         <Heading>{t("ramadhan.fidyah.title")}</Heading>
       </View>
       <Hint>{t("ramadhan.fidyah.hint")}</Hint>
@@ -144,9 +146,9 @@ function FidyahPanel({ remaining, locale }: { remaining: number; locale: string 
         onChangeNumber={priceField.set}
       />
       {result && (result.riceKg !== null || showAmount) ? (
-        <ResultBox icon={mode === "rice" ? "basket-outline" : "cash-outline"}>
+        <ResultBox icon={mode === "rice" ? "basket-outline" : "cash-outline"} hue="streak">
           {result.riceKg !== null ? (
-            <ResultFigure>
+            <ResultFigure hue="streak">
               {t("ramadhan.fidyah.resultRice", { kg: formatNumber(result.riceKg, locale, 3) })}
             </ResultFigure>
           ) : null}
@@ -156,7 +158,7 @@ function FidyahPanel({ remaining, locale }: { remaining: number; locale: string 
                 {t("ramadhan.fidyah.resultAmount", { amount: formatRupiah(result.amount, locale) })}
               </ResultDetail>
             ) : (
-              <ResultFigure>
+              <ResultFigure hue="streak">
                 {t(
                   mode === "cash" ? "ramadhan.fidyah.resultCash" : "ramadhan.fidyah.resultAmount",
                   { amount: formatRupiah(result.amount, locale) },

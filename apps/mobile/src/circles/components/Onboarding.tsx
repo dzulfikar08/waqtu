@@ -2,7 +2,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { Card, IconChip, Row, Section } from "@/components/ui";
+import { CIRCLES_HERO, GlowHero } from "@/components/GlowHero";
+import { Row, Section } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { Button, Hint, Panel } from "@/ramadhan/components/fields";
 import { radius, spacing, typography, useTheme } from "@/theme";
@@ -78,22 +79,14 @@ export function Onboarding({
 
   return (
     <View style={styles.root}>
-      <Card>
-        <View style={styles.hero}>
-          <IconChip icon="people" size={48} />
-          <Text
-            accessibilityRole="header"
-            style={[typography.title, styles.grow, { color: theme.text }]}
-          >
-            {t("circles.onboarding.title")}
-          </Text>
-        </View>
-        <Text style={[typography.subhead, styles.body, { color: theme.muted }]}>
-          {t("circles.onboarding.body")}
-        </Text>
-      </Card>
+      <GlowHero
+        palette={CIRCLES_HERO}
+        icon="people"
+        title={t("circles.onboarding.title")}
+        body={t("circles.onboarding.body")}
+      />
 
-      <Section title={t("circles.onboarding.handle")} icon="at-outline">
+      <Section title={t("circles.onboarding.handle")} icon="at-outline" hue="circles">
         <Panel>
           <TextField
             accessibilityLabel={t("circles.onboarding.handle")}
@@ -118,15 +111,17 @@ export function Onboarding({
         </Panel>
       </Section>
 
-      <Section title={t("circles.onboarding.gender")} icon="people-outline">
+      <Section title={t("circles.onboarding.gender")} icon="people-outline" hue="circles">
         <Row
           icon="man-outline"
+          hue="circles"
           label={t("circles.onboarding.ikhwan")}
           selected={gender === "ikhwan"}
           onPress={() => setGender("ikhwan")}
         />
         <Row
           icon="woman-outline"
+          hue="circles"
           label={t("circles.onboarding.akhwat")}
           selected={gender === "akhwat"}
           onPress={() => setGender("akhwat")}
@@ -136,7 +131,7 @@ export function Onboarding({
         </Panel>
       </Section>
 
-      <Section title={t("circles.onboarding.inviteTitle")} icon="key-outline">
+      <Section title={t("circles.onboarding.inviteTitle")} icon="key-outline" hue="circles">
         <Panel>
           <Hint>{t("circles.onboarding.inviteHint")}</Hint>
           <TextField
@@ -193,9 +188,7 @@ export function Onboarding({
 
 const styles = StyleSheet.create({
   root: { gap: spacing.lg },
-  hero: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
   grow: { flex: 1 },
-  body: { lineHeight: 20 },
   error: {
     flexDirection: "row",
     alignItems: "center",

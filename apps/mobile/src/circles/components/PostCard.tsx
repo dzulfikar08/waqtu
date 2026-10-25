@@ -5,7 +5,7 @@ import { Alert, StyleSheet, Text, View } from "react-native";
 import { Card, PressableScale, type IconName } from "@/components/ui";
 import { parseHalaqahRef } from "@/halaqah/program";
 import { useTranslation } from "@/i18n";
-import { HIT, radius, spacing, tabular, typography, useTheme } from "@/theme";
+import { HIT, hueColors, radius, spacing, tabular, typography, useTheme } from "@/theme";
 
 import type { CirclesApi } from "../api";
 import type { Post, ReportReason } from "../types";
@@ -37,6 +37,7 @@ export function PostCard({
 }) {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
+  const rose = hueColors(theme, "circles");
   const [menu, setMenu] = useState<"none" | "options" | "reason">("none");
   const [reportTarget, setReportTarget] = useState<"post" | "user">("post");
 
@@ -118,7 +119,7 @@ export function PostCard({
           >
             {post.handle}
             {post.mine ? (
-              <Text style={{ color: theme.accent }}>{` · ${t("circles.circle.mine")}`}</Text>
+              <Text style={{ color: rose.base }}>{` · ${t("circles.circle.mine")}`}</Text>
             ) : null}
           </Text>
           <Text style={[typography.caption, tabular, { color: theme.muted }]}>{time}</Text>
@@ -158,7 +159,7 @@ export function PostCard({
             <Ionicons
               name="stats-chart"
               size={14}
-              color={theme.accent}
+              color={rose.base}
               accessibilityElementsHidden
               importantForAccessibility="no"
             />
@@ -198,8 +199,8 @@ export function PostCard({
               style={[
                 styles.reaction,
                 {
-                  borderColor: selected ? theme.accent : theme.border,
-                  backgroundColor: selected ? theme.accentSoft : "transparent",
+                  borderColor: selected ? rose.base : theme.border,
+                  backgroundColor: selected ? rose.soft : "transparent",
                 },
               ]}
             >
@@ -209,7 +210,7 @@ export function PostCard({
                   typography.footnote,
                   tabular,
                   styles.count,
-                  { color: selected ? theme.accent : theme.muted },
+                  { color: selected ? rose.base : theme.muted },
                 ]}
               >
                 {post.reactions[emoji] ?? 0}
@@ -267,16 +268,16 @@ export function PostCard({
   );
 }
 
-/** Round initial of a handle on the soft accent wash. Decorative: the handle is read next to it. */
+/** Round initial of a handle on the soft Circles rose. Decorative: the handle is read next to it. */
 function Avatar({ handle }: { handle: string }) {
-  const theme = useTheme();
+  const rose = hueColors(useTheme(), "circles");
   return (
     <View
       accessible={false}
       importantForAccessibility="no-hide-descendants"
-      style={[styles.avatar, { backgroundColor: theme.accentSoft }]}
+      style={[styles.avatar, { backgroundColor: rose.soft }]}
     >
-      <Text style={[styles.initial, { color: theme.accent }]}>
+      <Text style={[styles.initial, { color: rose.base }]}>
         {handle.replace(/^@/, "").charAt(0).toUpperCase()}
       </Text>
     </View>

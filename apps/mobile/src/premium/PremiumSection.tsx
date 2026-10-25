@@ -2,9 +2,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
-import { IconChip, PressableScale, SectionTitle, type IconName } from "@/components/ui";
+import { GlowHero, PREMIUM_HERO } from "@/components/GlowHero";
+import { SectionTitle, type IconName } from "@/components/ui";
 import { useTranslation } from "@/i18n";
-import { cardChrome, radius, spacing, typography, useTheme } from "@/theme";
+import { onSky, radius, spacing, typography } from "@/theme";
 
 import { usePremium } from "./usePremium";
 
@@ -14,38 +15,29 @@ const BENEFITS: { key: "sync" | "ramadhan"; icon: IconName }[] = [
   { key: "ramadhan", icon: "moon" },
 ];
 
-/** Settings entry for Waqtu Premium; opens the paywall / subscription screen. */
+/** Settings entry for Waqtu Premium, a gold card; opens the paywall / subscription screen. */
 export function PremiumSection() {
   const router = useRouter();
   const { t } = useTranslation();
-  const theme = useTheme();
   const { premium } = usePremium();
   const label = premium ? t("premium.settingsActive") : t("premium.settingsFree");
   return (
     <View style={styles.section}>
-      <SectionTitle title={t("premium.settingsTitle")} icon="diamond" />
-      <PressableScale
-        accessibilityRole="button"
+      <SectionTitle title={t("premium.settingsTitle")} icon="diamond" hue="ramadhan" />
+      <GlowHero
+        palette={PREMIUM_HERO}
+        icon="diamond"
+        title={t("premium.title")}
+        body={label}
         onPress={() => router.push("/premium")}
-        style={[styles.card, cardChrome(theme), { borderColor: theme.gold, borderWidth: 1 }]}
       >
-        <View style={styles.head}>
-          <IconChip icon="diamond" size={44} color={theme.gold} background={theme.goldSoft} />
-          <View style={styles.text}>
-            <Text style={[typography.headline, { color: theme.text }]}>{t("premium.title")}</Text>
-            <Text style={[typography.subhead, { color: premium ? theme.gold : theme.muted }]}>
-              {label}
-            </Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={theme.faint} />
-        </View>
         {premium ? null : (
-          <View style={[styles.benefits, { borderColor: theme.separator }]}>
+          <View style={styles.benefits}>
             {BENEFITS.map(({ key, icon }) => (
-              <View key={key} style={styles.benefit}>
-                <Ionicons name={icon} size={16} color={theme.gold} />
+              <View key={key} style={[styles.benefit, { backgroundColor: onSky.glass }]}>
+                <Ionicons name={icon} size={16} color={onSky.text} />
                 <Text
-                  style={[typography.footnote, styles.text, { color: theme.muted }]}
+                  style={[typography.footnote, styles.text, { color: onSky.text }]}
                   numberOfLines={2}
                 >
                   {t(`premium.unlocks.${key}`)}
@@ -54,20 +46,25 @@ export function PremiumSection() {
             ))}
           </View>
         )}
-      </PressableScale>
+        <View style={styles.more}>
+          <Ionicons name="chevron-forward-circle" size={24} color={onSky.text} />
+        </View>
+      </GlowHero>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   section: { gap: spacing.sm },
-  card: { borderRadius: radius.lg, padding: spacing.md + 2, gap: spacing.md },
-  head: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
-  text: { flex: 1, gap: 2 },
-  benefits: {
+  text: { flex: 1, fontWeight: "600" },
+  benefits: { gap: spacing.sm },
+  benefit: {
+    flexDirection: "row",
+    alignItems: "center",
     gap: spacing.sm,
-    paddingTop: spacing.md - 4,
-    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: spacing.md - 4,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
   },
-  benefit: { flexDirection: "row", alignItems: "flex-start", gap: spacing.sm },
+  more: { alignItems: "flex-end", marginTop: -spacing.xs },
 });

@@ -5,7 +5,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { IconChip, Section } from "@/components/ui";
 import { useTranslation } from "@/i18n";
-import { radius, spacing, tabular, typography, useTheme } from "@/theme";
+import { hueColors, radius, spacing, tabular, typography, useTheme } from "@/theme";
 import { countDaily, DAILY_KEYS, getDaily, setDaily, type DailyChecks, type DailyKey } from "../db";
 import { toIso } from "../dates";
 import type { RamadhanContext } from "../context";
@@ -51,16 +51,25 @@ export function DailyCard({ ctx, night }: { ctx: RamadhanContext; night: number 
   const keys = DAILY_KEYS.filter((k) => k !== "itikaf" || night !== null);
   const day = ramadhanDay(ctx.today, ctx.hijriOffset);
   const done = keys.filter((key) => checks[key]).length;
+  const gold = hueColors(theme, "ramadhan");
 
   return (
     <>
       {night !== null ? (
-        <Section title={t("ramadhan.lastTen.title")} icon="sparkles">
+        <Section title={t("ramadhan.lastTen.title")} icon="sparkles" hue="ramadhan">
           <Panel>
-            <View style={[styles.banner, { backgroundColor: theme.goldSoft }]}>
-              <IconChip icon="moon" size={44} color={theme.gold} background={theme.goldSoft} />
+            <View
+              style={[
+                styles.banner,
+                {
+                  borderColor: gold.soft,
+                  experimental_backgroundImage: `linear-gradient(135deg, ${gold.soft} 0%, ${gold.wash} 100%)`,
+                },
+              ]}
+            >
+              <IconChip icon="moon" size={44} color={gold.base} background={gold.soft} />
               <View style={styles.bannerText}>
-                <Text style={[typography.title, tabular, { color: theme.gold }]}>
+                <Text style={[typography.title, tabular, { color: gold.base }]}>
                   {t("ramadhan.lastTen.night", { night })}
                 </Text>
                 <Text style={[typography.subhead, { color: theme.text }]}>
@@ -69,7 +78,7 @@ export function DailyCard({ ctx, night }: { ctx: RamadhanContext; night: number 
               </View>
             </View>
             <Hint>{t("ramadhan.lastTen.duaLabel")}</Hint>
-            <Text style={[styles.arabic, { color: theme.text, backgroundColor: theme.surfaceAlt }]}>
+            <Text style={[styles.arabic, { color: theme.text, backgroundColor: gold.wash }]}>
               {t("ramadhan.lastTen.duaArabic")}
             </Text>
             <Hint>{t("ramadhan.lastTen.duaMeaning")}</Hint>
@@ -79,8 +88,9 @@ export function DailyCard({ ctx, night }: { ctx: RamadhanContext; night: number 
       <Section
         title={t("ramadhan.daily.title")}
         icon="checkmark-done-outline"
+        hue="ramadhan"
         right={
-          <Text style={[typography.footnote, tabular, { color: theme.muted, fontWeight: "700" }]}>
+          <Text style={[typography.footnote, tabular, { color: gold.base, fontWeight: "700" }]}>
             {done}/{keys.length}
           </Text>
         }
@@ -94,7 +104,10 @@ export function DailyCard({ ctx, night }: { ctx: RamadhanContext; night: number 
           />
         ))}
         <Panel>
-          <IconLine icon={day === null ? "information-circle-outline" : "calendar-outline"}>
+          <IconLine
+            icon={day === null ? "information-circle-outline" : "calendar-outline"}
+            color={day === null ? undefined : gold.base}
+          >
             {day === null
               ? t("ramadhan.daily.notRamadhan")
               : t("ramadhan.daily.fastedCount", { count: fasted, year: span.hijriYear })}
@@ -107,6 +120,7 @@ export function DailyCard({ ctx, night }: { ctx: RamadhanContext; night: number 
 
 const styles = StyleSheet.create({
   banner: {
+    borderWidth: 1,
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.md - 4,

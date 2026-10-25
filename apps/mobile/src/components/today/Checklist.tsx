@@ -1,14 +1,17 @@
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { itemLabel } from "@/components/itemLabel";
 import { setEntry } from "@/db/entries";
 import { useTranslation } from "@/i18n";
 import { FLAG, clampCount, toggleFardh, type FardhAction, type ItemDef } from "@/mutabaah/items";
-import { spacing, tabular, typography, useTheme } from "@/theme";
+import type { DayPeriod } from "@/prayer/period";
+import { hueColors, prayerTone, spacing, tabular, typography, useTheme } from "@/theme";
 
-import { CheckCircle, Divider, Pill, StepButton } from "../ui";
+import { CheckCircle, Divider, Pill, PressableScale, ProgressTrack, StepButton } from "../ui";
+
+import { PrayerGlyph } from "./PrayerCards";
 
 interface Props {
   items: readonly ItemDef[];
@@ -41,14 +44,21 @@ export function Checklist({ items, day, entries, prayerTimes }: Props) {
     );
   }
 
+  const done = items.filter((item) => {
+    const value = entries.get(item.id) ?? 0;
+    return item.kind === "fardh" ? (value & FLAG.DONE) !== 0 : value > 0;
+  }).length;
+
   return (
     <View>
+      <Progress done={done} total={items.length} />
       {items.map((item, index) => {
         const value = entries.get(item.id) ?? 0;
         const name = itemLabel(item, t);
         const row =
           item.kind === "fardh" ? (
             <FardhRow
+              prayer={item.id as DayPeriod}
               name={name}
               time={prayerTimes?.[item.id] ?? null}
               value={value}
@@ -69,7 +79,7 @@ export function Checklist({ items, day, entries, prayerTimes }: Props) {
           );
         return (
           <View key={item.id}>
-            {index > 0 ? <Divider inset={TEXT_INSET} /> : null}
+            <Divider inset={index > 0 ? TEXT_INSET : 0} />
             {row}
           </View>
         );
@@ -78,22 +88,52 @@ export function Checklist({ items, day, entries, prayerTimes }: Props) {
   );
 }
 
+/** Today's count in large digits over a bar that grows as items are ticked. */
+function Progress({ done, total }: { done: number; total: number }) {
+  const theme = useTheme();
+  const brand = hueColors(theme, "brand");
+  const fraction = total > 0 ? done / total : 0;
+  const complete = total > 0 && done === total;
+  return (
+    <View style={styles.progress} accessible accessibilityLabel={`${done}/${total}`}>
+      <View style={styles.progressHead}>
+        <Text style={[styles.progressFigure, tabular, { color: theme.text }]}>
+          {done}
+          <Text style={[styles.progressTotal, { color: theme.faint }]}>/{total}</Text>
+        </Text>
+        <Text
+          style={[typography.headline, tabular, { color: complete ? brand.base : theme.muted }]}
+        >
+          {Math.round(fraction * 100)}%
+        </Text>
+      </View>
+      <ProgressTrack
+        value={fraction}
+        fill={`linear-gradient(90deg, ${theme.accent} 0%, ${hueColors(theme, "hafalan").base} 100%)`}
+        track={theme.surfaceAlt}
+        height={10}
+      />
+    </View>
+  );
+}
+
 function CheckRow({ name, done, onToggle }: { name: string; done: boolean; onToggle: () => void }) {
   const { t } = useTranslation();
   const theme = useTheme();
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="checkbox"
       accessibilityState={{ checked: done }}
       accessibilityLabel={done ? t("mutabaah.unmark", { name }) : t("mutabaah.markDone", { name })}
       onPress={onToggle}
-      style={({ pressed }) => [styles.row, pressed ? { backgroundColor: theme.surfaceAlt } : null]}
+      scaleTo={0.985}
+      style={styles.row}
     >
       <CheckCircle checked={done} size={BOX} />
       <Text style={[typography.body, styles.grow, { color: done ? theme.muted : theme.text }]}>
         {name}
       </Text>
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -137,11 +177,13 @@ function CountRow({
 }
 
 function FardhRow({
+  prayer,
   name,
   time,
   value,
   onAction,
 }: {
+  prayer: DayPeriod;
   name: string;
   time: string | null;
   value: number;
@@ -152,13 +194,14 @@ function FardhRow({
   const done = (value & FLAG.DONE) !== 0;
   return (
     <View style={styles.fardh}>
-      <Pressable
+      <PressableScale
         accessibilityRole="checkbox"
         accessibilityState={{ checked: done }}
         accessibilityLabel={
           done ? t("mutabaah.unmark", { name }) : t("mutabaah.markDone", { name })
         }
         onPress={() => onAction("done")}
+        scaleTo={0.985}
         style={styles.fardhTop}
       >
         <CheckCircle checked={done} size={BOX} />
@@ -166,9 +209,12 @@ function FardhRow({
           {name}
         </Text>
         {time ? (
-          <Text style={[typography.callout, tabular, { color: theme.muted }]}>{time}</Text>
+          <View style={styles.time}>
+            <PrayerGlyph prayer={prayer} size={16} color={prayerTone(prayer, theme.dark)} />
+            <Text style={[typography.callout, tabular, { color: theme.muted }]}>{time}</Text>
+          </View>
         ) : null}
-      </Pressable>
+      </PressableScale>
       <View style={styles.chips}>
         <Pill
           label={t("mutabaah.onTime")}
@@ -216,4 +262,9 @@ const styles = StyleSheet.create({
   },
   grow: { flex: 1 },
   stepper: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
+  time: { flexDirection: "row", alignItems: "center", gap: 5 },
+  progress: { padding: spacing.md, gap: spacing.sm + 2 },
+  progressHead: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between" },
+  progressFigure: { fontSize: 34, fontWeight: "800", letterSpacing: -0.8 },
+  progressTotal: { fontSize: 20, fontWeight: "700" },
 });

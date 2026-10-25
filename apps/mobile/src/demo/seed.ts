@@ -98,21 +98,29 @@ const KHATAM_PAGES = [22, 18, 20, 21];
 
 /**
  * Replaces everything on the device with deterministic demo data: Jakarta prayer times, a week of mutabaah ticks, Ramadhan day 5
- * with fasting/tarawih/tadarus checks and a khatam plan. Nothing is read from or sent to the network.
+ * with fasting/tarawih/tadarus checks and a khatam plan. Nothing is read from or sent to the network. `withLocation: false`
+ * leaves the location unset, for the first-run state of the Today screen.
  */
-export async function seedDemo(db: SQLiteDatabase, locale: Locale): Promise<void> {
+export async function seedDemo(
+  db: SQLiteDatabase,
+  locale: Locale,
+  withLocation = true,
+): Promise<void> {
   const jakarta = CITIES.find((c) => c.id === "jakarta");
   if (!jakarta) throw new Error("Jakarta missing from CITIES");
   const today = dayKeyInZone(new Date(DEMO_NOW_MS), DEMO_TIME_ZONE);
 
-  const settings: Record<string, string> = {
+  const place: Record<string, string> = {
     [PRAYER_KEYS.lat]: String(jakarta.latitude),
     [PRAYER_KEYS.lon]: String(jakarta.longitude),
     [PRAYER_KEYS.tz]: jakarta.timeZone,
     [PRAYER_KEYS.locationName]: jakarta.name,
     [PRAYER_KEYS.locationAt]: String(DEMO_NOW_MS),
-    [PRAYER_KEYS.method]: "kemenag",
     locationSource: "manual",
+  };
+  const settings: Record<string, string> = {
+    ...(withLocation ? place : {}),
+    [PRAYER_KEYS.method]: "kemenag",
   };
   await db.withExclusiveTransactionAsync(async (tx) => {
     for (const table of [

@@ -6,7 +6,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { Divider, IconChip, Row, Section } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { Button, Hint, Panel, ToggleRow } from "@/ramadhan/components/fields";
-import { radius, spacing, typography, useTheme } from "@/theme";
+import { hueColors, radius, spacing, typography, useTheme } from "@/theme";
 
 import type { CirclesApi } from "../api";
 import { CirclesHttpError } from "../api";
@@ -32,6 +32,7 @@ export function CirclesHome({
 }) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const rose = hueColors(theme, "circles");
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -75,10 +76,11 @@ export function CirclesHome({
         {t("circles.intro")}
       </Text>
 
-      <Section title={t("circles.home.yourCircle")} icon="globe-outline">
+      <Section title={t("circles.home.yourCircle")} icon="globe-outline" hue="circles">
         {publicCircle ? (
           <Row
             icon="people"
+            hue="circles"
             label={circleTitle(publicCircle, t("circles.circle.defaultName"))}
             detail={describe(publicCircle)}
             chevron
@@ -87,7 +89,7 @@ export function CirclesHome({
         ) : (
           <Panel>
             <View style={styles.empty}>
-              <IconChip icon="people-outline" size={44} />
+              <IconChip icon="people-outline" size={44} color={rose.base} background={rose.soft} />
               <Text style={[typography.headline, styles.grow, { color: theme.text }]}>
                 {t("circles.home.noCircle")}
               </Text>
@@ -108,11 +110,12 @@ export function CirclesHome({
         )}
       </Section>
 
-      <Section title={t("circles.home.privateTitle")} icon="lock-closed-outline">
+      <Section title={t("circles.home.privateTitle")} icon="lock-closed-outline" hue="circles">
         {privateCircles.map((circle) => (
           <Row
             key={circle.id}
             icon="lock-closed"
+            hue="circles"
             label={circleTitle(circle, t("circles.home.privateTitle"))}
             detail={describe(circle)}
             chevron
@@ -168,7 +171,7 @@ export function CirclesHome({
         </Panel>
       </Section>
 
-      <Section title={t("circles.home.myProfile")} icon="person-circle-outline">
+      <Section title={t("circles.home.myProfile")} icon="person-circle-outline" hue="circles">
         <Panel>
           <TextField
             accessibilityLabel={t("circles.onboarding.handle")}
@@ -217,6 +220,7 @@ export function CirclesHome({
         />
         <Row
           icon="ban-outline"
+          hue="circles"
           label={t("circles.home.blocked")}
           onPress={() =>
             void run(async () => {
@@ -234,6 +238,7 @@ export function CirclesHome({
               <Row
                 key={block.id}
                 icon="person-remove-outline"
+                hue="circles"
                 label={`${block.handle} · ${t("circles.blocks.unblock")}`}
                 onPress={() =>
                   void run(async () => {
@@ -250,12 +255,12 @@ export function CirclesHome({
       {notice ? (
         <View
           accessibilityLiveRegion="polite"
-          style={[styles.notice, { backgroundColor: theme.accentSoft }]}
+          style={[styles.notice, { backgroundColor: rose.soft }]}
         >
           <Ionicons
             name="information-circle"
             size={18}
-            color={theme.accent}
+            color={rose.base}
             accessibilityElementsHidden
             importantForAccessibility="no"
           />
