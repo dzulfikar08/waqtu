@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="waqtu_countdown_widget_label">Sahur &amp; iftar countdown</string>
+  <string name="waqtu_countdown_widget_description">Counts down to the next imsak or maghrib.</string>
+  <string name="waqtu_countdown_widget_empty">Open Waqtu to load the imsak and maghrib times.</string>
+</resources>

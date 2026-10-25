@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="waqtu_countdown_widget_label">Hitung mundur sahur &amp; berbuka</string>
+  <string name="waqtu_countdown_widget_description">Hitung mundur ke imsak atau maghrib berikutnya.</string>
+  <string name="waqtu_countdown_widget_empty">Buka Waqtu untuk memuat waktu imsak dan maghrib.</string>
+</resources>

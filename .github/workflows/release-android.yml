@@ -110,6 +110,23 @@ jobs:
           if [ "$PROFILE" = production ]; then ext=aab; fi
           bunx eas-cli@latest build --local --non-interactive --platform android --profile "$PROFILE" --output "$RUNNER_TEMP/waqtu-android-$PROFILE.$ext"
 
+      # A universal APK from the same AAB, signed with the upload key, for sideloading onto a test phone
+      # (`adb install`) without going through a Play track.
+      - name: Universal APK for sideloading
+        if: env.PROFILE == 'production'
+        working-directory: apps/mobile
+        env:
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          curl -sSfL -o "$RUNNER_TEMP/bundletool.jar" https://github.com/google/bundletool/releases/download/1.18.3/bundletool-all-1.18.3.jar
+          echo "a099cfa1543f55593bc2ed16a70a7c67fe54b1747bb7301f37fdfd6d91028e29  $RUNNER_TEMP/bundletool.jar" | sha256sum -c -
+          java -jar "$RUNNER_TEMP/bundletool.jar" build-apks --mode=universal \
+            --bundle="$RUNNER_TEMP/waqtu-android-production.aab" --output="$RUNNER_TEMP/universal.apks" \
+            --ks=release.jks --ks-pass="pass:$STORE_PASSWORD" --ks-key-alias="$KEY_ALIAS" --key-pass="pass:$KEY_PASSWORD"
+          unzip -p "$RUNNER_TEMP/universal.apks" universal.apk > "$RUNNER_TEMP/waqtu-android-production-universal.apk"
+
       - name: Checksum
         run: sha256sum "$RUNNER_TEMP"/waqtu-android-* | tee -a "$GITHUB_STEP_SUMMARY"
 

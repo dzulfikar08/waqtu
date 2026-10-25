@@ -1,170 +1,105 @@
-# Waqtu Development Roadmap
+# Waqtu roadmap
 
-> **Last updated**: 6 May 2025
-> **Overall progress**: Phase 1 ✅ | Phase 2 ✅ | Phase 3 ✅ | Phase 4 🚧 ~60%
+> **Last updated:** 25 Oct 2026
 
----
+Waqtu is prayer times, mutabaah yaumiyah and asynchronous halaqah for Muslims with little time:
+privacy-first (prayer math on the device, location never leaves it) and open source. Positioning for
+the phone launch: **Halaqah tanpa macet**.
 
-## Current State (v1.0)
+## Launch timeline
 
-- macOS 12+ native menu bar app (Swift/SwiftUI)
-- Prayer time countdown in menu bar
-- Calendar protection (Exchange, iCloud, default calendar)
-- Full-screen calm reminders
-- Offline prayer time calculation
-- Location-based (Core Location, never transmitted)
-- Polar.sh payment, lifetime license ($9.99 regular, $2.99 intro)
-- Landing page on Cloudflare (Next.js 16)
+From `docs/marketing/launch-plan.md`. Ramadhan dates follow the app's own calculation; Indonesia may
+start a day later.
 
----
+| Date            | Milestone                                             |
+| --------------- | ----------------------------------------------------- |
+| Dec 2026        | Build in public, waitlist, kajian channel list        |
+| 1-14 Jan 2027   | Waitlist push, kajian pitches                         |
+| **15 Jan 2027** | **Store submission target (App Store + Google Play)** |
+| **~8 Feb 2027** | **Ramadhan 1448H day 1**: launch and daily use        |
+| ~24 Feb 2027    | 17 Ramadhan                                           |
+| ~9 Mar 2027     | Eid al-Fitr                                           |
+| After Ramadhan  | Retention; fiqh companion at the earliest (see below) |
 
-## Phase 1: Strengthen Core (Now → 4 weeks) ✅ COMPLETE
+## Current state per platform
 
-### Critical
+| Platform                  | Path            | State                                                                                                                                                   |
+| ------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Phone app (iOS + Android) | `apps/mobile`   | Expo 57 / RN 0.86, version 0.1.0. Android versionCode 3 on Play internal testing. iOS ships as the next version of App Store record `dat.waqtu.ios`.    |
+| Mac app                   | `apps/apple`    | Swift menu-bar app, direct (Developer ID, Sparkle) and Mac App Store builds. 1.1.0 released May 2026; account, sync and Kemenag are in _Unreleased_.    |
+| Web                       | `apps/web`      | Astro on Cloudflare: landing (id + en), blog, Mac page, compare, changelog, resources, privacy/terms/support, waitlist, Polar checkout + webhook.       |
+| API                       | `services/api`  | Cloudflare Worker `waqt-updates` with D1 `waqtu-db` and R2: better-auth (Apple + Google), sync, circles, billing/entitlements, Sparkle appcast and DMG. |
+| Shared logic              | `packages/core` | Prayer times, Hijri/Ramadhan, khatam plan, fidyah/zakat, recitation alignment engine; `bun test`.                                                       |
+| Content                   | `content/`      | Quran text + metadata (Tanzil), Ramadhan 1448 halaqah program (draft, pending owner approval).                                                          |
 
-- [x] Re-enable webhook signature verification (currently disabled in `src/app/api/payments/webhook/route.ts`) — Standard Webhooks HMAC verification active with Polar.sh
-- [x] Add pre-prayer buffer notifications (10/15/20 min before) — top user request across Reddit
-- [x] Support multiple prayer calculation methods with per-madhab Asr settings (Hanafi vs Shafi'i)
-- [x] Add custom time offset per prayer to match local mosque times
+The Expo app replaces the Swift iPhone app; the old Swift iOS widget and watch targets stay in
+`apps/apple` for CI only and are not submitted again (`docs/backend-decision.md`).
 
-### Polish
+## Shipped
 
-- [x] Adhan audio notification option
-- [x] Improve onboarding flow — 4-step welcome walkthrough on first launch, explains privacy-first location
-- [x] Add "next prayer" vs "current prayer" indicator in menu bar
-- [x] Hijri date display in menu bar dropdown
+### Phone app (`apps/mobile`)
 
----
+- **Today / Week tabs**: prayer times, adhan reminders (exact alarms on Android), mutabaah checklist
+  with custom amalan, streak with grace days, one-time import of the Swift app's iCloud streak.
+- **Ramadhan tab**: imsak/iftar countdown (lock screen where supported), daily fasting, tarawih,
+  tadarus and i'tikaf log, shareable imsakiyah; khatam planner that rebalances, qadha/fidyah and
+  zakat fitrah (Premium).
+- **Halaqah**: Ramadhan 1448 program with voice reflection, share to circle, daily nudge and optional
+  amalan; shown in release builds only once its content is approved.
+- **Circles**: small anonymous halaqah groups for reflections and voice notes, handles, invite codes,
+  gender isolation (Premium).
+- **Hafalan & murojaah**: targets with self-check and recordings kept out of iOS backups.
+- **Account and sync**: optional sign-in (Apple, Google), offline-first SQLite with last-write-wins
+  sync (Premium), in-app account deletion.
+- **Premium paywall**: native IAP (`expo-iap`), server-verified; id (default) and en.
+- **Store pipeline**: demo mode and Maestro screenshot workflow, store listing text in
+  `apps/mobile/store/`.
 
-## Phase 2: Professional Features (4 → 10 weeks) 🚧 IN PROGRESS
+### Mac app (`apps/apple`)
 
-### Calendar & Work Integration
+- Menu-bar countdown, full-screen reminders, adhan and calm sounds, calendar protection (Exchange,
+  iCloud, Google), Slack status, location profiles, streak, onboarding (1.1.0).
+- Unreleased: Kemenag RI method matching `@waqtu/core`, Waqtu account (Google; Apple in the MAS
+  build), sync of the five fardhu and prayer settings, menu-bar fardhu checklist, Ramadhan countdown,
+  Premium from the signed-in account (`GET /v1/entitlement`).
 
-- [x] Google Calendar integration (OAuth) — GoogleCalendarManager built
-- [x] Customizable calendar event titles and duration (e.g., "Prayer — Dhuhr" or just "Busy") — block duration slider in Settings
-- [x] Pre-prayer buffer in calendar (block 0-10 min before for preparation/wudu) — slider in Calendar Protection settings
-- [x] Slack status integration — auto-set "Praying" during prayer times via Keychain-backed token, auto-expires
-- [~] Teams status integration — Microsoft Graph presence API requires admin-consented delegated permissions; impractical for individual Mac app
+### API (`services/api`)
 
-### Workplace Advocacy
+- Replaces the legacy `mutabaahapp-production` worker (decision in `docs/backend-decision.md`).
+- Entitlements from App Store (JWS verified to Apple Root CA G3), Google Play (Android Publisher API +
+  RTDN) and Polar (HMAC webhooks).
 
-- [x] Generate "prayer accommodation" email template for HR/managers — live at /resources/prayer-accommodation
-- [x] Add printable/forwardable "prayer times card" for sharing with colleagues — live at /resources/prayer-times-card
+## Premium
 
----
+One subscription unlocks the phone apps (iOS, Android) and the Mac app. Prayer times, adhan reminders,
+imsakiyah and basic mutabaah stay free.
 
-## Phase 3: Engagement & Retention (10 → 16 weeks) 🚧 IN PROGRESS
+| Item         | Value                                                                                    |
+| ------------ | ---------------------------------------------------------------------------------------- |
+| Premium-only | Sync across devices, circles, Ramadhan trackers (khatam, qadha/fidyah, zakat fitrah)     |
+| App Store    | Group `Waqtu Premium`: `dat.waqtu.premium.monthly`, `dat.waqtu.premium.yearly`           |
+| Google Play  | Subscription `premium`, base plans `monthly` and `yearly`                                |
+| Prices (IDR) | Rp 29.000 / month, Rp 249.000 / year                                                     |
+| Server       | `GET /v1/entitlement` answers `{ premium, source, expiresAt }` for the signed-in account |
 
-### Prayer Habit Tracking
+Owner decisions of 25 Oct 2026: sync and circles are Premium; the Mac moves to the same subscription;
+**no lifetime**, and the web stops selling lifetime. There are no paid users yet, so no lifetime buyers
+need grandfathering. Store products are configured by the owner (README, _Store setup_).
 
-- [x] Simple prayer log (prayed / missed per prayer) — PrayerStreakManager with UserDefaults persistence
-- [x] Weekly/monthly streak view — collapsible StreakReportView in menu bar with weekly mini-grid, current/best streak
-- [x] Optional daily hadith or dua in the reminder overlay — Quranic quote + DailyHadithProvider
-- [x] Post-prayer activity detection — monitors idle time after "I am going to pray"; sends reminder if user keeps working
+## In flight
 
-### Notifications & Customization
+| Work                         | Scope                                                                                                                       | Status                                                                                                            |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Premium cutover              | Mac licensing to subscription, remove lifetime from web and paywall                                                         | In progress                                                                                                       |
+| Mac phase 2                  | Localization (id + en), full mutabaah, streak, imsakiyah, halaqah, hafalan, circles                                         | In progress                                                                                                       |
+| On-device recitation check   | `whisper.rn` with `tarteel-ai/whisper-base-ar-quran` (ggml q8_0, ~82 MB, downloaded on first use); alignment engine in core | Engine and harness done; model not yet run on a phone (`docs/recitation/model-evaluation.md`)                     |
+| Fiqh companion (four madhab) | RAG over classical texts with exact citations, never picks a side                                                           | Research only; after Ramadhan, after scholar review, pending licence decision (`docs/fiqh-companion/research.md`) |
 
-- [x] Custom notification sounds (calm alternatives to Adhan for office) — CustomSoundManager
-- [x] Dark/light mode for the reminder overlay — theme picker in Settings, warm cream light theme
-- [x] Multiple location profiles (office vs home vs traveling) — LocationProfilesManager
+## Open owner decisions
 
----
-
-## Phase 4: Growth (16 → 24 weeks) 🚧 IN PROGRESS
-
-### ✅ 4.1 Apple Watch Complications (code complete, pending Xcode targets)
-
-- 5 complication families: Graphic Corner, Graphic Circular, Graphic Rectangular, Modular Large, Modular Small
-- Cached prayer times with once-daily refresh
-- SharedDataBridge pushes data from Mac app
-
-### ✅ 4.2 iOS Companion App (code complete, pending Xcode targets)
-
-- Read-only companion — Today view, Streak view, Settings
-- iCloud sync via NSUbiquitousKeyValueStore + shared app group
-- Lock Screen / Home Screen widget (PrayerWidget)
-
-### ✅ 4.3 macOS Widgets (code complete, pending Xcode target)
-
-- Small: Next prayer countdown
-- Medium: Countdown + prayer timeline
-- Large: Weekly streak + prayer timeline
-- WidgetKit with shared app group data source
-
-### ⏳ 4.4 Mosque Time Sync (3–4 weeks, not started)
-
-- **Scope**: Partner with Mawaqit or similar mosque time API to auto-sync mosque-specific jama'ah times
-- **Flow**: User searches their mosque → Waqtu fetches official times → applies them as a "mosque profile" with auto-adjustments
-- **Tech**: REST API integration, offline cache of mosque times (JSON)
-- **Why now**: #1 complaint in research — "I can never match my local mosque times"
-- **Key risk**: API availability and reliability. Plan fallback: manual mosque profile with user-entered offsets
-
-#### 4.5 Congregation Finder (2–3 weeks, opt-in)
-
-- **Scope**: Opt-in feature showing which colleagues in your Slack workspace or organization also use Waqtu
-- **Privacy-first**: Only shows count of users, never names. Requires explicit opt-in
-- **Why later**: Requires backend infrastructure. Evaluate after iOS app ships
-
-### Phase 4 Execution Order
-
-| Order | Item                      | Effort    | Impact     | Dependencies                                        |
-| ----- | ------------------------- | --------- | ---------- | --------------------------------------------------- |
-| 1     | Apple Watch complications | 2–3 weeks | High       | iOS companion (or standalone via WatchConnectivity) |
-| 2     | iOS companion app         | 6–8 weeks | High       | iCloud sync setup                                   |
-| 3     | macOS widgets             | 1–2 weeks | Medium     | None                                                |
-| 4     | Mosque time sync          | 3–4 weeks | High       | API partner agreement                               |
-| 5     | Congregation finder       | 2–3 weeks | Low-Medium | Backend infra                                       |
-
-### Phase 4 Success Metrics
-
-- iOS app: 500+ downloads in first month
-- Watch complications: Mentioned in 3+ App Store reviews
-- Mosque sync: 50+ mosques synced in first month
-- Overall: 2,000+ total Waqtu users across all platforms
-
----
-
-## Feature Prioritization Framework
-
-| Priority   | Signal                                        |
-| ---------- | --------------------------------------------- |
-| **Must**   | Users actively complain about its absence     |
-| **Should** | Competitors have it, users mention wanting it |
-| **Nice**   | Differentiator that could attract new users   |
-| **Later**  | No direct user demand yet, but strategic      |
-
-### Signals from Research (Reddit/Forums)
-
-1. **Pre-prayer notifications** — mentioned by multiple users, offered by Minarah and Slack Prayer Reminder
-2. **Mosque time sync** — "I can never get them to match my local mosques" (top complaint)
-3. **No ads, no tracking** — Muslim Pro data scandal makes privacy a trust differentiator
-4. **Apple Watch** — requested in nearly every "what app do you use" thread
-5. **Prayer streaks** — Pillars users value this for consistency motivation
-6. **Calendar integration** — Waqtu's killer feature; PrayerCal validates the need exists
-
----
-
-## Competitive Landscape Quick Reference
-
-| Competitor | Platform         | Price               | Key Differentiator               |
-| ---------- | ---------------- | ------------------- | -------------------------------- |
-| Sajda      | macOS native     | Free / $3.99 Pro    | Open-source, modern, Adhan audio |
-| Minarah    | macOS 14+        | Free                | Focus Mode (forced screen block) |
-| Guidance   | macOS + iOS      | Free                | Oldest, trusted, Apple Watch     |
-| PrayerCal  | Web (ICS)        | Free                | Calendar-only, no native app     |
-| Athan Pro  | macOS (Catalyst) | Free + IAP          | Feature-bloated, mobile-first    |
-| Pillars    | iOS only         | Free / subscription | Clean, streaks, no Mac app       |
-| Muslim Pro | iOS/Android      | Free + IAP          | Privacy scandal, ad-heavy        |
-
-**Waqtu's moat**: Only native Mac app that combines menu bar presence + calendar busy blocks (Exchange/iCloud/Google) + prayer streak tracking + post-dismiss accountability. PrayerCal comes closest but has no native app, no reminders, no offline, no streaks.
-
----
-
-## Features Built (Beyond Original Roadmap)
-
-These were developed organically and not part of the initial plan:
-
-- **Post-prayer activity detection**: After clicking "I am going to pray", polls system idle time for 5 min. If mouse/keyboard activity is detected, sends a gentle reminder notification. Uses `CGEventSource` API — no permissions needed.
-- **Slack status integration**: Auto-sets user's Slack status to "Praying" during prayer times. Uses Slack's `users.profile.set` API with `status_expiration` for auto-clear. Keychain-backed User OAuth Token (users.profile:write scope). Configured via Settings → Slack tab with status text and emoji customization.
-- **Slate blue secondary color palette**: `#6B8FAD` secondary accent used for snooze button and background glow. Dark variant `#5A7D9A`.
-- **Refactored color system**: All inline `Color(red:green:blue:)` replaced with shared `Color.waqtu*` named constants.
+| Decision                 | What is needed                                                                                                                                                                 |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Halaqah content approval | `content/halaqah/ramadhan-1448/program.json` is `draft-pending-owner-approval`; release builds hide it and posts leave it out until approved.                                  |
+| Fiqh licence (D1)        | OpenITI is CC BY-NC-SA 4.0: keep the companion free, get OpenITI/KITAB permission, or a legal opinion. Until then it cannot be Premium. Also D2-D8 in the research doc.        |
+| Recitation recordings    | 50 labelled murojaah recordings from Indonesian memorisers with written consent (kept off the repo), plus a mid-range Android device test, before the feature can be accepted. |
+| Legacy backend accounts  | Confirm whether the 3 `mutabaahapp-production` accounts are real users (migration is manual if so).                                                                            |

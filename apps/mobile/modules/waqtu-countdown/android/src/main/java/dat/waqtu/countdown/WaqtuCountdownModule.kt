@@ -12,6 +12,7 @@ import expo.modules.kotlin.modules.ModuleDefinition
 /**
  * Ongoing lock-screen notification that counts down to a moment (iftar, imsak). The countdown is a system
  * chronometer, so it keeps ticking while the app is closed; the notification removes itself at the target time.
+ * Also feeds the home-screen widget ([WaqtuCountdownWidget]) its schedule of upcoming imsak/maghrib moments.
  */
 class WaqtuCountdownModule : Module() {
   private val context: Context
@@ -28,6 +29,8 @@ class WaqtuCountdownModule : Module() {
     }
 
     Function("cancel") { manager.cancel(NOTIFICATION_ID) }
+
+    Function("setWidgetSchedule") { json: String -> WaqtuCountdownWidget.setSchedule(context, json) }
   }
 
   /** Posts (or replaces) the countdown. False when notifications are blocked or the target already passed. */
