@@ -34,6 +34,7 @@
 - **Fix: "still working" no longer erases the phone's record** — The "missed" the Mac infers after "I am going to pray" stays on this Mac and is never synced over a done/jamaah record made on the phone.
 - **License** — Direct-download build: "Link license to account" attaches the Polar license to the signed-in account (hidden until the server offers it).
 - Unit tests for the sync merge, mapping, settings whitelist and Ramadhan countdown run in CI (`xcodebuild test`, scheme `waqtu`).
+- Imsakiyah engine for the Ramadhan month table: Hijri month start/length, current-or-next Ramadhan and the daily imsak…isha table, ported from `@waqtu/core` and tested in CI against fixtures generated from it (`scripts/imsakiyah-fixtures.ts`).
 
 ## 1.1.0 (May 2026)
 
