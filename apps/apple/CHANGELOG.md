@@ -12,6 +12,9 @@
 - **Sync** — The prayer log (five fardhu) and the prayer settings (calculation method, madhab, time adjustments) sync with the mobile app over `/v1/sync`, last-write-wins. Location is never uploaded.
 - **Menu bar checklist** — "Today's prayers" shows the five fardhu; click one to mark it prayed (click again to undo). Edits sync in the background.
 - **Ramadhan** — During Ramadhan the menu bar title counts down to iftar, or to imsak (fajr − 10 min) outside fasting hours. Follows the moon-sighting correction (`hijriOffset`) set on the phone. Can be turned off in Settings → Account.
+- **Premium from the account** — An active Waqtu subscription (App Store, Play or Polar) on the signed-in account unlocks the Mac app (`GET /v1/entitlement`, refreshed on sign-in, launch and every sync; cached offline, cleared on sign-out).
+- **Fix: non-Gregorian system calendars** — Prayer log day keys and Ramadhan detection always use Gregorian dates, so an Islamic, Buddhist or Japanese system calendar no longer writes Hijri-year keys into the synced log.
+- **Fix: "still working" no longer erases the phone's record** — The "missed" the Mac infers after "I am going to pray" stays on this Mac and is never synced over a done/jamaah record made on the phone.
 - **License** — Direct-download build: "Link license to account" attaches the Polar license to the signed-in account (hidden until the server offers it).
 - Unit tests for the sync merge, mapping, settings whitelist and Ramadhan countdown run in CI (`xcodebuild test`, scheme `waqtu`).
 

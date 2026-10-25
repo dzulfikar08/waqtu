@@ -43,6 +43,24 @@ struct AccountUser: Codable, Equatable {
     let name: String?
 }
 
+/// `GET /v1/entitlement` (services/api/src/billing/entitlement.ts `EntitlementView`): premium from
+/// any source the account holds (App Store, Play, Polar subscription, Mac license key).
+struct AccountEntitlement: Decodable, Equatable {
+    let premium: Bool
+    /// "apple" | "google" | "polar" | "license"; nil when the account never held premium.
+    let source: String?
+    /// ISO time premium ends; nil for lifetime premium and for accounts that never held premium.
+    let expiresAt: String?
+
+    static func decode(_ data: Data) throws -> AccountEntitlement {
+        do {
+            return try JSONDecoder().decode(AccountEntitlement.self, from: data)
+        } catch {
+            throw WaqtuAPIError.invalidResponse
+        }
+    }
+}
+
 enum WaqtuAPIError: Error, LocalizedError, Equatable {
     case http(status: Int, message: String?)
     case invalidResponse
@@ -222,6 +240,12 @@ final class WaqtuAPIClient {
     /// Ends the session on the server; the caller forgets the token either way.
     func signOut(token: String) async {
         _ = try? await perform("/api/auth/sign-out", method: "POST", token: token, body: [:])
+    }
+
+    /// Premium status of the signed-in account across every platform (`GET /v1/entitlement`).
+    func entitlement(token: String) async throws -> AccountEntitlement {
+        let (data, _) = try checked(try await perform("/v1/entitlement", method: "GET", token: token))
+        return try AccountEntitlement.decode(data)
     }
 
     /// Links the Polar license key to the signed-in account (`POST /v1/entitlement/link-license`).

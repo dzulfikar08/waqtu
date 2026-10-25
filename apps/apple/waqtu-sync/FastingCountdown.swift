@@ -13,10 +13,12 @@ enum Ramadhan {
     /// Sahur ends at imsak, this many minutes before fajr.
     static let defaultImsakMinutes = 10
 
-    /// True when the civil day of `date` (in `calendar`) is in Ramadhan under the Umm al-Qura
-    /// calendar shifted by `hijriOffset` days (moon-sighting correction; Indonesia often lags by 1).
+    /// True when the civil (Gregorian) day of `date` in `calendar`'s time zone is in Ramadhan under
+    /// the Umm al-Qura calendar shifted by `hijriOffset` days (moon-sighting correction; Indonesia
+    /// often lags by 1). Only the zone of `calendar` is used, so a non-Gregorian system calendar
+    /// does not shift the result.
     static func isRamadhan(on date: Date, hijriOffset: Int = 0, calendar: Calendar = .current) -> Bool {
-        let civil = calendar.dateComponents([.year, .month, .day], from: date)
+        let civil = FardhMapping.gregorian(in: calendar).dateComponents([.year, .month, .day], from: date)
         guard let year = civil.year, let monthOfYear = civil.month, let day = civil.day else { return false }
         // Noon UTC avoids any zone edge: only the civil Y-M-D matters.
         var utc = Calendar(identifier: .gregorian)
