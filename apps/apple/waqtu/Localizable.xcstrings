@@ -41,26 +41,6 @@
         }
       }
     },
-    "%@, not yet prayed" : {
-      "localizations" : {
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@, belum sholat"
-          }
-        }
-      }
-    },
-    "%@, prayed" : {
-      "localizations" : {
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@, sudah sholat"
-          }
-        }
-      }
-    },
     "%lld days left in trial" : {
       "localizations" : {
         "en" : {
@@ -95,6 +75,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld menit"
+          }
+        }
+      }
+    },
+    "%lld pages" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld page"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld pages"
+                }
+              }
+            }
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld halaman"
           }
         }
       }
@@ -248,6 +256,26 @@
         }
       }
     },
+    "Add" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tambah"
+          }
+        }
+      }
+    },
+    "Add %@" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tambahkan %@"
+          }
+        }
+      }
+    },
     "Add 5 min reminder" : {
       "localizations" : {
         "id" : {
@@ -364,6 +392,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Blokir kalender otomatis selama waktu sholat agar rekan kerja melihatmu sedang sibuk di Outlook dan Teams."
+          }
+        }
+      }
+    },
+    "Available to add back" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bisa ditambahkan kembali"
           }
         }
       }
@@ -548,6 +586,16 @@
         }
       }
     },
+    "Charity" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sedekah"
+          }
+        }
+      }
+    },
     "Check for Updates…" : {
       "localizations" : {
         "id" : {
@@ -558,12 +606,32 @@
         }
       }
     },
+    "Checkbox" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centang"
+          }
+        }
+      }
+    },
     "Choose a dark or light appearance for the prayer overlay." : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pilih tampilan gelap atau terang untuk layar pengingat."
+          }
+        }
+      }
+    },
+    "Choose a day" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pilih tanggal"
           }
         }
       }
@@ -628,6 +696,16 @@
         }
       }
     },
+    "Counter" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hitungan"
+          }
+        }
+      }
+    },
     "Create daily busy blocks for each prayer so Outlook and Teams show you as busy. Events are recreated every day." : {
       "localizations" : {
         "id" : {
@@ -668,6 +746,16 @@
         }
       }
     },
+    "Decrease %@" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurangi %@"
+          }
+        }
+      }
+    },
     "Default" : {
       "localizations" : {
         "id" : {
@@ -694,6 +782,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dzikir saat istirahat"
+          }
+        }
+      }
+    },
+    "Dhuha prayer" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sholat dhuha"
           }
         }
       }
@@ -804,6 +902,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Masukkan koordinat jika deteksi otomatis tidak tersedia. Contoh: Makkah 21.4225, 39.8262"
+          }
+        }
+      }
+    },
+    "Evening dhikr" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dzikir petang"
+          }
+        }
+      }
+    },
+    "Every practice, including the five daily prayers, can be hidden and restored any time." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Semua amalan, termasuk lima sholat fardhu, bisa disembunyikan dan dikembalikan kapan saja."
           }
         }
       }
@@ -928,6 +1046,16 @@
         }
       }
     },
+    "Hafalan review" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Murojaah hafalan"
+          }
+        }
+      }
+    },
     "Hanafi (later)" : {
       "localizations" : {
         "id" : {
@@ -1010,6 +1138,26 @@
     },
     "Imsak" : {
       "shouldTranslate" : false
+    },
+    "In congregation" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berjamaah"
+          }
+        }
+      }
+    },
+    "Increase %@" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tambah %@"
+          }
+        }
+      }
     },
     "Indeed, We have granted you al-Kawthar." : {
       "localizations" : {
@@ -1254,8 +1402,28 @@
         }
       }
     },
+    "Made up" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qadha"
+          }
+        }
+      }
+    },
     "Maghrib" : {
       "shouldTranslate" : false
+    },
+    "Manage checklist" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atur daftar amalan"
+          }
+        }
+      }
     },
     "Manual Coordinates" : {
       "localizations" : {
@@ -1267,7 +1435,7 @@
         }
       }
     },
-    "Mark %@ as prayed" : {
+    "Mark %@ done" : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
@@ -1277,12 +1445,12 @@
         }
       }
     },
-    "Marked as prayed. Click to undo." : {
+    "Mark %@ done. Right-click for on time, in congregation or made up." : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sudah ditandai selesai. Klik untuk membatalkan."
+            "value" : "Tandai %@ selesai. Klik kanan untuk tepat waktu, berjamaah, atau qadha."
           }
         }
       }
@@ -1327,11 +1495,34 @@
         }
       }
     },
+    "Morning dhikr" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dzikir pagi"
+          }
+        }
+      }
+    },
     "Murattal" : {
       "shouldTranslate" : false
     },
     "Muslim World League" : {
       "shouldTranslate" : false
+    },
+    "Mutabaah" : {
+      "shouldTranslate" : false
+    },
+    "My list" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daftar saya"
+          }
+        }
+      }
     },
     "Never Miss a Prayer" : {
       "localizations" : {
@@ -1359,6 +1550,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sholat berikutnya"
+          }
+        }
+      }
+    },
+    "Next day" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hari berikutnya"
           }
         }
       }
@@ -1425,6 +1626,16 @@
     },
     "OK" : {
       "shouldTranslate" : false
+    },
+    "On time" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tepat waktu"
+          }
+        }
+      }
     },
     "Only a few minutes until %@. Focus after salah." : {
       "localizations" : {
@@ -1499,6 +1710,16 @@
     "Pomodoro" : {
       "shouldTranslate" : false
     },
+    "Practice name, e.g. Read Al-Mulk" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nama amalan, mis. Baca Al-Mulk"
+          }
+        }
+      }
+    },
     "Prayed" : {
       "localizations" : {
         "id" : {
@@ -1569,6 +1790,16 @@
         }
       }
     },
+    "Previous day" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hari sebelumnya"
+          }
+        }
+      }
+    },
     "Qatar" : {
       "shouldTranslate" : false
     },
@@ -1578,6 +1809,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keluar"
+          }
+        }
+      }
+    },
+    "Qur'an recitation" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tilawah Al-Qur'an"
           }
         }
       }
@@ -1592,12 +1833,32 @@
         }
       }
     },
+    "Ramadan halaqah" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Halaqah Ramadhan"
+          }
+        }
+      }
+    },
     "Ramadhan" : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ramadhan"
+          }
+        }
+      }
+    },
+    "Rawatib prayers" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sholat rawatib"
           }
         }
       }
@@ -1648,6 +1909,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Notifikasi pengingat"
+          }
+        }
+      }
+    },
+    "Remove %@" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hapus %@"
           }
         }
       }
@@ -2118,6 +2389,16 @@
         }
       }
     },
+    "Tahajjud prayer" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sholat tahajud"
+          }
+        }
+      }
+    },
     "Tehran" : {
       "localizations" : {
         "id" : {
@@ -2178,12 +2459,12 @@
         }
       }
     },
-    "Today's prayers" : {
+    "Today" : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sholat hari ini"
+            "value" : "Hari ini"
           }
         }
       }
@@ -2208,8 +2489,38 @@
         }
       }
     },
+    "Type" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jenis"
+          }
+        }
+      }
+    },
     "Umm al-Qura (Makkah)" : {
       "shouldTranslate" : false
+    },
+    "Undo %@" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Batalkan %@"
+          }
+        }
+      }
+    },
+    "Undo %@. Right-click for on time, in congregation or made up." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Batalkan %@. Klik kanan untuk tepat waktu, berjamaah, atau qadha."
+          }
+        }
+      }
     },
     "University of Islamic Sciences, Karachi" : {
       "shouldTranslate" : false
@@ -2294,6 +2605,16 @@
         }
       }
     },
+    "Voluntary fasting" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puasa sunnah"
+          }
+        }
+      }
+    },
     "Waqtu %@ is ready to install" : {
       "localizations" : {
         "id" : {
@@ -2370,6 +2691,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Status Slack-mu otomatis berubah selama waktu sholat dan kembali seperti semula saat blok sholat selesai."
+          }
+        }
+      }
+    },
+    "Your checklist is empty. Add practices in Settings." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daftar amalan kosong. Tambahkan dari Pengaturan."
+          }
+        }
+      }
+    },
+    "Your own practice" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amalan buatan sendiri"
           }
         }
       }
