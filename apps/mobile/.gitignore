@@ -4,3 +4,4 @@ expo-env.d.ts
 /ios/
 credentials.json
 *.jks
+google-play-service-account.json

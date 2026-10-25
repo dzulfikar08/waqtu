@@ -23,8 +23,9 @@ apply to these files.
     loads only the surah being studied (Metro evaluates a module when it is first required). Every file
     carries a `notice` field with Tanzil's copyright, license, "verbatim copy" term and link. The
     strings are not altered; a test compares all 6236 of them to `quran-uthmani-1.1.txt`.
-  - The hafalan screens show the credit ("Teks: Tanzil Project (Utsmani)") as a link that opens
-    <https://tanzil.net>, with the font credit beside it.
+  - The hafalan screens show the credit ("Teks Al-Qur'an: Tanzil Project (tanzil.net). Huruf: Amiri Quran." / "Quran text: Tanzil
+    Project (tanzil.net). Font: Amiri Quran.", `apps/mobile/src/hafalan/strings.ts`) as a link that opens
+    <https://tanzil.net>.
 - How the text is used without modifying it:
   - Tanzil puts the Bismillah in front of ayah 1 of every surah except 1 and 9 (in surahs 95 and 97
     its marks are ordered differently). The app only **displays** it as a heading line above the

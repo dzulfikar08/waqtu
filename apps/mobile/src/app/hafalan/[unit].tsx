@@ -191,7 +191,7 @@ export default function UnitScreen() {
 
       <Section title={t("hafalan.recitation")}>
         <View style={styles.panel}>
-          <Recitation unit={index} saved={data.recordings.get(index)} />
+          <Recitation key={index} unit={index} saved={data.recordings.get(index)} />
         </View>
       </Section>
       <QuranCredit />
