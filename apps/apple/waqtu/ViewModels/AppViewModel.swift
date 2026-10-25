@@ -13,7 +13,10 @@ final class AppViewModel {
     let locationManager: LocationManager
     let calendarManager: CalendarManager
     let trialManager: TrialManager
-    let licenseManager: LicenseManager
+    #if MAS
+    /// Waqtu Premium bought in the Mac App Store (auto-renewing subscription).
+    let storeSubscription: MacStoreSubscription
+    #endif
     let streakManager: PrayerStreakManager
     let slackManager: SlackManager
     let pomodoroManager: PomodoroManager
@@ -47,24 +50,32 @@ final class AppViewModel {
     /// True while calendar access is being refreshed.
     var isRefreshingCalendarAccess: Bool = false
 
-    /// Full access: trial active, trial used (legacy), valid license, or premium on the signed-in
-    /// Waqtu account (one subscription unlocks mobile and the Mac).
+    /// Full access: trial active, trial used (legacy), or paid premium.
     var hasAccess: Bool {
         trialManager.hasAccess || isPremium
     }
 
-    /// Paid premium (license key or account entitlement), as opposed to the trial.
+    /// Paid premium, as opposed to the trial: an active Mac App Store subscription (MAS build) or
+    /// premium on the signed-in Waqtu account (one subscription unlocks mobile and the Mac).
     var isPremium: Bool {
-        licenseManager.isLicensed || account.serverPremium
+        hasStoreSubscription || account.serverPremium
+    }
+
+    /// An active Mac App Store subscription on this Mac; always false in the direct-download build.
+    var hasStoreSubscription: Bool {
+        #if MAS
+        return storeSubscription.isActive
+        #else
+        return false
+        #endif
     }
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(trialManager: TrialManager = TrialManager(), licenseManager: LicenseManager = LicenseManager()) {
+    init(trialManager: TrialManager = TrialManager()) {
         let settings = AppSettings()
         self.settings = settings
         self.trialManager = trialManager
-        self.licenseManager = licenseManager
         self.calculator = PrayerTimeCalculator(settings: settings)
         self.reminderScheduler = PrayerReminderScheduler(settings: settings)
         self.locationManager = LocationManager()
@@ -77,6 +88,14 @@ final class AppViewModel {
         self.syncController = MutabaahSyncController(
             account: account, streakManager: streakManager, settings: settings
         )
+        #if MAS
+        let storeSubscription = MacStoreSubscription()
+        self.storeSubscription = storeSubscription
+        // Every active subscription transaction also goes to the account, so the phone unlocks too.
+        storeSubscription.onSignedTransaction = { [weak account] signed in
+            Task { @MainActor in await account?.submitAppStoreTransaction(signed) }
+        }
+        #endif
         syncController.onRemoteChanges = { [weak self] changes in
             guard let self else { return }
             if changes.prayerSettings {
@@ -95,9 +114,9 @@ final class AppViewModel {
         if settings.calendarProtectionEnabled {
             requestCalendarAccessAndRegenerate()
         }
-        Task { @MainActor in
-            await licenseManager.validate()
-        }
+        #if MAS
+        Task { @MainActor in await storeSubscription.refresh() }
+        #endif
     }
 
     private func setupLocationUpdates() {

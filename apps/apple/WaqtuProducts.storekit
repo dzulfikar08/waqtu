@@ -1,28 +1,100 @@
 {
   "identifier" : "9341b6a6-d2e0-4f5a-a617-4481fed08c1d",
-  "type" : "Default",
-  "version" : 3,
+  "nonRenewingSubscriptions" : [
+
+  ],
   "products" : [
-    {
-      "displayPrice" : "9.99",
-      "familyShareable" : false,
-      "internalID" : "9e655c21-1da2-478f-9ef0-373a17b5dc5c",
-      "localizations" : [
-        {
-          "description" : "Unlock Waqtu forever on this device. One-time purchase.",
-          "displayName" : "Lifetime Access",
-          "locale" : "en_US"
-        }
-      ],
-      "productID" : "dat.waqtu.lifetime",
-      "referenceName" : "Waqtu Lifetime",
-      "type" : "NonConsumable"
-    }
+
   ],
   "settings" : {
+    "_applicationInternalID" : "",
+    "_developerTeamID" : "",
     "_failTransactionsEnabled" : false,
-    "_locale" : "en_US",
-    "_storefront" : "USA",
-    "_storeKitErrors" : []
+    "_locale" : "id_ID",
+    "_storefront" : "IDN",
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "5E1C0D7A",
+      "localizations" : [
+
+      ],
+      "name" : "Waqtu Premium",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "29000",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6A3F2B10",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Sync across devices and Circles on Mac, iPhone and Android.",
+              "displayName" : "Waqtu Premium (monthly)",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "Sinkron antarperangkat dan Lingkaran di Mac, iPhone, dan Android.",
+              "displayName" : "Waqtu Premium (bulanan)",
+              "locale" : "id"
+            }
+          ],
+          "productID" : "dat.waqtu.mac.premium.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Waqtu Premium Mac Monthly",
+          "subscriptionGroupID" : "5E1C0D7A",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "249000",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6A3F2B11",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Sync across devices and Circles on Mac, iPhone and Android.",
+              "displayName" : "Waqtu Premium (yearly)",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "Sinkron antarperangkat dan Lingkaran di Mac, iPhone, dan Android.",
+              "displayName" : "Waqtu Premium (tahunan)",
+              "locale" : "id"
+            }
+          ],
+          "productID" : "dat.waqtu.mac.premium.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Waqtu Premium Mac Yearly",
+          "subscriptionGroupID" : "5E1C0D7A",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
   }
 }

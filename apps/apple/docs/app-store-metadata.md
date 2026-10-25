@@ -106,7 +106,7 @@ Waqtu lives in your Mac's menu bar and protects your prayer time at work.
 
 Runs fully offline. Your location stays on your Mac — no servers, no analytics, no ads.
 
-Unlock lifetime access with a single one-time In-App Purchase. A 7-day free trial lets you try everything first.
+Waqtu Premium is an auto-renewing subscription (monthly or yearly) that also unlocks Waqtu on iPhone and Android through your Waqtu account. A 7-day free trial lets you try everything first.
 ```
 
 **Keywords** (≤100)
@@ -121,24 +121,32 @@ prayer times,adhan,salah,namaz,islamic,muslim,menu bar,mosque,quran,ramadan,hijr
 **What's New** (v2.0 — first MAS release)
 
 ```
-Waqtu arrives on the Mac App Store: menu-bar prayer countdown, calendar busy protection, reminder overlay, prayer streaks, and 13 calculation methods. One-time lifetime unlock via In-App Purchase with a 7-day free trial.
+Waqtu arrives on the Mac App Store: menu-bar prayer countdown, calendar busy protection, reminder overlay, prayer streaks, and 13 calculation methods. Waqtu Premium subscription with a 7-day free trial.
 ```
 
-**In-App Purchase** (create in ASC → In-App Purchases)
+**Subscriptions** (create in ASC → Subscriptions, group `Waqtu Premium`)
 
 ```
-Reference Name:     Waqtu Lifetime
-Product ID:         dat.waqtu.lifetime      <- must match code exactly
-Type:               Non-Consumable
-Price:              $9.99 USD (tier)
-Display Name (en):  Lifetime Access
-Description (en):   Unlock Waqtu forever on this device. One-time purchase.
+Reference Name:     Waqtu Premium Mac Monthly
+Product ID:         dat.waqtu.mac.premium.monthly   <- must match code exactly
+Duration:           1 month
+Price:              Rp 29.000 (other regions: USD 2.99)
+
+Reference Name:     Waqtu Premium Mac Yearly
+Product ID:         dat.waqtu.mac.premium.yearly    <- must match code exactly
+Duration:           1 year
+Price:              Rp 249.000 (other regions: USD 24.99)
+
+Display Name (en):  Waqtu Premium (monthly / yearly)
+Description (en):   Sync across devices and Circles on Mac, iPhone and Android.
 ```
+
+The old non-consumable `dat.waqtu.lifetime` is retired: remove it from sale.
 
 **App Review Notes**
 
 ```
-Menu-bar agent app (no dock icon; LSUIElement). Grant Location for accurate times and Calendar access for the "busy block" feature — both are optional but recommended. The lifetime unlock is a non-consumable In-App Purchase (dat.waqtu.lifetime); a 7-day free trial precedes it. Restore Purchases is available in Settings → Upgrade. This sandboxed build excludes Slack/Google Calendar and auto-update (handled by the App Store).
+Menu-bar agent app (no dock icon; LSUIElement). Grant Location for accurate times and Calendar access for the "busy block" feature — both are optional but recommended. Waqtu Premium is an auto-renewable subscription (dat.waqtu.mac.premium.monthly / .yearly) after a 7-day free trial; Subscribe, Restore Purchases and Manage Subscription are in Settings → Upgrade. Signing in with a Waqtu account is optional; a subscription bought in this app is linked to that account so it also unlocks the phone apps. This sandboxed build excludes Slack/Google Calendar and auto-update (handled by the App Store).
 ```
 
 **Privacy Policy URL**: same as iOS.
@@ -147,5 +155,5 @@ Menu-bar agent app (no dock icon; LSUIElement). Grant Location for accurate time
 
 ## Pricing notes
 
-- MAS lifetime IAP: $9.99 tier matches the direct-distribution Polar price (Apple takes 30%).
-- iOS companion is free (no IAP).
+- Mac App Store: the same Waqtu Premium prices as the phone apps (Rp 29.000 / Rp 249.000).
+- The direct-download build sells nothing; it unlocks with a subscribed Waqtu account.

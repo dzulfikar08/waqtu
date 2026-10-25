@@ -46,9 +46,9 @@ You don't open anything. You don't check anything. You just see it, like you see
 
 Waqtu doesn't require an account. There's no login, no cloud sync (unless you want it), no data collection. Everything runs locally on your Mac. Your prayer data is yours alone.
 
-## One payment, forever
+## Free to try, one subscription for every device
 
-Waqtu costs $9.99 for lifetime access — less than most apps charge per year. No subscription. No recurring charges. One payment, all features, all future updates.
+Download Waqtu and try it free. Waqtu Premium is Rp 29.000/month or Rp 249.000/year, bought in the App Store, Google Play or the Mac App Store edition. One subscription on your Waqtu account unlocks every device you sign in on.
 
 <div className="neu-card p-6 mt-10">
   <p className="font-medium text-[var(--waqtu-text)]">Try it yourself</p>

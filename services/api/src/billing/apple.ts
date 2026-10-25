@@ -6,9 +6,23 @@
 
 export const APPLE_ROOT_CA_G3_SHA256 =
   "63343abfb89a6a03ebb57e9b3f5fa7be7c4f5c756f3017b3a8c488c3653e9179";
-export const APPLE_BUNDLE_ID = "dat.waqtu.ios";
-/** Auto-renewable subscriptions in the "Waqtu Premium" group. */
-export const APPLE_PRODUCT_IDS = ["dat.waqtu.premium.monthly", "dat.waqtu.premium.yearly"] as const;
+/** One App Store app that sells Waqtu Premium and the auto-renewable subscriptions it sells. */
+export interface AppleApp {
+  bundleId: string;
+  productIds: readonly string[];
+  /** App Store numeric app id; when set, Production notifications for this bundle must carry it. */
+  appAppleId?: number;
+}
+/** iPhone app: "Waqtu Premium" subscription group. */
+export const APPLE_IOS_APP: AppleApp = {
+  bundleId: "dat.waqtu.ios",
+  productIds: ["dat.waqtu.premium.monthly", "dat.waqtu.premium.yearly"],
+};
+/** Mac App Store app (waqtu-mas): its own "Waqtu Premium" subscription group, same prices. */
+export const APPLE_MAC_APP: AppleApp = {
+  bundleId: "dat.waqtu",
+  productIds: ["dat.waqtu.mac.premium.monthly", "dat.waqtu.mac.premium.yearly"],
+};
 
 // 1.2.840.113635.100.6.2.1 marks Apple WWDR intermediates, 1.2.840.113635.100.6.11.1
 // marks the App Store signing certificate (same OIDs Apple's own verifier checks).
@@ -37,16 +51,13 @@ const CURVES: Record<string, CurveName> = {
 export type AppleVerifyOptions = {
   /** SHA-256 (hex, colons tolerated) of the trusted root cert's DER. Tests pin their own root. */
   rootSha256: string;
-  bundleId: string;
-  /** Any of these product ids is accepted. */
-  productIds: readonly string[];
+  /** Apps whose transactions are accepted: the bundle picks the app, the product must be one of its own. */
+  apps: readonly AppleApp[];
   /**
    * Accept a transaction Apple revoked (refund, family-sharing removal). Purchases submitted by the
    * app never are; REFUND/REVOKE notifications must be.
    */
   allowRevoked?: boolean;
-  /** App Store numeric app id (APPLE_APP_ID); when set, Production notifications must carry it. */
-  appAppleId?: number;
 };
 
 export interface AppleTransaction {
@@ -116,8 +127,9 @@ async function verify(jws: string, opts: AppleVerifyOptions): Promise<AppleVerif
   if (!transactionId || bundleId === undefined || productId === undefined) {
     return { ok: false, reason: "payload" };
   }
-  if (bundleId !== opts.bundleId) return { ok: false, reason: "bundle" };
-  if (!opts.productIds.includes(productId)) return { ok: false, reason: "product" };
+  const app = opts.apps.find((candidate) => candidate.bundleId === bundleId);
+  if (!app) return { ok: false, reason: "bundle" };
+  if (!app.productIds.includes(productId)) return { ok: false, reason: "product" };
   const revocation = finite(payload.revocationDate);
   if (revocation !== undefined && !opts.allowRevoked) return { ok: false, reason: "revoked" };
   if (environment !== "Sandbox" && environment !== "Production") {
@@ -257,16 +269,20 @@ export async function verifyAppleNotificationJws(
     const notificationType = str(chain.payload.notificationType);
     if (!notificationType) return { ok: false, reason: "payload" };
     const data = isObject(chain.payload.data) ? chain.payload.data : undefined;
-    if (data?.bundleId !== undefined && data.bundleId !== opts.bundleId) {
-      return { ok: false, reason: "bundle" };
-    }
-    // Production notifications carry the numeric App Store id; Sandbox ones may not.
-    if (
-      opts.appAppleId !== undefined &&
-      data?.environment === "Production" &&
-      data.appAppleId !== opts.appAppleId
-    ) {
-      return { ok: false, reason: "bundle" };
+    // The notification names its app; the transaction inside must belong to that same app.
+    let apps = opts.apps;
+    if (data?.bundleId !== undefined) {
+      const app = opts.apps.find((candidate) => candidate.bundleId === data.bundleId);
+      if (!app) return { ok: false, reason: "bundle" };
+      // Production notifications carry the numeric App Store id; Sandbox ones may not.
+      if (
+        app.appAppleId !== undefined &&
+        data.environment === "Production" &&
+        data.appAppleId !== app.appAppleId
+      ) {
+        return { ok: false, reason: "bundle" };
+      }
+      apps = [app];
     }
 
     let transaction: AppleTransaction | null = null;
@@ -274,6 +290,7 @@ export async function verifyAppleNotificationJws(
     if (signedTransactionInfo) {
       const inner = await verifyAppleTransactionJws(signedTransactionInfo, {
         ...opts,
+        apps,
         allowRevoked: true,
       });
       if (!inner.ok) return inner;

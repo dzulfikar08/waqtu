@@ -97,6 +97,34 @@
         }
       }
     },
+    "%lld days remaining" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld day remaining"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld days remaining"
+                }
+              }
+            }
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sisa %lld hari"
+          }
+        }
+      }
+    },
     "%lld min" : {
       "localizations" : {
         "id" : {
@@ -386,16 +414,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Beri peringatan 5 menit sebelum tiap blok sholat."
-          }
-        }
-      }
-    },
-    "All settings will be reset to defaults, Waqtu events will be removed from your calendar, and the app will quit. Your license is preserved. Reopen Waqtu to start fresh." : {
-      "localizations" : {
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Semua pengaturan kembali ke bawaan, acara Waqtu dihapus dari kalendermu, lalu aplikasi keluar. Lisensimu tetap tersimpan. Buka lagi Waqtu untuk memulai dari awal."
           }
         }
       }
@@ -756,16 +774,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copot pemasangan bersih (manual)"
-          }
-        }
-      }
-    },
-    "Clears all settings and calendar events, then quits. Use to fix calendar access issues. Your license is preserved." : {
-      "localizations" : {
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Menghapus semua pengaturan dan acara kalender, lalu keluar. Pakai untuk memperbaiki masalah akses kalender. Lisensimu tetap tersimpan."
           }
         }
       }
@@ -1579,16 +1587,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Beri Tahu Waqtu Lokasimu"
-          }
-        }
-      }
-    },
-    "Lifetime access" : {
-      "localizations" : {
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktif selamanya"
           }
         }
       }
