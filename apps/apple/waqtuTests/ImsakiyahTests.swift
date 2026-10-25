@@ -122,16 +122,36 @@ struct ImsakiyahTests {
         )
     }
 
+    /// Minutes after midnight of a "HH:mm" string.
+    private func minutes(_ hhmm: String) -> Int? {
+        guard hhmm.count == 5, let h = Int(hhmm.prefix(2)), let m = Int(hhmm.suffix(2)) else { return nil }
+        return h * 60 + m
+    }
+
     /// Every row of every case (Kemenag Jakarta/Malang with offsets -1/0/+1 and imsak 15, MWL London,
-    /// and MWL Kiritimati, which only matches with core's dayShift) equals core to the minute.
+    /// and MWL Kiritimati, which only matches with core's dayShift) equals core to the minute, with one
+    /// documented library difference:
+    ///
+    /// Kemenag rounds up (`Rounding.up`). When a raw time lands exactly on :00 seconds, adhan-js's
+    /// `roundedMinute` still adds `60 - seconds` (a full minute), while Adhan-Swift's `ceil(second / 60)`
+    /// keeps the minute. Example: Jakarta 2026-03-16 fajr is 21:42:00 UTC unrounded, so core says 04:43
+    /// and Swift says 04:42 (imsak follows fajr). The rounded value no longer shows which side of the
+    /// boundary the raw time was on, so the Mac can't reproduce it without abandoning the app's own
+    /// calculator. The prayer-parity CI job allows ±1 min for the same reason. Here the only allowance
+    /// is "Swift exactly one minute earlier" on rounding-up methods. Being exactly on :00 seconds is
+    /// rare (about 1 in 60 times), and the test checks that too.
     @Test func tablesMatchCore() {
         let prayers = ImsakiyahFixtures.prayers.map { Imsakiyah.Prayer(rawValue: $0)! }
         #expect(prayers == Imsakiyah.Prayer.allCases)
+        var compared = 0
+        var roundingUpAllowances = 0
         for c in ImsakiyahFixtures.cases {
             guard let table = appTable(c) else {
                 Issue.record("\(c.id): no table")
                 continue
             }
+            // Kemenag is the only rounding-up method (`PrayerMethodParameters.kemenag`).
+            let roundsUp = c.method == "kemenag"
             #expect(table.start.description == c.start, "\(c.id)")
             #expect(table.length == c.length, "\(c.id)")
             #expect(table.rows.count == c.rows.count, "\(c.id)")
@@ -141,10 +161,20 @@ struct ImsakiyahTests {
                 #expect(row.date.description == expected.date, "\(label)")
                 #expect(table.row(for: row.date) == row, "\(label)")
                 for (prayer, local) in zip(prayers, expected.local) {
-                    #expect(row.local[prayer] == local, "\(label) \(prayer.rawValue)")
+                    compared += 1
+                    let actual = row.local[prayer]
+                    if roundsUp, let actual, let local, actual != local,
+                       let a = minutes(actual), let e = minutes(local), (e - a + 1440) % 1440 == 1 {
+                        roundingUpAllowances += 1
+                        continue
+                    }
+                    #expect(actual == local, "\(label) \(prayer.rawValue)")
                 }
             }
         }
+        let fixtureValues = ImsakiyahFixtures.cases.reduce(0) { $0 + $1.rows.count } * prayers.count
+        #expect(compared == fixtureValues)
+        #expect(roundingUpAllowances * 30 < compared, "\(roundingUpAllowances) of \(compared) off by the rounding-up minute")
     }
 
     @Test func imsakIsFajrMinusImsakMinutes() {
