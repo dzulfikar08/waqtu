@@ -16,7 +16,7 @@ Waqtu is a native macOS menu bar app built with SwiftUI and AppKit.
 - **Calendar**: EventKit (Exchange, iCloud, Google Calendar via CalDAV)
 - **Location**: CoreLocation (on-device only, never transmitted)
 - **Updates**: Sparkle 2 (auto-update via Cloudflare Worker + R2)
-- **Payments**: Polar.sh (lifetime license via webhook → license key generation)
+- **Payments**: Waqtu Premium subscription. Mac App Store build: StoreKit 2 (`MacStoreSubscription`); direct build: none, premium comes from the signed-in Waqtu account (`GET /v1/entitlement`)
 - **Slack**: Slack Web API (`users.profile.set`)
 
 ### Project Structure
@@ -29,7 +29,7 @@ waqtu/
 │   ├── AppSettings.swift          # All UserDefaults-backed settings
 │   ├── CalendarManager.swift      # EventKit: create/delete prayer blocks
 │   ├── GoogleCalendarManager.swift # Google Calendar OAuth integration
-│   ├── LicenseManager.swift       # Polar.sh license validation
+│   ├── MacStoreSubscription.swift # MAS only: StoreKit 2 Premium subscriptions
 │   ├── LocationManager.swift      # CoreLocation wrapper
 │   ├── LocationProfilesManager.swift # Multiple location profiles
 │   ├── PrayerReminderScheduler.swift # UNNotification reminders
@@ -166,11 +166,11 @@ Auto-detect via CoreLocation or manual coordinates. Location never leaves the de
 
 **Location profiles**: Multiple profiles for office, home, traveling.
 
-### 10. License & Trial
+### 10. Trial & Premium
 
 - 7-day free trial
-- Lifetime license via Polar.sh
-- License key activation (offline validation via Ed25519 signature)
+- Then Waqtu Premium (one subscription for Mac, iPhone and Android): bought in the Mac App Store build,
+  or held by the signed-in Waqtu account (subscribed on the phone) in either build
 - Trial banner in menu bar (days remaining)
 
 ### 11. First-Run Onboarding
