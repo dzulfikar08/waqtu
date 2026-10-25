@@ -13,7 +13,6 @@ const SECRET = `whsec_${btoa("polar-test-secret-0123456789abcdef")}`;
 const polarEnv: AppEnv = {
   ...env,
   POLAR_ACCESS_TOKEN: "polar_oat_test",
-  POLAR_ORG_ID: "org-waqtu",
   POLAR_WEBHOOK_SECRET: SECRET,
   POLAR_PRODUCT_MONTHLY_ID: "prod-monthly",
   POLAR_PRODUCT_YEARLY_ID: "prod-yearly",
@@ -297,7 +296,7 @@ describe("Polar webhook route", () => {
 
   it("ignores other products, other event types and unknown users", async () => {
     const other = await deliver(
-      subscriptionEvent("subscription.active", user.id, { product_id: "prod-mac-license" }),
+      subscriptionEvent("subscription.active", user.id, { product_id: "prod-other" }),
     );
     expect(await other!.json()).toEqual({ received: true, outcome: "ignored" });
     const order = await deliver(JSON.stringify({ type: "order.paid", data: { id: "ord_1" } }));
@@ -410,112 +409,5 @@ describe("Polar checkout and portal", () => {
       url: "https://api.polar.sh/v1/customer-sessions/",
       body: { external_customer_id: user.id },
     });
-  });
-});
-
-describe("POST /v1/entitlement/link-license", () => {
-  const granted = (id = "lic_1") =>
-    Response.json({ id, status: "granted", expires_at: null, key: "WAQTU-XXXX" });
-
-  function link(key: unknown, user: TestUser | null, handle: BillingHandler, e: AppEnv = polarEnv) {
-    return handle(
-      new Request(`${API}/v1/entitlement/link-license`, {
-        method: "POST",
-        headers: { "content-type": "application/json", ...(user ? { cookie: user.cookie } : {}) },
-        body: JSON.stringify({ key }),
-      }),
-      e,
-    );
-  }
-
-  it("grants lifetime premium for a granted Polar key", async () => {
-    const user = await createUser("lic-ok");
-    const polar = fakePolar(() => granted());
-    const handle = createBillingHandler({ fetch: polar.fetchImpl });
-    const res = await link("  WAQTU-XXXX  ", user, handle);
-    expect(res!.status).toBe(200);
-    expect(await res!.json()).toEqual({ premium: true, source: "license", expiresAt: null });
-    expect(polar.calls[0]).toMatchObject({
-      url: "https://api.polar.sh/v1/customer-portal/license-keys/validate",
-      method: "POST",
-      body: { key: "WAQTU-XXXX", organization_id: "org-waqtu" },
-    });
-  });
-
-  it("keeps premium forever once every subscription has lapsed", async () => {
-    const user = await createUser("lic-forever");
-    const handle = createBillingHandler({
-      fetch: fakePolar(() => granted("lic_forever")).fetchImpl,
-    });
-    await link("WAQTU-XXXX", user, handle);
-    const years = 50 * 365 * DAY;
-    const later = createBillingHandler({
-      fetch: fakePolar(() => granted()).fetchImpl,
-      now: () => Date.now() + years,
-    });
-    const res = await later(
-      new Request(`${API}/v1/entitlement`, { headers: { cookie: user.cookie } }),
-      env,
-    );
-    expect(await res!.json()).toEqual({ premium: true, source: "license", expiresAt: null });
-  });
-
-  it("is idempotent for the same account", async () => {
-    const user = await createUser("lic-again");
-    const handle = createBillingHandler({ fetch: fakePolar(() => granted("lic_again")).fetchImpl });
-    expect((await link("WAQTU-XXXX", user, handle))!.status).toBe(200);
-    expect((await link("WAQTU-XXXX", user, handle))!.status).toBe(200);
-  });
-
-  it("refuses a key another account already linked", async () => {
-    const first = await createUser("lic-first");
-    const second = await createUser("lic-second");
-    const handle = createBillingHandler({
-      fetch: fakePolar(() => granted("lic_shared")).fetchImpl,
-    });
-    expect((await link("WAQTU-XXXX", first, handle))!.status).toBe(200);
-    const res = await link("WAQTU-XXXX", second, handle);
-    expect(res!.status).toBe(409);
-    expect(await res!.json()).toEqual({ error: "linked_to_other_account" });
-  });
-
-  it("rejects revoked, expired and unknown keys without granting anything", async () => {
-    const user = await createUser("lic-bad");
-    const responses = [
-      Response.json({ id: "lic_r", status: "revoked", expires_at: null }),
-      Response.json({ id: "lic_d", status: "disabled", expires_at: null }),
-      Response.json({
-        id: "lic_e",
-        status: "granted",
-        expires_at: new Date(Date.now() - DAY).toISOString(),
-      }),
-      new Response("{}", { status: 404 }),
-      new Response("{}", { status: 422 }),
-    ];
-    for (const response of responses) {
-      const handle = createBillingHandler({ fetch: fakePolar(() => response.clone()).fetchImpl });
-      const res = await link("WAQTU-XXXX", user, handle);
-      expect(res!.status).toBe(400);
-      expect(await res!.json()).toEqual({ error: "invalid_license" });
-    }
-    const view = await createBillingHandler()(
-      new Request(`${API}/v1/entitlement`, { headers: { cookie: user.cookie } }),
-      env,
-    );
-    expect((await view!.json()) as { premium: boolean }).toMatchObject({ premium: false });
-  });
-
-  it("answers 502 when Polar is down or not configured, 401 without a session, 400 without a key", async () => {
-    const user = await createUser("lic-down");
-    const down = createBillingHandler({
-      fetch: fakePolar(() => new Response("x", { status: 500 })).fetchImpl,
-    });
-    expect((await link("WAQTU-XXXX", user, down))!.status).toBe(502);
-    expect(
-      (await link("WAQTU-XXXX", user, down, { ...env, POLAR_ORG_ID: undefined }))!.status,
-    ).toBe(502);
-    expect((await link("WAQTU-XXXX", null, down))!.status).toBe(401);
-    expect((await link("   ", user, down))!.status).toBe(400);
-    expect((await link(42, user, down))!.status).toBe(400);
   });
 });

@@ -9,6 +9,9 @@ export default defineConfig({
       miniflare: {
         bindings: {
           ENVIRONMENT: "test",
+          // Production makes circles premium (wrangler.toml); most circle tests exercise the circles
+          // themselves with free accounts, and the premium gate tests turn the flag on explicitly.
+          CIRCLES_REQUIRES_PREMIUM: "false",
           ADMIN_USER_IDS: "admin-circles-test, someone-else",
           BETTER_AUTH_SECRET: "test-secret-test-secret-test-secret-0123",
           BETTER_AUTH_URL: "http://localhost",

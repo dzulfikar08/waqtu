@@ -48,12 +48,44 @@ The Neon `DATABASE_URL` (including the password) is stored as a **plain-text** w
 - **Old widget and watch targets.** The Swift iOS widget and watchOS targets are not shipped with the
   Expo binary; users who update lose them until equivalents exist in the Expo app. The targets stay in
   `apps/apple` for reference and CI builds only, and are not submitted again under `dat.waqtu.ios`.
-- **Mac App Store lifetime buyers.** Buyers of the Mac App Store in-app purchase `dat.waqtu.lifetime`
-  keep their Mac unlock, but that purchase does not currently grant premium on the mobile apps (it is
-  not written to the `entitlement` table). **Open owner decision:** whether to honour it on mobile
-  (e.g. verify the Mac receipt server-side and write a lifetime entitlement) or leave it Mac-only.
+- **Mac App Store lifetime buyers.** Resolved 2026-10-25 (see below): the Mac App Store lifetime
+  purchase `dat.waqtu.lifetime` is replaced by subscriptions; nobody bought it.
 - **Submitting.** `apps/mobile/eas.json` `submit.production` targets `ascAppId` 6826628861 and the Play
   `internal` track. The Play service-account key is read from
   `apps/mobile/google-play-service-account.json` (git-ignored, never committed); in CI write it from a
   secret before `eas submit`. The `development` profile builds for physical iPhones;
   `development-simulator` keeps the simulator build.
+
+## Decision record: Premium is one subscription (2026-10-25, DEV-12 / DEV-13)
+
+Owner decisions: sync across devices is Premium; Circles are Premium; the Mac moves to subscriptions
+(no lifetime); the website stops selling lifetime. There were no paid users, so nothing is grandfathered.
+
+- **What is Premium.** iPhone/Android: free core is prayer times, mutabaah on the device, Ramadhan
+  basics, halaqah program and hafalan; Premium adds sync across devices, Circles and the paid trackers
+  on the paywall. Mac: a 7-day free trial, then the app needs Premium.
+- **One subscription, Rp 29.000 / month or Rp 249.000 / year.** iPhone `dat.waqtu.premium.monthly|yearly`
+  (app `dat.waqtu.ios`), Play `premium` (`monthly`/`yearly`), Mac App Store
+  `dat.waqtu.mac.premium.monthly|yearly` (app `dat.waqtu`, its own subscription group with the same
+  prices). Every purchase is linked to the Waqtu account (`POST /v1/billing/apple` accepts both Apple
+  apps, each only with its own products) so it unlocks every platform via `GET /v1/entitlement`.
+- **Direct-download Mac build** sells nothing: premium comes from signing in with a subscribed Waqtu
+  account; the Upgrade screen points to the phone apps.
+- **Web** sells nothing: `getwaqtu.com` lost its Polar lifetime checkout and webhook routes and shows the
+  store badges. The API's Polar subscription checkout stays (it needs a signed-in account the site does
+  not have) but no client calls it.
+- **Circles** are enforced on the server: `CIRCLES_REQUIRES_PREMIUM = "true"` in `wrangler.toml` (403
+  `premium_required` on join/create/post; reading stays open).
+- **Sync is gated in the apps, not on `/v1/sync`.** Considered and rejected: a server-side 403 for
+  non-premium accounts. The Mac app syncs during its free trial, which is local to the Mac and invisible
+  to the server, and the first sign-in on a device uploads its log before the app has fetched the
+  account's entitlement; both would break. The mobile app already syncs only with premium (PR #24).
+  `services/api/test/sync.test.ts` pins this behaviour.
+- **Removed (clean cutover):** web lifetime checkout and webhook (`apps/web/src/pages/api/payments/*`),
+  the Mac App Store lifetime IAP, the direct build's Polar license-key UI and `LicenseManager`,
+  `POST /license/activate`, `POST /v1/entitlement/link-license`, license entitlement rows and their
+  columns (migration `0005`).
+- **Kept for already-installed Mac versions:** the Sparkle appcast (`/appcast.xml`, `/`, `/latest`) so
+  they can update to the subscription build, and `POST /license/validate`, which old direct builds call on
+  launch with a stored key; it still answers `{ valid }`, and any failure makes them fall back to their
+  trial state.

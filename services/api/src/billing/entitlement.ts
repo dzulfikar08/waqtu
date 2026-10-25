@@ -1,8 +1,8 @@
-export type EntitlementSource = "apple" | "google" | "polar" | "license";
+export type EntitlementSource = "apple" | "google" | "polar";
 
 export interface EntitlementRow {
   source: EntitlementSource;
-  /** Epoch ms the paid period ends; null = lifetime. */
+  /** Epoch ms the paid period ends; null = no end date (no current source writes one). */
   expires_at: number | null;
 }
 
@@ -10,21 +10,20 @@ export interface EntitlementRow {
 export interface EntitlementView {
   premium: boolean;
   /**
-   * The source that grants premium now (lifetime first, then the latest expiry). When not premium it
+   * The source that grants premium now (the latest expiry). When not premium it
    * is the source of the most recent lapsed period, or null when the user never held premium.
    */
   source: EntitlementSource | null;
-  /** ISO time premium ends; null for lifetime premium and for users who never held premium. */
+  /** ISO time premium ends; null for users who never held premium. */
   expiresAt: string | null;
 }
 
-/** Lifetime outranks any dated period; among dated periods the later one wins. */
+/** An undated row would outrank every dated period; among dated periods the later one wins. */
 const reach = (row: EntitlementRow): number => row.expires_at ?? Number.POSITIVE_INFINITY;
 
 /**
  * Resolves a user's premium status from every entitlement row they hold. Sources are independent:
- * a Mac lifetime key keeps premium forever no matter what happens to a store subscription, and a
- * subscription bought on another platform keeps working alongside it.
+ * a subscription bought on another platform keeps working alongside the one bought here.
  */
 export function resolveEntitlement(rows: readonly EntitlementRow[], now: number): EntitlementView {
   let best: EntitlementRow | null = null;
@@ -63,10 +62,6 @@ export interface EntitlementWrite {
   /** The transaction/order the current period came from; a refund only ends access when it matches. */
   orderId?: string | null;
   revokedAt?: number | null;
-  /** License rows: the Polar customer, to find a refunded customer's keys. */
-  customerRef?: string | null;
-  /** License rows: when Polar last confirmed the key (0 = check again at the next read). */
-  checkedAt?: number | null;
   /** When the source produced this state (store signing time, event time, or now for a live read). */
   signedAt: number;
 }
@@ -86,16 +81,14 @@ export async function writeEntitlement(
   const result = await db
     .prepare(
       `INSERT INTO entitlement
-         (source, external_id, user_id, product_id, environment, expires_at, order_id, revoked_at, customer_ref, checked_at, signed_at, created_at, updated_at)
-       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?12)
+         (source, external_id, user_id, product_id, environment, expires_at, order_id, revoked_at, signed_at, created_at, updated_at)
+       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?10)
        ON CONFLICT (source, external_id) DO UPDATE SET
          product_id = excluded.product_id,
          environment = excluded.environment,
          expires_at = excluded.expires_at,
          order_id = excluded.order_id,
          revoked_at = excluded.revoked_at,
-         customer_ref = excluded.customer_ref,
-         checked_at = excluded.checked_at,
          signed_at = excluded.signed_at,
          updated_at = excluded.updated_at
        WHERE entitlement.user_id = excluded.user_id AND entitlement.signed_at <= excluded.signed_at`,
@@ -109,8 +102,6 @@ export async function writeEntitlement(
       write.expiresAt,
       write.orderId ?? null,
       write.revokedAt ?? null,
-      write.customerRef ?? null,
-      write.checkedAt ?? null,
       write.signedAt,
       now,
     )
@@ -130,8 +121,6 @@ export interface StoredEntitlement {
   expires_at: number | null;
   order_id: string | null;
   revoked_at: number | null;
-  customer_ref: string | null;
-  checked_at: number | null;
 }
 
 export function findEntitlement(
@@ -141,7 +130,7 @@ export function findEntitlement(
 ): Promise<StoredEntitlement | null> {
   return db
     .prepare(
-      "SELECT user_id, external_id, product_id, expires_at, order_id, revoked_at, customer_ref, checked_at FROM entitlement WHERE source = ?1 AND external_id = ?2",
+      "SELECT user_id, external_id, product_id, expires_at, order_id, revoked_at FROM entitlement WHERE source = ?1 AND external_id = ?2",
     )
     .bind(source, externalId)
     .first<StoredEntitlement>();

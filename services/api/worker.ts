@@ -65,33 +65,6 @@ function escapeXml(unsafe: string): string {
 
 const POLAR_API = "https://api.polar.sh/v1";
 
-async function polarActivate(
-  key: string,
-  deviceId: string,
-  orgId: string,
-  token: string,
-): Promise<{ activation_id?: string; error?: string }> {
-  const res = await fetch(`${POLAR_API}/customer-portal/license-keys/activate`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      key: key.trim(),
-      organization_id: orgId,
-      label: deviceId,
-      meta: { device_id: deviceId },
-    }),
-  });
-  if (!res.ok) {
-    const t = await res.text();
-    return { error: t || `Activate failed: ${res.status}` };
-  }
-  const data = (await res.json()) as { id?: string };
-  return { activation_id: data.id };
-}
-
 async function polarValidate(
   key: string,
   activationId: string,
@@ -200,36 +173,9 @@ export default {
       }
     }
 
-    if (request.method === "POST" && url.pathname === "/license/activate") {
-      const token = env.POLAR_ACCESS_TOKEN;
-      const orgId = env.POLAR_ORG_ID;
-      if (!token || !orgId) {
-        return Response.json(
-          { valid: false, error: "License server not configured" },
-          { status: 500 },
-        );
-      }
-      let body: { key?: string; device_id?: string };
-      try {
-        body = (await request.json()) as { key?: string; device_id?: string };
-      } catch {
-        return Response.json({ valid: false, error: "Invalid JSON" }, { status: 400 });
-      }
-      const key = body.key;
-      const deviceId = body.device_id;
-      if (!key || !deviceId) {
-        return Response.json(
-          { valid: false, error: "key and device_id required" },
-          { status: 400 },
-        );
-      }
-      const result = await polarActivate(key, deviceId, orgId, token);
-      if (result.error) {
-        return Response.json({ valid: false, error: result.error }, { status: 200 });
-      }
-      return Response.json({ valid: true, activation_id: result.activation_id });
-    }
-
+    // Mac app builds before the subscription switch validate a stored Polar license key here on every
+    // launch. Waqtu no longer sells keys (premium comes from the account subscription), but the route
+    // stays so those installed versions keep getting a well-formed answer. Activation is gone.
     if (request.method === "POST" && url.pathname === "/license/validate") {
       const token = env.POLAR_ACCESS_TOKEN;
       const orgId = env.POLAR_ORG_ID;

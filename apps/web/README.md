@@ -2,14 +2,16 @@
 
 getwaqtu.com: Astro 7 on Cloudflare Workers (worker `waqtu-landing-astro`).
 
-| Route                      | What                                                                      |
-| -------------------------- | ------------------------------------------------------------------------- |
-| `/`                        | Mobile landing in Indonesian (default): waitlist, Ramadhan countdown, FAQ |
-| `/en/`                     | Same page in English                                                      |
-| `/mac`                     | Waqtu for Mac landing, pricing and Polar checkout (English)               |
-| `/blog`, `/resources`, ... | Content pages (English)                                                   |
-| `POST /api/waitlist`       | Waitlist signup, stores into D1 (`prerender = false`)                     |
-| `POST /api/payments/*`     | Polar checkout and webhook                                                |
+| Route                      | What                                                                               |
+| -------------------------- | ---------------------------------------------------------------------------------- |
+| `/`                        | Mobile landing in Indonesian (default): waitlist, Premium, Ramadhan countdown, FAQ |
+| `/en/`                     | Same page in English                                                               |
+| `/mac`                     | Waqtu for Mac landing, download and Premium pricing (English)                      |
+| `/blog`, `/resources`, ... | Content pages (English)                                                            |
+| `POST /api/waitlist`       | Waitlist signup, stores into D1 (`prerender = false`)                              |
+
+The site sells nothing. Waqtu Premium is bought in the App Store, Google Play or the Mac App Store edition;
+Polar webhooks go to the API worker (`/v1/billing/polar/webhook`).
 
 Landing copy for both languages lives in `src/i18n/landing.ts` (one shape, no per-language template).
 The page is `src/components/Landing.astro`; `src/pages/index.astro` and `src/pages/en/index.astro` only pick the locale.

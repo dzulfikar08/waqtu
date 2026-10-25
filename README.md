@@ -49,27 +49,40 @@ GitHub Actions builds everything; no local Mac is needed.
 
 ## Premium
 
-One Waqtu subscription unlocks the phone apps (iOS, Android) and the Mac app; prayer times, adhan
-reminders and basic mutabaah stay free. Mac lifetime buyers (Polar license keys) keep premium forever
-by linking their key to their account. Premium belongs to the signed-in account: every source
-(App Store, Google Play, Polar, Mac license) writes a row into the `entitlement` table of `waqtu-db`,
-and `GET /v1/entitlement` answers `{ premium, source, expiresAt }` (`expiresAt` null with `premium` true
-= lifetime). Trust never comes from a client claim: App Store receipts are JWS chains verified to
-Apple Root CA G3, Play purchases are re-read from the Android Publisher API, Polar webhooks are
-HMAC-signed, license keys are validated by Polar. RevenueCat is not used: it was replaced by native IAP
-(`expo-iap`) plus our own server-side verification. The license-key field is hidden on iOS (App Store
-Guideline 3.1.1); keys can still be linked from the Android app. Endpoints and tests: `services/api/README.md`.
+Owner decisions (2026-10-25): Waqtu Premium is **one auto-renewing subscription** for iPhone, Android
+and Mac; there is no lifetime purchase anywhere (no paid users existed, so nobody is grandfathered).
 
-Prices live in the stores, not in code. Suggested prices:
+| Free core (iPhone, Android)                                                                         | Waqtu Premium                                                                                                              |
+| --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Prayer times and adhan reminders, mutabaah on the device, Ramadhan basics, halaqah program, hafalan | Sync across devices, Circles, plus the paid trackers listed on the in-app paywall; the whole Mac app after its 7-day trial |
+
+- **iPhone / Android:** bought in the app (App Store / Google Play).
+- **Mac, Mac App Store edition (`dat.waqtu`):** bought in the app (StoreKit 2 subscriptions); the
+  transaction is also sent to the account so the phone unlocks too. 7-day free trial first.
+- **Mac, direct download (Developer ID):** sells nothing. 7-day free trial, then premium comes from
+  signing in with a Waqtu account that holds a subscription bought on any platform.
+- **Web (getwaqtu.com):** sells nothing; it points to the stores.
+
+Premium belongs to the signed-in account: every source (App Store on iPhone or Mac, Google Play, Polar)
+writes a row into the `entitlement` table of `waqtu-db`, and `GET /v1/entitlement` answers
+`{ premium, source, expiresAt }`. Trust never comes from a client claim: App Store receipts are JWS
+chains verified to Apple Root CA G3, Play purchases are re-read from the Android Publisher API, Polar
+webhooks are HMAC-signed. RevenueCat is not used: it was replaced by native IAP (`expo-iap`, StoreKit 2
+on the Mac) plus our own server-side verification. Circles are enforced on the server
+(`CIRCLES_REQUIRES_PREMIUM = "true"`); sync is gated in the apps only (why: `docs/backend-decision.md`).
+Endpoints and tests: `services/api/README.md`.
+
+Prices live in the stores, not in code:
 
 | Plan    | Indonesia (IDR) | Elsewhere (USD) |
 | ------- | --------------- | --------------- |
 | Monthly | Rp 29.000       | 2.99            |
 | Yearly  | Rp 249.000      | 24.99           |
 
-Product ids (already used by the code, do not rename): App Store subscription group `Waqtu Premium`
-with `dat.waqtu.premium.monthly` and `dat.waqtu.premium.yearly`; Play subscription `premium` with base
-plans `monthly` and `yearly`; Polar product ids come from env.
+Product ids (already used by the code, do not rename): iPhone app subscription group `Waqtu Premium`
+with `dat.waqtu.premium.monthly` and `dat.waqtu.premium.yearly`; Mac App Store app subscription group
+`Waqtu Premium` with `dat.waqtu.mac.premium.monthly` and `dat.waqtu.mac.premium.yearly`; Play
+subscription `premium` with base plans `monthly` and `yearly`; Polar product ids come from env.
 
 ### Store setup
 
@@ -90,6 +103,20 @@ Everything below is a one-time job for the account owner. Nothing here is done b
    `https://getwaqtu.com/terms` (the paywall shows both links; Apple requires them for subscriptions).
 6. No in-app purchase capability or key file is needed: StoreKit 2 receipts are verified with Apple's
    public root certificate, so there is no App Store Connect API key to configure.
+
+#### App Store Connect (Mac App Store app `dat.waqtu`)
+
+1. Monetization → Subscriptions → create a group **Waqtu Premium** for the Mac app with
+   `dat.waqtu.mac.premium.monthly` (1 month) and `dat.waqtu.mac.premium.yearly` (1 year), the same
+   prices (Rp 29.000 / Rp 249.000, other regions from the USD column), localizations id + en and a review
+   screenshot of the Upgrade tab. Attach both to the next Mac App Store version. Remove the old
+   non-consumable `dat.waqtu.lifetime` from sale (nobody bought it).
+2. App Information → **App Store Server Notifications**: Production and Sandbox URL
+   `https://api.getwaqtu.com/v1/billing/apple/notifications`, version **2** (same endpoint as the iPhone app).
+3. Put the Mac app's numeric Apple id in `services/api/wrangler.toml` as `APPLE_MAC_APP_ID` so Production
+   notifications are checked against it.
+4. The local StoreKit test configuration is `apps/apple/WaqtuProducts.storekit` (select it in the
+   `waqtu-mas` scheme's Run options to test purchases without App Store Connect).
 
 #### Play Console (app `dat.waqtu.app`)
 
@@ -121,18 +148,20 @@ Everything below is a one-time job for the account owner. Nothing here is done b
 6. Settings → License testing: add the testers' Google accounts. Test subscriptions renew on an
    accelerated schedule.
 
-#### Polar (web and Mac)
+#### Polar (optional web subscription)
+
+The website sells nothing; Polar only matters if a signed-in web checkout is added later
+(`POST /v1/billing/polar/checkout` already exists).
 
 1. In the Waqtu organisation create two **subscription** products, monthly (USD 2.99) and yearly
-   (USD 24.99), separate from the Mac lifetime license product. Copy their product ids.
+   (USD 24.99), and archive the old Mac lifetime license product (nobody bought it). Copy the
+   subscription product ids.
 2. Settings → Webhooks → add endpoint `https://api.getwaqtu.com/v1/billing/polar/webhook`, format
    **Raw**, events `subscription.created`, `subscription.active`, `subscription.updated`,
-   `subscription.canceled`, `subscription.uncanceled`, `subscription.revoked`, plus `benefit_grant.revoked`
-   and `order.refunded` (a refunded Mac license key loses its lifetime premium). Copy the secret.
-3. The access token behind `POLAR_ACCESS_TOKEN` (the one the Mac license routes already use) needs the
-   `checkouts:write`, `customer_sessions:write` and `license_keys:read` scopes besides what licensing
-   needs. `license_keys:read` lets the worker re-confirm linked Mac keys every 7 days; without it a
-   refund is still caught by the webhook events above.
+   `subscription.canceled`, `subscription.uncanceled`, `subscription.revoked`. Copy the secret. Remove the
+   old webhook to `getwaqtu.com/api/payments/webhook`: that route is gone.
+3. The access token behind `POLAR_ACCESS_TOKEN` needs the `checkouts:write` and
+   `customer_sessions:write` scopes.
 
 #### Worker secrets (`waqt-updates`)
 
@@ -143,7 +172,7 @@ npx wrangler secret put GOOGLE_PLAY_RTDN_PUSH_EMAIL        # or GOOGLE_PLAY_RTDN
 npx wrangler secret put POLAR_WEBHOOK_SECRET
 npx wrangler secret put POLAR_PRODUCT_MONTHLY_ID
 npx wrangler secret put POLAR_PRODUCT_YEARLY_ID
-npx wrangler d1 migrations apply waqtu-db --remote          # creates the entitlement table
+npx wrangler d1 migrations apply waqtu-db --remote          # entitlement table + license cleanup
 ```
 
 Already set and reused: `BETTER_AUTH_URL` (must be `https://api.getwaqtu.com`, it is the RTDN audience),
@@ -154,7 +183,7 @@ A feature stays off, answering `404 {"error":"unavailable"}`, until its secrets 
 
 After deploying, check: sign in on a phone with a sandbox / license-tester account, buy a plan, then
 `GET /v1/entitlement` answers `premium: true`; restore the purchase on a second device with the same
-account; link a Mac license key from the paywall.
+account; sign in on the Mac with that account and the trial lock lifts.
 
 ## License
 

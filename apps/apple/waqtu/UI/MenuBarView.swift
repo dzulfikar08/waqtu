@@ -134,7 +134,7 @@ struct TrialEndingSoonModal: View {
             Text("Trial ending soon")
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundColor(.waqtuText)
-            Text("Your trial ends tomorrow. Upgrade anytime to keep using Waqtu.")
+            Text("Your trial ends tomorrow. Subscribe to Waqtu Premium, or sign in with a subscribed Waqtu account, to keep using Waqtu.")
                 .font(.system(size: 14))
                 .foregroundColor(.waqtuMuted)
                 .multilineTextAlignment(.center)
@@ -153,7 +153,7 @@ struct TrialEndingSoonModal: View {
 struct TrialExpiredMenuView: View {
     var body: some View {
         VStack(spacing: 14) {
-            Text("Upgrade to keep using Waqtu.")
+            Text("Subscribe to Waqtu Premium or sign in with your Waqtu account to keep using Waqtu.")
                 .font(.system(size: 13))
                 .foregroundColor(.waqtuText)
                 .multilineTextAlignment(.center)
@@ -809,7 +809,7 @@ struct SettingsView: View {
     var body: some View {
         Group {
             if let vm = viewModel, !vm.hasAccess {
-                UpgradeFullScreenView(trialManager: vm.trialManager, licenseManager: vm.licenseManager)
+                UpgradeFullScreenView(viewModel: vm)
             } else {
                 settingsTabs
             }
@@ -859,7 +859,6 @@ struct SettingsView: View {
                     AccountSettingsTab(
                         account: vm.account,
                         sync: vm.syncController,
-                        licenseManager: vm.licenseManager,
                         settings: settings
                     )
                     .tabItem {
@@ -871,13 +870,13 @@ struct SettingsView: View {
                             Label("Slack", systemImage: "message.fill")
                         }
 
-                    UpgradeSettingsTab(trialManager: vm.trialManager, licenseManager: vm.licenseManager)
+                    UpgradeSettingsTab(viewModel: vm)
                         .tabItem {
                             Label("Upgrade", systemImage: "crown.fill")
                         }
                 }
 
-                AboutSettingsTab(trialManager: viewModel?.trialManager, isLicensed: viewModel?.licenseManager.isLicensed ?? false, hasAccountPremium: viewModel?.account.serverPremium ?? false, onCheckForUpdates: onCheckForUpdates, onResetWaqtu: viewModel.map { vm in { vm.resetAllAndQuit() } })
+                AboutSettingsTab(trialManager: viewModel?.trialManager, hasStoreSubscription: viewModel?.hasStoreSubscription ?? false, hasAccountPremium: viewModel?.account.serverPremium ?? false, onCheckForUpdates: onCheckForUpdates, onResetWaqtu: viewModel.map { vm in { vm.resetAllAndQuit() } })
                     .tabItem {
                         Label("About", systemImage: "info.circle.fill")
                     }
@@ -888,237 +887,202 @@ struct SettingsView: View {
 
 // MARK: - Upgrade tab in Settings (visible before and after trial)
 struct UpgradeSettingsTab: View {
-    @Bindable var trialManager: TrialManager
-    @Bindable var licenseManager: LicenseManager
-    @State private var licenseKeyInput = ""
-    @State private var isActivating = false
-    @State private var activationError: String?
+    let viewModel: AppViewModel
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                if licenseManager.isLicensed {
-                    HStack(spacing: 8) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.waqtuPrimary)
-                        Text("You have lifetime access on this Mac.")
-                            .font(.system(size: 14))
-                            .foregroundColor(.waqtuText)
-                    }
-                    .padding(.vertical, 8)
-                } else {
-                    if trialManager.isTrialActive, trialManager.trialDaysRemaining > 0 {
-                        Text("\(trialManager.trialDaysRemaining) day\(trialManager.trialDaysRemaining == 1 ? "" : "s") left in trial. Upgrade anytime to keep access.")
-                            .font(.system(size: 13))
-                            .foregroundColor(.waqtuMuted)
-                    }
-                    #if MAS
-                    Text("Unlock Waqtu for lifetime access on this Mac with a one-time purchase.")
-                        .font(.system(size: 13))
-                        .foregroundColor(.waqtuMuted)
-                    VStack(alignment: .leading, spacing: 8) {
-                        if let err = activationError {
-                            Text(err)
-                                .font(.system(size: 11))
-                                .foregroundColor(.red)
-                        }
-                        Button(isActivating ? "Processing\u{2026}" : "Buy Lifetime Access") {
-                            purchaseLifetime()
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.waqtuPrimary)
-                        .disabled(isActivating)
-                        Button("Restore Purchases") {
-                            restorePurchases()
-                        }
-                        .buttonStyle(.bordered)
-                        .tint(.waqtuPrimary)
-                    }
-                    #else
-                    Text("Buy once at getwaqtu.com \u{2014} you\u{2019}ll get a license key by email. Enter it below to activate this Mac.")
-                        .font(.system(size: 13))
-                        .foregroundColor(.waqtuMuted)
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("License key")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(.waqtuMuted)
-                        TextField("Paste key from Polar email", text: $licenseKeyInput)
-                            .textFieldStyle(.roundedBorder)
-                            .onChange(of: licenseKeyInput) { _, _ in activationError = nil }
-                        if let err = activationError {
-                            Text(err)
-                                .font(.system(size: 11))
-                                .foregroundColor(.red)
-                        }
-                        Button(isActivating ? "Activating\u{2026}" : "Activate this device") {
-                            activateLicense()
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.waqtuPrimary)
-                        .disabled(isActivating || licenseKeyInput.trimmingCharacters(in: .whitespaces).isEmpty)
-                    }
-
-                    Button("Open getwaqtu.com to purchase") {
-                        if let url = URL(string: "https://getwaqtu.com") {
-                            NSWorkspace.shared.open(url)
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(.waqtuPrimary)
-                    #endif
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(24)
+            PremiumOfferView(viewModel: viewModel)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(24)
         }
     }
-
-    #if !MAS
-    private func activateLicense() {
-        activationError = nil
-        isActivating = true
-        Task { @MainActor in
-            let result = await licenseManager.activate(key: licenseKeyInput)
-            isActivating = false
-            switch result {
-            case .success:
-                licenseKeyInput = ""
-            case .failure(.message(let msg)):
-                activationError = msg
-            }
-        }
-    }
-    #else
-    private func purchaseLifetime() {
-        activationError = nil
-        isActivating = true
-        Task { @MainActor in
-            let result = await licenseManager.purchase()
-            isActivating = false
-            if case .failure(.message(let msg)) = result { activationError = msg }
-        }
-    }
-
-    private func restorePurchases() {
-        Task { @MainActor in await licenseManager.restore() }
-    }
-    #endif
 }
 
 // MARK: - Day 7: Full-screen upgrade (Settings)
+/// Shown instead of the settings tabs once the trial ended: the offer, plus the account tab so a
+/// subscriber can sign in and unlock this Mac.
 struct UpgradeFullScreenView: View {
-    @Bindable var trialManager: TrialManager
-    @Bindable var licenseManager: LicenseManager
-    @State private var licenseKeyInput = ""
-    @State private var isActivating = false
-    @State private var activationError: String?
+    let viewModel: AppViewModel
 
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
-            Text("Upgrade")
-                .font(.system(size: 26, weight: .semibold))
-                .foregroundColor(.waqtuText)
-            #if MAS
-            Text("Your trial has ended. Unlock Waqtu for lifetime access with a one-time purchase.")
-                .font(.system(size: 14))
-                .foregroundColor(.waqtuMuted)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+        TabView {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Your trial has ended")
+                        .font(.system(size: 22, weight: .semibold))
+                        .foregroundColor(.waqtuText)
+                    PremiumOfferView(viewModel: viewModel)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(24)
+            }
+            .tabItem {
+                Label("Upgrade", systemImage: "crown.fill")
+            }
 
-            VStack(alignment: .leading, spacing: 8) {
-                if let err = activationError {
-                    Text(err)
-                        .font(.system(size: 11))
-                        .foregroundColor(.red)
+            AccountSettingsTab(
+                account: viewModel.account,
+                sync: viewModel.syncController,
+                settings: viewModel.settings
+            )
+            .tabItem {
+                Label("Account", systemImage: "person.crop.circle.fill")
+            }
+        }
+    }
+}
+
+// MARK: - Waqtu Premium offer
+/// Waqtu Premium is one auto-renewing subscription for Mac, iPhone and Android, held by the Waqtu
+/// account. The Mac App Store build sells it in-app (StoreKit); the direct-download build sells
+/// nothing and unlocks with a subscribed Waqtu account.
+struct PremiumOfferView: View {
+    let viewModel: AppViewModel
+    @State private var isPurchasing = false
+    @State private var purchaseError: String?
+
+    private static let iPhoneURL = URL(string: "https://apps.apple.com/id/app/id6826628861")!
+    private static let androidURL = URL(string: "https://play.google.com/store/apps/details?id=dat.waqtu.app")!
+    private static let pricingURL = URL(string: "https://getwaqtu.com/mac#pricing")!
+    private static let termsURL = URL(string: "https://getwaqtu.com/terms")!
+    private static let privacyURL = URL(string: "https://getwaqtu.com/privacy")!
+    private static let manageURL = URL(string: "https://apps.apple.com/account/subscriptions")!
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if viewModel.isPremium {
+                activeSection
+            } else {
+                if viewModel.trialManager.isTrialActive, viewModel.trialManager.trialDaysRemaining > 0 {
+                    Text("\(viewModel.trialManager.trialDaysRemaining) days left in trial. Subscribe anytime to keep access.")
+                        .font(.system(size: 13))
+                        .foregroundColor(.waqtuMuted)
                 }
-                Button(isActivating ? "Processing\u{2026}" : "Buy Lifetime Access") {
-                    purchaseLifetime()
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(.waqtuPrimary)
-                .disabled(isActivating)
-                Button("Restore Purchases") {
-                    restorePurchases()
-                }
+                Text("Waqtu Premium is one subscription for your Mac, iPhone and Android, kept by your Waqtu account. It includes sync across your devices and Circles.")
+                    .font(.system(size: 13))
+                    .foregroundColor(.waqtuText)
+                    .fixedSize(horizontal: false, vertical: true)
+                #if MAS
+                storeSection
+                #else
+                phoneSection
+                #endif
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var activeSection: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundColor(.waqtuPrimary)
+            Text("Waqtu Premium is active.")
+                .font(.system(size: 14))
+                .foregroundColor(.waqtuText)
+        }
+        if viewModel.hasStoreSubscription {
+            Text("Subscribed in the Mac App Store.")
+                .font(.system(size: 12))
+                .foregroundColor(.waqtuMuted)
+            Button("Manage Subscription") { NSWorkspace.shared.open(Self.manageURL) }
                 .buttonStyle(.bordered)
                 .tint(.waqtuPrimary)
-            }
-            .frame(width: 280)
-            #else
-            Text("Your trial has ended. Buy lifetime access at getwaqtu.com \u{2014} you\u{2019}ll get a license key by email. Enter it below to activate this Mac.")
-                .font(.system(size: 14))
+        } else {
+            Text("Premium via your Waqtu account. Manage the subscription where you bought it.")
+                .font(.system(size: 12))
                 .foregroundColor(.waqtuMuted)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+        }
+    }
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text("License key")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(.waqtuMuted)
-                TextField("Paste key from Polar email", text: $licenseKeyInput)
-                    .textFieldStyle(.roundedBorder)
-                    .onChange(of: licenseKeyInput) { _, _ in activationError = nil }
-                if let err = activationError {
-                    Text(err)
-                        .font(.system(size: 11))
-                        .foregroundColor(.red)
-                }
-                Button(isActivating ? "Activating\u{2026}" : "Activate this device") {
-                    activateLicense()
+    #if MAS
+    @ViewBuilder
+    private var storeSection: some View {
+        let store = viewModel.storeSubscription
+        VStack(alignment: .leading, spacing: 8) {
+            if store.offers.isEmpty {
+                ProgressView().controlSize(.small)
+            }
+            ForEach(store.offers) { offer in
+                Button {
+                    purchase(productID: offer.id)
+                } label: {
+                    Group {
+                        if offer.isYearly {
+                            Text("Subscribe yearly: \(offer.displayPrice)/year")
+                        } else {
+                            Text("Subscribe monthly: \(offer.displayPrice)/month")
+                        }
+                    }
+                    .frame(minWidth: 240)
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.waqtuPrimary)
-                .disabled(isActivating || licenseKeyInput.trimmingCharacters(in: .whitespaces).isEmpty)
+                .disabled(isPurchasing)
             }
-            .frame(width: 280)
-
-            Button("Open getwaqtu.com to purchase") {
-                openStore()
+            if let purchaseError {
+                Text(purchaseError)
+                    .font(.system(size: 11))
+                    .foregroundColor(.red)
+            }
+            Button("Restore Purchases") {
+                Task { @MainActor in await store.restore() }
             }
             .buttonStyle(.bordered)
             .tint(.waqtuPrimary)
-            #endif
-            Spacer()
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .task { await store.loadProducts() }
+
+        if !viewModel.account.isSignedIn {
+            Text("Sign in under Account before subscribing so Premium also unlocks Waqtu on your iPhone or Android.")
+                .font(.system(size: 12))
+                .foregroundColor(.waqtuMuted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        Text("Payment is charged to your Apple ID. The subscription renews automatically unless cancelled at least 24 hours before the end of the period; manage or cancel it in your App Store account settings.")
+            .font(.system(size: 11))
+            .foregroundColor(.waqtuMuted)
+            .fixedSize(horizontal: false, vertical: true)
+        HStack(spacing: 16) {
+            Link("Terms of Use", destination: Self.termsURL)
+            Link("Privacy Policy", destination: Self.privacyURL)
+        }
+        .font(.system(size: 11))
     }
 
-    #if !MAS
-    private func activateLicense() {
-        activationError = nil
-        isActivating = true
+    private func purchase(productID: String) {
+        purchaseError = nil
+        isPurchasing = true
+        let token = viewModel.account.user.map { AppleAccountToken.uuid(forUserId: $0.id) }
         Task { @MainActor in
-            let result = await licenseManager.activate(key: licenseKeyInput)
-            isActivating = false
-            switch result {
-            case .success:
-                licenseKeyInput = ""
-            case .failure(.message(let msg)):
-                activationError = msg
-            }
-        }
-    }
-
-    private func openStore() {
-        if let url = URL(string: "https://getwaqtu.com") {
-            NSWorkspace.shared.open(url)
+            let result = await viewModel.storeSubscription.purchase(productID: productID, appAccountToken: token)
+            isPurchasing = false
+            if case .failure(.message(let message)) = result { purchaseError = message }
         }
     }
     #else
-    private func purchaseLifetime() {
-        activationError = nil
-        isActivating = true
-        Task { @MainActor in
-            let result = await licenseManager.purchase()
-            isActivating = false
-            if case .failure(.message(let msg)) = result { activationError = msg }
+    @ViewBuilder
+    private var phoneSection: some View {
+        Text("Subscribe in Waqtu on your iPhone or Android phone (Rp 29.000/month or Rp 249.000/year), then sign in here under Account with the same Waqtu account.")
+            .font(.system(size: 13))
+            .foregroundColor(.waqtuMuted)
+            .fixedSize(horizontal: false, vertical: true)
+        HStack(spacing: 8) {
+            Button("Waqtu for iPhone") { NSWorkspace.shared.open(Self.iPhoneURL) }
+                .buttonStyle(.borderedProminent)
+                .tint(.waqtuPrimary)
+            Button("Waqtu for Android") { NSWorkspace.shared.open(Self.androidURL) }
+                .buttonStyle(.borderedProminent)
+                .tint(.waqtuPrimary)
         }
-    }
-
-    private func restorePurchases() {
-        Task { @MainActor in await licenseManager.restore() }
+        if viewModel.account.isSignedIn {
+            Button("I subscribed: check again") {
+                Task { @MainActor in await viewModel.account.refreshEntitlement() }
+            }
+            .buttonStyle(.bordered)
+            .tint(.waqtuPrimary)
+        }
+        Button("More about Waqtu Premium") { NSWorkspace.shared.open(Self.pricingURL) }
+            .buttonStyle(.link)
     }
     #endif
 }
@@ -1814,7 +1778,8 @@ struct LocationSettingsTab: View {
 // MARK: - About Settings Tab
 struct AboutSettingsTab: View {
     var trialManager: TrialManager?
-    var isLicensed: Bool = false
+    /// An active Mac App Store subscription on this Mac (MAS build).
+    var hasStoreSubscription: Bool = false
     /// Premium on the signed-in Waqtu account (e.g. a subscription bought on the phone).
     var hasAccountPremium: Bool = false
     var onCheckForUpdates: (() -> Void)?
@@ -1885,7 +1850,7 @@ struct AboutSettingsTab: View {
                         showResetConfirmation = true
                     }
                     .buttonStyle(.bordered)
-                    Text("Clears all settings and calendar events, then quits. Use to fix calendar access issues. Your license is preserved.")
+                    Text("Clears all settings and calendar events, then quits. Use to fix calendar access issues. Your subscription is not affected.")
                         .font(.caption)
                         .foregroundColor(.waqtuMuted)
 
@@ -1915,18 +1880,18 @@ struct AboutSettingsTab: View {
                 onResetWaqtu?()
             }
         } message: {
-            Text("All settings will be reset to defaults, Waqtu events will be removed from your calendar, and the app will quit. Your license is preserved. Reopen Waqtu to start fresh.")
+            Text("All settings will be reset to defaults, Waqtu events will be removed from your calendar, and the app will quit. Your subscription is not affected. Reopen Waqtu to start fresh.")
         }
     }
 
     @ViewBuilder
     private var accessBadge: some View {
-        if isLicensed {
+        if hasStoreSubscription {
             HStack(spacing: 6) {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 12))
                     .foregroundColor(.waqtuPrimary)
-                Text("Lifetime access")
+                Text("Premium via the Mac App Store")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(.waqtuText)
             }

@@ -2,34 +2,19 @@
 //  AccountSettingsTab.swift
 //  waqtu
 //
-//  Settings → Account: sign in with Apple or Google, sync status, sign out, and (direct-download
-//  build) linking the Polar license to the account.
+//  Settings → Account: sign in with Apple or Google, sync status and sign out. The Waqtu account
+//  also carries Waqtu Premium: a subscription bought on any device unlocks this Mac.
 //
 
 import SwiftUI
 import AuthenticationServices
 
-#if !MAS
-private enum LicenseLinkState: Equatable {
-    case idle
-    case linking
-    case linked
-    case failed(String)
-    /// The server has no link endpoint yet: the button is hidden.
-    case unavailable
-}
-#endif
-
 struct AccountSettingsTab: View {
     let account: WaqtuAccount
     let sync: MutabaahSyncController
-    let licenseManager: LicenseManager
     @Bindable var settings: AppSettings
 
     @State private var appleNonce: String?
-    #if !MAS
-    @State private var linkState: LicenseLinkState = .idle
-    #endif
 
     var body: some View {
         Form {
@@ -58,7 +43,7 @@ struct AccountSettingsTab: View {
 
     private var signInSection: some View {
         Section {
-            Text("Sign in to sync your prayer checklist and prayer settings with Waqtu on your iPhone or Android. Your location is never uploaded.")
+            Text("Sign in to sync your prayer checklist and prayer settings with Waqtu on your iPhone or Android, and to use the Waqtu Premium you subscribed to there. Your location is never uploaded.")
                 .font(.caption)
                 .foregroundColor(.waqtuMuted)
             // Native Sign in with Apple needs the entitlement, which Apple grants to Mac App Store
@@ -114,7 +99,7 @@ struct AccountSettingsTab: View {
                 Image(systemName: "person.crop.circle.fill")
                     .foregroundColor(.waqtuPrimary)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(user.name?.isEmpty == false ? (user.name ?? "") : "Waqtu account")
+                    Text(user.name?.isEmpty == false ? (user.name ?? "") : String(localized: "Waqtu account"))
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(.waqtuText)
                     if let email = user.email, !email.isEmpty {
@@ -150,75 +135,39 @@ struct AccountSettingsTab: View {
             Text("Sync")
         }
 
-        #if !MAS
-        licenseSection
-        #endif
+        Section {
+            if account.serverPremium {
+                Label("Waqtu Premium is active on this account.", systemImage: "checkmark.seal.fill")
+                    .font(.system(size: 12))
+                    .foregroundColor(.waqtuPrimary)
+            } else {
+                Text("No Waqtu Premium on this account yet. A subscription bought in Waqtu on your iPhone or Android unlocks this Mac too.")
+                    .font(.caption)
+                    .foregroundColor(.waqtuMuted)
+                Button("Check again") {
+                    Task { @MainActor in await account.refreshEntitlement() }
+                }
+            }
+        } header: {
+            Text("Waqtu Premium")
+        }
     }
 
     private var syncStatusText: String {
         switch sync.status {
         case .idle:
-            return sync.lastSyncAt == nil ? "Not synced yet" : lastSyncText
+            return sync.lastSyncAt == nil ? String(localized: "Not synced yet") : lastSyncText
         case .syncing:
-            return "Syncing…"
+            return String(localized: "Syncing…")
         case .ok:
             return lastSyncText
         case .failed:
-            return "Sync failed. Will retry."
+            return String(localized: "Sync failed. Will retry.")
         }
     }
 
     private var lastSyncText: String {
-        guard let at = sync.lastSyncAt else { return "Not synced yet" }
-        return "Synced \(at.formatted(.relative(presentation: .named)))"
+        guard let at = sync.lastSyncAt else { return String(localized: "Not synced yet") }
+        return String(localized: "Synced \(at.formatted(.relative(presentation: .named)))")
     }
-
-    // MARK: - License
-
-    #if !MAS
-    @ViewBuilder
-    private var licenseSection: some View {
-        if licenseManager.isLicensed, let key = licenseManager.licenseKey, linkState != .unavailable {
-            Section {
-                switch linkState {
-                case .linked:
-                    Label("License linked. Premium is active on this account.", systemImage: "checkmark.seal.fill")
-                        .font(.system(size: 12))
-                        .foregroundColor(.waqtuPrimary)
-                default:
-                    Button(linkState == .linking ? "Linking…" : "Link license to account") {
-                        link(key: key)
-                    }
-                    .disabled(linkState == .linking)
-                    if case .failed(let message) = linkState {
-                        Text(message)
-                            .font(.caption)
-                            .foregroundColor(.red.opacity(0.85))
-                    }
-                    Text("Unlocks premium on your phone with the license you bought for this Mac.")
-                        .font(.caption)
-                        .foregroundColor(.waqtuMuted)
-                }
-            } header: {
-                Text("License")
-            }
-        }
-    }
-
-    private func link(key: String) {
-        guard let token = account.token else { return }
-        linkState = .linking
-        Task { @MainActor in
-            do {
-                let premium = try await account.api.linkLicense(token: token, key: key)
-                linkState = premium ? .linked : .failed("The server did not activate premium for this license.")
-            } catch WaqtuAPIError.notAvailable {
-                linkState = .unavailable
-            } catch {
-                if isUnauthorized(error) { account.sessionExpired() }
-                linkState = .failed(error.localizedDescription)
-            }
-        }
-    }
-    #endif
 }
