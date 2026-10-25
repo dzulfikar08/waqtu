@@ -203,7 +203,7 @@ export function tintedCard(theme: Theme, hue: Hue): ViewStyle {
   const { wash } = hueColors(theme, hue);
   return {
     ...cardChrome(theme),
-    experimental_backgroundImage: `linear-gradient(135deg, ${wash} 0%, ${theme.surface} 70%)`,
+    experimental_backgroundImage: `linear-gradient(160deg, ${wash} 0%, ${theme.surface} 45%)`,
   };
 }
 
