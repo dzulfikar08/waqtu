@@ -37,10 +37,11 @@ struct SettingsSyncMappingTests {
         #expect(SettingsSyncMapping.accountValues(for: prefs(method: "karachi"))["method"] == nil)
     }
 
-    @Test func kemenagFromThePhoneIsTheSingaporeMethodHere() {
+    @Test func kemenagFromThePhoneIsKemenagHere() {
         var p = prefs()
         #expect(SettingsSyncMapping.apply([SyncSetting(key: "method", value: "kemenag", updatedAt: 1)], to: &p))
-        #expect(p.calculationMethod == "singapore")
+        #expect(p.calculationMethod == "kemenag")
+        #expect(SettingsSyncMapping.accountValues(for: p)["method"] == "kemenag")
         // Already equivalent: a second pull changes nothing and nothing is queued for upload.
         #expect(!SettingsSyncMapping.apply([SyncSetting(key: "method", value: "kemenag", updatedAt: 2)], to: &p))
         let pending = SettingsSyncMapping.pending(prefs: p, stored: { $0 == "method" ? "kemenag" : nil }, explicitChange: false)

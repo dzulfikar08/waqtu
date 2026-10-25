@@ -45,7 +45,7 @@ enum SettingsSyncMapping {
     // MARK: Method / madhab ids
 
     private static let macForAccountMethod: [String: String] = [
-        "kemenag": "singapore",  // Kemenag uses the same 20°/18° angles as the Singapore method
+        "kemenag": "kemenag",
         "mwl": "muslimWorldLeague",
         "isna": "northAmerica",
         "ummAlQura": "ummAlQura",
@@ -54,6 +54,7 @@ enum SettingsSyncMapping {
     ]
 
     private static let accountForMacMethod: [String: String] = [
+        "kemenag": "kemenag",
         "muslimWorldLeague": "mwl",
         "northAmerica": "isna",
         "ummAlQura": "ummAlQura",

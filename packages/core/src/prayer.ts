@@ -60,7 +60,8 @@ export interface PrayerTimesResult {
  * calibrated against the published March 2026 Jakarta and Malang tables with Rounding.Up:
  * Subuh, Ashar and Isya keep the documented +2; Zuhur/Maghrib need +3 and Terbit -4
  * (documented -2 plus the horizon difference). Residual vs the tables is within ±1 min.
- * Swift (apps/apple/parity) MUST use the same numbers.
+ * Swift (apps/apple/shared/Core/PrayerMethodParameters.swift) MUST use the same numbers;
+ * CI (prayer-parity) checks it.
  */
 export const KEMENAG_IHTIYAT = {
   fajr: 2,
