@@ -26,6 +26,9 @@ export const circlesId = {
     ikhwan: "Ikhwan",
     akhwat: "Akhwat",
     join: "Gabung lingkaran",
+    inviteTitle: "Punya kode undangan?",
+    inviteHint:
+      "Opsional. Isi kode dari teman atau keluarga untuk langsung masuk lingkaran privat mereka.",
     privacy:
       "Yang disimpan: nama samaran, ikhwan/akhwat, bahasa, dan zona waktu kasar (misalnya UTC+7). Lokasi tidak pernah dikirim.",
   },
@@ -51,6 +54,7 @@ export const circlesId = {
     joinWithCode: "Masuk dengan kode",
     inviteCode: "Kode: {{code}}",
     myProfile: "Profil lingkaran",
+    saveHandle: "Simpan nama samaran",
     summaryOptIn: "Boleh membagikan ringkasan pekan",
     summaryOptInHint:
       "Hanya angka total pekan ini, tanpa nama ibadah. Tidak pernah dibagikan otomatis.",
@@ -171,6 +175,9 @@ export const circlesEn: Widen<typeof circlesId> = {
     ikhwan: "Ikhwan (brothers)",
     akhwat: "Akhwat (sisters)",
     join: "Join a circle",
+    inviteTitle: "Have an invite code?",
+    inviteHint:
+      "Optional. Enter a code from a friend or family to join their private circle directly.",
     privacy:
       "What is stored: handle, ikhwan/akhwat, language and a coarse time zone (like UTC+7). Your location is never sent.",
   },
@@ -196,6 +203,7 @@ export const circlesEn: Widen<typeof circlesId> = {
     joinWithCode: "Join with code",
     inviteCode: "Code: {{code}}",
     myProfile: "Circle profile",
+    saveHandle: "Save handle",
     summaryOptIn: "Allow sharing my weekly summary",
     summaryOptInHint:
       "Only this week's totals, never practice names. Nothing is ever shared automatically.",

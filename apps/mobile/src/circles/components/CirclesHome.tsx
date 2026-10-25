@@ -9,7 +9,7 @@ import { radius, spacing, useTheme } from "@/theme";
 
 import type { CirclesApi } from "../api";
 import { CirclesHttpError } from "../api";
-import { displayInviteCode, groupCircles } from "../logic";
+import { displayInviteCode, groupCircles, handleProblem, isInviteCode } from "../logic";
 import type { Block, Circle, CircleProfile } from "../types";
 
 function circleTitle(circle: Circle, fallback: string): string {
@@ -35,6 +35,9 @@ export function CirclesHome({
   const [notice, setNotice] = useState<string | null>(null);
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
+  const [handle, setHandle] = useState(profile.handle);
+  const handleIssue = handleProblem(handle);
+  const handleChanged = handle.trim() !== profile.handle;
   const [blocks, setBlocks] = useState<Block[] | null>(null);
   const { publicCircle, privateCircles } = groupCircles(circles);
 
@@ -118,7 +121,7 @@ export function CirclesHome({
           />
           <Button
             label={t("circles.home.joinWithCode")}
-            disabled={busy || code.replace(/[^A-Za-z0-9]/g, "").length < 6}
+            disabled={busy || !isInviteCode(code)}
             onPress={() =>
               void run(async () => {
                 const joined = await api.joinPrivate(code);
@@ -154,6 +157,35 @@ export function CirclesHome({
       </Section>
 
       <Section title={t("circles.home.myProfile")}>
+        <Panel>
+          <TextInput
+            accessibilityLabel={t("circles.onboarding.handle")}
+            autoCapitalize="none"
+            autoCorrect={false}
+            maxLength={24}
+            value={handle}
+            onChangeText={setHandle}
+            style={[styles.input, { color: theme.text, borderColor: theme.border }]}
+          />
+          {handleIssue ? <Hint>{t(`circles.handleProblem.${handleIssue}`)}</Hint> : null}
+          <Button
+            tone="plain"
+            label={t("circles.home.saveHandle")}
+            disabled={busy || !handleChanged || handleIssue !== null}
+            onPress={() =>
+              void run(async () => {
+                const saved = await api.saveProfile({
+                  handle: handle.trim(),
+                  language: profile.language,
+                  tzOffsetHours: profile.tzOffsetHours,
+                });
+                setHandle(saved.handle);
+                await reload();
+                setNotice(t("circles.home.saved"));
+              })
+            }
+          />
+        </Panel>
         <ToggleRow
           label={t("circles.home.summaryOptIn")}
           hint={t("circles.home.summaryOptInHint")}

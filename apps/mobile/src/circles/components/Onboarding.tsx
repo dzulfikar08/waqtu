@@ -8,13 +8,21 @@ import { radius, spacing, useTheme } from "@/theme";
 
 import type { CirclesApi } from "../api";
 import { CirclesHttpError } from "../api";
-import { circleLanguage, handleProblem, suggestHandle, tzOffsetHours } from "../logic";
+import {
+  circleLanguage,
+  handleProblem,
+  isInviteCode,
+  saveWithFreshHandle,
+  suggestHandle,
+  tzOffsetHours,
+} from "../logic";
 import type { Gender } from "../types";
 
 /**
  * First-time setup and the first join in one screen: pick a gender (one tap), then "Join" (second
  * tap). The handle starts as an anonymous suggestion; language and time-zone bucket come from the
- * phone. Nothing here asks for a name, an email or a location.
+ * phone. Nothing here asks for a name, an email or a location. An optional invite code joins that
+ * private circle instead of a public one.
  */
 export function Onboarding({
   api,
@@ -27,25 +35,37 @@ export function Onboarding({
   const theme = useTheme();
   const language = circleLanguage(i18n.language);
   const [handle, setHandle] = useState(() => suggestHandle(language));
+  /** False once the user types their own handle; only our suggestions are retried silently. */
+  const [suggested, setSuggested] = useState(true);
   const [gender, setGender] = useState<Gender | null>(null);
+  const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const problem = handleProblem(handle);
-  const ready = gender !== null && problem === null && !busy;
+  const codeOk = code.trim() === "" || isInviteCode(code);
+  const ready = gender !== null && problem === null && codeOk && !busy;
 
   const submit = async () => {
     if (!gender) return;
     setBusy(true);
     setError(null);
     try {
-      await api.saveProfile({
+      const saved = await saveWithFreshHandle({
         handle: handle.trim(),
-        gender,
-        language,
-        tzOffsetHours: tzOffsetHours(new Date()),
+        suggested,
+        save: (next) =>
+          api.saveProfile({
+            handle: next,
+            gender,
+            language,
+            tzOffsetHours: tzOffsetHours(new Date()),
+          }),
+        suggest: () => suggestHandle(language),
+        isTaken: (e) => e instanceof CirclesHttpError && e.key === "handleTaken",
       });
-      const joined = await api.joinPublic();
+      setHandle(saved.handle);
+      const joined = code.trim() ? await api.joinPrivate(code) : await api.joinPublic();
       onJoined(joined.circle.id);
     } catch (e) {
       setError(t(`circles.errors.${e instanceof CirclesHttpError ? e.key : "generic"}`));
@@ -67,14 +87,20 @@ export function Onboarding({
             autoCorrect={false}
             maxLength={24}
             value={handle}
-            onChangeText={setHandle}
+            onChangeText={(next) => {
+              setHandle(next);
+              setSuggested(false);
+            }}
             style={[styles.input, { color: theme.text, borderColor: theme.border }]}
           />
           {problem ? <Hint>{t(`circles.handleProblem.${problem}`)}</Hint> : null}
           <Button
             tone="plain"
             label={t("circles.onboarding.shuffle")}
-            onPress={() => setHandle(suggestHandle(language))}
+            onPress={() => {
+              setHandle(suggestHandle(language));
+              setSuggested(true);
+            }}
           />
         </Panel>
       </Section>
@@ -95,9 +121,32 @@ export function Onboarding({
         </Panel>
       </Section>
 
+      <Section title={t("circles.onboarding.inviteTitle")}>
+        <Panel>
+          <Hint>{t("circles.onboarding.inviteHint")}</Hint>
+          <TextInput
+            accessibilityLabel={t("circles.home.codeLabel")}
+            autoCapitalize="characters"
+            autoCorrect={false}
+            placeholder={t("circles.home.codePlaceholder")}
+            placeholderTextColor={theme.muted}
+            maxLength={12}
+            value={code}
+            onChangeText={setCode}
+            style={[styles.input, { color: theme.text, borderColor: theme.border }]}
+          />
+        </Panel>
+      </Section>
+
       {error ? <Text style={{ color: theme.text }}>{error}</Text> : null}
       <Button
-        label={busy ? t("circles.loading") : t("circles.onboarding.join")}
+        label={
+          busy
+            ? t("circles.loading")
+            : code.trim()
+              ? t("circles.home.joinWithCode")
+              : t("circles.onboarding.join")
+        }
         onPress={() => void submit()}
         disabled={!ready}
       />
