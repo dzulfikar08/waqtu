@@ -18,6 +18,7 @@ extension Color {
 struct MenuBarView: View {
     @Bindable var viewModel: AppViewModel
     @State private var showTrialEndingSoonModal = false
+    @Environment(\.openSettings) private var openSettings
 
     init(viewModel: AppViewModel) {
         self.viewModel = viewModel
@@ -62,11 +63,12 @@ struct MenuBarView: View {
 
             Divider()
 
-            // Today's fardhu checklist (marks prayed locally and syncs with the account)
-            FardhChecklistView(
-                streakManager: viewModel.streakManager,
-                onToggle: { viewModel.toggleFardh($0) }
-            )
+            // Mutabaah checklist for any day (stored in the account replica, syncs with the phone)
+            MutabaahChecklistView(sync: viewModel.syncController, onManage: {
+                SettingsView.requestedPane = SettingsView.Pane.mutabaah
+                NSApp.activate(ignoringOtherApps: true)
+                openSettings()
+            })
 
             Divider()
 
@@ -799,6 +801,27 @@ struct SettingsView: View {
     var viewModel: AppViewModel?
     var onCheckForUpdates: (() -> Void)?
     @State private var showAudioBrowser = false
+    @AppStorage(SettingsView.selectedTabKey) private var selectedTab = Pane.general
+
+    /// Tab ids for `TabView(selection:)`; the menu bar's "Manage checklist" opens `mutabaah`.
+    enum Pane {
+        static let general = "general"
+        static let prayerTimes = "prayerTimes"
+        static let mutabaah = "mutabaah"
+        static let pomodoro = "pomodoro"
+        static let location = "location"
+        static let account = "account"
+        static let slack = "slack"
+        static let upgrade = "upgrade"
+        static let about = "about"
+    }
+
+    private static let selectedTabKey = "settingsSelectedTab"
+
+    static var requestedPane: String {
+        get { UserDefaults.standard.string(forKey: selectedTabKey) ?? Pane.general }
+        set { UserDefaults.standard.set(newValue, forKey: selectedTabKey) }
+    }
 
     init(settings: AppSettings, viewModel: AppViewModel? = nil, onCheckForUpdates: (() -> Void)? = nil) {
         self.settings = settings
@@ -834,26 +857,38 @@ struct SettingsView: View {
             if let vm = viewModel, !vm.isPremium, vm.trialManager.trialDaysRemaining >= 2 {
                 TrialBannerView(daysRemaining: vm.trialManager.trialDaysRemaining)
             }
-            TabView {
+            TabView(selection: $selectedTab) {
                 GeneralSettingsTab(settings: settings, viewModel: viewModel)
                     .tabItem {
                         Label("General", systemImage: "gearshape.fill")
                     }
+                    .tag(Pane.general)
 
                 PrayerTimesSettingsTab(settings: settings, viewModel: viewModel)
                     .tabItem {
                         Label("Prayer Times", systemImage: "clock.fill")
                     }
+                    .tag(Pane.prayerTimes)
+
+                if let vm = viewModel {
+                    MutabaahSettingsTab(sync: vm.syncController)
+                        .tabItem {
+                            Label("Mutabaah", systemImage: "checklist")
+                        }
+                        .tag(Pane.mutabaah)
+                }
 
                 PomodoroSettingsTab(settings: settings, onBrowse: { showAudioBrowser = true })
                     .tabItem {
                         Label("Pomodoro", systemImage: "timer.fill")
                     }
+                    .tag(Pane.pomodoro)
 
                 LocationSettingsTab(settings: settings, viewModel: viewModel)
                     .tabItem {
                         Label("Location", systemImage: "location.fill")
                     }
+                    .tag(Pane.location)
 
                 if let vm = viewModel {
                     AccountSettingsTab(
@@ -864,22 +899,26 @@ struct SettingsView: View {
                     .tabItem {
                         Label("Account", systemImage: "person.crop.circle.fill")
                     }
+                    .tag(Pane.account)
 
                     SlackSettingsTab(settings: settings, slackManager: vm.slackManager)
                         .tabItem {
                             Label("Slack", systemImage: "message.fill")
                         }
+                        .tag(Pane.slack)
 
                     UpgradeSettingsTab(viewModel: vm)
                         .tabItem {
                             Label("Upgrade", systemImage: "crown.fill")
                         }
+                        .tag(Pane.upgrade)
                 }
 
                 AboutSettingsTab(trialManager: viewModel?.trialManager, hasStoreSubscription: viewModel?.hasStoreSubscription ?? false, hasAccountPremium: viewModel?.account.serverPremium ?? false, onCheckForUpdates: onCheckForUpdates, onResetWaqtu: viewModel.map { vm in { vm.resetAllAndQuit() } })
                     .tabItem {
                         Label("About", systemImage: "info.circle.fill")
                     }
+                    .tag(Pane.about)
             }
         }
     }

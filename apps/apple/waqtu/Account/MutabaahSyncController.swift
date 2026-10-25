@@ -2,8 +2,9 @@
 //  MutabaahSyncController.swift
 //  waqtu
 //
-//  Keeps the Mac's prayer log and prayer preferences in step with the signed-in account over
-//  /v1/sync. Prayer log edits are recorded in the replica the moment they happen and uploaded
+//  Owns the Mac's mutabaah checklist (the replica: every item, the `items` list) and keeps it,
+//  the prayer log and the prayer preferences in step with the signed-in account over /v1/sync.
+//  Edits are recorded in the replica the moment they happen (signed in or not) and uploaded
 //  shortly after; the account's changes are merged last-write-wins and written back to the log
 //  and to the prayer settings. Location is never part of the sync.
 //  State is only touched on the main thread; `syncNow` is main-actor.
@@ -29,12 +30,17 @@ struct RemoteChanges: Equatable {
 final class MutabaahSyncController {
     private(set) var status: SyncStatus = .idle
     private(set) var lastSyncAt: Date?
+    /// Bumped whenever the replica's checklist rows change (local edit or pull); views read it so
+    /// they redraw, since the replica itself is not observable.
+    private(set) var revision = 0
 
     private let account: WaqtuAccount
     private let streakManager: PrayerStreakManager
     private let settings: AppSettings
     let replica: MutabaahReplica
     @ObservationIgnored var onRemoteChanges: ((RemoteChanges) -> Void)?
+    /// Called after a checklist edit made on this Mac (entries or the item list).
+    @ObservationIgnored var onLocalChecklistChange: (() -> Void)?
 
     @ObservationIgnored private var inFlight = false
     @ObservationIgnored private var pendingRerun = false
@@ -59,6 +65,12 @@ final class MutabaahSyncController {
 
         streakManager.onLocalChange = { [weak self] change in self?.recordLocal(change) }
         account.onSessionChange = { [weak self] in self?.sessionChanged() }
+
+        // The replica is the checklist's store, signed in or not: bring in prayer-log rows it has
+        // not seen (logged before this version, or before the first sign-in).
+        if LogSync.reconcile(log: streakManager.entries, cleared: streakManager.clearedAt, into: replica) > 0 {
+            revision += 1
+        }
 
         NotificationCenter.default.addObserver(
             forName: Notification.Name("prayerTimeSettingsChanged"), object: nil, queue: .main
@@ -90,8 +102,49 @@ final class MutabaahSyncController {
     // MARK: - Local edits
 
     private func recordLocal(_ change: PrayerLogChange) {
-        guard account.isSignedIn else { return }
-        if LogSync.record(change, in: replica) { scheduleSync() }
+        guard LogSync.record(change, in: replica) else { return }
+        revision += 1
+        scheduleSync()
+    }
+
+    // MARK: - Checklist
+
+    var items: [ItemDef] { MutabaahChecklist.items(in: replica) }
+
+    func value(date: String, itemId: String) -> Int {
+        MutabaahChecklist.value(date: date, itemId: itemId, in: replica)
+    }
+
+    /// A fardh chip on the checklist; the prayer log follows so the overlay and widgets agree.
+    func applyFardh(_ action: FardhAction, fardh: Fardh, date: String) {
+        let now = FardhMapping.millis(Date())
+        guard let change = MutabaahChecklist.applyFardh(action, fardh: fardh, date: date, in: replica, at: now) else { return }
+        streakManager.applyRemote(change)
+        localEdit()
+    }
+
+    func toggleCheck(itemId: String, date: String) {
+        if MutabaahChecklist.toggleCheck(itemId: itemId, date: date, in: replica, at: FardhMapping.millis(Date())) {
+            localEdit()
+        }
+    }
+
+    func setCount(_ count: Int, itemId: String, date: String) {
+        if MutabaahChecklist.setCount(count, itemId: itemId, date: date, in: replica, at: FardhMapping.millis(Date())) {
+            localEdit()
+        }
+    }
+
+    func setItems(_ items: [ItemDef]) {
+        if MutabaahChecklist.setItems(items, in: replica, at: FardhMapping.millis(Date())) {
+            localEdit()
+        }
+    }
+
+    private func localEdit() {
+        revision += 1
+        onLocalChecklistChange?()
+        scheduleSync()
     }
 
     private func prayerSettingsEdited() {
@@ -147,6 +200,7 @@ final class MutabaahSyncController {
             if replica.prepareAccount(userId: user.id) == .replaced {
                 // Another account's log must not be uploaded to this one.
                 streakManager.resetAll()
+                revision += 1
                 onRemoteChanges?(RemoteChanges(prayerLog: true, prayerSettings: false))
             }
             LogSync.reconcile(log: streakManager.entries, cleared: streakManager.clearedAt, into: replica)
@@ -180,6 +234,9 @@ final class MutabaahSyncController {
 
     /// Writes what a pull brought into the prayer log and the prayer preferences.
     private func merge(_ changes: inout RemoteChanges, _ report: SyncReport) {
+        if !report.pulledEntries.isEmpty || report.pulledSettings.contains(where: { $0.key == MutabaahSettingKey.items }) {
+            revision += 1
+        }
         for entry in report.pulledEntries {
             if let change = FardhMapping.change(for: entry) {
                 streakManager.applyRemote(change)

@@ -103,6 +103,8 @@ final class AppViewModel {
                 self.pushToSharedContainer()
             }
         }
+        // Checklist edits move the streak shown by the widgets.
+        syncController.onLocalChecklistChange = { [weak self] in self?.pushToSharedContainer() }
         setupLocationUpdates()
         calculatePrayers()
         setupTimer()
@@ -524,19 +526,6 @@ final class AppViewModel {
             trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
         )
         UNUserNotificationCenter.current().add(request)
-    }
-
-    /// Menu bar checklist tap: marks the prayer prayed, or clears it when it already is.
-    /// The edit reaches the account through `streakManager.onLocalChange`.
-    func toggleFardh(_ fardh: Fardh) {
-        let name = fardh.logName
-        switch streakManager.statusFor(prayer: name) {
-        case .prayed, .late:
-            streakManager.clearPrayer(prayer: name)
-        case .missed, .none:
-            streakManager.markPrayed(prayer: name)
-        }
-        pushToSharedContainer()
     }
 
     func resetShownPrayers() {

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Full mutabaah checklist on the Mac (DEV-13)
+
+- **Every practice** — The menu bar shows the whole mutabaah checklist, not only the five fardhu: rawatib, dhuha, tahajjud, tilawah pages, dzikir pagi/petang, sedekah, puasa sunnah, and your own practices. Fardhu chips mark a prayer done on time; right-click toggles on time, in congregation (jamaah) or made up (qadha), the same flags as the phone.
+- **Any day** — Step back through previous days or pick one from a calendar to fill in what you missed.
+- **Settings → Mutabaah** — Remove practices, add built-ins back (including halaqah and murojaah), or create your own checkbox or counter practice.
+- **Same data as the phone** — Entries and the item list are stored with the phone's item ids, values and `items` setting, so edits made on either device show up on the other after sync. Works signed out too; the checklist uploads on the first sign-in.
+
 ### Bahasa Indonesia (DEV-13)
 
 - **Indonesian and English** — The Mac app's menu bar, settings, onboarding, overlay and notifications are translated into Indonesian through a String Catalog (`waqtu/Localizable.xcstrings`). Macs set to Indonesian get Indonesian; everything else stays English. Prayer and mutabaah terms match the mobile app (Subuh, Dzuhur, Ashar, Maghrib, Isya; Istiqamah; Berbuka/Imsak).

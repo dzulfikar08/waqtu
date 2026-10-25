@@ -72,7 +72,7 @@ struct LocalizationCatalogTests {
     }
 
     /// Prayer and checklist terms are the ones the phone shows, so a user switching devices reads the same words.
-    @Test func prayerNamesMatchTheMobileApp() throws {
+    @Test func termsMatchTheMobileApp() throws {
         let catalog = try Catalog()
         let mobile = try String(contentsOf: mobileIdURL, encoding: .utf8)
         func mobileValue(_ id: String) -> String? {
@@ -81,7 +81,18 @@ struct LocalizationCatalogTests {
                   let r = Range(m.range(at: 1), in: mobile) else { return nil }
             return String(mobile[r])
         }
-        let pairs = ["Fajr": "fajr", "Sunrise": "sunrise", "Dhuhr": "dhuhr", "Asr": "asr", "Isha": "isha"]
+        let pairs = [
+            "Fajr": "fajr", "Sunrise": "sunrise", "Dhuhr": "dhuhr", "Asr": "asr", "Isha": "isha",
+            // Checklist items and the item manager (mobile `items.*`, `mutabaah.*`).
+            "Rawatib prayers": "rawatib", "Dhuha prayer": "dhuha", "Tahajjud prayer": "tahajjud",
+            "Qur'an recitation": "tilawah", "Morning dhikr": "dzikir_pagi", "Evening dhikr": "dzikir_petang",
+            "Charity": "sedekah", "Voluntary fasting": "puasa", "Ramadan halaqah": "halaqah",
+            "Hafalan review": "murojaah", "On time": "onTime", "In congregation": "jamaah", "Made up": "qadha",
+            "Manage checklist": "manage", "Your checklist is empty. Add practices in Settings.": "empty",
+            "My list": "active", "Available to add back": "available", "Your own practice": "custom",
+            "Practice name, e.g. Read Al-Mulk": "namePlaceholder", "Checkbox": "kindCheck",
+            "Counter": "kindCount", "Add": "add", "Today": "today",
+        ]
         for (key, mobileKey) in pairs {
             let expected = try #require(mobileValue(mobileKey), "mobile id.ts has no \(mobileKey)")
             #expect(catalog.id(key) == expected, "\(key)")
