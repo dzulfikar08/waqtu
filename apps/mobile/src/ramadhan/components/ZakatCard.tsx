@@ -78,7 +78,7 @@ export function ZakatCard({ ctx, locale }: { ctx: RamadhanContext; locale: strin
   const priceField = mode === "cash" ? cash : pricePerKg;
 
   return (
-    <Section title={t("ramadhan.zakat.title")} icon="gift-outline">
+    <Section title={t("ramadhan.zakat.title")} icon="gift-outline" hue="brand">
       <Panel>
         <Hint>{t("ramadhan.zakat.hint")}</Hint>
         <NumberField

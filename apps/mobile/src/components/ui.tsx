@@ -90,7 +90,7 @@ export function PressableScale({
 /**
  * A tab screen: draws its own large title under the status bar (the tabs have no native header) and pads the end of
  * the content by what the floating tab bar covers, so the last card scrolls fully above it. An optional `backdrop`
- * (the Today sky) sits behind the header and drifts up slower than the content; the status bar gets the page colour
+ * gradient (the Today sky, a section's hue) sits behind the header and drifts up slower than the content; the status bar gets the page colour
  * once the content scrolls under it.
  */
 export function Screen({
@@ -107,8 +107,8 @@ export function Screen({
   /** Line under the title, e.g. the Hijri date. */
   caption?: ReactNode;
   right?: ReactNode;
-  /** Drawn behind the top of the screen, full width, from the top edge. */
-  backdrop?: ReactNode;
+  /** A CSS gradient drawn behind the top of the screen, full width, from the top edge (`hueWash`, `skyWash`). */
+  backdrop?: string;
   children: ReactNode;
 }) {
   const theme = useTheme();
@@ -123,6 +123,7 @@ export function Screen({
           style={[
             styles.backdrop,
             {
+              experimental_backgroundImage: backdrop,
               transform: [
                 {
                   translateY: scrollY.interpolate({
@@ -133,9 +134,7 @@ export function Screen({
               ],
             },
           ]}
-        >
-          {backdrop}
-        </Animated.View>
+        />
       ) : null}
       <Animated.ScrollView
         style={styles.fill}
@@ -572,7 +571,7 @@ const styles = StyleSheet.create({
   screen: { paddingHorizontal: spacing.md + 4, gap: spacing.lg },
   fill: { flex: 1 },
   statusBar: { position: "absolute", top: 0, left: 0, right: 0 },
-  backdrop: { position: "absolute", top: 0, left: 0, right: 0 },
+  backdrop: { position: "absolute", top: 0, left: 0, right: 0, height: 420 },
   pageHeader: { flexDirection: "row", alignItems: "flex-start", gap: spacing.md },
   pageHeaderText: { flex: 1, gap: 2 },
   card: { borderRadius: radius.lg },

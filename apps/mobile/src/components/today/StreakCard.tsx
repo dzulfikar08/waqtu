@@ -49,7 +49,9 @@ export function StreakCard({
         <View
           style={[
             styles.badge,
-            { experimental_backgroundImage: `radial-gradient(circle, ${amber.soft} 0%, ${amber.wash} 100%)` },
+            {
+              experimental_backgroundImage: `radial-gradient(circle, ${amber.soft} 0%, ${amber.wash} 100%)`,
+            },
           ]}
         >
           <Ionicons
@@ -76,7 +78,11 @@ export function StreakCard({
         ) : null}
       </View>
       {days.length > 0 ? (
-        <View style={styles.week} accessible={false} importantForAccessibility="no-hide-descendants">
+        <View
+          style={styles.week}
+          accessible={false}
+          importantForAccessibility="no-hide-descendants"
+        >
           {days.map((day) => {
             const isToday = day.date === today;
             return (
@@ -125,7 +131,13 @@ export function StreakCard({
 
 const styles = StyleSheet.create({
   head: { flexDirection: "row", alignItems: "center", gap: spacing.md - 4 },
-  badge: { width: 52, height: 52, borderRadius: 26, alignItems: "center", justifyContent: "center" },
+  badge: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   grow: { flex: 1, gap: 2 },
   figure: { fontSize: 28, fontWeight: "800", letterSpacing: -0.4 },
   best: {

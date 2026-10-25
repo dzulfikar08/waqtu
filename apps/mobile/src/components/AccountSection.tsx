@@ -5,13 +5,14 @@ import { Alert, StyleSheet, Text, View } from "react-native";
 
 import { type AuthClient } from "@/auth/client";
 import { appleSignInAvailable, signInWithApple, signInWithGoogle } from "@/auth/signIn";
+import { CIRCLES_HERO } from "@/components/GlowHero";
 import { Row, Section } from "@/components/ui";
 import { useSyncState } from "@/hooks/useSyncState";
 import { useTranslation } from "@/i18n";
 import { usePremium } from "@/premium/usePremium";
 import { syncNow } from "@/sync/run";
 import { forgetAccount } from "@/sync/sqliteStore";
-import { spacing, typography, useTheme } from "@/theme";
+import { onSky, spacing, typography, useTheme } from "@/theme";
 
 /** Rendered only when the auth server is configured, so there is never a dead sign-in button. */
 export function AccountSection({ client }: { client: AuthClient }) {
@@ -75,7 +76,7 @@ export function AccountSection({ client }: { client: AuthClient }) {
     ]);
 
   return (
-    <Section title={t("settings.account")} icon="person-circle">
+    <Section title={t("settings.account")} icon="person-circle" hue="circles">
       {session ? (
         <>
           <AccountHeader
@@ -87,6 +88,7 @@ export function AccountSection({ client }: { client: AuthClient }) {
             <Row
               label={`${t("sync.now")} · ${syncLabel()}`}
               icon="sync"
+              hue="circles"
               onPress={() => void syncNow(db, client, session.user.id, true)}
               disabled={sync.status === "syncing"}
             />
@@ -94,6 +96,7 @@ export function AccountSection({ client }: { client: AuthClient }) {
             <Row
               label={t("sync.premium")}
               icon="diamond-outline"
+              hue="ramadhan"
               chevron
               onPress={() => router.push("/premium")}
             />
@@ -101,6 +104,7 @@ export function AccountSection({ client }: { client: AuthClient }) {
           <Row
             label={t("settings.signOut")}
             icon="log-out-outline"
+            hue="circles"
             onPress={() => void run(() => client.signOut())}
           />
           <Row
@@ -116,12 +120,14 @@ export function AccountSection({ client }: { client: AuthClient }) {
             <Row
               label={t("settings.signInApple")}
               icon="logo-apple"
+              hue="circles"
               onPress={() => void run(() => signInWithApple(client))}
             />
           ) : null}
           <Row
             label={t("settings.signInGoogle")}
             icon="logo-google"
+            hue="circles"
             onPress={() => void run(() => signInWithGoogle(client))}
           />
         </>
@@ -140,17 +146,23 @@ export function AccountSection({ client }: { client: AuthClient }) {
   );
 }
 
-/** The signed-in account: an initial in a round accent badge, the name and the signed-in line. */
+/** The signed-in account: an initial in a round rose-to-violet badge, the name and the signed-in line. */
 function AccountHeader({ name, email, line }: { name: string; email: string; line: string }) {
   const theme = useTheme();
   const initial = (name || email).trim().charAt(0).toUpperCase() || "?";
+  const stops = theme.dark ? CIRCLES_HERO.dark : CIRCLES_HERO.light;
   return (
     <View accessible style={[styles.header, { borderColor: theme.separator }]}>
       <View
         importantForAccessibility="no-hide-descendants"
-        style={[styles.avatar, { backgroundColor: theme.accent }]}
+        style={[
+          styles.avatar,
+          {
+            experimental_backgroundImage: `linear-gradient(135deg, ${stops[0]} 0%, ${stops[1]} 100%)`,
+          },
+        ]}
       >
-        <Text style={[typography.title, { color: theme.accentText }]}>{initial}</Text>
+        <Text style={[typography.title, { color: onSky.text }]}>{initial}</Text>
       </View>
       <View style={styles.headerText}>
         {name ? (

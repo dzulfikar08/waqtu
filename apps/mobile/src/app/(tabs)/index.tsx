@@ -15,7 +15,7 @@ import { useTranslation } from "@/i18n";
 import { refreshLocationIfStale } from "@/prayer/location";
 import { periodAt, periodForHour } from "@/prayer/period";
 import { nextSlot, timesFor } from "@/prayer/schedule";
-import { prayerTone, skyTone, spacing, typography, useTheme } from "@/theme";
+import { prayerTone, skyWash, spacing, typography, useTheme } from "@/theme";
 
 const MS_DAY = 86_400_000;
 
@@ -73,17 +73,7 @@ export default function TodayScreen() {
       <Text style={[typography.callout, { color: theme.gold, fontWeight: "600" }]}>{hijri}</Text>
     </View>
   ) : null;
-  const sky = skyTone(period, theme.dark);
-  const backdrop = (
-    <View
-      style={[
-        styles.backdrop,
-        {
-          experimental_backgroundImage: `linear-gradient(180deg, ${sky}${theme.dark ? "73" : "40"} 0%, ${sky}00 100%)`,
-        },
-      ]}
-    />
-  );
+  const backdrop = skyWash(period, theme.dark);
 
   return (
     <Screen title={gregorian} eyebrow={eyebrow} caption={caption} backdrop={backdrop}>
@@ -139,6 +129,5 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     marginBottom: spacing.xs,
   },
-  backdrop: { height: 420 },
   block: { gap: spacing.sm },
 });

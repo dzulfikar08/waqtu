@@ -15,7 +15,8 @@ const TARGETS = {
 } as const;
 
 /**
- * `waqtu://demo?lang=id|en&to=today|week|ramadhan|circles|settings`: loads the demo data and opens a tab. Only the screenshot build
+ * `waqtu://demo?lang=id|en&to=today|week|ramadhan|circles|settings[&loc=none]`: loads the demo data (without a location
+ * with `loc=none`) and opens a tab. Only the screenshot build
  * (EXPO_PUBLIC_DEMO_MODE=1) does this; every other build bounces to the home tab.
  */
 export default function DemoRoute() {
@@ -26,15 +27,15 @@ export default function DemoRoute() {
 function DemoSeed() {
   const db = useSQLiteContext();
   const router = useRouter();
-  const { lang, to } = useLocalSearchParams<{ lang?: string; to?: string }>();
+  const { lang, to, loc } = useLocalSearchParams<{ lang?: string; to?: string; loc?: string }>();
 
   useEffect(() => {
     const locale = isLocale(lang) ? lang : "id";
     const target = TARGETS[to as keyof typeof TARGETS] ?? "/";
-    void seedDemo(db, locale)
+    void seedDemo(db, locale, loc !== "none")
       .catch((error: unknown) => console.error("demo seed failed", error))
       .then(() => router.replace(target));
-  }, [db, router, lang, to]);
+  }, [db, router, lang, to, loc]);
 
   return null;
 }

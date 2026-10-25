@@ -101,7 +101,9 @@ function Progress({ done, total }: { done: number; total: number }) {
           {done}
           <Text style={[styles.progressTotal, { color: theme.faint }]}>/{total}</Text>
         </Text>
-        <Text style={[typography.headline, tabular, { color: complete ? brand.base : theme.muted }]}>
+        <Text
+          style={[typography.headline, tabular, { color: complete ? brand.base : theme.muted }]}
+        >
           {Math.round(fraction * 100)}%
         </Text>
       </View>

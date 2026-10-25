@@ -37,6 +37,12 @@ jobs:
         with:
           name: fmt-patch
           path: fmt.patch
+      - if: always()
+        run: bun run lint
+      - if: always()
+        run: bun --filter @waqtu/mobile typecheck
+      - if: always()
+        run: bun --filter @waqtu/mobile test
 
   web-api:
     runs-on: ubuntu-latest

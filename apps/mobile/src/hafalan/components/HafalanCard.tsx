@@ -39,9 +39,17 @@ export function HafalanCard() {
   return (
     <Section
       title={`${t("hafalan.cardTitle")} · ${targetLabel(data.plan.target, t)}`}
-      icon="book-outline" hue="hafalan"
+      icon="book-outline"
+      hue="hafalan"
     >
-      <Row icon="book" hue="hafalan" label={line} selected={portion.complete} onPress={open} chevron />
+      <Row
+        icon="book"
+        hue="hafalan"
+        label={line}
+        selected={portion.complete}
+        onPress={open}
+        chevron
+      />
     </Section>
   );
 }

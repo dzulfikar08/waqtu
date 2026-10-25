@@ -30,7 +30,7 @@ import { Card, IconChip, PressableScale } from "@/components/ui";
 import { useMutabaah } from "@/hooks/useMutabaah";
 import { useTranslation } from "@/i18n";
 import { Button, Hint } from "@/ramadhan/components/fields";
-import { HIT, radius, spacing, typography, useTheme } from "@/theme";
+import { HIT, hueColors, radius, spacing, typography, useTheme } from "@/theme";
 
 interface Screen {
   circle: Circle;
@@ -55,6 +55,7 @@ function CircleFeed({
 }) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const rose = hueColors(theme, "circles");
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const mutabaah = useMutabaah();
@@ -155,9 +156,9 @@ function CircleFeed({
           </View>
         ) : null}
         {canPost(circle) ? (
-          <Card>
+          <Card hue="circles">
             <View style={styles.summaryHead}>
-              <IconChip icon="stats-chart" />
+              <IconChip icon="stats-chart" color={rose.base} background={rose.soft} />
               <View style={styles.grow}>
                 <Hint>{t("circles.circle.summary.shareHint")}</Hint>
               </View>
@@ -181,12 +182,12 @@ function CircleFeed({
         {notice ? (
           <View
             accessibilityLiveRegion="polite"
-            style={[styles.banner, { backgroundColor: theme.accentSoft }]}
+            style={[styles.banner, { backgroundColor: rose.soft }]}
           >
             <Ionicons
               name="information-circle"
               size={18}
-              color={theme.accent}
+              color={rose.base}
               accessibilityElementsHidden
               importantForAccessibility="no"
             />
@@ -219,7 +220,7 @@ function CircleFeed({
   if (!state.data) {
     return (
       <View style={[styles.center, { backgroundColor: theme.background }]}>
-        <IconChip icon="hourglass-outline" size={48} />
+        <IconChip icon="hourglass-outline" size={48} color={rose.base} background={rose.soft} />
         <Text style={[typography.callout, { color: theme.muted }]}>{t("circles.loading")}</Text>
       </View>
     );
@@ -246,7 +247,7 @@ function CircleFeed({
               scaleTo={0.9}
               style={styles.menuButton}
             >
-              <Ionicons name="ellipsis-horizontal-circle" size={26} color={theme.accent} />
+              <Ionicons name="ellipsis-horizontal-circle" size={26} color={rose.base} />
             </PressableScale>
           ),
         }}
@@ -270,7 +271,12 @@ function CircleFeed({
         ListHeaderComponent={header}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <IconChip icon="chatbubbles-outline" size={56} />
+            <IconChip
+              icon="chatbubbles-outline"
+              size={56}
+              color={rose.base}
+              background={rose.soft}
+            />
             <Text style={[typography.callout, styles.centerText, { color: theme.muted }]}>
               {t("circles.circle.empty")}
             </Text>

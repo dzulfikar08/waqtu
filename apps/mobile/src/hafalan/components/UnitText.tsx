@@ -6,7 +6,7 @@ import { useTranslation } from "@/i18n";
 import type { CheckView } from "@/recitation/check";
 import { arabicDigits } from "../format";
 import { wordKey, type UnitBlock } from "../text";
-import { cardChrome, radius, spacing, typography, useTheme } from "@/theme";
+import { cardChrome, hueColors, radius, spacing, typography, useTheme } from "@/theme";
 
 export type TestMode = "show" | "hide" | "letters";
 
@@ -14,7 +14,7 @@ export type TestMode = "show" | "hide" | "letters";
  * A unit of the mushaf in Uthmani script, right to left. In `hide` and `letters` mode every word
  * that is not in `revealed` is covered (or shown by its first letters); tapping a word reveals it.
  * `activeAyah` (counted from 0 within the unit) is the ayah the recording is at, drawn in the
- * accent colour; with `onAyahPress`, tapping an ayah (other than a covered word) jumps to it.
+ * hafalan colour; with `onAyahPress`, tapping an ayah (other than a covered word) jumps to it.
  * `check` (the developer recitation check) colours skipped words (underlined) and replaced words,
  * and the number of an ayah where the reciter jumped to another ayah.
  */
@@ -41,6 +41,7 @@ export function UnitText({
 }) {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
+  const hafalan = hueColors(theme, "hafalan");
   const quran = {
     fontFamily,
     fontSize,
@@ -57,10 +58,10 @@ export function UnitText({
             <View
               style={[
                 styles.surah,
-                { backgroundColor: theme.accentSoft, borderColor: theme.separator },
+                { backgroundColor: hafalan.soft, borderColor: theme.separator },
               ]}
             >
-              <Text style={[styles.surahArabic, { color: theme.accent, fontFamily }]}>
+              <Text style={[styles.surahArabic, { color: hafalan.base, fontFamily }]}>
                 {surahInfo(block.surah).arabic}
               </Text>
               <Text style={[typography.footnote, { color: theme.muted }]}>
@@ -81,7 +82,7 @@ export function UnitText({
               <Text
                 key={ayah.index}
                 onPress={onAyahPress ? () => onAyahPress(ayah.index - first) : undefined}
-                style={ayah.index - first === activeAyah ? { color: theme.accent } : undefined}
+                style={ayah.index - first === activeAyah ? { color: hafalan.base } : undefined}
               >
                 {ayah.words.map((word, i) => {
                   const key = wordKey(ayah.index, i);

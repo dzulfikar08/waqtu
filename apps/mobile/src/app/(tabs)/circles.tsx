@@ -4,7 +4,8 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { authClient, type AuthClient } from "@/auth/client";
 import { AccountSection } from "@/components/AccountSection";
-import { Card, IconChip, Screen, Section, type IconName } from "@/components/ui";
+import { CIRCLES_HERO, GlowHero } from "@/components/GlowHero";
+import { Card, IconChip, Screen, type IconName } from "@/components/ui";
 import type { CirclesApi } from "@/circles/api";
 import { CirclesHttpError, isUnauthorized } from "@/circles/api";
 import { circlesApi } from "@/circles/client";
@@ -13,17 +14,19 @@ import { Onboarding } from "@/circles/components/Onboarding";
 import { useLoad } from "@/circles/useLoad";
 import { useTranslation } from "@/i18n";
 import { PremiumGate } from "@/premium/PremiumGate";
-import { Button, Hint, Panel } from "@/ramadhan/components/fields";
-import { spacing, typography, useTheme } from "@/theme";
+import { Button } from "@/ramadhan/components/fields";
+import { hueColors, hueWash, spacing, typography, useTheme } from "@/theme";
 
 export default function CirclesScreen() {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const backdrop = hueWash(theme, "circles");
   return (
-    <Screen title={t("circles.tab")}>
+    <Screen title={t("circles.tab")} backdrop={backdrop}>
       {authClient && circlesApi ? (
         <SignedInGate client={authClient} api={circlesApi} />
       ) : (
-        <Notice icon="cloud-offline-outline" text={t("circles.unavailable")} />
+        <GlowHero palette={CIRCLES_HERO} icon="people" body={t("circles.unavailable")} />
       )}
     </Screen>
   );
@@ -43,13 +46,14 @@ function Notice({
 }) {
   const theme = useTheme();
   const danger = tone === "danger";
+  const hue = hueColors(theme, "circles");
   return (
-    <Card>
+    <Card hue={danger ? undefined : "circles"}>
       <View style={styles.notice}>
         <IconChip
           icon={icon}
-          color={danger ? theme.danger : theme.accent}
-          background={danger ? theme.dangerSoft : theme.accentSoft}
+          color={danger ? theme.danger : hue.base}
+          background={danger ? theme.dangerSoft : hue.soft}
         />
         <Text
           style={[typography.callout, styles.grow, { color: danger ? theme.text : theme.muted }]}
@@ -70,11 +74,12 @@ function SignedInGate({ client, api }: { client: AuthClient; api: CirclesApi }) 
   if (!session) {
     return (
       <View style={styles.stack}>
-        <Section title={t("circles.signIn.title")} icon="log-in-outline">
-          <Panel>
-            <Hint>{t("circles.signIn.body")}</Hint>
-          </Panel>
-        </Section>
+        <GlowHero
+          palette={CIRCLES_HERO}
+          icon="people"
+          title={t("circles.signIn.title")}
+          body={t("circles.signIn.body")}
+        />
         <AccountSection client={client} />
       </View>
     );

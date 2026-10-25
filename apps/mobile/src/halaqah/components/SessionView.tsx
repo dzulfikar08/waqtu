@@ -7,7 +7,7 @@ import { Section } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import type { DayKey } from "@/mutabaah/dates";
 import { Button, Hint, Panel } from "@/ramadhan/components/fields";
-import { radius, spacing, tabular, typography, useTheme } from "@/theme";
+import { hueColors, radius, spacing, tabular, typography, useTheme } from "@/theme";
 import { completeDay, getReflection, MAX_REFLECTION, saveReflection, uncompleteDay } from "../db";
 import { watchUrl } from "../embed";
 import type { Program, ProgramDay } from "../program";
@@ -49,7 +49,7 @@ export function SessionView({ program, day, done, todayKey }: Props) {
   return (
     <View style={styles.root}>
       <View style={styles.head}>
-        <Text style={[typography.overline, tabular, { color: theme.accent }]}>
+        <Text style={[typography.overline, tabular, { color: hueColors(theme, "halaqah").base }]}>
           {t("halaqah.dayN", { day: day.day })}
           {phase ? ` · ${phase.title[lang]}` : ""}
         </Text>
@@ -81,21 +81,21 @@ export function SessionView({ program, day, done, todayKey }: Props) {
         </View>
       </View>
 
-      <Section title={t("halaqah.summary")} icon="document-text-outline">
+      <Section title={t("halaqah.summary")} icon="document-text-outline" hue="halaqah">
         <Panel>
           <Text style={[styles.body, { color: theme.text }]}>{day.summary}</Text>
         </Panel>
       </Section>
 
       {day.madhhabNote ? (
-        <Section title={t("halaqah.madhhab")} icon="library-outline">
+        <Section title={t("halaqah.madhhab")} icon="library-outline" hue="halaqah">
           <Panel>
             <Text style={[styles.body, { color: theme.text }]}>{day.madhhabNote}</Text>
           </Panel>
         </Section>
       ) : null}
 
-      <Section title={t("halaqah.reflection")} icon="create-outline">
+      <Section title={t("halaqah.reflection")} icon="create-outline" hue="halaqah">
         <Panel>
           <Text style={[styles.body, styles.prompt, { color: theme.text }]}>
             {day.reflectionPrompt}
@@ -118,7 +118,7 @@ export function SessionView({ program, day, done, todayKey }: Props) {
       </Section>
 
       {day.amalan ? (
-        <Section title={t("halaqah.amalan")} icon="leaf-outline">
+        <Section title={t("halaqah.amalan")} icon="leaf-outline" hue="halaqah">
           <Panel>
             <Text style={[styles.body, { color: theme.text }]}>{day.amalan}</Text>
           </Panel>
@@ -126,7 +126,7 @@ export function SessionView({ program, day, done, todayKey }: Props) {
       ) : null}
 
       {day.sources.length > 0 ? (
-        <Section title={t("halaqah.sources")} icon="bookmarks-outline">
+        <Section title={t("halaqah.sources")} icon="bookmarks-outline" hue="halaqah">
           <Panel>
             {day.sources.map((source) => (
               <Hint key={source}>{source}</Hint>

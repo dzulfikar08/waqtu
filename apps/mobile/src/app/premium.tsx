@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { authClient } from "@/auth/client";
 import { circlesApi } from "@/circles/client";
+import { GlowHero, PREMIUM_HERO } from "@/components/GlowHero";
 import { Card, IconChip, PressableScale, Section, type IconName } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { Button } from "@/ramadhan/components/fields";
@@ -221,19 +222,14 @@ export default function PremiumScreen() {
           contentStyle: { backgroundColor: theme.background },
         }}
       />
-      <Card>
-        <View style={styles.hero}>
-          <IconChip icon="diamond" size={64} color={theme.gold} background={theme.goldSoft} />
-          <Text style={[typography.title, styles.center, { color: theme.text }]}>
-            {t("premium.title")}
-          </Text>
-          <Text style={[styles.intro, styles.center, { color: theme.muted }]}>
-            {t("premium.intro")}
-          </Text>
-        </View>
-      </Card>
+      <GlowHero
+        palette={PREMIUM_HERO}
+        icon="diamond"
+        title={t("premium.title")}
+        body={t("premium.intro")}
+      />
 
-      <Section title={t("premium.unlocksTitle")} icon="sparkles">
+      <Section title={t("premium.unlocksTitle")} icon="sparkles" hue="ramadhan">
         {unlocks.map((key) => (
           <View key={key} style={[styles.bullet, { borderColor: theme.separator }]}>
             <IconChip
@@ -249,7 +245,7 @@ export default function PremiumScreen() {
         ))}
       </Section>
 
-      <Section title={t("premium.freeTitle")} icon="heart">
+      <Section title={t("premium.freeTitle")} icon="heart" hue="brand">
         <View style={[styles.bullet, { borderColor: theme.separator }]}>
           <IconChip icon="checkmark" size={30} />
           <Text style={[typography.callout, styles.grow, { color: theme.text }]}>
@@ -348,9 +344,6 @@ export default function PremiumScreen() {
 
 const styles = StyleSheet.create({
   content: { paddingHorizontal: spacing.md + 4, paddingTop: spacing.md, gap: spacing.lg },
-  hero: { alignItems: "center", gap: spacing.sm, paddingVertical: spacing.sm },
-  center: { textAlign: "center" },
-  intro: { ...typography.callout, lineHeight: 22 },
   grow: { flex: 1, gap: 2 },
   bullet: {
     minHeight: 52,

@@ -25,7 +25,7 @@ export function PlanSettings({ data }: { data: HafalanData }) {
     ]);
 
   return (
-    <Section title={t("hafalan.planTitle")} icon="settings-outline">
+    <Section title={t("hafalan.planTitle")} icon="settings-outline" hue="hafalan">
       <StepperRow
         label={t("hafalan.reviewCap")}
         value={plan.maxReviewPerDay}
@@ -35,6 +35,7 @@ export function PlanSettings({ data }: { data: HafalanData }) {
       />
       <Row
         icon="calendar-outline"
+        hue="hafalan"
         label={t("hafalan.extend")}
         onPress={() =>
           void updatePlan(db, {

@@ -31,7 +31,7 @@ export default function AboutScreen() {
       style={{ backgroundColor: theme.background }}
       contentContainerStyle={[styles.content, { paddingBottom: spacing.xl + insets.bottom }]}
     >
-      <Section title={t("about.title")} icon="information-circle">
+      <Section title={t("about.title")} icon="information-circle" hue="brand">
         <Pressable
           onPress={() => setTaps((n) => n + 1)}
           style={({ pressed }) => [
@@ -52,7 +52,7 @@ export default function AboutScreen() {
           </View>
         </Pressable>
       </Section>
-      <Section title={t("about.licences")} icon="document-text">
+      <Section title={t("about.licences")} icon="document-text" hue="neutral">
         <Panel>
           <Text style={[styles.body, { color: theme.text }]}>{t("about.quran")}</Text>
           <Text style={[styles.body, { color: theme.text }]}>{t("about.font")}</Text>
@@ -63,12 +63,13 @@ export default function AboutScreen() {
         <Row
           label={t("about.apache")}
           icon="open-outline"
+          hue="neutral"
           chevron
           onPress={() => void Linking.openURL(APACHE_2)}
         />
       </Section>
       {showDeveloper ? (
-        <Section title={t("about.developer")} icon="construct">
+        <Section title={t("about.developer")} icon="construct" hue="neutral">
           <ToggleRow
             label={t("about.recitationCheck")}
             hint={t("about.recitationCheckHint")}

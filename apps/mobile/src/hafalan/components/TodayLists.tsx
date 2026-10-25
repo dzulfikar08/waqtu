@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { CheckCircle, IconChip, Section } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { Hint } from "@/ramadhan/components/fields";
-import { radius, spacing, tabular, typography, useTheme } from "@/theme";
+import { hueColors, radius, spacing, tabular, typography, useTheme, type Hue } from "@/theme";
 import { unitLabel } from "../format";
 import type { HafalanData } from "../useHafalan";
 
@@ -35,12 +35,14 @@ export function TodayLists({ data }: { data: HafalanData }) {
       <Section
         title={t("hafalan.sabaq")}
         icon="book-outline"
-        right={<Count done={portion.sabaq.done.length} total={sabaq.length} />}
+        hue="hafalan"
+        right={<Count hue="hafalan" done={portion.sabaq.done.length} total={sabaq.length} />}
       >
         {sabaq.length === 0
           ? none
           : sabaq.map((unit) => (
               <UnitRow
+                hue="hafalan"
                 key={unit}
                 label={unitLabel(units[unit])}
                 detail={t("hafalan.page", { page: units[unit].page })}
@@ -52,12 +54,14 @@ export function TodayLists({ data }: { data: HafalanData }) {
       <Section
         title={t("hafalan.murojaah")}
         icon="repeat"
-        right={<Count done={portion.murojaah.done.length} total={murojaah.length} />}
+        hue="week"
+        right={<Count hue="week" done={portion.murojaah.done.length} total={murojaah.length} />}
       >
         {murojaah.length === 0
           ? none
           : murojaah.map((unit) => (
               <UnitRow
+                hue="week"
                 key={unit}
                 label={unitLabel(units[unit])}
                 detail={t("hafalan.page", { page: units[unit].page })}
@@ -87,11 +91,11 @@ export function TodayLists({ data }: { data: HafalanData }) {
 }
 
 /** `2/3` beside a section title: how much of the list is done. */
-function Count({ done, total }: { done: number; total: number }) {
+function Count({ done, total, hue }: { done: number; total: number; hue: Hue }) {
   const theme = useTheme();
   if (total === 0) return null;
   return (
-    <Text style={[typography.footnote, tabular, styles.count, { color: theme.muted }]}>
+    <Text style={[typography.footnote, tabular, styles.count, { color: hueColors(theme, hue).base }]}>
       {done}/{total}
     </Text>
   );
@@ -103,6 +107,7 @@ function UnitRow({
   detail,
   flag,
   done,
+  hue,
   onPress,
 }: {
   label: string;
@@ -110,9 +115,12 @@ function UnitRow({
   /** Short warning after the page, e.g. overdue. */
   flag?: string;
   done: boolean;
+  /** The list's colour, for the pressed wash and the chevron. */
+  hue: Hue;
   onPress: () => void;
 }) {
   const theme = useTheme();
+  const tone = hueColors(theme, hue);
   return (
     <Pressable
       accessibilityRole="button"
@@ -122,7 +130,7 @@ function UnitRow({
         styles.row,
         {
           borderColor: theme.separator,
-          backgroundColor: pressed ? theme.surfaceAlt : "transparent",
+          backgroundColor: pressed ? tone.soft : "transparent",
         },
       ]}
     >
@@ -143,7 +151,7 @@ function UnitRow({
           ) : null}
         </Text>
       </View>
-      <Ionicons name="chevron-forward" size={18} color={theme.faint} />
+      <Ionicons name="chevron-forward" size={18} color={tone.base} />
     </Pressable>
   );
 }

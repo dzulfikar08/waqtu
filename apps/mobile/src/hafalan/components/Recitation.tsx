@@ -8,7 +8,7 @@ import { useVoiceRecorder } from "@/circles/useVoiceRecorder";
 import { PressableScale } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { Button, Hint } from "@/ramadhan/components/fields";
-import { HIT, radius, spacing, tabular, typography, useTheme } from "@/theme";
+import { HIT, hueColors, radius, spacing, tabular, typography, useTheme } from "@/theme";
 import { MicButton } from "./MicButton";
 import { deleteRecording, saveRecording, type StoredRecording } from "../db";
 import { formatSeconds } from "../format";
@@ -155,6 +155,7 @@ function SavedPlayer({
 }) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const hafalan = hueColors(theme, "hafalan");
   const player = useAudioPlayer(recordingUri(name));
   const status = useAudioPlayerStatus(player);
   const [failed, setFailed] = useState(false);
@@ -207,7 +208,7 @@ function SavedPlayer({
 
   const progress = status.duration > 0 ? Math.min(1, status.currentTime / status.duration) : 0;
   return (
-    <View style={[styles.player, { backgroundColor: theme.surfaceAlt }]}>
+    <View style={[styles.player, { backgroundColor: hafalan.soft }]}>
       <View style={styles.playerRow}>
         <PressableScale
           accessibilityRole="button"
@@ -228,7 +229,7 @@ function SavedPlayer({
             <View
               style={[
                 styles.fill,
-                { backgroundColor: theme.accent, width: `${Math.round(progress * 100)}%` },
+                { backgroundColor: hafalan.base, width: `${Math.round(progress * 100)}%` },
               ]}
             />
           </View>

@@ -191,6 +191,13 @@ export function hueColors(theme: Theme, hue: Hue): HueColors {
   };
 }
 
+/** A wash of the section's hue behind a screen's header, fading out downwards (`Screen` `backdrop`). */
+export function hueWash(theme: Theme, hue: Hue): string {
+  const rgb = HUES[hue][theme.dark ? 1 : 0];
+  const top = theme.dark ? 0.4 : 0.22;
+  return `linear-gradient(180deg, rgba(${rgb},${top}) 0%, rgba(${rgb},0) 100%)`;
+}
+
 /** A card tinted by its section's hue: a soft wash in the top-left corner fading into the card colour. */
 export function tintedCard(theme: Theme, hue: Hue): ViewStyle {
   const { wash } = hueColors(theme, hue);
@@ -234,7 +241,13 @@ export function skyGradient(period: DayPeriod, dark: boolean, angle = 150): stri
   return `linear-gradient(${angle}deg, ${stops[0]} 0%, ${stops[1]} 55%, ${stops[2]} 100%)`;
 }
 
-/** The middle colour of `period`'s sky, for a faint wash behind the Today header. */
+/** A wash of `period`'s sky behind the Today header, fading out downwards (`Screen` `backdrop`). */
+export function skyWash(period: DayPeriod, dark: boolean): string {
+  const tone = SKIES[period][dark ? 1 : 0][1];
+  return `linear-gradient(180deg, ${tone}${dark ? "73" : "40"} 0%, ${tone}00 100%)`;
+}
+
+/** The middle colour of `period`'s sky, for the hero's coloured shadow and a sky-coloured glyph. */
 export function skyTone(period: DayPeriod, dark: boolean): string {
   return SKIES[period][dark ? 1 : 0][1];
 }
