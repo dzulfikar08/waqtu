@@ -467,6 +467,7 @@ def wait_for_assets(asc: Asc, kind: str, assets: dict) -> None:
     """Polls uploaded assets (id -> file name) until App Store Connect has processed all of them."""
     pending = dict(assets)
     deadline = time.time() + 30 * 60
+    last = None
     while pending:
         states = {}
         for id_, name in list(pending.items()):
@@ -476,10 +477,12 @@ def wait_for_assets(asc: Asc, kind: str, assets: dict) -> None:
             elif state.get("state") == "FAILED":
                 raise SystemExit(f"{kind} {name} failed: {state.get('errors')}")
             else:
-                states[name] = state
+                states[name] = state.get("state")
         if not pending:
             return
-        log(f"{kind}: {len(pending)} processing: {states}")
+        if states != last:
+            log(f"{kind}: processing {states}")
+            last = states
         if time.time() > deadline:
             raise SystemExit(f"{kind} not processed within 30 minutes: {sorted(pending.values())}")
         time.sleep(30)
