@@ -295,19 +295,22 @@ def wait_for_build(asc: Asc, number: str, wait: bool) -> tuple[dict, str] | None
         time.sleep(60)
 
 
-def latest_build_number(asc: Asc) -> str:
+def latest_build_number(asc: Asc) -> str | None:
     """CFBundleVersion of the build uploaded last (the Mac build number comes from the release-mas.yml run)."""
     page = asc.get(
         "/v1/builds",
         **{"filter[app]": APP_ID, "filter[preReleaseVersion.platform]": ASC_PLATFORM, "sort": "-uploadedDate", "limit": 1},
     )
-    if not page["data"]:
-        raise SystemExit("No build uploaded for this app yet")
-    return page["data"][0]["attributes"]["version"]
+    return page["data"][0]["attributes"]["version"] if page["data"] else None
 
 
 def attach_build(asc: Asc, version: dict, wait: bool) -> None:
     number = os.environ.get("BUILD_NUMBER") or latest_build_number(asc)
+    if number is None:
+        if wait:
+            raise SystemExit("No build uploaded for this app yet")
+        note("No build uploaded yet; not attached (dry run)")
+        return
     found = wait_for_build(asc, number, wait)
     if found is None:
         note(f"Build {number} is not processed yet; not attached (dry run)")
