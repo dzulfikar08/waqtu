@@ -1,13 +1,15 @@
 #!/bin/bash
 set -euo pipefail
 
-# Signs a built (unsigned) waqtu.app for Developer ID distribution, inside-out:
-# Sparkle's nested code, the widget extension, then the app. Each of the app and the widget
-# embeds its own provisioning profile, which Sign in with Apple and iCloud require.
+# Signs a built (unsigned) waqtu.app inside-out: Sparkle's nested code, the widget extension, then
+# the app. Each of the app and the widget embeds its own provisioning profile, which Sign in with
+# Apple and iCloud require. Developer ID by default; the Mac App Store build (release-mas.yml) passes
+# its Apple Distribution identity, App Store profiles and APP_ENTITLEMENTS.
 #
 # usage: sign-app.sh APP_PATH IDENTITY
 # env:   PROVISIONING_PROFILE_PATH         profile for dat.waqtu
 #        WIDGET_PROVISIONING_PROFILE_PATH  profile for dat.waqtu.mac-widget
+#        APP_ENTITLEMENTS                  app entitlements (default waqtu/waqtu.entitlements)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -49,7 +51,7 @@ fi
 if [[ -n "${PROVISIONING_PROFILE_PATH:-}" ]]; then
   cp "$PROVISIONING_PROFILE_PATH" "$APP/Contents/embedded.provisionprofile"
 fi
-python3 "$SCRIPT_DIR/make-entitlements.py" "$PROJECT_DIR/waqtu/waqtu.entitlements" \
+python3 "$SCRIPT_DIR/make-entitlements.py" "${APP_ENTITLEMENTS:-$PROJECT_DIR/waqtu/waqtu.entitlements}" \
   "$TMP/app.entitlements" "dat.waqtu" ${PROVISIONING_PROFILE_PATH:+"$PROVISIONING_PROFILE_PATH"}
 sign --entitlements "$TMP/app.entitlements" "$APP"
 
