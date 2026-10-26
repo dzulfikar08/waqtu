@@ -193,34 +193,31 @@ enum ScreenshotMode {
         try write(Canvas.store(caption: caption(2, language), ui: mutabaah, layout: .panel), "\(language.rawValue)-02-mutabaah", in: directory)
 
         // 3. Imsakiyah window for the whole of Ramadan.
-        let imsakiyah = try await capture(ImsakiyahView(viewModel: model), size: CGSize(width: 560, height: 860))
+        let imsakiyah = try await capture(
+            WindowChrome(title: String(localized: "Imsakiyah")) {
+                ImsakiyahView(viewModel: model).frame(width: 560, height: 800)
+            }
+        )
         try write(Canvas.store(caption: caption(3, language), ui: imsakiyah, layout: .panel), "\(language.rawValue)-03-imsakiyah", in: directory)
 
-        // 4. Settings, Prayer Times tab.
-        let settings = try await captureSettings(model, pane: SettingsView.Pane.prayerTimes)
+        // 4. Settings, Prayer Times pane, tall enough for every correction.
+        let settings = try await capture(
+            WindowChrome(title: String(localized: "Prayer Times")) {
+                PrayerTimesSettingsTab(settings: model.settings, viewModel: model).frame(width: 520, height: 700)
+            }
+        )
         try write(Canvas.store(caption: caption(4, language), ui: settings, layout: .panel), "\(language.rawValue)-04-settings", in: directory)
 
-        // 5. Settings, Upgrade tab (Waqtu Premium).
-        let upgrade = try await captureSettings(model, pane: SettingsView.Pane.upgrade)
+        // 5 and App Review: the Upgrade pane (Waqtu Premium), subscriptions, restore, terms and privacy.
+        let upgrade = try await capture(
+            WindowChrome(title: String(localized: "Upgrade")) {
+                PremiumOfferView(viewModel: model)
+                    .frame(width: 472, alignment: .leading)
+                    .padding(24)
+            }
+        )
         try write(Canvas.store(caption: caption(5, language), ui: upgrade, layout: .panel), "\(language.rawValue)-05-premium", in: directory)
-
-        // App Review: the whole Upgrade tab content, subscriptions, restore, terms and privacy.
-        let offer = try await capture(
-            PremiumOfferView(viewModel: model)
-                .frame(width: 472, alignment: .leading)
-                .padding(24)
-                .background(Color.waqtuBackground)
-        )
-        try write(
-            Canvas.review(caption: reviewCaption(language), ui: offer),
-            "review-premium-\(language.rawValue)", in: directory
-        )
-    }
-
-    @MainActor
-    private static func captureSettings(_ model: AppViewModel, pane: String) async throws -> CGImage {
-        SettingsView.requestedPane = pane
-        return try await capture(SettingsView(settings: model.settings, viewModel: model), size: CGSize(width: 520, height: 520))
+        try write(Canvas.review(caption: reviewCaption(language), ui: upgrade), "review-premium-\(language.rawValue)", in: directory)
     }
 
     private static func caption(_ screen: Int, _ language: Language) -> Caption {
@@ -264,6 +261,7 @@ enum ScreenshotMode {
                     Text(verbatim: title)
                         .font(.system(size: 13, weight: .medium))
                         .monospacedDigit()
+                        .fixedSize()
                 }
             }
             .foregroundStyle(.white)
@@ -274,9 +272,40 @@ enum ScreenshotMode {
         }
     }
 
-    /// Offscreen window drawn at `renderScale` whatever the runner's display is.
+    /// A plain macOS title bar over a window's content (the windows are drawn without their frame).
+    private struct WindowChrome<Content: View>: View {
+        let title: String
+        @ViewBuilder let content: Content
+
+        var body: some View {
+            VStack(spacing: 0) {
+                ZStack {
+                    HStack(spacing: 8) {
+                        ForEach(["#FF5F57", "#FEBC2E", "#28C840"], id: \.self) { hex in
+                            Circle().fill(Color(hex: hex)).frame(width: 12, height: 12)
+                        }
+                        Spacer()
+                    }
+                    .padding(.horizontal, 12)
+                    Text(verbatim: title)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(.waqtuText.opacity(0.85))
+                }
+                .frame(height: 30)
+                .background(Color(hex: "#21382E"))
+                Rectangle().fill(Color.black.opacity(0.35)).frame(height: 1)
+                content
+            }
+            .background(Color.waqtuBackground)
+        }
+    }
+
+    /// Offscreen window drawn at `renderScale` whatever the runner's display is, with its controls
+    /// in their active (key window) look.
     private final class RenderWindow: NSWindow {
         override var backingScaleFactor: CGFloat { ScreenshotMode.renderScale }
+        override var isKeyWindow: Bool { true }
+        override var isMainWindow: Bool { true }
     }
 
     /// Draws `view` (fitting size unless given) in an offscreen window and returns its pixels.
