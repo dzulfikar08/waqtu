@@ -319,7 +319,9 @@ describe("reader counters", () => {
 
   test("the next unfinished item wraps round and is null when all are done", () => {
     expect(nextOpenItem(session, { a: 1 }, 0)).toBe(1);
-    expect(nextOpenItem(session, { a: 1, b: 3 }, 2)).toBeNull();
+    expect(nextOpenItem(session, { a: 1, b: 3 }, 0)).toBe(2);
+    // Only the item itself is left: the search comes back round to it.
+    expect(nextOpenItem(session, { a: 1, b: 3 }, 2)).toBe(2);
     expect(nextOpenItem(session, { b: 3, c: 2 }, 2)).toBe(0);
     expect(nextOpenItem(session, { a: 1, b: 3, c: 2 }, 0)).toBeNull();
   });
