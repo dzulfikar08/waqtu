@@ -2,7 +2,7 @@
   "expo": {
     "name": "Waqtu",
     "slug": "waqtu",
-    "version": "0.1.0",
+    "version": "1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "waqtu",
@@ -10,7 +10,7 @@
     "platforms": ["ios", "android"],
     "ios": {
       "bundleIdentifier": "dat.waqtu.ios",
-      "buildNumber": "5",
+      "buildNumber": "6",
       "supportsTablet": false,
       "config": {
         "usesNonExemptEncryption": false
@@ -18,7 +18,7 @@
     },
     "android": {
       "package": "dat.waqtu.app",
-      "versionCode": 7,
+      "versionCode": 8,
       "allowBackup": false,
       "adaptiveIcon": {
         "backgroundColor": "#F7F7FA",
