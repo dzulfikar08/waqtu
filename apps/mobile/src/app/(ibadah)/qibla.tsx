@@ -35,6 +35,8 @@ type CompassState = "checking" | "ask" | "denied" | "unavailable" | "live";
 
 /** Degrees either side of the qibla that count as facing it. */
 const TOLERANCE = 3;
+/** How long to wait for a first compass reading before showing the "no compass" message. */
+const HEADING_TIMEOUT_MS = 8_000;
 const TICKS = Array.from({ length: 72 }, (_, i) => i * 5);
 const CARDINALS = [
   { angle: 0, key: "north" },
@@ -153,10 +155,16 @@ function LiveCompass({ bearing }: { bearing: number }) {
     if (state !== "live") return;
     let cancelled = false;
     let subscription: Location.LocationSubscription | null = null;
+    let received = false;
+    // Some devices (no magnetometer, emulators) never report a heading: stop waiting and say so.
+    const timeout = setTimeout(() => {
+      if (!cancelled && !received) setState("unavailable");
+    }, HEADING_TIMEOUT_MS);
     void Location.watchHeadingAsync(
       (reading: HeadingReading) => {
         const next = headingOf(reading);
         if (!next) return;
+        received = true;
         setHeading(next);
         setAccuracy(reading.accuracy);
       },
@@ -173,6 +181,7 @@ function LiveCompass({ bearing }: { bearing: number }) {
       });
     return () => {
       cancelled = true;
+      clearTimeout(timeout);
       subscription?.remove();
     };
   }, [state]);
