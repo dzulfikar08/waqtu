@@ -34,7 +34,7 @@ const bad = (detail: string): never => {
   throw new ValidationError(400, detail);
 };
 
-const isRecord = (v: unknown): v is Record<string, unknown> =>
+export const isRecord = (v: unknown): v is Record<string, unknown> =>
   typeof v === "object" && v !== null && !Array.isArray(v);
 
 function checkKeys(obj: Record<string, unknown>, allowed: string[], where: string) {
