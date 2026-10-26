@@ -24,6 +24,10 @@
 name: Store submit
 
 on:
+  # TEMPORARY: dry runs (submit off) of the mac job from the branch.
+  push:
+    branches: [mas-submit]
+    paths: [.github/workflows/store-submit.yml, apps/mobile/store/submit/appstore.py, apps/apple/store/**]
   workflow_dispatch:
     inputs:
       platform:
@@ -120,7 +124,7 @@ jobs:
           "$RUNNER_TEMP/venv/bin/python" apps/mobile/store/submit/play.py
 
   mac:
-    if: inputs.platform == 'mac'
+    if: inputs.platform == 'mac' || github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 150
     environment: release
