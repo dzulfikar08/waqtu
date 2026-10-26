@@ -744,6 +744,11 @@ def prepare_subscriptions(asc: Asc) -> list[dict]:
                     )
                     log(f"{product}: localization {locale} created")
                 screenshot = asc.get_or_none(f"/v1/subscriptions/{sid}/appStoreReviewScreenshot")
+                editable = sub["attributes"]["state"] in ("MISSING_METADATA", "READY_TO_SUBMIT", "DEVELOPER_ACTION_NEEDED", "REJECTED")
+                if screenshot and editable and screenshot["attributes"].get("sourceFileChecksum") != md5(shot):
+                    asc.delete(f"/v1/subscriptionAppStoreReviewScreenshots/{screenshot['id']}")
+                    log(f"{product}: outdated review screenshot removed")
+                    screenshot = None
                 if not screenshot:
                     id_ = upload_asset(
                         asc, "subscriptionAppStoreReviewScreenshots", "subscription", "subscriptions", sid, shot
