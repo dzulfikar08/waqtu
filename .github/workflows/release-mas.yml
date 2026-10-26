@@ -120,6 +120,9 @@ jobs:
             CODE_SIGNING_ALLOWED=NO
           app="$RUNNER_TEMP/Waqtu.xcarchive/Products/Applications/Waqtu.app"
           test -d "$app"
+          iconutil -c iconset -o "$RUNNER_TEMP/AppIcon.iconset" "$app/Contents/Resources/AppIcon.icns"
+          ls "$RUNNER_TEMP/AppIcon.iconset"
+          test -f "$RUNNER_TEMP/AppIcon.iconset/icon_512x512@2x.png"
           if find "$app" -iname '*sparkle*' | grep -q .; then echo "::error::Sparkle is in the Mac App Store build"; exit 1; fi
           /usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' -c 'Print CFBundleVersion' -c 'Print ITSAppUsesNonExemptEncryption' \
             -c 'Print LSApplicationCategoryType' "$app/Contents/Info.plist"
