@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Mac App Store
+
+- **Delete account** — Settings → Account → Delete account (signed in) deletes the Waqtu account and its server data after a confirmation, like the phone app.
+- **Store build** — `release-mas.yml` archives `waqtu-mas` (now `Waqtu.app`), signs it with the Apple Distribution certificate and Mac App Store profiles, and uploads a signed .pkg; `store-submit.yml` (platform `mac`) fills the listing from `apps/apple/store` and submits it with the Mac subscriptions. The MAS build gets the location entitlement it needs under the sandbox, declares exempt encryption, and ships a full macOS icon set; the widget extension is sandboxed.
+
 ### Imsakiyah on the Mac (DEV-13)
 
 - **Ramadhan month table** — Menu bar → Imsakiyah opens the table for the current or next Ramadhan: imsak (fajr − 10 min), Subuh, Dzuhur, Ashar, Maghrib, Isya for every day, today highlighted, with the start date, the day of Ramadhan and Idul Fitri. Uses the Mac's location, calculation method (incl. Kemenag), madhab, minute corrections and the moon-sighting correction synced from the phone; numbers match `@waqtu/core`'s `imsakiyahTable`.
