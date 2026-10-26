@@ -158,7 +158,14 @@ export type Hue =
   | "ramadhan"
   | "circles"
   | "week"
-  | "neutral";
+  | "neutral"
+  | "ibadah"
+  | "qibla"
+  | "matsurat"
+  | "dzikir"
+  | "doa"
+  | "tasbih"
+  | "muhasabah";
 
 /** [light, dark] base colour per hue, as r,g,b. */
 const HUES: Record<Hue, readonly [string, string]> = {
@@ -171,6 +178,14 @@ const HUES: Record<Hue, readonly [string, string]> = {
   circles: ["209,65,106", "242,139,168"],
   week: ["79,91,213", "155,164,245"],
   neutral: ["90,125,154", "168,184,200"],
+  // Ibadah tab and its tools: emerald for the hub, then one colour per tool.
+  ibadah: ["5,150,105", "110,215,165"],
+  qibla: ["214,84,58", "248,150,128"],
+  matsurat: ["3,132,199", "125,205,245"],
+  dzikir: ["190,132,8", "240,200,100"],
+  doa: ["176,40,196", "228,150,242"],
+  tasbih: ["94,132,18", "186,222,108"],
+  muhasabah: ["109,40,217", "190,160,250"],
 };
 
 export interface HueColors {

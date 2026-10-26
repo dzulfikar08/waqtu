@@ -10,14 +10,21 @@ const TARGETS = {
   today: "/",
   week: "/week",
   ramadhan: "/ramadhan",
+  ibadah: "/ibadah",
   circles: "/circles",
   settings: "/settings",
+  qibla: "/qibla",
+  matsurat: "/matsurat",
+  dzikir: "/dzikir",
+  doa: "/doa",
+  tasbih: "/tasbih",
+  muhasabah: "/muhasabah",
 } as const;
 
 /**
- * `waqtu://demo?lang=id|en&to=today|week|ramadhan|circles|settings[&loc=none]`: loads the demo data (without a location
- * with `loc=none`) and opens a tab. Only the screenshot build
- * (EXPO_PUBLIC_DEMO_MODE=1) does this; every other build bounces to the home tab.
+ * `waqtu://demo?lang=id|en&to=<target>[&loc=none]`: loads the demo data (without a location with `loc=none`) and opens a
+ * tab (today, week, ramadhan, ibadah, circles, settings) or an Ibadah tool (qibla, matsurat, dzikir, doa, tasbih,
+ * muhasabah). Only the screenshot build (EXPO_PUBLIC_DEMO_MODE=1) does this; every other build bounces to the home tab.
  */
 export default function DemoRoute() {
   if (!DEMO_MODE) return <Redirect href="/" />;

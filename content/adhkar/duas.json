@@ -1,0 +1,139 @@
+{
+  "categories": [
+    {
+      "id": "daily-supplications",
+      "name": "Daily Supplications",
+      "duas": [
+        {
+          "id": "dua-before-eating",
+          "title": "Before Eating",
+          "arabic": "بِسْمِ اللَّهِ",
+          "transliteration": "Bismillah",
+          "translation": "In the name of Allah",
+          "reference": "Abu Dawud 3767"
+        },
+        {
+          "id": "dua-after-eating",
+          "title": "After Eating",
+          "arabic": "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ",
+          "transliteration": "Alhamdulillahil-ladhi at'amana wa saqana wa ja'alana muslimin",
+          "translation": "All praise is due to Allah who has given us food and drink and made us Muslims",
+          "reference": "Abu Dawud 3850"
+        },
+        {
+          "id": "dua-entering-home",
+          "title": "Entering Home",
+          "arabic": "بِسْمِ اللَّهِ وَلَجْنَا، وَبِسْمِ اللَّهِ خَرَجْنَا، وَعَلَى اللَّهِ رَبِّنَا تَوَكَّلْنَا",
+          "transliteration": "Bismillahi walajna, wa bismillahi kharajna, wa 'alallahi rabbina tawakkalna",
+          "translation": "In the name of Allah we enter, in the name of Allah we leave, and upon Allah our Lord we depend",
+          "reference": "Abu Dawud 5096"
+        },
+        {
+          "id": "dua-leaving-home",
+          "title": "Leaving Home",
+          "arabic": "بِسْمِ اللَّهِ، تَوَكَّلْتُ عَلَى اللَّهِ، لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
+          "transliteration": "Bismillah, tawakkaltu 'alallah, la hawla wa la quwwata illa billah",
+          "translation": "In the name of Allah, I place my trust in Allah, there is no might and no power except with Allah",
+          "reference": "Abu Dawud 5095"
+        },
+        {
+          "id": "dua-entering-masjid",
+          "title": "Entering the Masjid",
+          "arabic": "اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",
+          "transliteration": "Allahumma aftah li abwaba rahmatik",
+          "translation": "O Allah, open for me the doors of Your mercy",
+          "reference": "Muslim 713"
+        },
+        {
+          "id": "dua-leaving-masjid",
+          "title": "Leaving the Masjid",
+          "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ",
+          "transliteration": "Allahumma inni as'aluka min fadlik",
+          "translation": "O Allah, I ask You from Your bounty",
+          "reference": "Muslim 713"
+        }
+      ]
+    },
+    {
+      "id": "protection-duas",
+      "name": "Protection & Safety",
+      "duas": [
+        {
+          "id": "dua-protection",
+          "title": "Seeking Protection",
+          "arabic": "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+          "transliteration": "A'udhu bikalimatillahit-tammati min sharri ma khalaq",
+          "translation": "I seek refuge in the perfect words of Allah from the evil of what He has created",
+          "reference": "Muslim 2708"
+        },
+        {
+          "id": "dua-evil-eye",
+          "title": "Protection from Evil Eye",
+          "arabic": "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّةِ مِنْ كُلِّ شَيْطَانٍ وَهَامَّةٍ وَمِنْ كُلِّ عَيْنٍ لَامَّةٍ",
+          "transliteration": "A'udhu bikalimatillahit-tammati min kulli shaytanin wa hammatin wa min kulli 'aynin lammah",
+          "translation": "I seek refuge in the perfect words of Allah from every devil and poisonous creature, and from every evil eye",
+          "reference": "Bukhari 3371"
+        }
+      ]
+    },
+    {
+      "id": "gratitude-duas",
+      "name": "Gratitude & Praise",
+      "duas": [
+        {
+          "id": "dua-gratitude",
+          "title": "General Gratitude",
+          "arabic": "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
+          "transliteration": "Alhamdulillahi rabbil-'alamin",
+          "translation": "All praise is due to Allah, Lord of all the worlds",
+          "reference": "Quran 1:2"
+        },
+        {
+          "id": "dua-new-blessing",
+          "title": "Upon Receiving a Blessing",
+          "arabic": "اللَّهُمَّ بَارِكْ لِي فِيهِ وَزِدْنِي مِنْهُ",
+          "transliteration": "Allahumma barik li fihi wa zidni minhu",
+          "translation": "O Allah, bless it for me and increase it for me",
+          "reference": "Tirmidhi 3451"
+        }
+      ]
+    },
+    {
+      "id": "forgiveness-duas",
+      "name": "Seeking Forgiveness",
+      "duas": [
+        {
+          "id": "dua-istighfar",
+          "title": "Seeking Forgiveness",
+          "arabic": "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ",
+          "transliteration": "Astaghfirullah wa atubu ilayh",
+          "translation": "I seek forgiveness from Allah and repent to Him",
+          "reference": "Bukhari 6307"
+        },
+        {
+          "id": "dua-sayyidul-istighfar",
+          "title": "Master of Seeking Forgiveness",
+          "arabic": "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ",
+          "transliteration": "Allahumma anta rabbi la ilaha illa ant, khalaqtani wa ana 'abduk, wa ana 'ala 'ahdika wa wa'dika mastata't, a'udhu bika min sharri ma sana't, abu'u laka bini'matika 'alayy, wa abu'u bidhanbi faghfir li, fa innahu la yaghfirudh-dhunuba illa ant",
+          "translation": "O Allah, You are my Lord, there is no deity except You. You created me and I am Your servant, and I am faithful to my covenant and my promise as much as I can. I seek refuge in You from the evil of what I have done. I acknowledge Your favor upon me and I acknowledge my sin, so forgive me, for verily none can forgive sins except You",
+          "reference": "Bukhari 6306",
+          "notes": "The Prophet (ﷺ) said: Whoever says this with firm belief in it during the day and dies that day before evening, he will be among the people of Paradise"
+        }
+      ]
+    },
+    {
+      "id": "travel-duas",
+      "name": "Travel",
+      "duas": [
+        {
+          "id": "dua-travel",
+          "title": "When Traveling",
+          "arabic": "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ، وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ",
+          "transliteration": "Subhanal-ladhi sakhkhara lana hadha wa ma kunna lahu muqrinin, wa inna ila rabbina lamunqalibun",
+          "translation": "Glory be to Him who has subjected this to us, and we could never have it by our efforts. Surely, to our Lord we are returning",
+          "reference": "Abu Dawud 2602"
+        }
+      ]
+    }
+  ]
+}

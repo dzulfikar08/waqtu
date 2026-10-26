@@ -3,6 +3,7 @@ import { circlesId } from "@/circles/strings";
 import { errorsId } from "@/errors/strings";
 import { premiumId } from "@/premium/strings";
 import { hafalanId } from "@/hafalan/strings";
+import { ibadahId } from "@/ibadah/strings";
 import { halaqahId } from "@/halaqah/strings";
 import { ramadhanId } from "@/ramadhan/strings";
 import { aboutId, recitationId } from "@/recitation/strings";
@@ -178,6 +179,7 @@ export const id = {
   premium: premiumId,
   halaqah: halaqahId,
   hafalan: hafalanId,
+  ibadah: ibadahId,
   recitation: recitationId,
   about: aboutId,
   errors: errorsId,

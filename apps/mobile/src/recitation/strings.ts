@@ -116,6 +116,8 @@ export const aboutId = {
   quran:
     "Teks Al-Qur'an: Tanzil Project (tanzil.net), Uthmani 1.1, dipakai tanpa perubahan sesuai ketentuan Tanzil.",
   font: "Huruf Al-Qur'an: Amiri Quran, SIL Open Font License 1.1.",
+  adhkar:
+    "Dzikir pagi & petang, Al-Ma'tsurat (wirid susunan Imam Hasan al-Banna, kubro dan sughro), doa harian, dan bacaan tasbih: dari aplikasi Mutabaah (pengembang yang sama), dipakai tanpa perubahan. Teks Arab ditampilkan apa adanya. Terjemahan mengikuti bahasa yang ada di sumbernya: Al-Ma'tsurat berbahasa Indonesia; dzikir, doa dan tasbih berbahasa Inggris. Rujukan hadits tampil di tiap bacaan yang memilikinya.",
   models:
     "Model pengenal bacaan (diunduh hanya saat cek bacaan dipakai): tarteel-ai/whisper-base-ar-quran dan tarteel-ai/whisper-tiny-ar-quran oleh Tarteel AI, dikonversi ke ggml oleh sadrapp dan ram-a-dhan. Dilisensikan di bawah Apache License 2.0; berkas dipakai tanpa perubahan. Model dasar Whisper oleh OpenAI (MIT).",
   apache: "Baca Apache License 2.0",
@@ -135,6 +137,8 @@ export const aboutEn: Widen<typeof aboutId> = {
   quran:
     "Quran text: Tanzil Project (tanzil.net), Uthmani 1.1, used unmodified under Tanzil's terms.",
   font: "Quran font: Amiri Quran, SIL Open Font License 1.1.",
+  adhkar:
+    "Morning & evening dhikr, Al-Ma'thurat (the wird compiled by Imam Hasan al-Banna, kubro and sughro), daily duas and the tasbih phrases: from the Mutabaah app (same developer), used unmodified. Arabic text is shown exactly as stored. Translations are in the language of the source: Al-Ma'thurat in Indonesian; dhikr, duas and tasbih in English. Hadith references are shown on every text that has one.",
   models:
     "Recitation recognition models (downloaded only when the recitation check is used): tarteel-ai/whisper-base-ar-quran and tarteel-ai/whisper-tiny-ar-quran by Tarteel AI, converted to ggml by sadrapp and ram-a-dhan. Licensed under the Apache License 2.0; the files are used unmodified. Base Whisper model by OpenAI (MIT).",
   apache: "Read the Apache License 2.0",

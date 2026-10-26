@@ -56,6 +56,7 @@ export default function AboutScreen() {
         <Panel>
           <Text style={[styles.body, { color: theme.text }]}>{t("about.quran")}</Text>
           <Text style={[styles.body, { color: theme.text }]}>{t("about.font")}</Text>
+          <Text style={[styles.body, { color: theme.text }]}>{t("about.adhkar")}</Text>
           <Text style={[styles.body, { color: theme.text }]}>{t("about.models")}</Text>
           <Text style={[styles.body, { color: theme.text }]}>{t("about.runtime")}</Text>
         </Panel>

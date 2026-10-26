@@ -24,6 +24,18 @@ export const PREMIUM_HERO: HeroPalette = {
   dark: ["#3A2A12", "#5A4220"],
 };
 
+/** Ibadah in the morning: emerald into sky. */
+export const IBADAH_PAGI_HERO: HeroPalette = {
+  light: ["#047857", "#0E8F7E", "#2C8FC9"],
+  dark: ["#0B3B2E", "#123A44"],
+};
+
+/** Ibadah from Asr on: emerald into dusk indigo. */
+export const IBADAH_PETANG_HERO: HeroPalette = {
+  light: ["#047857", "#22577A", "#3B3F8F"],
+  dark: ["#0B3B2E", "#1C2350"],
+};
+
 function gradient(stops: readonly string[], angle = 150): string {
   const last = stops.length - 1;
   return `linear-gradient(${angle}deg, ${stops
