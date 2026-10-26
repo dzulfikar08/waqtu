@@ -9,8 +9,6 @@ name: Mac screenshots
 
 on:
   workflow_dispatch:
-  push:
-    branches: [mas-screenshots]
 
 permissions:
   contents: read
