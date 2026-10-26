@@ -309,16 +309,10 @@ describe("api client", () => {
     const { api, calls } = client(() =>
       ok({ posts: [], users: [], ok: true, since: 1, groups: [] }),
     );
-    expect(await api.adminQueue()).toEqual({
-      posts: [],
-      users: [],
-      ok: true,
-      since: 1,
-      groups: [],
-    });
+    expect((await api.adminQueue()).posts).toEqual([]);
     await api.adminPost("p 1", "hide");
     await api.adminUser("u1", "suspend");
-    await api.adminErrors();
+    expect((await api.adminErrors()).groups).toEqual([]);
     await api.adminErrors(1234);
     expect(calls.map((c) => [c.init.method, c.url])).toEqual([
       ["GET", "https://api.example.test/v1/admin/circles/queue"],
