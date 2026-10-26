@@ -41,13 +41,21 @@ struct CheckForUpdatesView: View {
 @main
 struct WaqtuApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @State private var viewModel = AppViewModel()
+    @State private var viewModel = WaqtuApp.makeViewModel()
 
     private static var menuBarIcon: NSImage? = {
         guard let img = NSImage(named: "MutabaahSymbol") else { return nil }
         img.size = NSSize(width: 16, height: 16)
         return img
     }()
+
+    private static func makeViewModel() -> AppViewModel {
+        #if DEBUG
+        // Screenshot mode (Screenshots/ScreenshotMode.swift) swaps in its demo model.
+        if let demo = ScreenshotMode.makeViewModelIfActive() { return demo }
+        #endif
+        return AppViewModel()
+    }
 
     /// "Check for Updates" action. Nil when Sparkle is unavailable (Mac App Store build),
     /// which hides the menu item and About-settings button via their existing nil-guards.
