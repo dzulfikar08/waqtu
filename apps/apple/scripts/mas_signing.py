@@ -43,6 +43,16 @@ def bundle_id(asc: Asc, identifier: str) -> dict:
     return (mac or found)[0]
 
 
+def related(asc: Asc, path: str) -> list[dict]:
+    """A to-many relationship list; some of them reject the `limit` parameter."""
+    try:
+        return asc.all(path)
+    except AscError as e:
+        if e.status != 400:
+            raise
+        return asc.get(path)["data"]
+
+
 def inspect(asc: Asc) -> None:
     print("Certificates:")
     for c in asc.all("/v1/certificates", **{"filter[certificateType]": CERT_TYPES}):
@@ -51,12 +61,12 @@ def inspect(asc: Asc) -> None:
               f"expires={a.get('expirationDate')} id={c['id']}")
     for identifier in BUNDLE_IDS:
         b = bundle_id(asc, identifier)
-        caps = asc.all(f"/v1/bundleIds/{b['id']}/bundleIdCapabilities")
+        caps = related(asc, f"/v1/bundleIds/{b['id']}/bundleIdCapabilities")
         print(f"Bundle id {identifier} ({b['attributes']['platform']}, id={b['id']}): "
               + ", ".join(sorted(c["attributes"]["capabilityType"] for c in caps)))
-        for p in asc.all(f"/v1/bundleIds/{b['id']}/profiles"):
+        for p in related(asc, f"/v1/bundleIds/{b['id']}/profiles"):
             a = p["attributes"]
-            certs = asc.all(f"/v1/profiles/{p['id']}/certificates")
+            certs = related(asc, f"/v1/profiles/{p['id']}/certificates")
             print(f"  profile {a['name']!r} {a['profileType']} {a['profileState']} expires={a.get('expirationDate')} "
                   f"certs={[serial(c['attributes']['serialNumber']) for c in certs]}")
 
@@ -75,11 +85,11 @@ def profiles(asc: Asc, cert_serial: str, out_dir: Path) -> None:
     for identifier in BUNDLE_IDS:
         b = bundle_id(asc, identifier)
         chosen = None
-        for p in asc.all(f"/v1/bundleIds/{b['id']}/profiles"):
+        for p in related(asc, f"/v1/bundleIds/{b['id']}/profiles"):
             a = p["attributes"]
             if a["profileType"] != "MAC_APP_STORE" or a["profileState"] != "ACTIVE":
                 continue
-            if cert["id"] not in {c["id"] for c in asc.all(f"/v1/profiles/{p['id']}/certificates")}:
+            if cert["id"] not in {c["id"] for c in related(asc, f"/v1/profiles/{p['id']}/certificates")}:
                 continue
             if chosen is None or a["expirationDate"] > chosen["attributes"]["expirationDate"]:
                 chosen = p

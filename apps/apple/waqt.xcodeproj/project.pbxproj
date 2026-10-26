@@ -1137,6 +1137,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Waqtu;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times. Full access is required to add and remove these events.";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";
@@ -1473,6 +1475,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Waqtu;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times. Full access is required to add and remove these events.";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Waqtu creates daily prayer blocks in your calendar so Outlook and Teams show you as busy during prayer times.";

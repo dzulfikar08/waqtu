@@ -86,12 +86,24 @@ jobs:
         run: '"$RUNNER_TEMP/venv/bin/python" apps/apple/scripts/mas_signing.py inspect'
 
       - name: Create Mac Installer Distribution certificate
-        if: inputs.create_installer_cert
+        if: inputs.create_installer_cert || github.event_name == 'push'
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_PATH: ${{ runner.temp }}/asc.p8
           RECIPIENT: ${{ inputs.recipient_public_key }}
+          RECIPIENT_TEMP: |
+            -----BEGIN PUBLIC KEY-----
+            MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAnD19sz0BYJtdWZi22iui
+            DO7JyfsFMEFpwe6e0QTadh79X2YqicBMnmyd/lLWG3XIvw7tGxPaIM8xPPH+ffZ8
+            pftL5/E1qWS7vNWHUqjDajHe/mffAWZXYSS6j7jMLvOhN6R0xrG5wpOSMdkzgS6l
+            9z/9K1j5jHUxLguKPTLl9A0rYEFPJZoegIR8GQxW+8ICtOU+CefPtn97ZREaYZxJ
+            T4Va3MOcyo885lpP6DwjIQG3uoxZBLixUsK/N/+/nJjrfgOkEr/ys6tD9w4URtid
+            frEZpMIgsihNjyKuj5cuTRnhRBRhj5XzHEl3gelnRosFEsvmYbtMdoXGY7Zvvrfy
+            D6yeJ/oz1dnDsUEfbSUDZlEoW+kJVOrjZzeiM7VxjJt4XSo/cr7AUEr3ni9ASxsW
+            KFupvFhczfHASciTAzpX4JQ3L3UkgyxU5m1Jv6MQyhaW3feHb7j0wTbiw40Fph5x
+            ey1T/vmmmht90D2Si3RAKL9+XxNGr49I1wRu04T7rxGBAgMBAAE=
+            -----END PUBLIC KEY-----
         run: |
           umask 077
           test -n "$RECIPIENT"
@@ -118,7 +130,7 @@ jobs:
           rm -rf "$work"
 
       - name: Upload encrypted certificate
-        if: inputs.create_installer_cert
+        if: inputs.create_installer_cert || github.event_name == 'push'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: mas-installer-encrypted
