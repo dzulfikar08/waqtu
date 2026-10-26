@@ -10,6 +10,8 @@ crons = ["17 * * * *"]
 [vars]
 # App Store numeric app id of Waqtu (not a secret): Production server notifications must carry it.
 APPLE_APP_ID = "6826628861"
+# Mac App Store app "Waqtu for Mac" (bundle dat.waqtu); its server notifications must carry this id.
+APPLE_MAC_APP_ID = "6827054953"
 ENVIRONMENT = "production"
 # Circles are Waqtu Premium (owner decision 2026-10-25): the app gates the tab and the API refuses joins/posts with 403 premium_required.
 CIRCLES_REQUIRES_PREMIUM = "true"

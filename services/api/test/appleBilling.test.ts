@@ -67,6 +67,7 @@ async function notification(
       data: {
         bundleId: tx.bundleId,
         ...(tx.bundleId === APPLE_BUNDLE_ID ? { appAppleId: 6826628861 } : {}),
+        ...(tx.bundleId === MAC_BUNDLE_ID ? { appAppleId: 6827054953 } : {}),
         environment: tx.environment,
         signedTransactionInfo: await chain.sign(tx),
         ...(extra.renewal ? { signedRenewalInfo: await chain.sign(extra.renewal) } : {}),
