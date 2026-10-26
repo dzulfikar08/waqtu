@@ -34,8 +34,6 @@ jobs:
         with:
           bun-version: 1.4.4
       - run: bun install --frozen-lockfile
-      - name: TEMP oxfmt diff
-        run: bunx oxfmt . ; git --no-pager diff ; git checkout -- .
       - run: bun run lint
       - run: bun run fmt:check
       - run: bun run typecheck
