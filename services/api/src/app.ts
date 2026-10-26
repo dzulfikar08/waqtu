@@ -1,7 +1,10 @@
 import { handleBilling } from "./billing/routes";
 import { getAuth } from "./auth";
+import { isAdmin } from "./circles/admin";
+import { errorResponse, HttpError } from "./circles/http";
 import { handleCircles, isCirclesPath } from "./circles/router";
 import type { AppEnv } from "./env";
+import { parseErrorsSince, readErrorGroups, receiveErrors } from "./errors";
 import { applyWrites, readChanges } from "./sync";
 import { parseLimit, parseSince, parseSyncBody, ValidationError } from "./validate";
 
@@ -45,6 +48,14 @@ function json(body: unknown, status = 200): Response {
   return Response.json(body, { status, headers: { "cache-control": "no-store" } });
 }
 
+/** Methods per non-circles `/v1` route; anything else is 404. */
+const V1_METHODS: Record<string, readonly string[]> = {
+  "/v1/sync": ["GET", "POST"],
+  "/v1/me": ["GET"],
+  "/v1/errors": ["POST"],
+  "/v1/admin/errors": ["GET"],
+};
+
 async function handleV1(request: Request, env: AppEnv, url: URL): Promise<Response> {
   const route = url.pathname;
   if (isCirclesPath(route)) {
@@ -52,11 +63,8 @@ async function handleV1(request: Request, env: AppEnv, url: URL): Promise<Respon
     if (!session) return json({ error: "unauthorized" }, 401);
     return handleCircles(request, env, session.user.id, url);
   }
-  const isSync = route === "/v1/sync";
-  const isMe = route === "/v1/me";
-  if (!isSync && !isMe) return json({ error: "not_found" }, 404);
-
-  const allowed = isSync ? ["GET", "POST"] : ["GET"];
+  const allowed = V1_METHODS[route];
+  if (!allowed) return json({ error: "not_found" }, 404);
   if (!allowed.includes(request.method)) {
     return Response.json(
       { error: "method_not_allowed" },
@@ -64,11 +72,25 @@ async function handleV1(request: Request, env: AppEnv, url: URL): Promise<Respon
     );
   }
 
+  // Anonymous on purpose: a session cookie may come along but is never read.
+  if (route === "/v1/errors") return receiveErrors(request, env, Date.now());
+
   const session = await getAuth(env).api.getSession({ headers: request.headers });
   if (!session) return json({ error: "unauthorized" }, 401);
   const user = session.user;
 
-  if (isMe) return json({ id: user.id, email: user.email, name: user.name });
+  if (route === "/v1/admin/errors") {
+    if (!isAdmin(env.ADMIN_USER_IDS, user.id)) return json({ error: "forbidden" }, 403);
+    try {
+      const since = parseErrorsSince(url.searchParams.get("since"), Date.now());
+      return json({ since, groups: await readErrorGroups(env.APP_DB, since) });
+    } catch (e) {
+      if (e instanceof HttpError) return errorResponse(e);
+      throw e;
+    }
+  }
+
+  if (route === "/v1/me") return json({ id: user.id, email: user.email, name: user.name });
 
   try {
     if (request.method === "GET") {

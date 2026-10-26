@@ -68,7 +68,7 @@ Removed: `POST /license/activate` (only the purchase flow of old builds used it;
 
 ### Database
 
-A second D1 binding, `APP_DB` (`waqtu-db`), holds the app data. The existing `DB` binding stays for releases. Migrations live in `migrations/` (`0001_auth.sql` for better-auth, `0002_sync.sql` for sync data, `0003_circles.sql` for halaqah circles, `0004_entitlement.sql` for premium entitlements, `0005_drop_license_entitlements.sql` removes the retired Mac license rows and columns):
+A second D1 binding, `APP_DB` (`waqtu-db`), holds the app data. The existing `DB` binding stays for releases. Migrations live in `migrations/` (`0001_auth.sql` for better-auth, `0002_sync.sql` for sync data, `0003_circles.sql` for halaqah circles, `0004_entitlement.sql` for premium entitlements, `0005_drop_license_entitlements.sql` removes the retired Mac license rows and columns, `0006_client_errors.sql` for anonymous crash reports):
 
 ```bash
 npx wrangler d1 migrations apply waqtu-db --remote   # production
@@ -123,13 +123,15 @@ The web client id and secret are only needed while the app signs in through the 
 
 ### Endpoints
 
-All `/v1/*` routes need a better-auth session (cookie from the Expo client, or a bearer token) and answer `401 {"error":"unauthorized"}` otherwise.
+All `/v1/*` routes except `POST /v1/errors` need a better-auth session (cookie from the Expo client, or a bearer token) and answer `401 {"error":"unauthorized"}` otherwise.
 
 - `GET /v1/me` returns `{ id, email, name }`.
 - `POST /v1/sync` with `{ entries?, settings? }` (max 500 entries, 100 settings, body at most 1,000,000 bytes: larger requests get `413 {"error":"payload_too_large"}`; unknown fields get 400) upserts last-write-wins and returns `{ applied: { entries, settings }, cursor }`. A write applies only if its `updatedAt` is newer, or equal with a greater value. Identical re-pushes change nothing and leave the cursor alone.
 - Sync is a Waqtu Premium feature, but `/v1/sync` deliberately does not check premium: the gate lives in the apps (mobile syncs only with premium). The Mac app syncs during its free trial, which is a local trial the server cannot see, and a first sign-in uploads the device's log before the app has read the account's entitlement; a server-side `403` would break both. See `docs/backend-decision.md`.
 - `GET /v1/sync?since=<cursor>&limit=<1..500>` returns `{ entries, settings, cursor, hasMore }` ordered by revision. Settings are `{ key, value, updatedAt }`; there is no deletion, set a key to an empty string instead. Loop while `hasMore`, passing the returned `cursor` as `since`.
 - Account deletion is `POST /api/auth/delete-user`; foreign keys cascade and remove the user's synced rows.
+- `POST /v1/errors` takes anonymous crash and error reports from the phone app, no session needed (a cookie that comes along is ignored): `{ events: [...] }`, 1 to 20 events of `{ platform: "ios"|"android", appVersion, buildNumber?, runtimeVersion?, updateId?, channel?, fatal, name, message (≤ 500 chars), stack? (≤ 8192 chars), screen?, count? (repeats folded on the phone, 1..10000) }`, body at most 256 KB. Unknown fields or anything out of range is `400` and nothing is stored; `202 { accepted }` otherwise. Rows hold no user id, no location and no IP: the per-IP limit (10 requests a minute, `429` with `Retry-After`) counts under an HMAC of the IP keyed with `BETTER_AUTH_SECRET`, and those counters are deleted after two minutes. The hourly cron deletes reports older than 90 days.
+- `GET /v1/admin/errors?since=<epoch ms>` (default: last 7 days, admins in `ADMIN_USER_IDS` only, else `403`) returns `{ since, groups }`: reports grouped by `name` + `message` + top stack frame, most recent first (max 100), each with `fatal`, `reports`, `occurrences`, `firstSeen`, `lastSeen`, `platforms`, `appVersions`, `screens` and the latest `stack`.
 
 ### Premium (`/v1/entitlement`, `/v1/billing/*`)
 

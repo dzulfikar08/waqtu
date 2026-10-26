@@ -2,6 +2,7 @@ import { handleReleases, type ReleaseBucket } from "./releases";
 import { handleApp } from "./src/app";
 import { sweepOrphanUploads } from "./src/circles/cleanup";
 import type { AppEnv } from "./src/env";
+import { sweepOldErrors } from "./src/errors";
 
 interface D1Database {
   prepare(query: string): {
@@ -212,8 +213,10 @@ export default {
     return new Response("Not found", { status: 404 });
   },
 
-  /** Hourly cron (wrangler.toml): drops circle voice notes uploaded but never posted. */
+  /** Hourly cron (wrangler.toml): drops circle voice notes uploaded but never posted, and crash reports past 90 days. */
   async scheduled(_controller: ScheduledController, env: AppEnv, ctx: ExecutionContext) {
-    ctx.waitUntil(sweepOrphanUploads(env, Date.now()));
+    const now = Date.now();
+    ctx.waitUntil(sweepOrphanUploads(env, now));
+    ctx.waitUntil(sweepOldErrors(env.APP_DB, now));
   },
 };

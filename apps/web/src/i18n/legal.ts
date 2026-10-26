@@ -30,7 +30,7 @@ export interface SupportDoc {
 }
 
 /** Date both legal pages and the policy text refer to. Bump it whenever either document changes. */
-export const LEGAL_UPDATED = "2026-10-25";
+export const LEGAL_UPDATED = "2026-10-26";
 
 const mail = `<a href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a>`;
 
@@ -137,7 +137,8 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
         items: [
           "<strong>Ponsel:</strong> pembaruan aplikasi lewat Expo Updates (u.expo.dev), yang menerima versi aplikasi, platform, dan alamat IP-mu; video halaqah lewat YouTube dengan host privasi-ditingkatkan (youtube-nocookie.com), yang dimuat hanya saat kamu membuka video; Apple dan Google saat masuk.",
           "<strong>Mac:</strong> pembaruan otomatis (Sparkle) lewat layanan pembaruan kami; Slack, hanya jika kamu menyalakan integrasinya, dengan token yang kamu berikan sendiri, untuk mengatur teks dan emoji status; Google Calendar, hanya jika kamu menyambungkannya; unduhan audio dari quranicaudio.com dan archive.org saat kamu memintanya.",
-          "Kami tidak menemukan SDK analitik, pelaporan error, atau iklan di aplikasi Mac maupun ponsel.",
+          "<strong>Laporan crash anonim (ponsel):</strong> jika aplikasi ponsel mengalami error atau crash, ia mengirim laporan ke server kami (api.getwaqtu.com, bukan layanan pihak ketiga) berisi versi dan build aplikasi, platform, ID pembaruan, nama dan pesan error, jejak tumpukan (stack trace) kode aplikasi, dan nama layar (misalnya &quot;Pekan&quot;, bukan isinya). Laporan tidak memuat akun, lokasi, atau alamat IP; alamat email dan angka mirip koordinat dihapus dari pesan error sebelum dikirim. Hash IP dipakai paling lama 2 menit untuk membatasi kiriman berulang, dan laporan dihapus setelah 90 hari.",
+          "Kami tidak menemukan SDK analitik, pelaporan error pihak ketiga, atau iklan di aplikasi Mac maupun ponsel.",
         ],
       },
       {
@@ -277,7 +278,8 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
         items: [
           "<strong>Phone:</strong> app updates through Expo Updates (u.expo.dev), which receives your app version, platform and IP address; halaqah videos through YouTube's privacy-enhanced host (youtube-nocookie.com), loaded only when you open a video; Apple and Google when you sign in.",
           "<strong>Mac:</strong> automatic updates (Sparkle) through our update service; Slack, only if you turn the integration on, with a token you provide, to set a status text and emoji; Google Calendar, only if you connect it; audio downloads from quranicaudio.com and archive.org when you ask for them.",
-          "We found no analytics, crash-reporting or advertising SDKs in the Mac or phone apps.",
+          "<strong>Anonymous crash reports (phone):</strong> when the phone app hits an error or crashes, it sends a report to our own server (api.getwaqtu.com, not a third-party service) with the app version and build, platform, update id, the error name and message, a stack trace of the app's code, and the screen name (such as &quot;Week&quot;, not its contents). Reports carry no account, no location and no IP address; email addresses and coordinate-like numbers are removed from error messages before sending. A hash of the IP is kept for at most 2 minutes to limit repeated sending, and reports are deleted after 90 days.",
+          "We found no analytics, third-party crash-reporting or advertising SDKs in the Mac or phone apps.",
         ],
       },
       {

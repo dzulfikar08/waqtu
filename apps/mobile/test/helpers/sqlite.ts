@@ -23,6 +23,11 @@ export function asExpoDb(raw: Database): SQLiteDatabase {
       raw.query(sql).get(...(params as never[])) ?? null,
     getAllAsync: async (sql: string, ...params: unknown[]) =>
       raw.query(sql).all(...(params as never[])),
+    runSync: (sql: string, ...params: unknown[]) => {
+      raw.query(sql).run(...(params as never[]));
+    },
+    getFirstSync: (sql: string, ...params: unknown[]) =>
+      raw.query(sql).get(...(params as never[])) ?? null,
     withTransactionAsync: async (fn: () => Promise<void>) => {
       raw.exec("BEGIN");
       try {

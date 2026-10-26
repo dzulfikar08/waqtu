@@ -5,7 +5,7 @@ export interface AppEnv extends GooglePlayEnv, PolarEnv {
   APP_DB: D1Database;
   /** R2 bucket `waqtu-circle-media`: circle voice notes. */
   CIRCLE_MEDIA: R2Bucket;
-  /** Comma-separated better-auth user ids allowed to use `/v1/admin/circles/*`. A secret; unset means no admins. */
+  /** Comma-separated better-auth user ids allowed to use `/v1/admin/circles/*` and `/v1/admin/errors`. A secret; unset means no admins. */
   ADMIN_USER_IDS?: string;
   /** "true" makes circles premium: `/v1/circles/config` reports `requiresPremium: true` and the API refuses joins/posts without premium (403 premium_required). */
   CIRCLES_REQUIRES_PREMIUM?: string;
