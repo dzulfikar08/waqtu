@@ -195,7 +195,7 @@ enum ScreenshotMode {
         // 3. Imsakiyah window for the whole of Ramadan.
         let imsakiyah = try await capture(
             WindowChrome(title: String(localized: "Imsakiyah")) {
-                ImsakiyahView(viewModel: model).frame(width: 560, height: 800)
+                ImsakiyahView(viewModel: model).frame(width: 560, height: 870)
             }
         )
         try write(Canvas.store(caption: caption(3, language), ui: imsakiyah, layout: .panel), "\(language.rawValue)-03-imsakiyah", in: directory)
@@ -300,19 +300,21 @@ enum ScreenshotMode {
         }
     }
 
-    /// Offscreen window drawn at `renderScale` whatever the runner's display is, with its controls
-    /// in their active (key window) look.
+    /// Offscreen window drawn at `renderScale` whatever the runner's display is, made key so the
+    /// controls have their active look (tinted prominent buttons).
     private final class RenderWindow: NSWindow {
         override var backingScaleFactor: CGFloat { ScreenshotMode.renderScale }
-        override var isKeyWindow: Bool { true }
-        override var isMainWindow: Bool { true }
+        override var canBecomeKey: Bool { true }
+        override var canBecomeMain: Bool { true }
     }
 
-    /// Draws `view` (fitting size unless given) in an offscreen window and returns its pixels.
+    /// Draws `view` at its fitting size in an offscreen window and returns its pixels.
     @MainActor
-    private static func capture<V: View>(_ view: V, size: CGSize? = nil) async throws -> CGImage {
-        let hosting = NSHostingView(rootView: view.environment(\.colorScheme, .dark))
-        let size = size ?? hosting.fittingSize
+    private static func capture<V: View>(_ view: V) async throws -> CGImage {
+        let hosting = NSHostingView(rootView: view
+            .environment(\.colorScheme, .dark)
+            .environment(\.controlActiveState, .key))
+        let size = hosting.fittingSize
         guard size.width >= 1, size.height >= 1 else { throw ScreenshotError(description: "empty view") }
         let window = RenderWindow(
             contentRect: CGRect(x: -20_000, y: -20_000, width: size.width, height: size.height),
@@ -325,7 +327,8 @@ enum ScreenshotMode {
         window.backgroundColor = NSColor(Color.waqtuBackground)
         hosting.frame = CGRect(origin: .zero, size: size)
         window.contentView = hosting
-        window.orderFrontRegardless()
+        NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
         // SwiftUI lays out, runs onAppear/task and settles its first animations.
         try await Task.sleep(nanoseconds: 1_500_000_000)
         hosting.layoutSubtreeIfNeeded()
