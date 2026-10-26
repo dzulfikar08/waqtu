@@ -1,8 +1,10 @@
 import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { bearer } from "better-auth/plugins";
 import { deleteUserMedia } from "./circles/cleanup";
 import type { AppEnv } from "./env";
+import { reviewEmails } from "./reviewAccount";
 
 export const APPLE_BUNDLE_ID = "dat.waqtu.ios";
 /** Bundle id of the Mac app (direct download and Mac App Store builds share it). */
@@ -41,6 +43,21 @@ export function createAuth(env: AppEnv) {
   const trustedOrigins = ["waqtu://", "waqtu://*"];
   if (!isProduction) trustedOrigins.push("exp://", "exp://**");
 
+  // Email + password exists only for store reviewer accounts, which the `review-account` workflow
+  // creates: no sign-up, and sign-in is refused for any address outside REVIEW_ACCOUNT_EMAILS (same
+  // error as a wrong password), so a credential row for anyone else is useless.
+  const reviewers = reviewEmails(env.REVIEW_ACCOUNT_EMAILS);
+  const onlyReviewers = createAuthMiddleware(async (ctx) => {
+    if (ctx.path !== "/sign-in/email") return;
+    const email: unknown = ctx.body?.email;
+    if (typeof email !== "string" || !reviewers.has(email.trim().toLowerCase())) {
+      throw new APIError("UNAUTHORIZED", {
+        code: "INVALID_EMAIL_OR_PASSWORD",
+        message: "Invalid email or password",
+      });
+    }
+  });
+
   return betterAuth({
     database: env.APP_DB,
     secret: env.BETTER_AUTH_SECRET,
@@ -51,6 +68,8 @@ export function createAuth(env: AppEnv) {
       ...(apple ? { apple } : {}),
       ...(google ? { google } : {}),
     },
+    emailAndPassword: { enabled: true, disableSignUp: true },
+    hooks: { before: onlyReviewers },
     user: {
       deleteUser: {
         enabled: true,

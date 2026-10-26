@@ -68,7 +68,7 @@ Removed: `POST /license/activate` (only the purchase flow of old builds used it;
 
 ### Database
 
-A second D1 binding, `APP_DB` (`waqtu-db`), holds the app data. The existing `DB` binding stays for releases. Migrations live in `migrations/` (`0001_auth.sql` for better-auth, `0002_sync.sql` for sync data, `0003_circles.sql` for halaqah circles, `0004_entitlement.sql` for premium entitlements, `0005_drop_license_entitlements.sql` removes the retired Mac license rows and columns, `0006_client_errors.sql` for anonymous crash reports):
+A second D1 binding, `APP_DB` (`waqtu-db`), holds the app data. The existing `DB` binding stays for releases. Migrations live in `migrations/` (`0001_auth.sql` for better-auth, `0002_sync.sql` for sync data, `0003_circles.sql` for halaqah circles, `0004_entitlement.sql` for premium entitlements, `0005_drop_license_entitlements.sql` removes the retired Mac license rows and columns, `0006_client_errors.sql` for anonymous crash reports, `0007_review_entitlement.sql` rebuilds `entitlement` to allow the `review` source):
 
 ```bash
 npx wrangler d1 migrations apply waqtu-db --remote   # production
@@ -120,6 +120,12 @@ What the app needs and where each id is created (Google Cloud console → APIs &
 | none                                   | Sign in with Apple             | App ID `dat.waqtu.ios` with the Sign in with Apple capability (Apple Developer → Identifiers) | `APPLE_CLIENT_ID=dat.waqtu.ios`               |
 
 The web client id and secret are only needed while the app signs in through the browser flow. Android and iOS clients have no secret. The `EXPO_PUBLIC_GOOGLE_*` names are the convention for the native Google sign-in code in `apps/mobile`, which has not been added yet (today the app only reads `EXPO_PUBLIC_API_URL`).
+
+### Reviewer accounts (email + password)
+
+Store reviewers (Google Play, App Store) sign in with email + password; nobody else can. `src/auth.ts` enables better-auth `emailAndPassword` with `disableSignUp: true` (`POST /api/auth/sign-up/email` answers 400) and no email verification, and a `hooks.before` refuses `POST /api/auth/sign-in/email` with the wrong-password error (401 `INVALID_EMAIL_OR_PASSWORD`) for any email not in `REVIEW_ACCOUNT_EMAILS` (plain var in `wrangler.toml`, comma-separated, default `review@getwaqtu.com`), so a credential row for anyone else is useless. Rate limiting is better-auth's default. The app shows the form behind "App reviewer? Sign in with email" in Settings → Account.
+
+The account is created by `.github/workflows/review-account.yml` (secret `REVIEW_ACCOUNT_PASSWORD` in the `release` environment; run it after deploying): it hashes the password with better-auth's own `hashPassword` (`better-auth/crypto`) and runs the idempotent statements of `src/reviewAccount.ts`: the `user` row (name "Waqtu Review", email verified), one `credential` account, and an `entitlement` row with source `review` expiring 2100-01-01, which `GET /v1/entitlement` reports as premium. Re-run it to rotate the password. See "Reviewer account" in the root README for the store consoles.
 
 ### Endpoints
 

@@ -1,6 +1,7 @@
-export type EntitlementSource = "apple" | "google" | "polar";
+/** `review`: store reviewer accounts, granted by the server's `review-account` workflow. */
+export type EntitlementSource = "apple" | "google" | "polar" | "review";
 
-const SOURCES: readonly EntitlementSource[] = ["apple", "google", "polar"];
+const SOURCES: readonly EntitlementSource[] = ["apple", "google", "polar", "review"];
 
 /** What `GET /v1/entitlement` returns. `expiresAt` null with `premium` true means no expiry. */
 export interface Entitlement {

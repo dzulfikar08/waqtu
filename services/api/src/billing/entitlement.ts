@@ -1,4 +1,5 @@
-export type EntitlementSource = "apple" | "google" | "polar";
+/** `review`: store reviewer accounts, written only by the `review-account` workflow (src/reviewAccount.ts). */
+export type EntitlementSource = "apple" | "google" | "polar" | "review";
 
 export interface EntitlementRow {
   source: EntitlementSource;
