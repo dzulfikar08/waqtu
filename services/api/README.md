@@ -169,8 +169,8 @@ Secrets: `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`, `GOOGLE_PLAY_RTDN_PUSH_EMAIL` or `G
 `GOOGLE_PLAY_PACKAGE_NAME` (optional, default `dat.waqtu.app`), `POLAR_ACCESS_TOKEN`,
 `POLAR_WEBHOOK_SECRET`, `POLAR_PRODUCT_MONTHLY_ID`, `POLAR_PRODUCT_YEARLY_ID`, `POLAR_SERVER` and
 `POLAR_SUCCESS_URL` (optional). `POLAR_ORG_ID` is only read by the legacy `/license/validate`.
-`APPLE_APP_ID` is a plain var in `wrangler.toml`; add `APPLE_MAC_APP_ID` there once the Mac App Store
-app's numeric id is known.
+`APPLE_APP_ID` (iPhone app, 6826628861) and `APPLE_MAC_APP_ID` (Mac App Store app "Waqtu for Mac",
+6827054953) are plain vars in `wrangler.toml`.
 
 ### Tests
 
