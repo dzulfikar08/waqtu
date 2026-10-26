@@ -613,9 +613,13 @@ def update_review_detail(asc: Asc, vid: str) -> None:
 def ensure_free(asc: Asc) -> None:
     schedule = asc.get_or_none(f"/v1/apps/{APP_ID}/appPriceSchedule")
     if schedule:
-        prices = asc.get(
-            f"/v1/appPriceSchedules/{schedule['id']}/manualPrices", include="appPricePoint", limit=50
-        )
+        # An app that never had a price answers with a schedule object whose manual prices do not exist (404).
+        try:
+            prices = asc.get(f"/v1/appPriceSchedules/{schedule['id']}/manualPrices", include="appPricePoint", limit=50)
+        except AscError as e:
+            if e.status != 404:
+                raise
+            prices = {}
         points = [i for i in prices.get("included", []) if i["type"] == "appPricePoints"]
         if points and all(float(p["attributes"]["customerPrice"]) == 0 for p in points):
             note("Price: free (already set)")
