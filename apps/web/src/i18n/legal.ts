@@ -161,7 +161,7 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
           "Data akun, sinkron, lingkaran, dan catatan Premium disimpan selama akunmu ada.",
           "<strong>Menghapus akun di aplikasi ponsel:</strong> buka Pengaturan, bagian Akun, lalu ketuk Hapus akun dan konfirmasi. Ini menghapus di server kami: akun dan sesi masuk, sinkron mutabaah dan pengaturan, profil lingkaran, keanggotaan, kiriman, reaksi, blokir, laporan yang kamu kirim, catatan hak Premium, dan semua pesan suaramu (berkas di R2 dihapus lebih dulu; kalau gagal, akun tetap ada dan kamu bisa mencoba lagi). Tindakan ini tidak bisa dibatalkan.",
           "<strong>Yang tidak ikut terhapus:</strong> data di ponselmu (hapus dengan mencopot aplikasi), langganan di App Store atau Google Play (batalkan di toko), catatan transaksi yang disimpan Apple, Google, atau Polar sendiri, dan salinan cadangan basis data Cloudflare yang kami tidak kendalikan. Masuk lagi setelah menghapus akan membuat akun baru yang kosong.",
-          "<strong>Aplikasi Mac belum punya tombol hapus akun.</strong> Hapus lewat aplikasi ponsel, atau kirim email ke " +
+          "<strong>Menghapus akun di aplikasi Mac:</strong> buka Pengaturan, tab Akun, klik Hapus akun dan konfirmasi. Yang terhapus sama dengan di aplikasi ponsel; data di Mac-mu tetap ada sampai kamu menghapus aplikasinya. Bisa juga lewat email ke " +
             mail +
             ".",
           "<strong>Daftar tunggu dan permintaan lain:</strong> kirim email ke " +
@@ -303,7 +303,7 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
           "Account, sync, circle and entitlement data are kept as long as your account exists.",
           "<strong>Deleting your account in the phone app:</strong> open Settings, find the Account section, tap Delete account and confirm. On our server this removes: your account and sign-in sessions, mutabaah sync and settings, circle profile, memberships, posts, reactions, blocks, reports you sent, entitlement records, and all your voice notes (the R2 files are deleted first; if that fails the account stays and you can try again). It cannot be undone.",
           "<strong>What is not removed:</strong> data on your phone (delete it by uninstalling the app), subscriptions in the App Store or Google Play (cancel them in the store), transaction records that Apple, Google or Polar keep themselves, and Cloudflare database backups that we do not control. Signing in again after deletion creates a new, empty account.",
-          "<strong>The Mac app has no delete-account button yet.</strong> Delete through the phone app, or email " +
+          "<strong>Deleting your account in the Mac app:</strong> open Settings, the Account tab, click Delete account and confirm. It removes the same as the phone app; data on your Mac stays until you delete the app. You can also email " +
             mail +
             ".",
           "<strong>Waitlist and other requests:</strong> email " +
@@ -383,7 +383,7 @@ export const terms: Record<LegalLocale, LegalDoc> = {
       {
         heading: "Akun",
         paragraphs: [
-          "Akun bersifat opsional dan dibuat lewat Apple atau Google. Kamu bertanggung jawab atas akses ke akun tersebut. Kamu bisa menghapus akun kapan saja dari Pengaturan di aplikasi ponsel; lihat Kebijakan Privasi untuk apa yang terhapus. Menghapus akun tidak membatalkan langganan di toko.",
+          "Akun bersifat opsional dan dibuat lewat Apple atau Google. Kamu bertanggung jawab atas akses ke akun tersebut. Kamu bisa menghapus akun kapan saja dari Pengaturan di aplikasi ponsel atau Mac; lihat Kebijakan Privasi untuk apa yang terhapus. Menghapus akun tidak membatalkan langganan di toko.",
         ],
       },
       {
@@ -475,7 +475,7 @@ export const terms: Record<LegalLocale, LegalDoc> = {
       {
         heading: "Accounts",
         paragraphs: [
-          "An account is optional and is created through Apple or Google. You are responsible for access to that account. You can delete your account at any time from Settings in the phone app; see the Privacy Policy for what is removed. Deleting your account does not cancel a store subscription.",
+          "An account is optional and is created through Apple or Google. You are responsible for access to that account. You can delete your account at any time from Settings in the phone or Mac app; see the Privacy Policy for what is removed. Deleting your account does not cancel a store subscription.",
         ],
       },
       {
@@ -547,7 +547,7 @@ export const support: Record<LegalLocale, SupportDoc> = {
       {
         question: "Bagaimana cara menghapus akun saya?",
         answer:
-          'Di aplikasi ponsel: Pengaturan, bagian Akun, Hapus akun, lalu konfirmasi. Kalau muncul pesan untuk masuk ulang, keluar dulu, masuk lagi, lalu ulangi. Aplikasi Mac belum punya tombol ini; hapus lewat aplikasi ponsel atau kirim email. Detail apa yang terhapus ada di <a href="/privacy">Kebijakan Privasi</a>.',
+          'Di aplikasi ponsel: Pengaturan, bagian Akun, Hapus akun, lalu konfirmasi. Di Mac: Pengaturan, tab Akun, Hapus akun. Kalau muncul pesan untuk masuk ulang, keluar dulu, masuk lagi, lalu ulangi. Bisa juga lewat email. Detail apa yang terhapus ada di <a href="/privacy">Kebijakan Privasi</a>.',
       },
       {
         question: "Bagaimana cara membatalkan langganan Premium?",
@@ -616,7 +616,7 @@ export const support: Record<LegalLocale, SupportDoc> = {
       {
         question: "How do I delete my account?",
         answer:
-          'In the phone app: Settings, the Account section, Delete account, then confirm. If it asks you to sign in again, sign out, sign in, and repeat. The Mac app has no such button yet; delete through the phone app or send an email. What gets removed is listed in the <a href="/en/privacy">Privacy Policy</a>.',
+          'In the phone app: Settings, the Account section, Delete account, then confirm. On the Mac: Settings, the Account tab, Delete account. If it asks you to sign in again, sign out, sign in, and repeat. You can also send an email. What gets removed is listed in the <a href="/en/privacy">Privacy Policy</a>.',
       },
       {
         question: "How do I cancel my Premium subscription?",

@@ -189,6 +189,29 @@ final class WaqtuAccount {
         if let current { await api.signOut(token: current) }
     }
 
+    /// Deletes the account and its server data, then forgets the session like a sign-out.
+    @MainActor
+    func deleteAccount() async {
+        guard let current = token, !isBusy else { return }
+        errorMessage = nil
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            try await api.deleteAccount(token: current)
+            guard token == current else { return }
+            forgetSession()
+            onSessionChange?()
+        } catch WaqtuAPIError.sessionStale {
+            errorMessage = String(localized: "For safety, sign out, sign in again, then delete the account.")
+        } catch {
+            if isUnauthorized(error), token == current {
+                sessionExpired()
+            } else {
+                errorMessage = String(localized: "Could not delete the account. Check your connection and try again.")
+            }
+        }
+    }
+
     /// The server rejected the token: drop it and ask for a new sign-in.
     func sessionExpired() {
         guard token != nil else { return }

@@ -856,6 +856,16 @@
         }
       }
     },
+    "Could not delete the account. Check your connection and try again." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gagal menghapus akun. Periksa koneksimu lalu coba lagi."
+          }
+        }
+      }
+    },
     "Counter" : {
       "localizations" : {
         "id" : {
@@ -952,6 +962,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bawaan"
+          }
+        }
+      }
+    },
+    "Delete account" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hapus akun"
+          }
+        }
+      }
+    },
+    "Delete account…" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hapus akun…"
+          }
+        }
+      }
+    },
+    "Delete your account?" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hapus akunmu?"
           }
         }
       }
@@ -1182,6 +1222,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Untuk lokasi di atas lintang ±48°. Otomatis memilih sesuai lokasimu."
+          }
+        }
+      }
+    },
+    "For safety, sign out, sign in again, then delete the account." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demi keamanan, keluar dulu, masuk lagi, lalu hapus akun."
           }
         }
       }
@@ -2884,6 +2934,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tema"
+          }
+        }
+      }
+    },
+    "This deletes your account on our server: synced prayer checklist and settings, your Circles profile, posts and voice notes, and premium records linked to it. It cannot be undone. Data on this Mac stays, and so does any App Store subscription; cancel that in the App Store." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ini menghapus akunmu di server kami: mutabaah dan pengaturan yang tersinkron, profil Lingkaran, kiriman dan pesan suara, serta catatan premium yang terkait. Tindakan ini tidak bisa dibatalkan. Data di Mac ini tetap ada, begitu pula langganan App Store; batalkan langganan itu di App Store."
           }
         }
       }

@@ -1,0 +1,130 @@
+# Mac App Store signing material, through the App Store Connect API.
+#   inspect (always)        lists distribution certificates, the Mac bundle ids and their profiles, and the
+#                           subject of IOS_DIST_CERT_P12_BASE64 (the Apple Distribution certificate that also signs
+#                           the Mac App Store build).
+#   create_installer_cert   creates a Mac Installer Distribution certificate (signs the .pkg) from a key made on the
+#                           runner and uploads it as an artifact, a password-protected .p12 encrypted to
+#                           `recipient_public_key` (RSA public key PEM). Decrypt it locally:
+#                             openssl pkeyutl -decrypt -inkey recipient.key -pkeyopt rsa_padding_mode:oaep \
+#                               -pkeyopt rsa_oaep_md:sha256 -in key.enc -out key.bin
+#                             openssl enc -d -aes-256-cbc -pbkdf2 -pass file:key.bin -in bundle.enc | tar -x
+#                           then store mas-installer.p12 (base64) and its password as MAS_INSTALLER_P12_BASE64 and
+#                           MAS_INSTALLER_P12_PASSWORD, and delete the artifact. Apple limits these certificates;
+#                           only run it when the secret is missing or the certificate expires.
+name: MAS signing
+
+on:
+  # TEMPORARY: iterate from the branch before the workflow exists on master.
+  push:
+    branches: [mas-submit]
+    paths: [.github/workflows/mas-signing.yml, apps/apple/scripts/mas_signing.py]
+  workflow_dispatch:
+    inputs:
+      create_installer_cert:
+        description: "Create a Mac Installer Distribution certificate (encrypted artifact)"
+        type: boolean
+        default: false
+      recipient_public_key:
+        description: "RSA public key (PEM) the artifact is encrypted to"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  signing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Python dependencies
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet --only-binary :all: -r apps/mobile/store/submit/requirements.txt
+
+      - name: Distribution certificate in the secrets
+        env:
+          P12_BASE64: ${{ secrets.IOS_DIST_CERT_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          APP_PROFILE_BASE64: ${{ secrets.MACOS_APP_STORE_PROFILE_BASE64 }}
+        run: |
+          umask 077
+          printf '%s' "$P12_BASE64" | base64 -d > "$RUNNER_TEMP/dist.p12"
+          openssl pkcs12 -in "$RUNNER_TEMP/dist.p12" -passin env:P12_PASSWORD -nokeys -legacy 2>/dev/null \
+            | openssl x509 -noout -subject -serial -enddate \
+            || openssl pkcs12 -in "$RUNNER_TEMP/dist.p12" -passin env:P12_PASSWORD -nokeys | openssl x509 -noout -subject -serial -enddate
+          rm -f "$RUNNER_TEMP/dist.p12"
+          if [ -n "$APP_PROFILE_BASE64" ]; then
+            printf '%s' "$APP_PROFILE_BASE64" | base64 -d > "$RUNNER_TEMP/p.provisionprofile"
+            openssl smime -inform der -verify -noverify -in "$RUNNER_TEMP/p.provisionprofile" 2>/dev/null > "$RUNNER_TEMP/p.plist"
+            python3 - "$RUNNER_TEMP/p.plist" <<'EOF'
+          import plistlib, sys
+          p = plistlib.load(open(sys.argv[1], "rb"))
+          print("MACOS_APP_STORE_PROFILE:", p["Name"], p.get("Platform"), p["ExpirationDate"],
+                "provisions-all" if p.get("ProvisionsAllDevices") else "", sorted(p["Entitlements"]))
+          EOF
+            rm -f "$RUNNER_TEMP/p.provisionprofile" "$RUNNER_TEMP/p.plist"
+          fi
+
+      - name: App Store Connect key
+        env:
+          ASC_KEY_BASE64: ${{ secrets.ASC_KEY_BASE64 }}
+        run: |
+          umask 077
+          printf '%s' "$ASC_KEY_BASE64" | base64 -d > "$RUNNER_TEMP/asc.p8"
+
+      - name: Inspect
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_PATH: ${{ runner.temp }}/asc.p8
+        run: '"$RUNNER_TEMP/venv/bin/python" apps/apple/scripts/mas_signing.py inspect'
+
+      - name: Create Mac Installer Distribution certificate
+        if: inputs.create_installer_cert
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_PATH: ${{ runner.temp }}/asc.p8
+          RECIPIENT: ${{ inputs.recipient_public_key }}
+        run: |
+          umask 077
+          test -n "$RECIPIENT"
+          printf '%s\n' "$RECIPIENT" > "$RUNNER_TEMP/recipient.pem"
+          openssl pkey -pubin -in "$RUNNER_TEMP/recipient.pem" -noout
+          work="$RUNNER_TEMP/installer"
+          mkdir -p "$work/out"
+          openssl genrsa -out "$work/key.pem" 2048 2>/dev/null
+          openssl req -new -key "$work/key.pem" -subj "/CN=Waqtu MAS Installer/O=JoyoDigitama/C=ID" -out "$work/req.csr"
+          "$RUNNER_TEMP/venv/bin/python" apps/apple/scripts/mas_signing.py installer-cert "$work/req.csr" "$work/cert.der"
+          openssl x509 -inform der -in "$work/cert.der" -out "$work/cert.pem"
+          openssl x509 -in "$work/cert.pem" -noout -subject -serial -enddate
+          openssl rand -base64 24 | tr -d '\n' > "$work/out/mas-installer.password"
+          # macOS `security import` only reads PKCS#12 files with the legacy SHA1/3DES algorithms.
+          openssl pkcs12 -export -inkey "$work/key.pem" -in "$work/cert.pem" -name "Mac Installer Distribution" \
+            -certpbe PBE-SHA1-3DES -keypbe PBE-SHA1-3DES -macalg sha1 \
+            -passout file:"$work/out/mas-installer.password" -out "$work/out/mas-installer.p12"
+          tar -C "$work/out" -cf "$work/bundle.tar" mas-installer.p12 mas-installer.password
+          mkdir -p "$RUNNER_TEMP/artifact"
+          openssl rand -hex 32 > "$work/key.bin"
+          openssl enc -aes-256-cbc -pbkdf2 -salt -pass file:"$work/key.bin" -in "$work/bundle.tar" -out "$RUNNER_TEMP/artifact/bundle.enc"
+          openssl pkeyutl -encrypt -pubin -inkey "$RUNNER_TEMP/recipient.pem" -pkeyopt rsa_padding_mode:oaep \
+            -pkeyopt rsa_oaep_md:sha256 -in "$work/key.bin" -out "$RUNNER_TEMP/artifact/key.enc"
+          rm -rf "$work"
+
+      - name: Upload encrypted certificate
+        if: inputs.create_installer_cert
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: mas-installer-encrypted
+          path: ${{ runner.temp }}/artifact/
+          retention-days: 1
+
+      - name: Remove API key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/asc.p8"
