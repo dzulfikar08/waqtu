@@ -9,8 +9,9 @@ usage:
       Writes OUT_DIR/<bundle id>.provisionprofile for dat.waqtu and dat.waqtu.mac-widget: the newest
       active MAC_APP_STORE profile that contains the distribution certificate with this serial
       (hex, as `openssl x509 -serial` prints it), created when there is none.
-  mas_signing.py installer-cert CSR_PEM OUT_DER
-      Creates a MAC_INSTALLER_DISTRIBUTION certificate for the CSR and writes it (DER) to OUT_DER.
+  mas_signing.py installer-cert CSR_PEM OUT_DER [REVOKE_ID]
+      Creates a MAC_INSTALLER_DISTRIBUTION certificate for the CSR and writes it (DER) to OUT_DER. Apple allows only a
+      few of them; REVOKE_ID first revokes that existing Mac Installer Distribution certificate (only that type).
 
 Environment: ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH (App Store Connect API key .p8).
 """
@@ -117,7 +118,13 @@ def profiles(asc: Asc, cert_serial: str, out_dir: Path) -> None:
         print(f"{identifier}: profile {chosen['attributes']['name']!r} expires {chosen['attributes']['expirationDate']}")
 
 
-def installer_cert(asc: Asc, csr: Path, out: Path) -> None:
+def installer_cert(asc: Asc, csr: Path, out: Path, revoke: str | None) -> None:
+    if revoke:
+        old = asc.get(f"/v1/certificates/{revoke}")["data"]["attributes"]
+        if old["certificateType"] != "MAC_INSTALLER_DISTRIBUTION":
+            raise SystemExit(f"{revoke} is a {old['certificateType']} certificate; only installer certificates are revoked here")
+        asc.delete(f"/v1/certificates/{revoke}")
+        print(f"Revoked {old['certificateType']} serial={old.get('serialNumber')} expires={old.get('expirationDate')}")
     created = asc.post(
         "/v1/certificates",
         {
@@ -141,7 +148,7 @@ def main() -> None:
         elif command == "profiles":
             profiles(asc, args[0], Path(args[1]))
         elif command == "installer-cert":
-            installer_cert(asc, Path(args[0]), Path(args[1]))
+            installer_cert(asc, Path(args[0]), Path(args[1]), args[2] if len(args) > 2 else None)
         else:
             raise SystemExit(__doc__)
     except AscError as e:

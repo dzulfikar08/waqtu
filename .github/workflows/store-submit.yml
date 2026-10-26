@@ -1,4 +1,5 @@
-# Store metadata and review submission for Waqtu (apps/mobile), from the files in apps/mobile/store:
+# Store metadata and review submission for Waqtu (apps/mobile, from the files in apps/mobile/store) and Waqtu for Mac
+# (apps/apple, from apps/apple/store):
 #   ios      apps/mobile/store/submit/appstore.py fills App Store version from app.json `version` (text id + en-US,
 #            6.9" screenshots from the latest successful "Store screenshots" run, App Review information, age rating,
 #            categories, price, availability, subscriptions) with build ios.buildNumber, then submits the version
@@ -6,13 +7,18 @@
 #   android  apps/mobile/store/submit/play.py updates the id + en-US listings (graphics from the play-listing-assets
 #            release) and releases android.versionCode to production. With managed publishing off, the commit sends it
 #            to review.
-# Both builds must be uploaded first (Release iOS with upload_testflight, Release Android with a play_track).
+#   mac      the same appstore.py with STORE_PLATFORM=mac fills the Mac App Store version of Waqtu for Mac (text from
+#            apps/apple/store, 2880x1800 screenshots and the subscription review screenshot from the latest successful
+#            "Mac screenshots" run) with the newest uploaded build (Release Mac App Store), then submits it together with
+#            the Mac Waqtu Premium subscriptions. Not part of `both`.
+# The builds must be uploaded first (Release iOS with upload_testflight, Release Android with a play_track, Release
+# Mac App Store).
 # submit=false does everything except the final step: App Store leaves a draft review submission, Play validates the
 # edit and discards it.
 #
 # Manual only (Actions tab -> "Store submit" -> Run workflow). Secrets of the `release` environment:
 #   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_BASE64   App Store Connect API key (.p8)
-#   REVIEW_ACCOUNT_PASSWORD                     password of the App Review demo account review@getwaqtu.com
+#   REVIEW_ACCOUNT_PASSWORD                     password of the App Review demo account review@getwaqtu.com (iOS)
 #   REVIEW_CONTACT_PHONE                        App Review contact phone
 #   PLAY_SERVICE_ACCOUNT_JSON                   Google Play service account key (raw JSON)
 name: Store submit
@@ -23,7 +29,7 @@ on:
       platform:
         description: "Which store"
         type: choice
-        options: [both, ios, android]
+        options: [both, ios, android, mac]
         default: both
       submit:
         description: "Submit for review (off = upload metadata and stop before submitting)"
@@ -40,7 +46,7 @@ concurrency:
 
 jobs:
   ios:
-    if: inputs.platform != 'android'
+    if: inputs.platform == 'both' || inputs.platform == 'ios'
     runs-on: ubuntu-latest
     timeout-minutes: 150
     environment: release
@@ -84,7 +90,7 @@ jobs:
         run: rm -f "$RUNNER_TEMP/asc.p8"
 
   android:
-    if: inputs.platform != 'ios'
+    if: inputs.platform == 'both' || inputs.platform == 'android'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: release
@@ -112,3 +118,46 @@ jobs:
           export VERSION_NAME=$(jq -r .expo.version apps/mobile/app.json)
           export PLAY_ASSETS_DIR="$RUNNER_TEMP/play"
           "$RUNNER_TEMP/venv/bin/python" apps/mobile/store/submit/play.py
+
+  mac:
+    if: inputs.platform == 'mac'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    environment: release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Python dependencies
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet --only-binary :all: -r apps/mobile/store/submit/requirements.txt
+
+      - name: Screenshots of the latest Mac screenshots run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_id=$(gh run list -R "$GITHUB_REPOSITORY" --workflow mas-screenshots.yml --status success --limit 1 --json databaseId -q '.[0].databaseId')
+          test -n "$run_id"
+          gh run download "$run_id" -R "$GITHUB_REPOSITORY" -n screenshots-mac -D "$RUNNER_TEMP/shots"
+          echo "Screenshots: Mac screenshots run $run_id" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: App Store Connect
+        env:
+          STORE_PLATFORM: mac
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_BASE64: ${{ secrets.ASC_KEY_BASE64 }}
+          REVIEW_CONTACT_PHONE: ${{ secrets.REVIEW_CONTACT_PHONE }}
+          SUBMIT: ${{ inputs.submit }}
+        run: |
+          umask 077
+          export ASC_KEY_PATH="$RUNNER_TEMP/asc.p8"
+          printf '%s' "$ASC_KEY_BASE64" | base64 -d > "$ASC_KEY_PATH"
+          export SCREENSHOTS_DIR="$RUNNER_TEMP/shots"
+          "$RUNNER_TEMP/venv/bin/python" apps/mobile/store/submit/appstore.py
+
+      - name: Remove API key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/asc.p8"
