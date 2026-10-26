@@ -306,8 +306,16 @@ describe("api client", () => {
   });
 
   test("admin calls go to /v1/admin with the session cookie", async () => {
-    const { api, calls } = client(() => ok({ posts: [], users: [], ok: true, since: 1, groups: [] }));
-    expect(await api.adminQueue()).toEqual({ posts: [], users: [], ok: true, since: 1, groups: [] });
+    const { api, calls } = client(() =>
+      ok({ posts: [], users: [], ok: true, since: 1, groups: [] }),
+    );
+    expect(await api.adminQueue()).toEqual({
+      posts: [],
+      users: [],
+      ok: true,
+      since: 1,
+      groups: [],
+    });
     await api.adminPost("p 1", "hide");
     await api.adminUser("u1", "suspend");
     await api.adminErrors();

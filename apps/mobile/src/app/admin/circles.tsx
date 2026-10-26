@@ -170,11 +170,7 @@ function PostItem({
             background={theme.dangerSoft}
           />
         ) : (
-          <Badge
-            label={t("admin.moderation.visible")}
-            color={rose.base}
-            background={rose.soft}
-          />
+          <Badge label={t("admin.moderation.visible")} color={rose.base} background={rose.soft} />
         )}
       </View>
       <Text

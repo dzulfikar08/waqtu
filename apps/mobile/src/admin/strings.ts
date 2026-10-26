@@ -24,7 +24,8 @@ export const adminId = {
     removeConfirm: "Hapus kiriman ini untuk semua orang? Tidak bisa dibatalkan.",
     suspend: "Tangguhkan",
     unsuspend: "Cabut penangguhan",
-    suspendConfirm: "Tangguhkan {{handle}}? Ia keluar dari semua lingkaran sampai penangguhan dicabut.",
+    suspendConfirm:
+      "Tangguhkan {{handle}}? Ia keluar dari semua lingkaran sampai penangguhan dicabut.",
     cancel: "Batal",
     done: "Tersimpan",
   },

@@ -51,10 +51,7 @@ function CrashReports({ api }: { api: CirclesApi }) {
         </Card>
       ) : null}
       {groups?.map((group) => (
-        <GroupCard
-          key={`${group.name}\n${group.message}\n${group.topFrame}`}
-          group={group}
-        />
+        <GroupCard key={`${group.name}\n${group.message}\n${group.topFrame}`} group={group} />
       ))}
     </ScrollView>
   );
