@@ -1,0 +1,24 @@
+# TEMPORARY (ibadah-tools branch): prints oxfmt's changes as a patch artifact. Remove before merge.
+name: tmp fmt patch
+on:
+  push:
+    branches: [ibadah-tools]
+permissions:
+  contents: read
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.4
+      - run: bun install --frozen-lockfile
+      - run: bun run fmt
+      - run: git diff > fmt.patch; git diff --stat
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: fmt-patch
+          path: fmt.patch
