@@ -1,0 +1,137 @@
+# Deploys the Cloudflare Workers from GitHub Actions, so no local machine runs wrangler.
+#
+#   api  -> services/api (worker `waqt-updates`, api.getwaqtu.com): applies pending D1 migrations of `waqtu-db`
+#           (services/api/migrations) on the remote database first, then `wrangler deploy`.
+#   web  -> apps/web (worker `waqtu-landing-astro`, getwaqtu.com): `astro build` + `wrangler deploy`, same as
+#           `bun run deploy:web`.
+#
+# Manual only (Actions tab -> "Deploy" -> Run workflow, or `gh workflow run deploy.yml -f target=both`).
+# Secrets, in the `release` environment: CLOUDFLARE_API_TOKEN (Workers Scripts: Edit, D1: Edit, plus Workers Routes /
+# Custom Domains on the zone) and CLOUDFLARE_ACCOUNT_ID. Worker secrets (BETTER_AUTH_SECRET, ADMIN_USER_IDS, ...) are
+# not touched: they stay on the workers.
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "What to deploy"
+        type: choice
+        options: [both, api, web]
+        default: both
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+# `shell: bash` runs with pipefail, so a failing wrangler is not hidden behind `| tee`.
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  api:
+    if: inputs.target == 'api' || inputs.target == 'both'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: release
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.4
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Database name comes from services/api/wrangler.toml ([[d1_databases]] APP_DB, migrations_dir = "migrations").
+      - name: Apply D1 migrations (waqtu-db, remote)
+        working-directory: services/api
+        run: |
+          bunx wrangler d1 migrations apply waqtu-db --remote | tee "$RUNNER_TEMP/migrations.log"
+
+      - name: Deploy worker (waqt-updates)
+        working-directory: services/api
+        run: bun run deploy | tee "$RUNNER_TEMP/deploy.log"
+
+      # /v1/me without a session answers 401 once the worker serves the app routes.
+      - name: Health check
+        run: |
+          code=000
+          for _ in 1 2 3 4 5 6; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' https://api.getwaqtu.com/v1/me || true)
+            [ "$code" = 401 ] && break
+            sleep 10
+          done
+          {
+            echo '### API deployed'
+            echo '```'
+            grep -Eo 'https://[^ ]+' "$RUNNER_TEMP/deploy.log" | sort -u || true
+            grep -E 'Current Version ID|Version ID' "$RUNNER_TEMP/deploy.log" || true
+            echo '```'
+            echo 'Migrations:'
+            echo '```'
+            tail -n 20 "$RUNNER_TEMP/migrations.log"
+            echo '```'
+            echo "Health: \`GET https://api.getwaqtu.com/v1/me\` -> $code (expected 401)"
+          } >> "$GITHUB_STEP_SUMMARY"
+          test "$code" = 401
+
+  web:
+    if: inputs.target == 'web' || inputs.target == 'both'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: release
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.4
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Same as `bun run deploy:web`: astro build, then wrangler deploy of the generated dist/server/wrangler.json.
+      - name: Build and deploy (waqtu-landing-astro)
+        run: bun run deploy:web | tee "$RUNNER_TEMP/deploy.log"
+
+      - name: Health check
+        run: |
+          code=000
+          for _ in 1 2 3 4 5 6; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' https://getwaqtu.com/ || true)
+            [ "$code" = 200 ] && break
+            sleep 10
+          done
+          {
+            echo '### Web deployed'
+            echo '```'
+            grep -Eo 'https://[^ ]+' "$RUNNER_TEMP/deploy.log" | sort -u || true
+            grep -E 'Current Version ID|Version ID' "$RUNNER_TEMP/deploy.log" || true
+            echo '```'
+            echo "Health: \`GET https://getwaqtu.com/\` -> $code (expected 200)"
+          } >> "$GITHUB_STEP_SUMMARY"
+          test "$code" = 200
