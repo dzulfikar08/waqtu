@@ -116,8 +116,9 @@ def main() -> None:
         languages = {"id": default if default.split("-")[0] in ("id", "in") else "id", "en": "en-US"}
 
         for folder, language in languages.items():
+            # PUT creates the listing when the language has none yet (PATCH answers 404 then).
             play.request(
-                "PATCH",
+                "PUT",
                 f"{API}/edits/{edit}/listings/{language}",
                 json={
                     "language": language,
