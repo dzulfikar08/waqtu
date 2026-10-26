@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import { emailCredentials, emailSignInProblem } from "../src/auth/emailSignIn";
-import { parseEntitlement } from "../src/premium/entitlement";
+import { parseEntitlement, type Entitlement } from "../src/premium/entitlement";
 
 describe("reviewer email sign-in", () => {
   test("normalizes the email and keeps the password as typed", () => {
@@ -26,7 +26,11 @@ describe("reviewer email sign-in", () => {
   });
 
   test("the review entitlement counts as premium", () => {
-    const value = { premium: true, source: "review", expiresAt: "2100-01-01T00:00:00.000Z" };
+    const value: Entitlement = {
+      premium: true,
+      source: "review",
+      expiresAt: "2100-01-01T00:00:00.000Z",
+    };
     expect(parseEntitlement(value)).toEqual(value);
   });
 });
