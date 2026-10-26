@@ -1,0 +1,141 @@
+{
+  "title": "Evening Dhikr (Adhkar Al-Masa')",
+  "description": "Remembrances to be recited in the evening",
+  "items": [
+    {
+      "id": "evening-001",
+      "arabic": "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "transliteration": "Amsayna wa amsal-mulku lillah, walhamdulillah, la ilaha illallahu wahdahu la sharika lah, lahul-mulku walahul-hamd, wa huwa 'ala kulli shay'in qadir",
+      "translation": "We have entered evening and the dominion belongs to Allah, and all praise belongs to Allah. There is no deity except Allah alone, with no partner. To Him belongs the dominion and to Him belongs all praise, and He has power over everything",
+      "repetitions": 1,
+      "reference": "Muslim 2723",
+      "order": 1
+    },
+    {
+      "id": "evening-002",
+      "arabic": "اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ الْمَصِيرُ",
+      "transliteration": "Allahumma bika amsayna, wa bika asbahna, wa bika nahya, wa bika namut, wa ilaykal-masir",
+      "translation": "O Allah, by You we enter the evening, by You we enter the morning, by You we live, by You we die, and to You is the final return",
+      "repetitions": 1,
+      "reference": "Tirmidhi 3391",
+      "order": 2
+    },
+    {
+      "id": "evening-003",
+      "arabic": "أَمْسَيْنَا عَلَى فِطْرَةِ الْإِسْلَامِ، وَعَلَى كَلِمَةِ الْإِخْلَاصِ، وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ، وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ حَنِيفًا مُسْلِمًا وَمَا كَانَ مِنَ الْمُشْرِكِينَ",
+      "transliteration": "Amsayna 'ala fitratil-islam, wa 'ala kalimatil-ikhlas, wa 'ala dini nabiyyina muhammadin sallallahu 'alayhi wa sallam, wa 'ala millati abina ibrahima hanifan musliman wa ma kana minal-mushrikin",
+      "translation": "We have entered evening upon the natural religion of Islam, the word of sincere devotion, the religion of our Prophet Muhammad (peace be upon him), and the way of our father Ibrahim, who was upright and a Muslim, and was not of those who associate others with Allah",
+      "repetitions": 1,
+      "reference": "Ahmad 15360",
+      "order": 3
+    },
+    {
+      "id": "evening-004",
+      "arabic": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+      "transliteration": "Subhanallahi wa bihamdihi",
+      "translation": "Glory be to Allah and praise Him",
+      "repetitions": 100,
+      "reference": "Muslim 2691",
+      "order": 4
+    },
+    {
+      "id": "evening-005",
+      "arabic": "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "transliteration": "La ilaha illallahu wahdahu la sharika lah, lahul-mulku walahul-hamd, wa huwa 'ala kulli shay'in qadir",
+      "translation": "There is no deity except Allah alone, with no partner. To Him belongs the dominion and to Him belongs all praise, and He has power over everything",
+      "repetitions": 10,
+      "reference": "Bukhari 3293",
+      "order": 5
+    },
+    {
+      "id": "evening-006",
+      "arabic": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ",
+      "transliteration": "Subhanallahi wa bihamdihi 'adada khalqihi, wa rida nafsihi, wa zinata 'arshihi, wa midada kalimatihi",
+      "translation": "Glory be to Allah and praise Him, by the number of His creation, by His pleasure, by the weight of His Throne, and by the ink of His words",
+      "repetitions": 3,
+      "reference": "Muslim 2726",
+      "order": 6
+    },
+    {
+      "id": "evening-007",
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلًا مُتَقَبَّلًا",
+      "transliteration": "Allahumma inni as'aluka 'ilman nafi'a, wa rizqan tayyiba, wa 'amalan mutaqabbala",
+      "translation": "O Allah, I ask You for beneficial knowledge, goodly provision, and accepted deeds",
+      "repetitions": 1,
+      "reference": "Ibn Majah 925",
+      "order": 7
+    },
+    {
+      "id": "evening-008",
+      "arabic": "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ",
+      "transliteration": "Astaghfirullah wa atubu ilayh",
+      "translation": "I seek forgiveness from Allah and repent to Him",
+      "repetitions": 100,
+      "reference": "Bukhari 6307",
+      "order": 8
+    },
+    {
+      "id": "evening-009",
+      "arabic": "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+      "transliteration": "A'udhu bikalimatillahit-tammati min sharri ma khalaq",
+      "translation": "I seek refuge in the perfect words of Allah from the evil of what He has created",
+      "repetitions": 3,
+      "reference": "Muslim 2708",
+      "order": 9
+    },
+    {
+      "id": "evening-010",
+      "arabic": "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+      "transliteration": "Bismillahil-ladhi la yadurru ma'asmihi shay'un fil-ardi wa la fis-sama', wa huwas-sami'ul-'alim",
+      "translation": "In the name of Allah, with whose name nothing on earth or in heaven can cause harm, and He is the All-Hearing, the All-Knowing",
+      "repetitions": 3,
+      "reference": "Abu Dawud 5088",
+      "order": 10
+    },
+    {
+      "id": "evening-011",
+      "arabic": "رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ نَبِيًّا",
+      "transliteration": "Raditu billahi rabba, wa bil-islami dina, wa bi-muhammadin sallallahu 'alayhi wa sallam nabiyya",
+      "translation": "I am pleased with Allah as my Lord, with Islam as my religion, and with Muhammad (peace be upon him) as my Prophet",
+      "repetitions": 3,
+      "reference": "Abu Dawud 5072",
+      "order": 11
+    },
+    {
+      "id": "evening-012",
+      "arabic": "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِي كُلَّهُ، وَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ",
+      "transliteration": "Ya Hayyu ya Qayyum, birahmatika astaghith, aslih li sha'ni kullahu, wa la takilni ila nafsi tarfata 'ayn",
+      "translation": "O Ever-Living, O Sustainer, by Your mercy I seek help. Set right all my affairs and do not leave me to myself even for the blink of an eye",
+      "repetitions": 1,
+      "reference": "An-Nasa'i in Al-Kubra 10407",
+      "order": 12
+    },
+    {
+      "id": "evening-013",
+      "arabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَأَعُوذُ بِكَ مِنَ الْعَجْزِ وَالْكَسَلِ، وَأَعُوذُ بِكَ مِنَ الْجُبْنِ وَالْبُخْلِ، وَأَعُوذُ بِكَ مِنْ غَلَبَةِ الدَّيْنِ وَقَهْرِ الرِّجَالِ",
+      "transliteration": "Allahumma inni a'udhu bika minal-hammi wal-hazan, wa a'udhu bika minal-'ajzi wal-kasal, wa a'udhu bika minal-jubni wal-bukhl, wa a'udhu bika min ghalabatid-dayni wa qahrir-rijal",
+      "translation": "O Allah, I seek refuge in You from worry and grief, from incapacity and laziness, from cowardice and miserliness, and from being overcome by debt and being overpowered by men",
+      "repetitions": 1,
+      "reference": "Bukhari 2893",
+      "order": 13
+    },
+    {
+      "id": "evening-014",
+      "arabic": "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لَا إِلَهَ إِلَّا أَنْتَ",
+      "transliteration": "Allahumma 'afini fi badani, allahumma 'afini fi sam'i, allahumma 'afini fi basari, la ilaha illa ant",
+      "translation": "O Allah, grant me health in my body. O Allah, grant me health in my hearing. O Allah, grant me health in my sight. There is no deity except You",
+      "repetitions": 3,
+      "reference": "Abu Dawud 5090",
+      "order": 14
+    },
+    {
+      "id": "evening-015",
+      "arabic": "حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ، عَلَيْهِ تَوَكَّلْتُ، وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
+      "transliteration": "Hasbiyallahu la ilaha illa huwa, 'alayhi tawakkaltu, wa huwa rabbul-'arshil-'azim",
+      "translation": "Allah is sufficient for me. There is no deity except Him. Upon Him I have relied, and He is the Lord of the Great Throne",
+      "repetitions": 7,
+      "reference": "Abu Dawud 5081",
+      "order": 15
+    }
+  ]
+}

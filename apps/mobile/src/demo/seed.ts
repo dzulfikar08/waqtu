@@ -96,6 +96,35 @@ const TODAY: Record<string, number> = {
 /** Pages read per Ramadhan day, from day 1. */
 const KHATAM_PAGES = [22, 18, 20, 21];
 
+/** Muhasabah days back from today with [taqwa, gratitude, energy, willingness]; today also has notes. */
+const MUHASABAH: readonly { back: number; ratings: readonly [number, number, number, number] }[] = [
+  { back: 0, ratings: [8, 9, 6, 9] },
+  { back: 1, ratings: [7, 8, 6, 8] },
+  { back: 2, ratings: [7, 9, 5, 8] },
+  { back: 4, ratings: [6, 7, 5, 7] },
+  { back: 5, ratings: [7, 8, 7, 8] },
+  { back: 7, ratings: [6, 7, 6, 7] },
+  { back: 9, ratings: [5, 7, 4, 6] },
+  { back: 11, ratings: [6, 6, 5, 7] },
+  { back: 14, ratings: [5, 6, 6, 6] },
+  { back: 17, ratings: [6, 7, 5, 6] },
+  { back: 21, ratings: [5, 6, 4, 6] },
+  { back: 25, ratings: [4, 6, 5, 5] },
+];
+
+const MUHASABAH_TODAY: Record<Locale, { feelings: string; newAction: string; tomorrow: string }> = {
+  id: {
+    feelings: "Tenang setelah tarawih. Sempat kesal saat macet sore tadi, lalu istighfar.",
+    newAction: "Mengirim takjil ke tetangga dan membaca Al-Ma'tsurat petang.",
+    tomorrow: "Tilawah satu juz dan sahur tepat waktu.",
+  },
+  en: {
+    feelings: "Calm after tarawih. Got irritated in traffic this afternoon, then made istighfar.",
+    newAction: "Sent iftar food to the neighbours and read the evening Al-Ma'thurat.",
+    tomorrow: "Recite one juz and wake for suhoor on time.",
+  },
+};
+
 /**
  * Replaces everything on the device with deterministic demo data: Jakarta prayer times, a week of mutabaah ticks, Ramadhan day 5
  * with fasting/tarawih/tadarus checks and a khatam plan. Nothing is read from or sent to the network. `withLocation: false`
@@ -121,6 +150,19 @@ export async function seedDemo(
   const settings: Record<string, string> = {
     ...(withLocation ? place : {}),
     [PRAYER_KEYS.method]: "kemenag",
+    // Ibadah tools: a tasbih part-way through, two favourite duas, the evening Al-Ma'tsurat begun.
+    "ibadah.tasbih": JSON.stringify({
+      preset: "afterPrayer",
+      count: 47,
+      customTarget: 0,
+      vibrate: true,
+      linkedItem: null,
+    }),
+    "ibadah.duaFavourites": JSON.stringify(["dua-before-eating", "dua-sayyidul-istighfar"]),
+    "ibadah.progress.matsurat-sughro-petang": JSON.stringify({
+      day: today,
+      counts: { "0": 1, "1": 1, "2": 1, "3": 1, "4": 1, "5": 2 },
+    }),
   };
   await db.withExclusiveTransactionAsync(async (tx) => {
     for (const table of [
@@ -130,6 +172,7 @@ export async function seedDemo(
       "ramadhan_khatam",
       "ramadhan_khatam_log",
       "ramadhan_qadha",
+      "muhasabah",
     ]) {
       await tx.runAsync(`DELETE FROM ${table}`);
     }
@@ -176,6 +219,20 @@ export async function seedDemo(
     await tx.runAsync(
       "INSERT INTO ramadhan_qadha (kind, count, date) VALUES ('made_up', 1, '2027-01-28')",
     );
+    for (const { back, ratings } of MUHASABAH) {
+      const notes = back === 0 ? MUHASABAH_TODAY[locale] : null;
+      await tx.runAsync(
+        `INSERT INTO muhasabah (date, feelings, new_action, taqwa, gratitude, energy, willingness, continue_tomorrow, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        addDays(today, -back),
+        notes?.feelings ?? null,
+        notes?.newAction ?? null,
+        ...ratings,
+        notes?.tomorrow ?? null,
+        DEMO_NOW_MS,
+        DEMO_NOW_MS,
+      );
+    }
     for (const [key, value] of Object.entries(settings)) {
       await tx.runAsync(
         "INSERT INTO settings (key, value, updated_at, dirty) VALUES (?, ?, ?, 0)",

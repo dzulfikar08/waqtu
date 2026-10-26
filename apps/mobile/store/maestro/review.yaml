@@ -1,5 +1,6 @@
-# Design review shots, not store screenshots: Today without a location, the rest of the Today checklist, Circles and the
-# lower half of Settings, so a visual change can be checked on every tab in light and dark. Same demo build and data as screens.yaml.
+# Design review shots, not store screenshots: Today without a location, the rest of the Today checklist, Circles, the
+# lower half of Settings and the Ibadah tab with its tools, so a visual change can be checked on every tab in light and
+# dark. Same demo build and data as screens.yaml.
 #
 #   maestro test --test-output-dir <dir> -e APP_ID=dat.waqtu.app -e LOCALE=en store/maestro/review.yaml
 appId: ${APP_ID}
@@ -81,3 +82,92 @@ appId: ${APP_ID}
 - scroll
 - waitForAnimationToEnd
 - takeScreenshot: ${LOCALE}-24-settings-more
+
+# Ibadah: the hub and each tool (demo: 17:00 in Jakarta, so the evening adhkar are suggested).
+- openLink: waqtu://demo?lang=${LOCALE}&to=ibadah
+- extendedWaitUntil:
+    visible: ".*(Worship tools|Alat ibadah|Open in.*).*"
+    timeout: 30000
+- tapOn:
+    text: Open
+    optional: true
+- extendedWaitUntil:
+    visible: ".*(Worship tools|Alat ibadah).*"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ${LOCALE}-25-ibadah
+- scroll
+- waitForAnimationToEnd
+- takeScreenshot: ${LOCALE}-26-ibadah-tools
+
+- openLink: waqtu://demo?lang=${LOCALE}&to=matsurat
+- extendedWaitUntil:
+    visible: ".*(texts done|bacaan selesai|Open in.*).*"
+    timeout: 30000
+- tapOn:
+    text: Open
+    optional: true
+- extendedWaitUntil:
+    visible: ".*(texts done|bacaan selesai).*"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ${LOCALE}-27-matsurat
+- scroll
+- waitForAnimationToEnd
+- takeScreenshot: ${LOCALE}-28-matsurat-more
+
+- openLink: waqtu://demo?lang=${LOCALE}&to=qibla
+- extendedWaitUntil:
+    visible: ".*(Qibla direction|Arah kiblat|Open in.*).*"
+    timeout: 30000
+- tapOn:
+    text: Open
+    optional: true
+- extendedWaitUntil:
+    visible: ".*(Qibla direction|Arah kiblat).*"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ${LOCALE}-29-qibla
+
+- openLink: waqtu://demo?lang=${LOCALE}&to=tasbih
+- extendedWaitUntil:
+    visible: ".*(Vibrate on every tap|Getar setiap ketukan|Open in.*).*"
+    timeout: 30000
+- tapOn:
+    text: Open
+    optional: true
+- extendedWaitUntil:
+    visible: ".*(Vibrate on every tap|Getar setiap ketukan).*"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ${LOCALE}-30-tasbih
+
+- openLink: waqtu://demo?lang=${LOCALE}&to=doa
+- extendedWaitUntil:
+    visible: ".*(Before Eating|Sebelum makan|Open in.*).*"
+    timeout: 30000
+- tapOn:
+    text: Open
+    optional: true
+- extendedWaitUntil:
+    visible: ".*(Before Eating|Sebelum makan).*"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ${LOCALE}-31-doa
+
+- openLink: waqtu://demo?lang=${LOCALE}&to=muhasabah
+- extendedWaitUntil:
+    visible: ".*(Private: your muhasabah|Pribadi: catatan|Open in.*).*"
+    timeout: 30000
+- tapOn:
+    text: Open
+    optional: true
+- extendedWaitUntil:
+    visible: ".*(Private: your muhasabah|Pribadi: catatan).*"
+    timeout: 30000
+- waitForAnimationToEnd
+- takeScreenshot: ${LOCALE}-32-muhasabah
+- scroll
+- scroll
+- waitForAnimationToEnd
+- takeScreenshot: ${LOCALE}-33-muhasabah-trends

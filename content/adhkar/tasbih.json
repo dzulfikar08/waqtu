@@ -1,0 +1,54 @@
+{
+  "title": "Tasbih presets",
+  "source": "Mutabaah app (dzulfikar08/Mutabaah), Mutabaah/Core/Models/TasbihCounter.swift, TasbihPreset.presets; strings copied unmodified, ids added.",
+  "phrases": [
+    {
+      "id": "subhanallah",
+      "name": "Subhanallah",
+      "arabic": "سُبْحَانَ اللَّهِ",
+      "transliteration": "Subhanallah",
+      "translation": "Glory be to Allah",
+      "recommendedCount": 33
+    },
+    {
+      "id": "alhamdulillah",
+      "name": "Alhamdulillah",
+      "arabic": "الْحَمْدُ لِلَّهِ",
+      "transliteration": "Alhamdulillah",
+      "translation": "All praise is due to Allah",
+      "recommendedCount": 33
+    },
+    {
+      "id": "allahu-akbar",
+      "name": "Allahu Akbar",
+      "arabic": "اللَّهُ أَكْبَرُ",
+      "transliteration": "Allahu Akbar",
+      "translation": "Allah is the Greatest",
+      "recommendedCount": 34
+    },
+    {
+      "id": "tahlil",
+      "name": "La ilaha illallah",
+      "arabic": "لَا إِلَٰهَ إِلَّا اللَّهُ",
+      "transliteration": "La ilaha illallah",
+      "translation": "There is no god but Allah",
+      "recommendedCount": 100
+    },
+    {
+      "id": "istighfar",
+      "name": "Astaghfirullah",
+      "arabic": "أَسْتَغْفِرُ اللَّهَ",
+      "transliteration": "Astaghfirullah",
+      "translation": "I seek forgiveness from Allah",
+      "recommendedCount": 100
+    },
+    {
+      "id": "salawat",
+      "name": "Salawat",
+      "arabic": "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ",
+      "transliteration": "Allahumma salli 'ala Muhammad",
+      "translation": "O Allah, send blessings upon Muhammad",
+      "recommendedCount": 100
+    }
+  ]
+}

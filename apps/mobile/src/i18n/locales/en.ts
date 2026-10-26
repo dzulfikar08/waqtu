@@ -3,6 +3,7 @@ import { circlesEn } from "@/circles/strings";
 import { errorsEn } from "@/errors/strings";
 import { premiumEn } from "@/premium/strings";
 import { hafalanEn } from "@/hafalan/strings";
+import { ibadahEn } from "@/ibadah/strings";
 import { halaqahEn } from "@/halaqah/strings";
 import { ramadhanEn } from "@/ramadhan/strings";
 import { aboutEn, recitationEn } from "@/recitation/strings";
@@ -181,6 +182,7 @@ export const en: Widen<typeof id> = {
   premium: premiumEn,
   halaqah: halaqahEn,
   hafalan: hafalanEn,
+  ibadah: ibadahEn,
   recitation: recitationEn,
   about: aboutEn,
   errors: errorsEn,

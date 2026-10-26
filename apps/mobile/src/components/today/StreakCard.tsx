@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useTranslation } from "@/i18n";
@@ -7,7 +8,7 @@ import type { StreakResult } from "@/mutabaah/streak";
 import type { DaySummary } from "@/mutabaah/week";
 import { hueColors, spacing, tabular, typography, useTheme } from "@/theme";
 
-import { Card } from "../ui";
+import { Card, PressableScale } from "../ui";
 
 function weekday(day: DayKey, locale: string): string {
   const { year, month, day: d } = civilOf(day);
@@ -18,7 +19,8 @@ function weekday(day: DayKey, locale: string): string {
 
 /**
  * Streak with forgiving copy: never a loss message, a missed day is simply not mentioned. Amber, with the last seven
- * days as flames: lit where the day counted, today ringed.
+ * days as flames: lit where the day counted, today ringed. Links to the Week tab, which the Ramadhan tab replaces in the
+ * bar during the season.
  */
 export function StreakCard({
   streak,
@@ -31,6 +33,7 @@ export function StreakCard({
   today: DayKey;
 }) {
   const { t, i18n } = useTranslation();
+  const router = useRouter();
   const theme = useTheme();
   const amber = hueColors(theme, "streak");
   const lines: string[] = [];
@@ -125,6 +128,18 @@ export function StreakCard({
           </Text>
         ))}
       </View>
+      <PressableScale
+        accessibilityRole="link"
+        onPress={() => router.push("/week")}
+        scaleTo={0.98}
+        hitSlop={6}
+        style={[styles.more, { borderColor: theme.separator }]}
+      >
+        <Text style={[typography.subhead, styles.grow, { color: amber.base, fontWeight: "600" }]}>
+          {t("week.title")}
+        </Text>
+        <Ionicons name="chevron-forward" size={16} color={amber.base} />
+      </PressableScale>
     </Card>
   );
 }
@@ -160,4 +175,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   lines: { gap: 2, marginTop: spacing.xs },
+  more: {
+    flexDirection: "row",
+    alignItems: "center",
+    minHeight: 40,
+    marginTop: spacing.xs,
+    paddingTop: spacing.sm,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
 });

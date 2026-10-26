@@ -9,6 +9,7 @@
     ".astro/**",
     "**/*.generated.ts",
     "apps/mobile/test/fixtures/**",
-    "content/quran/surah/**"
+    "content/quran/surah/**",
+    "content/adhkar/*.json"
   ]
 }

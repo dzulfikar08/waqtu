@@ -1,3 +1,5 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useCallback } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -28,6 +30,7 @@ const TEXT_INSET = spacing.md + BOX + GAP;
 
 export function Checklist({ items, day, entries, prayerTimes }: Props) {
   const db = useSQLiteContext();
+  const router = useRouter();
   const { t } = useTranslation();
   const theme = useTheme();
 
@@ -75,6 +78,15 @@ export function Checklist({ items, day, entries, prayerTimes }: Props) {
               name={name}
               done={value > 0}
               onToggle={() => write(item.id, value > 0 ? 0 : 1)}
+              onOpen={
+                item.id === "dzikir_pagi" || item.id === "dzikir_petang"
+                  ? () =>
+                      router.push({
+                        pathname: "/dzikir",
+                        params: { time: item.id === "dzikir_pagi" ? "pagi" : "petang" },
+                      })
+                  : undefined
+              }
             />
           );
         return (
@@ -117,23 +129,57 @@ function Progress({ done, total }: { done: number; total: number }) {
   );
 }
 
-function CheckRow({ name, done, onToggle }: { name: string; done: boolean; onToggle: () => void }) {
+/**
+ * A checkbox row. With `onOpen` (the morning and evening dhikr) a long press, or the book chip at the end, opens the
+ * reader; a tap still ticks the box.
+ */
+function CheckRow({
+  name,
+  done,
+  onToggle,
+  onOpen,
+}: {
+  name: string;
+  done: boolean;
+  onToggle: () => void;
+  onOpen?: () => void;
+}) {
   const { t } = useTranslation();
   const theme = useTheme();
-  return (
+  const toggle = (
     <PressableScale
       accessibilityRole="checkbox"
       accessibilityState={{ checked: done }}
       accessibilityLabel={done ? t("mutabaah.unmark", { name }) : t("mutabaah.markDone", { name })}
       onPress={onToggle}
+      onLongPress={onOpen}
       scaleTo={0.985}
-      style={styles.row}
+      style={[styles.row, onOpen ? styles.grow : null]}
     >
       <CheckCircle checked={done} size={BOX} />
       <Text style={[typography.body, styles.grow, { color: done ? theme.muted : theme.text }]}>
         {name}
       </Text>
     </PressableScale>
+  );
+  if (!onOpen) return toggle;
+  const dzikir = hueColors(theme, "dzikir");
+  return (
+    <View style={styles.split}>
+      {toggle}
+      <PressableScale
+        accessibilityRole="button"
+        accessibilityLabel={t("ibadah.checklistOpen", { name })}
+        onPress={onOpen}
+        scaleTo={0.92}
+        style={styles.open}
+      >
+        <View style={[styles.openChip, { backgroundColor: dzikir.soft }]}>
+          <Ionicons name="book-outline" size={15} color={dzikir.base} />
+          <Ionicons name="chevron-forward" size={14} color={dzikir.base} />
+        </View>
+      </PressableScale>
+    </View>
   );
 }
 
@@ -244,6 +290,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: GAP,
+  },
+  split: { flexDirection: "row", alignItems: "center" },
+  open: { minWidth: 56, minHeight: 56, alignItems: "center", justifyContent: "center" },
+  openChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 1,
+    height: 30,
+    paddingHorizontal: 9,
+    borderRadius: 15,
+    marginRight: spacing.sm,
   },
   fardh: { paddingTop: spacing.xs, paddingBottom: spacing.md - 2 },
   fardhTop: {
