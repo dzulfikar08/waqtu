@@ -16,6 +16,8 @@ import {
   parseDuas,
   parseMatsurat,
   type ReaderSession,
+  type SessionId,
+  type TextLang,
 } from "../src/ibadah/content";
 import {
   categoryName,
@@ -94,7 +96,7 @@ describe("bundled adhkar content", () => {
   });
 
   test("every session loads, with the expected size and translation language", () => {
-    const expected: Record<string, { items: number; reps: number; lang: string }> = {
+    const expected: Record<SessionId, { items: number; reps: number; lang: TextLang }> = {
       "matsurat-kubro-pagi": { items: 40, reps: 199, lang: "id" },
       "matsurat-kubro-petang": { items: 40, reps: 199, lang: "id" },
       "matsurat-sughro-pagi": { items: 32, reps: 191, lang: "id" },
@@ -102,7 +104,7 @@ describe("bundled adhkar content", () => {
       "dzikir-pagi": { items: 15, reps: 238, lang: "en" },
       "dzikir-petang": { items: 15, reps: 238, lang: "en" },
     };
-    expect([...SESSION_IDS].sort()).toEqual(Object.keys(expected).sort());
+    expect(SESSION_IDS).toHaveLength(Object.keys(expected).length);
     for (const id of SESSION_IDS) {
       const session = loadSession(id);
       expect(session.id).toBe(id);

@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
   tip: { paddingHorizontal: spacing.xs, textAlign: "center" },
   compass: { gap: spacing.md, alignItems: "stretch" },
   dialWrap: { alignItems: "center", gap: 2 },
-  rose: { ...StyleSheet.absoluteFillObject, borderWidth: 2 },
+  rose: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, borderWidth: 2 },
   tick: { alignSelf: "center", marginTop: 6, borderRadius: 1 },
   cardinal: {
     alignSelf: "center",
