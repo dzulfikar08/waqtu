@@ -106,6 +106,7 @@ jobs:
             -----END PUBLIC KEY-----
         run: |
           umask 077
+          RECIPIENT="${RECIPIENT:-$RECIPIENT_TEMP}"
           test -n "$RECIPIENT"
           printf '%s\n' "$RECIPIENT" > "$RUNNER_TEMP/recipient.pem"
           openssl pkey -pubin -in "$RUNNER_TEMP/recipient.pem" -noout
