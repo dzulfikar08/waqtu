@@ -460,18 +460,37 @@ def upload_asset(asc: Asc, kind: str, relationship: str, parent_kind: str, paren
             }
         },
     )
-    for _ in range(60):
-        state = asc.get(f"/v1/{kind}/{created['id']}")["data"]["attributes"].get("assetDeliveryState") or {}
-        if state.get("state") == "COMPLETE":
-            return created["id"]
-        if state.get("state") == "FAILED":
-            raise SystemExit(f"{kind} {path.name} failed: {state.get('errors')}")
-        time.sleep(5)
-    raise SystemExit(f"{kind} {path.name} did not finish processing")
+    return created["id"]
+
+
+def wait_for_assets(asc: Asc, kind: str, assets: dict) -> None:
+    """Polls uploaded assets (id -> file name) until App Store Connect has processed all of them."""
+    pending = dict(assets)
+    deadline = time.time() + 30 * 60
+    last = None
+    while pending:
+        states = {}
+        for id_, name in list(pending.items()):
+            state = asc.get(f"/v1/{kind}/{id_}")["data"]["attributes"].get("assetDeliveryState") or {}
+            if state.get("state") == "COMPLETE":
+                del pending[id_]
+            elif state.get("state") == "FAILED":
+                raise SystemExit(f"{kind} {name} failed: {state.get('errors')}")
+            else:
+                states[name] = state.get("state")
+        if not pending:
+            return
+        if states != last:
+            log(f"{kind}: processing {states}")
+            last = states
+        if time.time() > deadline:
+            raise SystemExit(f"{kind} not processed within 30 minutes: {sorted(pending.values())}")
+        time.sleep(30)
 
 
 def update_screenshots(asc: Asc, localization_ids: dict) -> None:
     source = screenshot_dir()
+    uploaded = {}
     with tempfile.TemporaryDirectory() as tmp:
         tmp_dir = Path(tmp)
         for folder, locale in LOCALES.items():
@@ -495,14 +514,17 @@ def update_screenshots(asc: Asc, localization_ids: dict) -> None:
             current = asc.all(f"/v1/appScreenshotSets/{shot_set['id']}/appScreenshots")
             current_sums = [s["attributes"].get("sourceFileChecksum") for s in current]
             states = {(s["attributes"].get("assetDeliveryState") or {}).get("state") for s in current}
-            if current_sums == [md5(f) for f in files] and states <= {"COMPLETE"}:
+            if current_sums == [md5(f) for f in files] and states <= {"COMPLETE", "UPLOAD_COMPLETE"}:
+                uploaded.update({s["id"]: s["attributes"].get("fileName") for s in current})
                 note(f"Screenshots {locale}: {len(files)} already in place")
                 continue
             for shot in current:
                 asc.delete(f"/v1/appScreenshots/{shot['id']}")
             for f in files:
-                upload_asset(asc, "appScreenshots", "appScreenshotSet", "appScreenshotSets", shot_set["id"], f)
+                id_ = upload_asset(asc, "appScreenshots", "appScreenshotSet", "appScreenshotSets", shot_set["id"], f)
+                uploaded[id_] = f"{locale}/{f.name}"
             note(f"Screenshots {locale}: uploaded {len(files)} ({', '.join(f.name for f in files)})")
+    wait_for_assets(asc, "appScreenshots", uploaded)
 
 
 def update_review_detail(asc: Asc, vid: str) -> None:
@@ -666,9 +688,10 @@ def prepare_subscriptions(asc: Asc) -> list[dict]:
                     log(f"{product}: localization {locale} created")
                 screenshot = asc.get_or_none(f"/v1/subscriptions/{sid}/appStoreReviewScreenshot")
                 if not screenshot:
-                    upload_asset(
+                    id_ = upload_asset(
                         asc, "subscriptionAppStoreReviewScreenshots", "subscription", "subscriptions", sid, shot
                     )
+                    wait_for_assets(asc, "subscriptionAppStoreReviewScreenshots", {id_: shot.name})
                     log(f"{product}: review screenshot uploaded ({shot.name})")
                 if not asc.get_or_none(f"/v1/subscriptions/{sid}/subscriptionAvailability"):
                     territories = asc.all("/v1/territories")
