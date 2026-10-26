@@ -50,9 +50,9 @@ describe("POST /v1/errors", () => {
     expect(res.status).toBe(202);
     expect(await res.json()).toEqual({ accepted: 2 });
 
-    const { results } = await env.APP_DB.prepare(
-      "SELECT * FROM client_error ORDER BY fatal",
-    ).all<Record<string, unknown>>();
+    const { results } = await env.APP_DB.prepare("SELECT * FROM client_error ORDER BY fatal").all<
+      Record<string, unknown>
+    >();
     expect(results).toHaveLength(2);
     expect(results[0]).toMatchObject({
       platform: "android",
@@ -70,7 +70,9 @@ describe("POST /v1/errors", () => {
     });
     expect(results[1]).toMatchObject({ fatal: 1, count: 3 });
     const columns = Object.keys(results[0] as object);
-    expect(columns.filter((c) => /user|^ip|latitude|longitude|location|email/i.test(c))).toEqual([]);
+    expect(columns.filter((c) => /user|^ip|latitude|longitude|location|email/i.test(c))).toEqual(
+      [],
+    );
     const stored = JSON.stringify(results);
     expect(stored).not.toContain(user.id);
     expect(stored).not.toContain("198.51.100.7");
@@ -90,7 +92,9 @@ describe("POST /v1/errors", () => {
       ],
     });
     expect(res.status).toBe(202);
-    const row = await env.APP_DB.prepare("SELECT * FROM client_error").first<Record<string, unknown>>();
+    const row = await env.APP_DB.prepare("SELECT * FROM client_error").first<
+      Record<string, unknown>
+    >();
     expect(row).toMatchObject({ build_number: null, stack: null, top_frame: "", count: 1 });
   });
 
