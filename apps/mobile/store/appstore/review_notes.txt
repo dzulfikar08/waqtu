@@ -1,4 +1,10 @@
-Waqtu works fully without an account, so there are no demo credentials to give. Open the app and everything in the tabs Today, Week, Ramadan and Settings is available right away.
+Waqtu works fully without an account. Open the app and everything in the tabs Today, Week, Ramadan and Settings is available right away.
+
+Demo account (already has Waqtu Premium, for Circles and Sync): the email and password are in the Sign-In Information. Sign in with them like this:
+1. Open Settings > Account.
+2. Tap the small link "App reviewer? Sign in with email" (Indonesian: "Peninjau aplikasi? Masuk dengan email") below the Sign in with Apple and Google buttons.
+3. Enter the demo email and password and tap Sign in. Settings > Account then shows the account with Premium active, and the Circles tab opens.
+This email sign-in only accepts the review account; regular users sign in with Apple or Google.
 
 How to review:
 1. First launch: tap "Pick a city" on the Today tab (or allow location). Prayer times are calculated on the device with no network request.

@@ -46,7 +46,10 @@ describe("store metadata", () => {
     });
   }
 
-  test("review notes promise no demo credentials", () => {
-    expect(read("appstore/review_notes.txt")).toContain("no demo credentials");
+  test("review notes explain the reviewer sign-in and fit App Review's 4000 characters", () => {
+    const notes = read("appstore/review_notes.txt");
+    expect(notes).toContain("App reviewer? Sign in with email");
+    expect(notes).toContain("Sign-In Information");
+    expect(length(notes)).toBeLessThanOrEqual(4000);
   });
 });
