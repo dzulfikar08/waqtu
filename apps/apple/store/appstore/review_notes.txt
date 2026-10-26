@@ -1,0 +1,17 @@
+Waqtu for Mac is a menu bar app (LSUIElement, no Dock icon). After launch, click the Waqtu icon in the menu bar at the top right of the screen to open it; the Settings button is at the bottom of that menu.
+
+No demo account is needed. Every new install gets a 7-day free trial of the whole app without signing in, so everything can be reviewed right away. The Mac app has no email sign-in: a Waqtu account is created only with Sign in with Apple or Sign in with Google, and signing in is optional (you can use your own Apple ID with Sign in with Apple).
+
+How to review:
+1. Menu bar: next prayer with a countdown, today's prayer times, the Hijri date, the mutabaah (daily practice) checklist, and buttons for Imsakiyah (Ramadan timetable), Halaqah, Hafalan and Circles.
+2. Settings > Prayer Times: calculation method, Asr, high-latitude rule, minute adjustments. Settings > Location: allow location or set it by hand (prayer times are calculated on the Mac; the location is never uploaded).
+3. Settings > General: the full-screen prayer reminder ("Test Overlay" in the menu shows it), notifications before prayers, and Calendar protection, which adds "busy" prayer blocks to a calendar the user picks (EventKit, only after the user turns it on and grants access).
+4. Optional, off by default: Settings > Slack sets the user's Slack status during prayers after the user connects Slack.
+
+In-app purchase: Waqtu Premium auto-renewing subscriptions in the group "Waqtu Premium": dat.waqtu.mac.premium.monthly (Rp 29.000/month) and dat.waqtu.mac.premium.yearly (Rp 249.000/year). After the 7-day trial the app asks for Waqtu Premium. The paywall is Settings > Upgrade: subscribe with a sandbox Apple ID; Restore Purchases is on the same screen, together with the auto-renewal terms and links to the Terms of Use and Privacy Policy. Buying does not require a Waqtu account. If the user is signed in, the purchase is also linked to the Waqtu account so it unlocks Waqtu on iPhone (the "Waqtu" app, 6826628861) and Android.
+
+Account: Settings > Account. Sync across devices and Circles (small anonymous halaqah groups with posts and voice notes, with report and block) need a signed-in account with Premium. Account deletion: Settings > Account > Delete account (signed-in users), with a confirmation dialog; it deletes the account and its server data.
+
+Permissions: Location (prayer times only, stays on the Mac), Calendar (only for Calendar protection), Notifications (prayer reminders). Launch at Login is off by default and only turned on by the user in Settings.
+
+Contact: dzulfikar.at@gmail.com

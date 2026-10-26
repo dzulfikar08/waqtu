@@ -1,0 +1,163 @@
+# Mac App Store build of Waqtu (scheme waqtu-mas, bundle dat.waqtu, app "Waqtu for Mac" 6827054953):
+# archive (unsigned) → sign the app and its widget with the Apple Distribution certificate, the Mac App Store profiles
+# and waqtu-mas.entitlements (scripts/sign-app.sh) → productbuild a .pkg signed with the Mac Installer Distribution
+# certificate → validate and upload it to App Store Connect with altool. The build has no Sparkle (waqtu-mas does not
+# link it); it is sandboxed. CFBundleVersion is run_number * 100 + run_attempt, so every run uploads a new, increasing
+# build number. Submitting the uploaded build for review is store-submit.yml (platform mac).
+#
+# Manual only. Secrets of the `release` environment:
+#   IOS_DIST_CERT_P12_BASE64, IOS_DIST_CERT_PASSWORD     Apple Distribution certificate (.p12); signs Mac App Store apps too
+#   MAS_INSTALLER_P12_BASE64, MAS_INSTALLER_P12_PASSWORD Mac Installer Distribution certificate (.p12), signs the .pkg
+#                                                        (the "3rd Party Mac Developer Installer" identity)
+#   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_BASE64            App Store Connect API key (.p8): Mac App Store profiles for
+#                                                        dat.waqtu and dat.waqtu.mac-widget (apps/apple/scripts/mas_signing.py
+#                                                        reuses or creates them), validation and upload
+name: Release Mac App Store
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Marketing version (CFBundleShortVersionString); must match the App Store version being prepared"
+        type: string
+        default: "1.0"
+      upload:
+        description: "Upload the package to App Store Connect (off = export the signed .pkg only)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-mas
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: macos-latest
+    timeout-minutes: 90
+    environment: release
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      VERSION: ${{ inputs.version || '1.0' }}
+      UPLOAD: ${{ inputs.upload && '1' || '0' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+
+      - name: Build number
+        run: |
+          echo "BUILD=$(( ${{ github.run_number }} * 100 + ${{ github.run_attempt }} ))" >> "$GITHUB_ENV"
+
+      - name: Python dependencies
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet --only-binary :all: -r apps/mobile/store/submit/requirements.txt
+
+      - name: Import signing certificates
+        env:
+          P12_BASE64: ${{ secrets.IOS_DIST_CERT_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          INSTALLER_P12_BASE64: ${{ secrets.MAS_INSTALLER_P12_BASE64 }}
+          INSTALLER_P12_PASSWORD: ${{ secrets.MAS_INSTALLER_P12_PASSWORD }}
+        run: |
+          kc="$RUNNER_TEMP/release.keychain-db"
+          kcpass="$(uuidgen)"
+          printf '%s' "$P12_BASE64" | base64 --decode > "$RUNNER_TEMP/dist.p12"
+          curl -fsSL -o "$RUNNER_TEMP/wwdr.cer" https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer
+          security create-keychain -p "$kcpass" "$kc"
+          security set-keychain-settings -lut 21600 "$kc"
+          security unlock-keychain -p "$kcpass" "$kc"
+          security import "$RUNNER_TEMP/wwdr.cer" -k "$kc" -T /usr/bin/codesign || true
+          security import "$RUNNER_TEMP/dist.p12" -k "$kc" -P "$P12_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
+          printf '%s' "$INSTALLER_P12_BASE64" | base64 --decode > "$RUNNER_TEMP/installer.p12"
+          security import "$RUNNER_TEMP/installer.p12" -k "$kc" -P "$INSTALLER_P12_PASSWORD" -T /usr/bin/productbuild -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$kcpass" "$kc" > /dev/null
+          security list-keychains -d user -s "$kc" $(security list-keychains -d user | tr -d '"')
+          rm -f "$RUNNER_TEMP/dist.p12" "$RUNNER_TEMP/installer.p12" "$RUNNER_TEMP/wwdr.cer"
+          identity="$(security find-identity -v -p codesigning "$kc" | grep 'Apple Distribution' | head -1 | awk '{print $2}')"
+          if [ -z "$identity" ]; then echo "::error::No Apple Distribution identity in IOS_DIST_CERT_P12_BASE64"; exit 1; fi
+          serial="$(security find-certificate -c 'Apple Distribution' -p "$kc" | openssl x509 -noout -serial | cut -d= -f2)"
+          echo "CODESIGN_IDENTITY=$identity" >> "$GITHUB_ENV"
+          echo "DIST_CERT_SERIAL=$serial" >> "$GITHUB_ENV"
+          installer="$(security find-identity -v "$kc" | grep -E '3rd Party Mac Developer Installer|Mac Installer Distribution' | head -1 | awk '{print $2}')"
+          if [ -z "$installer" ]; then echo "::error::No Mac Installer Distribution identity in MAS_INSTALLER_P12_BASE64"; exit 1; fi
+          echo "INSTALLER_IDENTITY=$installer" >> "$GITHUB_ENV"
+
+      - name: App Store Connect key
+        env:
+          ASC_KEY_BASE64: ${{ secrets.ASC_KEY_BASE64 }}
+        run: |
+          umask 077
+          mkdir -p "$RUNNER_TEMP/private_keys"
+          printf '%s' "$ASC_KEY_BASE64" | base64 --decode > "$RUNNER_TEMP/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          echo "ASC_KEY_PATH=$RUNNER_TEMP/private_keys/AuthKey_${ASC_KEY_ID}.p8" >> "$GITHUB_ENV"
+
+      - name: Mac App Store provisioning profiles
+        run: |
+          "$RUNNER_TEMP/venv/bin/python" apps/apple/scripts/mas_signing.py "$DIST_CERT_SERIAL" "$RUNNER_TEMP/profiles"
+          echo "PROVISIONING_PROFILE_PATH=$RUNNER_TEMP/profiles/dat.waqtu.provisionprofile" >> "$GITHUB_ENV"
+          echo "WIDGET_PROVISIONING_PROFILE_PATH=$RUNNER_TEMP/profiles/dat.waqtu.mac-widget.provisionprofile" >> "$GITHUB_ENV"
+
+      - name: Archive
+        working-directory: apps/apple
+        run: |
+          xcodebuild archive -quiet \
+            -project waqt.xcodeproj -scheme waqtu-mas -configuration Release \
+            -destination 'generic/platform=macOS' \
+            -archivePath "$RUNNER_TEMP/Waqtu.xcarchive" \
+            MARKETING_VERSION="$VERSION" CURRENT_PROJECT_VERSION="$BUILD" \
+            CODE_SIGNING_ALLOWED=NO
+          app="$RUNNER_TEMP/Waqtu.xcarchive/Products/Applications/Waqtu.app"
+          test -d "$app"
+          iconutil -c iconset -o "$RUNNER_TEMP/AppIcon.iconset" "$app/Contents/Resources/AppIcon.icns"
+          ls "$RUNNER_TEMP/AppIcon.iconset"
+          test -f "$RUNNER_TEMP/AppIcon.iconset/icon_512x512@2x.png"
+          if find "$app" -iname '*sparkle*' | grep -q .; then echo "::error::Sparkle is in the Mac App Store build"; exit 1; fi
+          /usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' -c 'Print CFBundleVersion' -c 'Print ITSAppUsesNonExemptEncryption' \
+            -c 'Print LSApplicationCategoryType' "$app/Contents/Info.plist"
+          echo "APP_PATH=$app" >> "$GITHUB_ENV"
+
+      - name: Sign
+        working-directory: apps/apple
+        env:
+          APP_ENTITLEMENTS: ${{ github.workspace }}/apps/apple/waqtu-mas/waqtu-mas.entitlements
+        run: |
+          ./scripts/sign-app.sh "$APP_PATH" "$CODESIGN_IDENTITY"
+          codesign -d --entitlements :- "$APP_PATH" | grep -q 'com.apple.security.app-sandbox'
+          for appex in "$APP_PATH"/Contents/PlugIns/*.appex; do
+            codesign -d --entitlements :- "$appex" | grep -q 'com.apple.security.app-sandbox'
+          done
+
+      - name: Package
+        run: |
+          pkg="$RUNNER_TEMP/Waqtu-$VERSION-$BUILD.pkg"
+          productbuild --component "$APP_PATH" /Applications --sign "$INSTALLER_IDENTITY" "$pkg"
+          pkgutil --check-signature "$pkg"
+          echo "PKG_PATH=$pkg" >> "$GITHUB_ENV"
+
+      - name: Validate and upload
+        env:
+          API_PRIVATE_KEYS_DIR: ${{ runner.temp }}/private_keys
+        run: |
+          xcrun altool --validate-app -f "$PKG_PATH" -t macos --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+          if [ "$UPLOAD" = "1" ]; then
+            xcrun altool --upload-app -f "$PKG_PATH" -t macos --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+          fi
+          {
+            echo "## Mac App Store"
+            echo "- Version $VERSION ($BUILD)"
+            echo "- Uploaded: $([ "$UPLOAD" = "1" ] && echo yes || echo no, validated only)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Clean up signing material
+        if: always()
+        run: |
+          security delete-keychain "$RUNNER_TEMP/release.keychain-db" || true
+          rm -rf "$RUNNER_TEMP/private_keys" "$RUNNER_TEMP/profiles"

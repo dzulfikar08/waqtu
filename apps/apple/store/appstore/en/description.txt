@@ -1,0 +1,29 @@
+Waqtu lives in your Mac's menu bar and keeps prayer time protected during a busy workday. Prayer times are calculated on your Mac, and your location is never sent to a server.
+
+In the menu bar
+• The next prayer and a live countdown, always one glance away, with today's five prayers and the Hijri date.
+• Use your Mac's location or set it by hand, and keep several locations (office, home, travel).
+• Calculation methods including Kemenag RI, Muslim World League, ISNA, Umm al-Qura and Egyptian, Shafi'i or Hanafi Asr, a high-latitude rule and per-prayer minute adjustments.
+
+Reminders that respect your work
+• A full-screen prayer reminder with a countdown, in a light or dark theme, with an optional adhan.
+• Notifications 5 to 30 minutes before each prayer.
+• Calendar protection: Waqtu adds short "busy" blocks for the prayers to your calendar, so colleagues see you as unavailable in Outlook, Teams and other calendar apps.
+• Optional Slack status while you pray.
+• A focus timer (Pomodoro) aligned with prayer times, with dhikr and Qur'an verse breaks.
+
+Mutabaah yaumiyah
+• A daily checklist of the five prayers, sunnah prayers, Qur'an recitation, dhikr and more, with a consistency streak and a weekly report.
+
+Ramadan
+• An iftar or imsak countdown in the menu bar during Ramadan and a full-month imsakiyah timetable.
+
+Halaqah and hafalan
+• The halaqah program and a memorization (hafalan) companion, and Circles: small anonymous halaqah circles to share reflections and voice notes.
+
+Waqtu Premium
+Every new install includes a 7-day free trial of the whole app. After that, Waqtu for Mac needs Waqtu Premium, an auto-renewing subscription: Rp 29.000 per month or Rp 249.000 per year (prices in your currency are shown before you buy). Signing in with your Waqtu account (Apple or Google) is optional; with it, the same subscription also unlocks Waqtu on iPhone and Android, syncs your mutabaah across devices and opens Circles.
+
+Subscriptions renew automatically unless cancelled at least 24 hours before the end of the period. Payment is charged to your Apple ID and you can manage or cancel the subscription in your App Store account settings.
+Terms of use: https://getwaqtu.com/en/terms
+Privacy policy: https://getwaqtu.com/en/privacy

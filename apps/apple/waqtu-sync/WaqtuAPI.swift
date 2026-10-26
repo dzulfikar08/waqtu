@@ -65,6 +65,8 @@ enum WaqtuAPIError: Error, LocalizedError, Equatable {
     case http(status: Int, message: String?)
     case invalidResponse
     case missingToken
+    /// better-auth refuses to delete an account whose session is not recent (`SESSION_EXPIRED`).
+    case sessionStale
 
     var errorDescription: String? {
         switch self {
@@ -74,6 +76,8 @@ enum WaqtuAPIError: Error, LocalizedError, Equatable {
             return "Unexpected response from the server."
         case .missingToken:
             return "The server did not return a session."
+        case .sessionStale:
+            return "Sign in again before deleting the account."
         }
     }
 
@@ -236,6 +240,23 @@ final class WaqtuAPIClient {
     /// Ends the session on the server; the caller forgets the token either way.
     func signOut(token: String) async {
         _ = try? await perform("/api/auth/sign-out", method: "POST", token: token, body: [:])
+    }
+
+    /// Deletes the account and its server data (`POST /api/auth/delete-user`; the rows cascade).
+    /// A session older than better-auth's fresh window gets `WaqtuAPIError.sessionStale`.
+    func deleteAccount(token: String) async throws {
+        let (data, http) = try await perform(
+            "/api/auth/delete-user",
+            method: "POST",
+            token: token,
+            body: [:],
+            extraHeaders: ["expo-origin": "\(WaqtuAPI.callbackScheme)://"]
+        )
+        guard (200..<300).contains(http.statusCode) else {
+            let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+            if obj?["code"] as? String == "SESSION_EXPIRED" { throw WaqtuAPIError.sessionStale }
+            throw WaqtuAPIError.http(status: http.statusCode, message: Self.errorMessage(data))
+        }
     }
 
     /// Premium status of the signed-in account across every platform (`GET /v1/entitlement`).

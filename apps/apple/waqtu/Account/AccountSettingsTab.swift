@@ -2,7 +2,7 @@
 //  AccountSettingsTab.swift
 //  waqtu
 //
-//  Settings → Account: sign in with Apple or Google, sync status and sign out. The Waqtu account
+//  Settings → Account: sign in with Apple or Google, sync status, sign out and account deletion. The Waqtu account
 //  also carries Waqtu Premium: a subscription bought on any device unlocks this Mac.
 //
 
@@ -15,6 +15,7 @@ struct AccountSettingsTab: View {
     @Bindable var settings: AppSettings
 
     @State private var appleNonce: String?
+    @State private var confirmingDelete = false
 
     var body: some View {
         Form {
@@ -150,6 +151,29 @@ struct AccountSettingsTab: View {
             }
         } header: {
             Text("Waqtu Premium")
+        }
+
+        Section {
+            Button("Delete account…", role: .destructive) {
+                confirmingDelete = true
+            }
+            .disabled(account.isBusy)
+            if account.isBusy {
+                ProgressView().controlSize(.small)
+            }
+            if let message = account.errorMessage {
+                Text(message)
+                    .font(.caption)
+                    .foregroundColor(.red.opacity(0.85))
+            }
+        }
+        .confirmationDialog("Delete your account?", isPresented: $confirmingDelete) {
+            Button("Delete account", role: .destructive) {
+                Task { @MainActor in await account.deleteAccount() }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This deletes your account on our server: synced prayer checklist and settings, your Circles profile, posts and voice notes, and premium records linked to it. It cannot be undone. Data on this Mac stays, and so does any App Store subscription; cancel that in the App Store.")
         }
     }
 

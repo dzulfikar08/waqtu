@@ -73,83 +73,12 @@ The app calculates prayer times on-device from location; no login or account is 
 
 ---
 
-## Mac App Store app — `dat.waqtu` (Waqtu)
+## Mac App Store app — `dat.waqtu` (Waqtu for Mac, 6827054953)
 
-**App Name**
-
-```
-Waqtu
-```
-
-**Subtitle** (≤30)
-
-```
-Prayer times in your menu bar
-```
-
-**Description** (≤4000)
-
-```
-Waqtu lives in your Mac's menu bar and protects your prayer time at work.
-
-• Next-prayer countdown always visible in the menu bar
-• Calendar protection — automatic "busy" blocks during prayers so Outlook, Teams, and calendar apps show you as unavailable
-• Full-screen prayer reminder overlay with a circular countdown timer
-• Pre-prayer notifications (5/10/15/30 minutes before)
-• Adhan audio playback
-• Prayer streak tracking with a weekly report
-• Daily hadith and dua in the reminder overlay
-• 13 calculation methods, Hanafi/Shafi'i Asr, per-prayer adjustments
-• Multiple location profiles (office, home, travel)
-• Light and dark overlay themes
-• Hijri date in the menu bar
-
-Runs fully offline. Your location stays on your Mac — no servers, no analytics, no ads.
-
-Waqtu Premium is an auto-renewing subscription (monthly or yearly) that also unlocks Waqtu on iPhone and Android through your Waqtu account. A 7-day free trial lets you try everything first.
-```
-
-**Keywords** (≤100)
-
-```
-prayer times,adhan,salah,namaz,islamic,muslim,menu bar,mosque,quran,ramadan,hijri,prayer reminder,azan
-```
-
-**Primary Category**: Lifestyle
-**Secondary Category**: Productivity
-
-**What's New** (v2.0 — first MAS release)
-
-```
-Waqtu arrives on the Mac App Store: menu-bar prayer countdown, calendar busy protection, reminder overlay, prayer streaks, and 13 calculation methods. Waqtu Premium subscription with a 7-day free trial.
-```
-
-**Subscriptions** (create in ASC → Subscriptions, group `Waqtu Premium`)
-
-```
-Reference Name:     Waqtu Premium Mac Monthly
-Product ID:         dat.waqtu.mac.premium.monthly   <- must match code exactly
-Duration:           1 month
-Price:              Rp 29.000 (other regions: USD 2.99)
-
-Reference Name:     Waqtu Premium Mac Yearly
-Product ID:         dat.waqtu.mac.premium.yearly    <- must match code exactly
-Duration:           1 year
-Price:              Rp 249.000 (other regions: USD 24.99)
-
-Display Name (en):  Waqtu Premium (monthly / yearly)
-Description (en):   Sync across devices and Circles on Mac, iPhone and Android.
-```
-
-The old non-consumable `dat.waqtu.lifetime` is retired: remove it from sale.
-
-**App Review Notes**
-
-```
-Menu-bar agent app (no dock icon; LSUIElement). Grant Location for accurate times and Calendar access for the "busy block" feature — both are optional but recommended. Waqtu Premium is an auto-renewable subscription (dat.waqtu.mac.premium.monthly / .yearly) after a 7-day free trial; Subscribe, Restore Purchases and Manage Subscription are in Settings → Upgrade. Signing in with a Waqtu account is optional; a subscription bought in this app is linked to that account so it also unlocks the phone apps. This sandboxed build excludes Slack/Google Calendar and auto-update (handled by the App Store).
-```
-
-**Privacy Policy URL**: same as iOS.
+The listing lives in `apps/apple/store/appstore` (`id/` primary, `en/`, `review_notes.txt`) and is pushed with
+`.github/workflows/store-submit.yml` (platform `mac`), together with the screenshots of `mas-screenshots.yml` and the
+subscriptions `dat.waqtu.mac.premium.monthly` / `.yearly` (group "Waqtu Premium", Rp 29.000 / Rp 249.000). App Privacy
+is not available to API keys; it is answered by hand in App Store Connect.
 
 ---
 

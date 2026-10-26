@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0A8A72BC95731ACC48AB6DD7"
-               BuildableName = "waqtu-mas.app"
+               BuildableName = "Waqtu.app"
                BlueprintName = "waqtu-mas"
                ReferencedContainer = "container:waqt.xcodeproj">
             </BuildableReference>

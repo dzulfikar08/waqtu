@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-"""Fills the App Store version of Waqtu from apps/mobile/store and submits it to App Review.
+"""Fills the App Store version of Waqtu (iPhone) or Waqtu for Mac and submits it to App Review.
 
 Run by .github/workflows/store-submit.yml. Everything goes through the App Store Connect API and is idempotent: a rerun
-updates what differs and skips what is already in place.
+updates what differs and skips what is already in place. STORE_PLATFORM picks the app: "ios" (apps/mobile/store) or
+"mac" (apps/apple/store); see PLATFORMS.
 
 Environment:
+  STORE_PLATFORM                            "ios" (default) or "mac"
   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH   App Store Connect API key (.p8 file path)
-  BUILD_NUMBER                              CFBundleVersion of the build to submit (app.json ios.buildNumber)
-  SCREENSHOTS_DIR                           unpacked screenshots-ios-iphone-pro-max artifact
-  REVIEW_ACCOUNT_PASSWORD, REVIEW_CONTACT_PHONE
+  BUILD_NUMBER                              CFBundleVersion of the build to submit (iOS: app.json ios.buildNumber;
+                                            Mac: the newest processed build when unset)
+  SCREENSHOTS_DIR                           unpacked screenshots artifact (screenshots-ios-iphone-pro-max / screenshots-mac)
+  REVIEW_ACCOUNT_PASSWORD (iOS only), REVIEW_CONTACT_PHONE
   SUBMIT                                    "true" submits the review submission; anything else stops before it
   GITHUB_STEP_SUMMARY                       optional, the final state table goes there
 """
@@ -25,28 +28,56 @@ import requests
 from PIL import Image
 
 API = "https://api.appstoreconnect.apple.com"
-APP_ID = "6826628861"
-STORE = Path(__file__).resolve().parents[1]
+APPS = Path(__file__).resolve().parents[3]
+# Per app: App Store Connect app id and platform, the folder with appstore/<locale folder>/*.txt and review_notes.txt,
+# the screenshot display type, the demo account (None: no sign-in information) and the subscription review screenshot.
+PLATFORMS = {
+    "ios": {
+        "app_id": "6826628861",
+        "asc_platform": "IOS",
+        "store": APPS / "mobile" / "store",
+        # 1320x2868 (6.9") screenshots go in the 6.7" set, the one App Store Connect requires for iPhone.
+        "screenshot_type": "APP_IPHONE_67",
+        "demo_account": "review@getwaqtu.com",
+        "subscription_screenshots": ("en-23-circles.png", "en-06-settings.png", "en-01-*.png"),
+    },
+    "mac": {
+        "app_id": "6827054953",
+        "asc_platform": "MAC_OS",
+        "store": APPS / "apple" / "store",
+        # 2880x1800 renders of the app (mas-screenshots.yml).
+        "screenshot_type": "APP_DESKTOP",
+        # The Mac app signs in only with Apple or Google, so App Review gets no demo account; the notes explain that
+        # the 7-day trial covers the whole app and that Premium can be bought with a sandbox Apple ID.
+        "demo_account": None,
+        "subscription_screenshots": ("review-premium-en.png",),
+    },
+}
+PLATFORM = os.environ.get("STORE_PLATFORM", "ios")
+if PLATFORM not in PLATFORMS:
+    raise SystemExit(f"STORE_PLATFORM must be one of {sorted(PLATFORMS)}")
+APP_ID = PLATFORMS[PLATFORM]["app_id"]
+ASC_PLATFORM = PLATFORMS[PLATFORM]["asc_platform"]
+STORE = PLATFORMS[PLATFORM]["store"]
+SCREENSHOT_TYPE = PLATFORMS[PLATFORM]["screenshot_type"]
+DEMO_ACCOUNT = PLATFORMS[PLATFORM]["demo_account"]
 # store/appstore/<folder> -> App Store Connect locale; the first one is the primary locale.
 LOCALES = {"id": "id", "en": "en-US"}
 PRIMARY_LOCALE = "id"
 COPYRIGHT = "2026 JoyoDigitama"
 PRIMARY_CATEGORY = "LIFESTYLE"
 SECONDARY_CATEGORY = "PRODUCTIVITY"
-# 1320x2868 (6.9") screenshots go in the 6.7" set, the one App Store Connect requires for iPhone.
-SCREENSHOT_TYPE = "APP_IPHONE_67"
 REVIEW_CONTACT = {
     "contactFirstName": "Dzulfikar",
     "contactLastName": "Ats Tsauri",
     "contactEmail": "dzulfikar.at@gmail.com",
 }
-DEMO_ACCOUNT = "review@getwaqtu.com"
-# Halaqah videos are YouTube embeds of third-party channels played through the official YouTube player, which YouTube's
-# terms allow; the app also shows third-party prayer-time methods. So the honest answer is "uses third-party content"
-# (with the rights to do so), not "does not use".
+# Halaqah videos (phone and Mac) are YouTube embeds of third-party channels played through the official YouTube player,
+# which YouTube's terms allow; the apps also show third-party prayer-time methods. So the honest answer is "uses
+# third-party content" (with the rights to do so), not "does not use".
 CONTENT_RIGHTS = "USES_THIRD_PARTY_CONTENT"
-# Age rating questionnaire. Nothing objectionable; Circles let signed-in Premium users post text and voice notes to
-# other members (user-generated content and messaging, moderated with report and block).
+# Age rating questionnaire, the same for both apps. Nothing objectionable; Circles let signed-in Premium users post text
+# and voice notes to other members (user-generated content and messaging, moderated with report and block).
 AGE_RATING = {
     "alcoholTobaccoOrDrugUseOrReferences": "NONE",
     "contests": "NONE",
@@ -81,6 +112,14 @@ SUBSCRIPTION_TEXT = {
     "dat.waqtu.premium.yearly": {
         "id": ("Waqtu Premium Tahunan", "Sinkron antarperangkat dan Lingkaran halaqah"),
         "en-US": ("Waqtu Premium Yearly", "Sync across devices and halaqah Circles"),
+    },
+    "dat.waqtu.mac.premium.monthly": {
+        "id": ("Waqtu Premium Bulanan", "Waqtu di Mac, sinkron dan Lingkaran"),
+        "en-US": ("Waqtu Premium Monthly", "Waqtu on Mac, sync and Circles"),
+    },
+    "dat.waqtu.mac.premium.yearly": {
+        "id": ("Waqtu Premium Tahunan", "Waqtu di Mac, sinkron dan Lingkaran"),
+        "en-US": ("Waqtu Premium Yearly", "Waqtu on Mac, sync and Circles"),
     },
 }
 GROUP_NAME = "Waqtu Premium"
@@ -205,7 +244,7 @@ def ref(kind: str, id_: str) -> dict:
 
 
 def find_version(asc: Asc) -> dict:
-    versions = asc.all(f"/v1/apps/{APP_ID}/appStoreVersions", **{"filter[platform]": "IOS"})
+    versions = asc.all(f"/v1/apps/{APP_ID}/appStoreVersions", **{"filter[platform]": ASC_PLATFORM})
     for v in versions:
         state = v["attributes"].get("appVersionState") or v["attributes"].get("appStoreState")
         if state in EDITABLE_VERSION_STATES | SUBMITTED_VERSION_STATES:
@@ -229,7 +268,7 @@ def wait_for_build(asc: Asc, number: str, wait: bool) -> tuple[dict, str] | None
             **{
                 "filter[app]": APP_ID,
                 "filter[version]": number,
-                "filter[preReleaseVersion.platform]": "IOS",
+                "filter[preReleaseVersion.platform]": ASC_PLATFORM,
                 "include": "preReleaseVersion",
                 "limit": 5,
             },
@@ -256,8 +295,22 @@ def wait_for_build(asc: Asc, number: str, wait: bool) -> tuple[dict, str] | None
         time.sleep(60)
 
 
+def latest_build_number(asc: Asc) -> str | None:
+    """CFBundleVersion of the build uploaded last (the Mac build number comes from the release-mas.yml run)."""
+    page = asc.get(
+        "/v1/builds",
+        **{"filter[app]": APP_ID, "filter[preReleaseVersion.platform]": ASC_PLATFORM, "sort": "-uploadedDate", "limit": 1},
+    )
+    return page["data"][0]["attributes"]["version"] if page["data"] else None
+
+
 def attach_build(asc: Asc, version: dict, wait: bool) -> None:
-    number = os.environ["BUILD_NUMBER"]
+    number = os.environ.get("BUILD_NUMBER") or latest_build_number(asc)
+    if number is None:
+        if wait:
+            raise SystemExit("No build uploaded for this app yet")
+        note("No build uploaded yet; not attached (dry run)")
+        return
     found = wait_for_build(asc, number, wait)
     if found is None:
         note(f"Build {number} is not processed yet; not attached (dry run)")
@@ -532,9 +585,9 @@ def update_review_detail(asc: Asc, vid: str) -> None:
     attributes = {
         **REVIEW_CONTACT,
         "contactPhone": os.environ["REVIEW_CONTACT_PHONE"].strip(),
-        "demoAccountRequired": True,
-        "demoAccountName": DEMO_ACCOUNT,
-        "demoAccountPassword": os.environ["REVIEW_ACCOUNT_PASSWORD"],
+        "demoAccountRequired": DEMO_ACCOUNT is not None,
+        "demoAccountName": DEMO_ACCOUNT or "",
+        "demoAccountPassword": os.environ["REVIEW_ACCOUNT_PASSWORD"] if DEMO_ACCOUNT else "",
         "notes": notes,
     }
     detail = asc.get_or_none(f"/v1/appStoreVersions/{vid}/appStoreReviewDetail")
@@ -554,15 +607,19 @@ def update_review_detail(asc: Asc, vid: str) -> None:
                 }
             },
         )
-    note(f"App Review information: contact {REVIEW_CONTACT['contactEmail']}, demo account {DEMO_ACCOUNT}")
+    note(f"App Review information: contact {REVIEW_CONTACT['contactEmail']}, demo account {DEMO_ACCOUNT or 'none'}")
 
 
 def ensure_free(asc: Asc) -> None:
     schedule = asc.get_or_none(f"/v1/apps/{APP_ID}/appPriceSchedule")
     if schedule:
-        prices = asc.get(
-            f"/v1/appPriceSchedules/{schedule['id']}/manualPrices", include="appPricePoint", limit=50
-        )
+        # An app that never had a price answers with a schedule object whose manual prices do not exist (404).
+        try:
+            prices = asc.get(f"/v1/appPriceSchedules/{schedule['id']}/manualPrices", include="appPricePoint", limit=50)
+        except AscError as e:
+            if e.status != 404:
+                raise
+            prices = {}
         points = [i for i in prices.get("included", []) if i["type"] == "appPricePoints"]
         if points and all(float(p["attributes"]["customerPrice"]) == 0 for p in points):
             note("Price: free (already set)")
@@ -632,7 +689,7 @@ def ensure_availability(asc: Asc) -> None:
 
 def subscription_screenshot() -> Path:
     root = Path(os.environ["SCREENSHOTS_DIR"])
-    for pattern in ("en-23-circles.png", "en-06-settings.png", "en-01-*.png"):
+    for pattern in PLATFORMS[PLATFORM]["subscription_screenshots"]:
         hits = sorted(root.rglob(pattern), key=lambda p: ("light" not in p.parts, len(p.parts)))
         hits = [p for p in hits if not any(part.startswith("maestro-") for part in p.parts)]
         if hits:
@@ -687,6 +744,15 @@ def prepare_subscriptions(asc: Asc) -> list[dict]:
                     )
                     log(f"{product}: localization {locale} created")
                 screenshot = asc.get_or_none(f"/v1/subscriptions/{sid}/appStoreReviewScreenshot")
+                editable = sub["attributes"]["state"] in ("MISSING_METADATA", "READY_TO_SUBMIT", "DEVELOPER_ACTION_NEEDED", "REJECTED")
+                if screenshot and editable and screenshot["attributes"].get("sourceFileChecksum") != md5(shot):
+                    try:
+                        asc.delete(f"/v1/subscriptionAppStoreReviewScreenshots/{screenshot['id']}")
+                        log(f"{product}: outdated review screenshot removed")
+                        screenshot = None
+                    except AscError as e:
+                        # Locked while the subscription sits in a draft review submission.
+                        log(f"{product}: review screenshot kept ({e.status}: cannot replace it now)")
                 if not screenshot:
                     id_ = upload_asset(
                         asc, "subscriptionAppStoreReviewScreenshots", "subscription", "subscriptions", sid, shot
@@ -746,7 +812,7 @@ def review_submission(asc: Asc, version: dict, products: list[dict], submit: boo
         "/v1/reviewSubmissions",
         **{
             "filter[app]": APP_ID,
-            "filter[platform]": "IOS",
+            "filter[platform]": ASC_PLATFORM,
             "filter[state]": "READY_FOR_REVIEW,WAITING_FOR_REVIEW,IN_REVIEW,UNRESOLVED_ISSUES",
         },
     )
@@ -759,7 +825,7 @@ def review_submission(asc: Asc, version: dict, products: list[dict], submit: boo
     if draft is None:
         draft = asc.post(
             "/v1/reviewSubmissions",
-            {"data": {"type": "reviewSubmissions", "attributes": {"platform": "IOS"}, "relationships": {"app": ref("apps", APP_ID)}}},
+            {"data": {"type": "reviewSubmissions", "attributes": {"platform": ASC_PLATFORM}, "relationships": {"app": ref("apps", APP_ID)}}},
         )["data"]
         log(f"Review submission {draft['id']} created")
     rid = draft["id"]
@@ -833,7 +899,7 @@ def final_state(asc: Asc, vid: str) -> None:
         f"Final: version {version['versionString']} appVersionState={version.get('appVersionState')}"
         f" appStoreState={version.get('appStoreState')}"
     )
-    for s in asc.all("/v1/reviewSubmissions", **{"filter[app]": APP_ID, "filter[platform]": "IOS"})[:5]:
+    for s in asc.all("/v1/reviewSubmissions", **{"filter[app]": APP_ID, "filter[platform]": ASC_PLATFORM})[:5]:
         note(f"Final: review submission {s['id']} {s['attributes']['state']} submitted {s['attributes'].get('submittedDate')}")
     for group in asc.all(f"/v1/apps/{APP_ID}/subscriptionGroups"):
         for sub in asc.all(f"/v1/subscriptionGroups/{group['id']}/subscriptions"):
