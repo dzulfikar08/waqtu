@@ -34,6 +34,28 @@ jobs:
         with:
           bun-version: 1.4.4
       - run: bun install --frozen-lockfile
+      - name: TEMP oxfmt diff
+        run: bunx oxfmt . ; git --no-pager diff ; git checkout -- .
+      - name: TEMP review-account hash script
+        working-directory: services/api
+        env:
+          EMAIL: review@getwaqtu.com
+          REVIEW_ACCOUNT_PASSWORD: dummy-password-for-ci
+          SQL_FILE: /tmp/review.sql
+        run: |
+          ls -la node_modules/better-auth/dist/crypto/index.mjs
+          node --input-type=module -e '
+            import { randomUUID } from "node:crypto";
+            import { writeFileSync } from "node:fs";
+            import { hashPassword, verifyPassword } from "better-auth/crypto";
+            import { reviewAccountStatements } from "./src/reviewAccount.ts";
+            const id = () => randomUUID().replaceAll("-", "");
+            const passwordHash = await hashPassword(process.env.REVIEW_ACCOUNT_PASSWORD);
+            console.log("verify", await verifyPassword({ hash: passwordHash, password: process.env.REVIEW_ACCOUNT_PASSWORD }));
+            const statements = reviewAccountStatements({ email: process.env.EMAIL, passwordHash, newUserId: id(), newAccountId: id(), now: Date.now() });
+            writeFileSync(process.env.SQL_FILE, statements.join("\n") + "\n", { mode: 0o600 });
+          '
+          sed -E 's/[0-9a-f]{32}:[0-9a-f]{128}/HASH/' /tmp/review.sql
       - run: bun run lint
       - run: bun run fmt:check
       - run: bun run typecheck

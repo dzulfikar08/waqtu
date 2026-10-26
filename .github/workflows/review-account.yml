@@ -1,0 +1,145 @@
+# Creates (or refreshes) the store reviewer account for Google Play / App Store review: an email + password
+# account with Premium. Email sign-in exists only for addresses in REVIEW_ACCOUNT_EMAILS
+# (services/api/wrangler.toml [vars]); nobody can sign up with email.
+#
+# Writes, in `waqtu-db` (remote):
+#   - "user"       name "Waqtu Review", emailVerified 1 (kept when it exists, so re-running keeps the same account)
+#   - account      providerId `credential`, accountId = user id, password = better-auth's own scrypt hash
+#                  (`hashPassword` from `better-auth/crypto`, the version in bun.lock), replacing any previous one
+#   - entitlement  source `review`, expires 2100-01-01: `GET /v1/entitlement` reports premium
+# The statements come from services/api/src/reviewAccount.ts (covered by services/api/test/reviewAccount.test.ts).
+# Re-run it to rotate the password: update the secret first.
+#
+# Order: merge, run "Deploy" (api; applies migration 0007 and REVIEW_ACCOUNT_EMAILS), then this workflow.
+# Manual only. `release` environment secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, REVIEW_ACCOUNT_PASSWORD.
+name: Review account
+
+on:
+  workflow_dispatch:
+    inputs:
+      email:
+        description: "Reviewer account email (must be listed in REVIEW_ACCOUNT_EMAILS)"
+        type: string
+        required: true
+        default: review@getwaqtu.com
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  provision:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: release
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      REVIEW_ACCOUNT_PASSWORD: ${{ secrets.REVIEW_ACCOUNT_PASSWORD }}
+      EMAIL_INPUT: ${{ inputs.email }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.4
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check inputs
+        working-directory: services/api
+        run: |
+          email=$(printf '%s' "$EMAIL_INPUT" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+          if ! [[ "$email" =~ ^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]+$ ]]; then echo "not an email: $email"; exit 1; fi
+          if [ ${#REVIEW_ACCOUNT_PASSWORD} -lt 12 ]; then
+            echo "REVIEW_ACCOUNT_PASSWORD is missing or shorter than 12 characters (release environment secret)"
+            exit 1
+          fi
+          allowed=$(sed -n 's/^REVIEW_ACCOUNT_EMAILS *= *"\(.*\)"/\1/p' wrangler.toml | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+          if ! [[ ",$allowed," == *",$email,"* ]]; then
+            echo "$email is not in REVIEW_ACCOUNT_EMAILS in services/api/wrangler.toml: the API would refuse its sign-in"
+            exit 1
+          fi
+          echo "EMAIL=$email" >> "$GITHUB_ENV"
+
+      # The `review` entitlement source needs migration 0007 (applied by the Deploy workflow).
+      - name: Check the database is migrated
+        working-directory: services/api
+        run: |
+          schema=$(bunx wrangler d1 execute waqtu-db --remote --json \
+            --command "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'entitlement'" | jq -r '.[0].results[0].sql // empty')
+          if [[ "$schema" != *"'review'"* ]]; then
+            echo "waqtu-db has no 'review' entitlement source yet: run the Deploy workflow (api) first"
+            exit 1
+          fi
+
+      # better-auth's own hash function, from the installed better-auth (bun.lock), so the Worker verifies it.
+      - name: Hash the password and build the SQL
+        working-directory: services/api
+        run: |
+          sql="$RUNNER_TEMP/review-account.sql"
+          echo "SQL_FILE=$sql" >> "$GITHUB_ENV"
+          SQL_FILE="$sql" node --input-type=module -e '
+            import { randomUUID } from "node:crypto";
+            import { writeFileSync } from "node:fs";
+            import { hashPassword } from "better-auth/crypto";
+            import { reviewAccountStatements } from "./src/reviewAccount.ts";
+            const id = () => randomUUID().replaceAll("-", "");
+            const statements = reviewAccountStatements({
+              email: process.env.EMAIL,
+              passwordHash: await hashPassword(process.env.REVIEW_ACCOUNT_PASSWORD),
+              newUserId: id(),
+              newAccountId: id(),
+              now: Date.now(),
+            });
+            writeFileSync(process.env.SQL_FILE, statements.join("\n") + "\n", { mode: 0o600 });
+          '
+
+      - name: Write the account and its Premium
+        working-directory: services/api
+        run: |
+          bunx wrangler d1 execute waqtu-db --remote --file "$SQL_FILE" > /dev/null
+          rm -f "$SQL_FILE"
+
+      # Signs in the way the app does and reads the entitlement; prints only non-secret results.
+      - name: Verify and summarize
+        working-directory: services/api
+        run: |
+          row=$(bunx wrangler d1 execute waqtu-db --remote --json --command "
+            SELECT u.id, u.emailVerified AS verified,
+                   (SELECT COUNT(*) FROM account a WHERE a.userId = u.id AND a.providerId = 'credential') AS credentials,
+                   (SELECT e.expires_at FROM entitlement e WHERE e.user_id = u.id AND e.source = 'review') AS expires
+            FROM \"user\" u WHERE u.email = '$EMAIL'" | jq -c '.[0].results[0] // empty')
+          [ -n "$row" ] || { echo "no user row for $EMAIL"; exit 1; }
+
+          jar="$RUNNER_TEMP/cookies"
+          code=$(jq -n '{ email: env.EMAIL, password: env.REVIEW_ACCOUNT_PASSWORD }' |
+            curl -s -o /dev/null -w '%{http_code}' -c "$jar" -H 'content-type: application/json' \
+              --data-binary @- https://api.getwaqtu.com/api/auth/sign-in/email || true)
+          entitlement='{}'
+          if [ "$code" = 200 ]; then
+            entitlement=$(curl -s -b "$jar" https://api.getwaqtu.com/v1/entitlement || echo '{}')
+          fi
+          rm -f "$jar"
+          premium=$(printf '%s' "$entitlement" | jq -r '.premium // false' 2>/dev/null || echo false)
+          {
+            echo '### Review account'
+            echo "- Email: \`$EMAIL\`"
+            echo "- User id: \`$(printf '%s' "$row" | jq -r .id)\`"
+            echo "- Email verified: $(printf '%s' "$row" | jq -r .verified), credential accounts: $(printf '%s' "$row" | jq -r .credentials)"
+            echo "- Premium (review) until: $(printf '%s' "$row" | jq -r '.expires // "none" | if type == "number" then (. / 1000 | todate) else . end')"
+            echo "- Live check: \`POST /api/auth/sign-in/email\` -> $code (expected 200), \`GET /v1/entitlement\` premium: $premium"
+            echo '- Password: the `REVIEW_ACCOUNT_PASSWORD` secret (not printed). Give it to the store reviewers in Play Console / App Store Connect.'
+          } >> "$GITHUB_STEP_SUMMARY"
+          test "$code" = 200
+          test "$premium" = true

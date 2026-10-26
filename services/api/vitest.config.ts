@@ -16,6 +16,7 @@ export default defineConfig({
           BETTER_AUTH_SECRET: "test-secret-test-secret-test-secret-0123",
           BETTER_AUTH_URL: "http://localhost",
           APPLE_CLIENT_ID: "dat.waqtu.ios",
+          REVIEW_ACCOUNT_EMAILS: "review@example.test, Second-Reviewer@Example.test",
           GOOGLE_CLIENT_ID: "web-client.apps.googleusercontent.com",
           GOOGLE_CLIENT_SECRET: "test-google-secret",
           GOOGLE_EXTRA_CLIENT_IDS:

@@ -178,6 +178,23 @@ The website sells nothing; Polar only matters if a signed-in web checkout is add
 3. The access token behind `POLAR_ACCESS_TOKEN` needs the `checkouts:write` and
    `customer_sessions:write` scopes.
 
+#### Reviewer account (Play and App Store review)
+
+Store reviewers get a ready-made account with Premium. Waqtu otherwise only has Google and Apple
+sign-in, so the API also accepts email + password, but only for the addresses in
+`REVIEW_ACCOUNT_EMAILS` (`services/api/wrangler.toml` [vars], default `review@getwaqtu.com`); nobody can
+sign up with email.
+
+1. Add the `release` environment secret `REVIEW_ACCOUNT_PASSWORD` (a long random password).
+2. Run **Deploy** (api) so migration `0007` and `REVIEW_ACCOUNT_EMAILS` are live, then run
+   **Review account** (`.github/workflows/review-account.yml`, input `email`). It creates or refreshes
+   the account (better-auth credential hash, `review` entitlement until 2100), signs in once against
+   `api.getwaqtu.com` to check it, and writes the user id and result to the run summary. Re-run it after
+   changing the secret to rotate the password.
+3. In Play Console (App content → App access) and App Store Connect (App Review Information → Sign-in
+   required) give the email, the password and: "Settings → Account → App reviewer? Sign in with email"
+   (Indonesian UI: "Peninjau aplikasi? Masuk dengan email").
+
 #### Worker secrets (`waqt-updates`)
 
 ```bash

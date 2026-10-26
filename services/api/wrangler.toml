@@ -13,6 +13,9 @@ APPLE_APP_ID = "6826628861"
 ENVIRONMENT = "production"
 # Circles are Waqtu Premium (owner decision 2026-10-25): the app gates the tab and the API refuses joins/posts with 403 premium_required.
 CIRCLES_REQUIRES_PREMIUM = "true"
+# Store reviewer accounts (comma-separated): the only emails allowed to sign in with email + password.
+# The accounts themselves are created by .github/workflows/review-account.yml.
+REVIEW_ACCOUNT_EMAILS = "review@getwaqtu.com"
 
 [[d1_databases]]
 binding = "DB"

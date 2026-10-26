@@ -12,6 +12,8 @@ export interface AppEnv extends GooglePlayEnv, PolarEnv {
   ENVIRONMENT?: string;
   BETTER_AUTH_SECRET?: string;
   BETTER_AUTH_URL?: string;
+  /** Comma-separated emails of store reviewer accounts, the only ones allowed to sign in with email + password. Plain var in wrangler.toml. */
+  REVIEW_ACCOUNT_EMAILS?: string;
   /** Enables native Sign in with Apple. The id-token audience is APPLE_BUNDLE_ID, not this value. */
   APPLE_CLIENT_ID?: string;
   /** App Store numeric app id of the iPhone app (6826628861); its Production server notifications must carry it. */

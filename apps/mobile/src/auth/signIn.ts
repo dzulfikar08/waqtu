@@ -3,6 +3,7 @@ import * as Crypto from "expo-crypto";
 import { Platform } from "react-native";
 
 import type { AuthClient } from "./client";
+import { emailCredentials, emailSignInProblem, type EmailSignInProblem } from "./emailSignIn";
 
 function isCanceled(e: unknown): boolean {
   const code =
@@ -58,4 +59,20 @@ export async function signInWithApple(client: AuthClient): Promise<boolean> {
 export async function signInWithGoogle(client: AuthClient): Promise<void> {
   const { error } = await client.signIn.social({ provider: "google", callbackURL: "/" });
   if (error) throw new Error(error.message || "Google sign-in failed");
+}
+
+/** Email + password, for store reviewer accounts only. Null on success, else what went wrong. */
+export async function signInWithEmail(
+  client: AuthClient,
+  email: string,
+  password: string,
+): Promise<EmailSignInProblem | null> {
+  const credentials = emailCredentials(email, password);
+  if (!credentials) return "missing";
+  try {
+    const { error } = await client.signIn.email(credentials);
+    return error ? emailSignInProblem(error) : null;
+  } catch {
+    return "failed";
+  }
 }

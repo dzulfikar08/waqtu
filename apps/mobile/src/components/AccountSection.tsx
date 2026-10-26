@@ -1,18 +1,26 @@
 import { useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { type AuthClient } from "@/auth/client";
-import { appleSignInAvailable, signInWithApple, signInWithGoogle } from "@/auth/signIn";
+import type { EmailSignInProblem } from "@/auth/emailSignIn";
+import {
+  appleSignInAvailable,
+  signInWithApple,
+  signInWithEmail,
+  signInWithGoogle,
+} from "@/auth/signIn";
+import { TextField } from "@/circles/components/TextField";
 import { CIRCLES_HERO } from "@/components/GlowHero";
 import { Row, Section } from "@/components/ui";
 import { useSyncState } from "@/hooks/useSyncState";
 import { useTranslation } from "@/i18n";
 import { usePremium } from "@/premium/usePremium";
+import { Button, ButtonRow, Hint, Panel } from "@/ramadhan/components/fields";
 import { syncNow } from "@/sync/run";
 import { forgetAccount } from "@/sync/sqliteStore";
-import { onSky, spacing, typography, useTheme } from "@/theme";
+import { HIT, onSky, spacing, typography, useTheme } from "@/theme";
 
 /** Rendered only when the auth server is configured, so there is never a dead sign-in button. */
 export function AccountSection({ client }: { client: AuthClient }) {
@@ -130,6 +138,7 @@ export function AccountSection({ client }: { client: AuthClient }) {
             hue="circles"
             onPress={() => void run(() => signInWithGoogle(client))}
           />
+          <ReviewerSignIn client={client} />
         </>
       )}
       {deleteError ? (
@@ -143,6 +152,99 @@ export function AccountSection({ client }: { client: AuthClient }) {
         </Text>
       ) : null}
     </Section>
+  );
+}
+
+const PROBLEM_KEYS = {
+  missing: "settings.reviewerMissing",
+  invalid: "settings.reviewerInvalid",
+  rateLimited: "settings.reviewerRateLimited",
+  failed: "settings.reviewerFailed",
+} as const satisfies Record<EmailSignInProblem, string>;
+
+/**
+ * Email + password sign-in for store reviewers (Google Play, App Store) behind a quiet link: the server
+ * only accepts the reviewer accounts it was configured with, and nobody can sign up this way.
+ */
+function ReviewerSignIn({ client }: { client: AuthClient }) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [problem, setProblem] = useState<EmailSignInProblem | null>(null);
+
+  if (!open) {
+    return (
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => setOpen(true)}
+        hitSlop={8}
+        style={styles.reviewerLink}
+      >
+        <Text style={[typography.footnote, { color: theme.muted }]}>
+          {t("settings.reviewerLink")}
+        </Text>
+      </Pressable>
+    );
+  }
+
+  const submit = async () => {
+    setBusy(true);
+    setProblem(null);
+    const result = await signInWithEmail(client, email, password);
+    setBusy(false);
+    setProblem(result);
+    if (result === null) setPassword("");
+  };
+
+  return (
+    <Panel>
+      <TextField
+        accessibilityLabel={t("settings.reviewerEmail")}
+        placeholder={t("settings.reviewerEmail")}
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="email"
+        keyboardType="email-address"
+        textContentType="username"
+        returnKeyType="next"
+        value={email}
+        onChangeText={setEmail}
+      />
+      <TextField
+        accessibilityLabel={t("settings.reviewerPassword")}
+        placeholder={t("settings.reviewerPassword")}
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="current-password"
+        secureTextEntry
+        textContentType="password"
+        returnKeyType="go"
+        value={password}
+        onChangeText={setPassword}
+        onSubmitEditing={() => void submit()}
+      />
+      {problem ? <Hint>{t(PROBLEM_KEYS[problem])}</Hint> : null}
+      <ButtonRow>
+        <Button
+          label={t("settings.reviewerSubmit")}
+          disabled={busy}
+          onPress={() => void submit()}
+        />
+        <Button
+          tone="plain"
+          label={t("settings.reviewerCancel")}
+          disabled={busy}
+          onPress={() => {
+            setOpen(false);
+            setPassword("");
+            setProblem(null);
+          }}
+        />
+      </ButtonRow>
+    </Panel>
   );
 }
 
@@ -195,4 +297,9 @@ const styles = StyleSheet.create({
   },
   headerText: { flex: 1, gap: 2 },
   note: { padding: spacing.md },
+  reviewerLink: {
+    minHeight: HIT,
+    justifyContent: "center",
+    paddingHorizontal: spacing.md,
+  },
 });
