@@ -1,0 +1,59 @@
+# Sets ADMIN_USER_IDS on the API worker (circles moderation + crash reports) from account emails, so nobody has to look
+# up better-auth user ids or run wrangler locally. The list replaces the current value: pass every admin each time.
+# Each email must belong to an account that has signed in at least once.
+#
+# Manual only. Uses CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID from the `release` environment.
+name: Admin users
+
+on:
+  workflow_dispatch:
+    inputs:
+      emails:
+        description: "Comma-separated admin account emails (replaces the whole list)"
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  set:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: release
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      EMAILS: ${{ inputs.emails }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+
+      - name: Look up user ids and set the secret
+        working-directory: services/api
+        run: |
+          ids=()
+          IFS=',' read -ra list <<< "$EMAILS"
+          for raw in "${list[@]}"; do
+            email=$(echo "$raw" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+            [ -n "$email" ] || continue
+            if ! [[ "$email" =~ ^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]+$ ]]; then echo "not an email: $email"; exit 1; fi
+            id=$(npx --yes wrangler@4 d1 execute waqtu-db --remote --json \
+              --command "SELECT id FROM \"user\" WHERE lower(email) = '$email'" | jq -r '.[0].results[0].id // empty')
+            if [ -z "$id" ]; then echo "no account for $email (sign in to the app once first)"; exit 1; fi
+            ids+=("$id")
+            echo "$email -> found"
+          done
+          [ ${#ids[@]} -gt 0 ] || { echo "no emails given"; exit 1; }
+          value=$(IFS=,; echo "${ids[*]}")
+          printf '%s' "$value" | npx --yes wrangler@4 secret put ADMIN_USER_IDS
+          echo "ADMIN_USER_IDS set for ${#ids[@]} account(s)" >> "$GITHUB_STEP_SUMMARY"
