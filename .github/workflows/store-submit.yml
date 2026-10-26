@@ -159,22 +159,6 @@ jobs:
           umask 077
           export ASC_KEY_PATH="$RUNNER_TEMP/asc.p8"
           printf '%s' "$ASC_KEY_BASE64" | base64 -d > "$ASC_KEY_PATH"
-          # TEMPORARY probe: is App Privacy reachable with the API key?
-          (cd apps/mobile/store/submit && "$RUNNER_TEMP/venv/bin/python" - <<'EOF'
-          from appstore import Asc, AscError, APP_ID
-          asc = Asc()
-          for path in (f"/v1/apps/{APP_ID}/dataUsages", f"/v1/apps/{APP_ID}/appDataUsages", f"/v1/appDataUsagesPublishState/{APP_ID}",
-                       "/v1/appDataUsageCategories", f"/v1/apps/{APP_ID}/dataUsagePublishState"):
-              for base in ("https://api.appstoreconnect.apple.com", "https://appstoreconnect.apple.com/iris"):
-                  try:
-                      r = asc.get(base + path)
-                      print("OK", base, path, str(r)[:300])
-                  except AscError as e:
-                      print("ERR", base, path, e.status, str(e)[:200])
-                  except Exception as e:
-                      print("EXC", base, path, type(e).__name__, str(e)[:200])
-          EOF
-          )
           export SCREENSHOTS_DIR="$RUNNER_TEMP/shots"
           "$RUNNER_TEMP/venv/bin/python" apps/mobile/store/submit/appstore.py
 
