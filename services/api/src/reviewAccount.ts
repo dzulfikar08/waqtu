@@ -39,7 +39,9 @@ export interface ReviewAccountInput {
 export function reviewAccountStatements(input: ReviewAccountInput): string[] {
   const email = input.email.trim().toLowerCase();
   if (!EMAIL.test(email)) throw new Error(`not an email: ${email}`);
-  if (!/^[0-9a-f]+:[0-9a-f]+$/.test(input.passwordHash)) throw new Error("unexpected password hash");
+  if (!/^[0-9a-f]+:[0-9a-f]+$/.test(input.passwordHash)) {
+    throw new Error("unexpected password hash");
+  }
   const iso = quote(new Date(input.now).toISOString());
   const userId = `(SELECT id FROM "user" WHERE email = ${quote(email)})`;
   return [
