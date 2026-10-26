@@ -112,19 +112,25 @@ export async function readQueue(db: D1Database): Promise<ModerationQueue> {
 }
 
 /**
- * `restore` shows a hidden post again and dismisses its reports (it takes three new reporters to hide
- * it again; the earlier ones cannot report it twice); `remove` deletes its content and its voice note. Returns R2 keys to delete.
+ * `hide` takes a post out of every feed while its reports stay pending, so it stays in the queue for a
+ * final decision; `restore` shows it again (also the way to dismiss reports on a visible post) and
+ * dismisses its reports (it takes three new reporters to hide it again; the earlier ones cannot report
+ * it twice); `remove` deletes its content and its voice note. Returns R2 keys to delete.
  */
 export async function resolvePost(
   db: D1Database,
   postId: string,
-  action: "restore" | "remove",
+  action: "hide" | "restore" | "remove",
 ): Promise<string[]> {
   const post = await db
     .prepare("SELECT id FROM circle_post WHERE id = ?1 AND status <> 'removed'")
     .bind(postId)
     .first();
   if (!post) throw notFound();
+  if (action === "hide") {
+    await db.prepare("UPDATE circle_post SET status = 'hidden' WHERE id = ?1").bind(postId).run();
+    return [];
+  }
   if (action === "restore") {
     await db.batch([
       db.prepare("UPDATE circle_post SET status = 'visible' WHERE id = ?1").bind(postId),

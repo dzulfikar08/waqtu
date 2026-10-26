@@ -305,6 +305,35 @@ describe("api client", () => {
     expect(JSON.parse(calls[1]!.init.body as string)).toEqual({ code: "ABCD-2345" });
   });
 
+  test("admin calls go to /v1/admin with the session cookie", async () => {
+    const { api, calls } = client(() => ok({ posts: [], users: [], ok: true, since: 1, groups: [] }));
+    expect(await api.adminQueue()).toEqual({ posts: [], users: [], ok: true, since: 1, groups: [] });
+    await api.adminPost("p 1", "hide");
+    await api.adminUser("u1", "suspend");
+    await api.adminErrors();
+    await api.adminErrors(1234);
+    expect(calls.map((c) => [c.init.method, c.url])).toEqual([
+      ["GET", "https://api.example.test/v1/admin/circles/queue"],
+      ["POST", "https://api.example.test/v1/admin/circles/posts/p%201"],
+      ["POST", "https://api.example.test/v1/admin/circles/users/u1"],
+      ["GET", "https://api.example.test/v1/admin/errors"],
+      ["GET", "https://api.example.test/v1/admin/errors?since=1234"],
+    ]);
+    expect(JSON.parse(calls[1]!.init.body as string)).toEqual({ action: "hide" });
+    expect(JSON.parse(calls[2]!.init.body as string)).toEqual({ action: "suspend" });
+    expect((calls[0]!.init.headers as Record<string, string>).cookie).toBe(
+      "better-auth.session_token=abc",
+    );
+  });
+
+  test("a non-admin gets a 403 error, not data", async () => {
+    const { api } = client(() => ok({ error: "forbidden" }, 403));
+    const error = await api.adminQueue().catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(CirclesHttpError);
+    expect((error as CirclesHttpError).status).toBe(403);
+    expect((error as CirclesHttpError).code).toBe("forbidden");
+  });
+
   test("feed paging and reaction toggling", async () => {
     const { api, calls } = client(() =>
       ok({ posts: [], nextBefore: null, reactions: {}, myReaction: null }),

@@ -106,3 +106,35 @@ export interface Report {
   reason: ReportReason;
   note?: string;
 }
+
+/** A post with pending reports in `GET /v1/admin/circles/queue` (admins only, so user ids appear). */
+export interface QueuePost {
+  id: string;
+  circleId: string;
+  authorUserId: string;
+  authorHandle: string;
+  kind: Post["kind"];
+  text: string | null;
+  hidden: boolean;
+  pendingReports: number;
+  reasons: ReportReason[];
+  createdAt: number;
+}
+
+/** A person with pending user reports in the admin queue. */
+export interface QueueUser {
+  userId: string;
+  handle: string;
+  suspended: boolean;
+  pendingReports: number;
+  reasons: ReportReason[];
+}
+
+export interface ModerationQueue {
+  posts: QueuePost[];
+  users: QueueUser[];
+}
+
+/** `hide` keeps the reports pending; `restore` unhides and dismisses them; `remove` is final. */
+export type PostAction = "hide" | "restore" | "remove";
+export type UserAction = "suspend" | "unsuspend" | "dismiss";

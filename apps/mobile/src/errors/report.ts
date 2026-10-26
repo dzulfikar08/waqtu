@@ -168,3 +168,22 @@ export function settleBatch(
     return q.count > sentCount ? [{ ...q, count: q.count - sentCount }] : [];
   });
 }
+
+/** One group of `GET /v1/admin/errors`: reports with the same name, message and top stack frame. */
+export interface ErrorGroup {
+  name: string;
+  message: string;
+  topFrame: string;
+  fatal: boolean;
+  /** Reports received. */
+  reports: number;
+  /** Times the apps saw it (folded repeats included). */
+  occurrences: number;
+  firstSeen: number;
+  lastSeen: number;
+  platforms: string[];
+  appVersions: string[];
+  screens: string[];
+  /** Stack of the latest report. */
+  stack: string | null;
+}
