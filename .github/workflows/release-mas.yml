@@ -18,7 +18,7 @@ on:
   # TEMPORARY: iterate from the branch before the workflow exists on master.
   push:
     branches: [mas-submit]
-    paths: [.github/workflows/release-mas.yml]
+    paths: [.github/workflows/release-mas.yml, apps/apple/waqt.xcodeproj/**, apps/apple/waqtu/Assets.xcassets/**]
   workflow_dispatch:
     inputs:
       version:
