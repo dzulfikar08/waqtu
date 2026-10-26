@@ -195,7 +195,7 @@ enum ScreenshotMode {
         // 3. Imsakiyah window for the whole of Ramadan.
         let imsakiyah = try await capture(
             WindowChrome(title: String(localized: "Imsakiyah")) {
-                ImsakiyahView(viewModel: model).frame(width: 560, height: 870)
+                ImsakiyahView(viewModel: model).frame(width: 560, height: 830)
             }
         )
         try write(Canvas.store(caption: caption(3, language), ui: imsakiyah, layout: .panel), "\(language.rawValue)-03-imsakiyah", in: directory)

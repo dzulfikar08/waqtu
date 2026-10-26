@@ -39,18 +39,6 @@ jobs:
             -quiet \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
 
-      - name: Build waqtu-mas (Release, unsigned; screenshot code must stay out)
-        working-directory: apps/apple
-        run: |
-          xcodebuild build \
-            -project waqt.xcodeproj \
-            -scheme waqtu-mas \
-            -configuration Release \
-            -destination 'generic/platform=macOS' \
-            -derivedDataPath build-release \
-            -quiet \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
-
       - name: Build the fake clock
         working-directory: apps/apple
         run: clang -dynamiclib -O2 -framework CoreFoundation -o build/fake-clock.dylib scripts/screenshots/fake-clock.c
