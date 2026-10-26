@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import { Linking } from "react-native";
 
+import { AdminSection } from "@/admin/AdminSection";
 import { AccountSection } from "@/components/AccountSection";
 import { PrayerSettingsSection } from "@/components/PrayerSettingsSection";
 import { StreakSettingsSection } from "@/components/StreakSettingsSection";
@@ -128,6 +129,7 @@ export default function SettingsScreen() {
       </Section>
       {authClient ? <PremiumSection /> : null}
       {authClient ? <AccountSection client={authClient} /> : null}
+      {authClient ? <AdminSection client={authClient} /> : null}
       <Section title={t("about.licences")} icon="information-circle" hue="neutral">
         <Row
           label={t("about.row")}

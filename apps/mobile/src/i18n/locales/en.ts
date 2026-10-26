@@ -1,3 +1,4 @@
+import { adminEn } from "@/admin/strings";
 import { circlesEn } from "@/circles/strings";
 import { errorsEn } from "@/errors/strings";
 import { premiumEn } from "@/premium/strings";
@@ -174,4 +175,5 @@ export const en: Widen<typeof id> = {
   recitation: recitationEn,
   about: aboutEn,
   errors: errorsEn,
+  admin: adminEn,
 };

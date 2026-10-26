@@ -320,7 +320,7 @@ const adminRoutes: Route[] = [
     method: "POST",
     pattern: ["posts", ":postId"],
     handler: async (c) => {
-      const action = parseAction(await readJson(c.request), ["restore", "remove"] as const);
+      const action = parseAction(await readJson(c.request), ["hide", "restore", "remove"] as const);
       const keys = await resolvePost(db(c), postParam(c), action);
       if (keys.length > 0) await c.env.CIRCLE_MEDIA.delete(keys);
       return json({ ok: true });

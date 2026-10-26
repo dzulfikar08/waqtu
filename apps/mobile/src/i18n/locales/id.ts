@@ -1,3 +1,4 @@
+import { adminId } from "@/admin/strings";
 import { circlesId } from "@/circles/strings";
 import { errorsId } from "@/errors/strings";
 import { premiumId } from "@/premium/strings";
@@ -171,4 +172,5 @@ export const id = {
   recitation: recitationId,
   about: aboutId,
   errors: errorsId,
+  admin: adminId,
 } as const;

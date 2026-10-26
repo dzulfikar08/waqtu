@@ -927,6 +927,46 @@ describe("moderation", () => {
     expect(unknown.status).toBe(400);
   });
 
+  test("admins can hide a reported post before it reaches three reports, then unhide it", async () => {
+    const root = await admin();
+    const { owner, circle, others } = await circleOf(2);
+    const p = await post(owner, circle.id, "meragukan");
+    await report(others[0]!, circle.id, p.id, "inappropriate");
+    expect(await feed(others[1]!, circle.id)).toHaveLength(1);
+
+    const queued = (await (await api("/v1/admin/circles/queue", { user: root })).json()) as {
+      posts: { id: string; hidden: boolean; pendingReports: number; reasons: string[] }[];
+    };
+    expect(queued.posts).toEqual([
+      expect.objectContaining({
+        id: p.id,
+        hidden: false,
+        pendingReports: 1,
+        reasons: ["inappropriate"],
+      }),
+    ]);
+
+    const hide = await api(`/v1/admin/circles/posts/${p.id}`, {
+      user: root,
+      json: { action: "hide" },
+    });
+    expect(hide.status).toBe(200);
+    expect(await feed(others[1]!, circle.id)).toHaveLength(0);
+    expect(await feed(owner, circle.id)).toHaveLength(0);
+    // Still pending, so it stays in the queue (hidden first) for a final decision.
+    const hidden = (await (await api("/v1/admin/circles/queue", { user: root })).json()) as {
+      posts: { id: string; hidden: boolean }[];
+    };
+    expect(hidden.posts).toEqual([expect.objectContaining({ id: p.id, hidden: true })]);
+
+    await api(`/v1/admin/circles/posts/${p.id}`, { user: root, json: { action: "restore" } });
+    expect(await feed(others[1]!, circle.id)).toHaveLength(1);
+    const empty = (await (await api("/v1/admin/circles/queue", { user: root })).json()) as {
+      posts: unknown[];
+    };
+    expect(empty.posts).toHaveLength(0);
+  });
+
   test("suspending a user ends their circle access until lifted", async () => {
     const root = await admin();
     const { owner, circle, others } = await circleOf(1);
