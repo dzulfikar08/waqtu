@@ -1,0 +1,114 @@
+# Store metadata and review submission for Waqtu (apps/mobile), from the files in apps/mobile/store:
+#   ios      apps/mobile/store/submit/appstore.py fills App Store version from app.json `version` (text id + en-US,
+#            6.9" screenshots from the latest successful "Store screenshots" run, App Review information, age rating,
+#            categories, price, availability, subscriptions) with build ios.buildNumber, then submits the version
+#            together with the Waqtu Premium subscriptions.
+#   android  apps/mobile/store/submit/play.py updates the id + en-US listings (graphics from the play-listing-assets
+#            release) and releases android.versionCode to production. With managed publishing off, the commit sends it
+#            to review.
+# Both builds must be uploaded first (Release iOS with upload_testflight, Release Android with a play_track).
+# submit=false does everything except the final step: App Store leaves a draft review submission, Play validates the
+# edit and discards it.
+#
+# Manual only (Actions tab -> "Store submit" -> Run workflow). Secrets of the `release` environment:
+#   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_BASE64   App Store Connect API key (.p8)
+#   REVIEW_ACCOUNT_PASSWORD                     password of the App Review demo account review@getwaqtu.com
+#   REVIEW_CONTACT_PHONE                        App Review contact phone
+#   PLAY_SERVICE_ACCOUNT_JSON                   Google Play service account key (raw JSON)
+name: Store submit
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: "Which store"
+        type: choice
+        options: [both, ios, android]
+        default: both
+      submit:
+        description: "Submit for review (off = upload metadata and stop before submitting)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: store-submit
+  cancel-in-progress: false
+
+jobs:
+  ios:
+    if: inputs.platform != 'android'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    environment: release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Python dependencies
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet --only-binary :all: -r apps/mobile/store/submit/requirements.txt
+
+      - name: Screenshots of the latest Store screenshots run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_id=$(gh run list -R "$GITHUB_REPOSITORY" --workflow store-screenshots.yml --status success --limit 1 --json databaseId -q '.[0].databaseId')
+          test -n "$run_id"
+          gh run download "$run_id" -R "$GITHUB_REPOSITORY" -n screenshots-ios-iphone-pro-max -D "$RUNNER_TEMP/shots"
+          echo "Screenshots: Store screenshots run $run_id" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: App Store Connect
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_BASE64: ${{ secrets.ASC_KEY_BASE64 }}
+          REVIEW_ACCOUNT_PASSWORD: ${{ secrets.REVIEW_ACCOUNT_PASSWORD }}
+          REVIEW_CONTACT_PHONE: ${{ secrets.REVIEW_CONTACT_PHONE }}
+          SUBMIT: ${{ inputs.submit }}
+        run: |
+          umask 077
+          export ASC_KEY_PATH="$RUNNER_TEMP/asc.p8"
+          printf '%s' "$ASC_KEY_BASE64" | base64 -d > "$ASC_KEY_PATH"
+          export BUILD_NUMBER=$(jq -r .expo.ios.buildNumber apps/mobile/app.json)
+          export SCREENSHOTS_DIR="$RUNNER_TEMP/shots"
+          "$RUNNER_TEMP/venv/bin/python" apps/mobile/store/submit/appstore.py
+
+      - name: Remove API key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/asc.p8"
+
+  android:
+    if: inputs.platform != 'ios'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Python dependencies
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet --only-binary :all: -r apps/mobile/store/submit/requirements.txt
+
+      - name: Play listing assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download play-listing-assets -R "$GITHUB_REPOSITORY" -D "$RUNNER_TEMP/play" -p '*.png'
+
+      - name: Google Play
+        env:
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          SUBMIT: ${{ inputs.submit }}
+        run: |
+          export VERSION_CODE=$(jq -r .expo.android.versionCode apps/mobile/app.json)
+          export VERSION_NAME=$(jq -r .expo.version apps/mobile/app.json)
+          export PLAY_ASSETS_DIR="$RUNNER_TEMP/play"
+          "$RUNNER_TEMP/venv/bin/python" apps/mobile/store/submit/play.py

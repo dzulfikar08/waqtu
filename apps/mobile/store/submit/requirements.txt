@@ -1,0 +1,4 @@
+PyJWT==2.15.1
+cryptography==50.0.2
+requests==2.34.2
+pillow==13.0.0
