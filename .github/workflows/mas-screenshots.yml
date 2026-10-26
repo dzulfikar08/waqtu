@@ -1,0 +1,107 @@
+# Mac App Store screenshots of Waqtu for Mac: an unsigned Debug build of waqtu-mas runs its
+# DEBUG screenshot mode (apps/apple/waqtu/Screenshots/ScreenshotMode.swift) once per language and
+# uploads the PNGs as the `screenshots-mac` artifact:
+#   id-01-…png … id-05-…png, en-01-…png … en-05-…png   2880×1800 store canvases
+#   review-premium-id.png, review-premium-en.png       2560×1600 subscription screen for App Review
+# The app sees a fixed moment (12 Feb 2027 17:00 WIB, Ramadan 1448 in Jakarta) through
+# apps/apple/scripts/screenshots/fake-clock.c. No secrets.
+name: Mac screenshots
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+
+      - name: Build waqtu-mas (Debug, unsigned)
+        working-directory: apps/apple
+        run: |
+          xcodebuild build \
+            -project waqt.xcodeproj \
+            -scheme waqtu-mas \
+            -configuration Debug \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath build \
+            -quiet \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+
+      - name: Build the fake clock
+        working-directory: apps/apple
+        run: clang -dynamiclib -O2 -framework CoreFoundation -o build/fake-clock.dylib scripts/screenshots/fake-clock.c
+
+      - name: Render screenshots (id, en)
+        working-directory: apps/apple
+        run: |
+          set -euo pipefail
+          app=""
+          for candidate in build/Build/Products/Debug/*.app; do
+            if [ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$candidate/Contents/Info.plist")" = "dat.waqtu" ]; then
+              app="$candidate"
+            fi
+          done
+          if [ -z "$app" ]; then echo "::error::No dat.waqtu app in build/Build/Products/Debug"; exit 1; fi
+          exe="$app/Contents/MacOS/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Contents/Info.plist")"
+          echo "App: $app"
+          out="$PWD/build/screenshots"
+          rm -rf "$out" && mkdir -p "$out"
+          # 12 Feb 2027 17:00 in Jakarta (UTC+7).
+          epoch="$(date -j -u -f '%Y-%m-%d %H:%M:%S' '2027-02-12 10:00:00' +%s)"
+          for lang in id en; do
+            if [ "$lang" = id ]; then locale=id_ID; else locale=en_US; fi
+            echo "::group::$lang"
+            WAQTU_SCREENSHOTS_DIR="$out" \
+            WAQTU_SCREENSHOTS_EXPECT_DAY=2027-02-12 \
+            WAQTU_FAKE_UNIX_TIME="$epoch" \
+            TZ=Asia/Jakarta \
+            DYLD_INSERT_LIBRARIES="$PWD/build/fake-clock.dylib" \
+              "$exe" -AppleLanguages "($lang)" -AppleLocale "$locale" &
+            pid=$!
+            ( sleep 300; kill -9 "$pid" 2>/dev/null ) &
+            watchdog=$!
+            status=0
+            wait "$pid" || status=$?
+            kill "$watchdog" 2>/dev/null || true
+            echo "::endgroup::"
+            if [ "$status" -ne 0 ]; then echo "::error::Screenshot mode ($lang) exited with $status"; exit 1; fi
+          done
+
+      - name: Check the PNGs
+        working-directory: apps/apple/build/screenshots
+        run: |
+          set -euo pipefail
+          ls -la
+          fail=0
+          check() { # file width height
+            local w h a
+            w="$(sips -g pixelWidth "$1" | awk '/pixelWidth/ {print $2}')"
+            h="$(sips -g pixelHeight "$1" | awk '/pixelHeight/ {print $2}')"
+            a="$(sips -g hasAlpha "$1" | awk '/hasAlpha/ {print $2}')"
+            echo "$1 ${w}x${h} alpha=$a"
+            if [ "$w" != "$2" ] || [ "$h" != "$3" ] || [ "$a" != "no" ]; then echo "::error::$1 is ${w}x${h} alpha=$a"; fail=1; fi
+          }
+          for lang in id en; do
+            n="$(ls "$lang"-0*.png | wc -l | tr -d ' ')"
+            if [ "$n" -ne 5 ]; then echo "::error::$n $lang screenshots, expected 5"; fail=1; fi
+            for f in "$lang"-0*.png; do check "$f" 2880 1800; done
+            check "review-premium-$lang.png" 2560 1600
+          done
+          diff <(ls id-0*.png | sed 's/^id-//') <(ls en-0*.png | sed 's/^en-//')
+          exit "$fail"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: screenshots-mac
+          path: apps/apple/build/screenshots/*.png
+          if-no-files-found: error

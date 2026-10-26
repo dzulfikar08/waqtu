@@ -28,6 +28,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        #if DEBUG
+        // Screenshot mode renders, writes its PNGs and quits: no permission prompts or onboarding.
+        if ScreenshotMode.isActive {
+            ScreenshotMode.run()
+            return
+        }
+        #endif
         requestLocationPermission()
         UNUserNotificationCenter.current().delegate = self
         Self.applyLaunchAtLogin(UserDefaults.standard.bool(forKey: "launchAtLogin"))

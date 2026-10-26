@@ -339,7 +339,12 @@ struct PrayerRow: View {
 /// loss message, plus the last 7 days and the pause switch.
 struct StreakReportView: View {
     let sync: MutabaahSyncController
-    @State private var isExpanded = false
+    @State private var isExpanded: Bool
+
+    init(sync: MutabaahSyncController, isExpanded: Bool = false) {
+        self.sync = sync
+        _isExpanded = State(initialValue: isExpanded)
+    }
 
     var body: some View {
         let _ = sync.revision

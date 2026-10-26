@@ -83,16 +83,18 @@ struct ImsakiyahView: View {
     }
 
     private func header(span: Ramadhan.Span, today: CivilDate) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Imsakiyah Ramadan \(span.hijriYear)H")
+        // The year as plain digits: an Int interpolation would be grouped ("1,448H").
+        let year = String(span.hijriYear)
+        return VStack(alignment: .leading, spacing: 4) {
+            Text("Imsakiyah Ramadan \(year)H")
                 .font(.system(size: 18, weight: .bold))
                 .foregroundColor(.waqtuText)
             if today >= span.start && today <= span.end {
-                Text("Day \(span.start.days(to: today) + 1) of Ramadan \(span.hijriYear)H")
+                Text("Day \(span.start.days(to: today) + 1) of Ramadan \(year)H")
                     .font(.system(size: 12))
                     .foregroundColor(.waqtuGold)
             } else {
-                Text("Ramadan \(span.hijriYear)H starts \(Self.dateLabel(span.start, long: true))")
+                Text("Ramadan \(year)H starts \(Self.dateLabel(span.start, long: true))")
                     .font(.system(size: 12))
                     .foregroundColor(.waqtuGold)
             }

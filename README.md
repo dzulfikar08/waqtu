@@ -45,6 +45,13 @@ GitHub Actions builds everything; no local Mac is needed.
   Pixel 7 Pro) and a 6.9" iPhone simulator. Each artifact also holds design review shots under `review/{dark,light}`
   (the store screens in dark plus `review.yaml`: Today without a location, checklist, Circles, lower Settings). Output is the `screenshots-*`
   artifacts. Store listing text lives in `apps/mobile/store/`. No secrets needed, and no other build sets the demo flag.
+- **Mac screenshots** (`mas-screenshots.yml`, manual): an unsigned Debug build of `waqtu-mas` runs its DEBUG screenshot
+  mode (`apps/apple/waqtu/Screenshots/ScreenshotMode.swift`, on when `WAQTU_SCREENSHOTS_DIR` is set) once per language
+  with the wall clock fixed to 12 Feb 2027 17:00 WIB (`apps/apple/scripts/screenshots/fake-clock.c`): Jakarta, Kemenag,
+  Ramadan day 5, a kept checklist, an active trial. The `screenshots-mac` artifact holds `id-0N-*.png`/`en-0N-*.png`
+  (2880×1800 store canvases: popover, mutabaah, imsakiyah, prayer settings, Premium) and `review-premium-{id,en}.png`
+  (2560×1600, the Upgrade pane for subscription review; the prices are filled in by the DEBUG build because StoreKit
+  has no products on CI). No secrets needed.
 - **Release macOS** (`release-macos.yml`, manual): runs `apps/apple/scripts/release.sh` → Developer ID
   sign, notarize, DMG, Sparkle sign, upload to R2, record in D1. Secrets are listed at the top of the
   workflow and live in the `release` environment.

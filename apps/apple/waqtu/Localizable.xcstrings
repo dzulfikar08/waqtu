@@ -936,12 +936,12 @@
         }
       }
     },
-    "Day %lld of Ramadan %lldH" : {
+    "Day %lld of Ramadan %@H" : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hari ke-%1$lld Ramadhan %2$lldH"
+            "value" : "Hari ke-%1$lld Ramadhan %2$@H"
           }
         }
       }
@@ -1488,12 +1488,12 @@
     "Imsakiyah" : {
       "shouldTranslate" : false
     },
-    "Imsakiyah Ramadan %lldH" : {
+    "Imsakiyah Ramadan %@H" : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Imsakiyah Ramadhan %lldH"
+            "value" : "Imsakiyah Ramadhan %@H"
           }
         }
       }
@@ -2209,6 +2209,16 @@
         }
       }
     },
+    "Privacy Policy" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kebijakan Privasi"
+          }
+        }
+      }
+    },
     "Qatar" : {
       "shouldTranslate" : false
     },
@@ -2242,12 +2252,12 @@
         }
       }
     },
-    "Ramadan %lldH starts %@" : {
+    "Ramadan %@H starts %@" : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ramadhan %1$lldH mulai %2$@"
+            "value" : "Ramadhan %1$@H mulai %2$@"
           }
         }
       }
@@ -2914,6 +2924,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Teheran"
+          }
+        }
+      }
+    },
+    "Terms of Use" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ketentuan Penggunaan"
           }
         }
       }

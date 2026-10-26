@@ -33,8 +33,17 @@ final class MacStoreSubscription: @unchecked Sendable {
     }
 
     var offers: [Offer] {
-        products.map { Offer(id: $0.id, displayPrice: $0.displayPrice) }
+        #if DEBUG
+        if let demoOffers { return demoOffers }
+        #endif
+        return products.map { Offer(id: $0.id, displayPrice: $0.displayPrice) }
     }
+
+    #if DEBUG
+    /// Screenshot mode only (Screenshots/ScreenshotMode.swift): what the buttons show when the App
+    /// Store cannot answer (unsigned CI build).
+    @ObservationIgnored var demoOffers: [Offer]?
+    #endif
 
     /// Receives the JWS of every verified subscription transaction (purchase, renewal, restore,
     /// launch). Set by the owner to link the subscription to the Waqtu account.
