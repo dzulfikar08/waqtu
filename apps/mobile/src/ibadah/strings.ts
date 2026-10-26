@@ -25,7 +25,8 @@ export const ibadahId = {
     permissionBody:
       "Ponsel hanya memberi data kompas saat izin lokasi aktif. Arah kiblat tetap dihitung dari lokasi sholat yang tersimpan; layar ini tidak menyimpan atau mengirim posisimu.",
     allow: "Izinkan kompas",
-    denied: "Izin lokasi ditolak, jadi kompas tidak bisa dibaca. Gunakan angka di atas dengan kompas biasa, atau izinkan lewat pengaturan sistem.",
+    denied:
+      "Izin lokasi ditolak, jadi kompas tidak bisa dibaca. Gunakan angka di atas dengan kompas biasa, atau izinkan lewat pengaturan sistem.",
     openSystemSettings: "Buka pengaturan sistem",
     unavailable: "Kompas ponsel ini tidak bisa dibaca. Gunakan angka di atas dengan kompas biasa.",
     starting: "Membaca kompas…",
@@ -146,7 +147,8 @@ export const ibadahId = {
     target: "Target",
     noTarget: "Tanpa target",
     mutabaah: "Catat ke mutabaah",
-    linkHint: "Pilih item hitungan buatanmu. Hitungan tasbih bisa ditambahkan ke item itu hari ini.",
+    linkHint:
+      "Pilih item hitungan buatanmu. Hitungan tasbih bisa ditambahkan ke item itu hari ini.",
     noCounters:
       'Belum ada item hitungan buatanmu. Buat di Atur daftar amalan (jenis Hitungan), misalnya "Istighfar".',
     manage: "Atur daftar amalan",
@@ -258,7 +260,8 @@ export const ibadahEn: Widen<typeof ibadahId> = {
     denied:
       "Location access was declined, so the compass can't be read. Use the figure above with an ordinary compass, or allow it in system settings.",
     openSystemSettings: "Open system settings",
-    unavailable: "This phone's compass can't be read. Use the figure above with an ordinary compass.",
+    unavailable:
+      "This phone's compass can't be read. Use the figure above with an ordinary compass.",
     starting: "Reading the compass…",
     aligned: "You are facing the qibla",
     turnRight: "Turn right {{deg}}°",

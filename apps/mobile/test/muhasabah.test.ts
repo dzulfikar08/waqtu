@@ -73,7 +73,10 @@ describe("muhasabah storage", () => {
 
   test("ratings outside 1–10 are dropped before they reach the table, which also refuses them", async () => {
     const { db, raw } = await migratedDb();
-    await saveMuhasabah(db, entry(TODAY, { taqwa: 11, gratitude: 0, energy: 4.5, willingness: 10 }));
+    await saveMuhasabah(
+      db,
+      entry(TODAY, { taqwa: 11, gratitude: 0, energy: 4.5, willingness: 10 }),
+    );
     expect(await getMuhasabah(db, TODAY)).toEqual(entry(TODAY, { willingness: 10 }));
     expect(() =>
       raw.run(

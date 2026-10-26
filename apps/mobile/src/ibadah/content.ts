@@ -224,7 +224,10 @@ const SOURCES: Record<SessionId, () => ReaderSession> = {
   "matsurat-sughro-pagi": () =>
     parseMatsurat(require("../../../../content/adhkar/sugro-pagi.json"), "matsurat-sughro-pagi"),
   "matsurat-sughro-petang": () =>
-    parseMatsurat(require("../../../../content/adhkar/sugro-petang.json"), "matsurat-sughro-petang"),
+    parseMatsurat(
+      require("../../../../content/adhkar/sugro-petang.json"),
+      "matsurat-sughro-petang",
+    ),
   "dzikir-pagi": () =>
     parseDhikr(require("../../../../content/adhkar/morning_dhikr.json"), "dzikir-pagi"),
   "dzikir-petang": () =>

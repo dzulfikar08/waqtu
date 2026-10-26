@@ -4,12 +4,7 @@ import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import {
-  GlowHero,
-  HeroButton,
-  IBADAH_PAGI_HERO,
-  IBADAH_PETANG_HERO,
-} from "@/components/GlowHero";
+import { GlowHero, HeroButton, IBADAH_PAGI_HERO, IBADAH_PETANG_HERO } from "@/components/GlowHero";
 import { IconChip, PressableScale, Screen, SectionTitle, type IconName } from "@/components/ui";
 import { onDataChanged } from "@/db/events";
 import { useMutabaah, useNow } from "@/hooks/useMutabaah";

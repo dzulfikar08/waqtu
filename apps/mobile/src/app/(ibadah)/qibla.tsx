@@ -253,11 +253,7 @@ function LiveCompass({ bearing }: { bearing: number }) {
         />
         <Text
           accessibilityLiveRegion="polite"
-          style={[
-            typography.headline,
-            tabular,
-            { color: aligned ? theme.accentText : theme.text },
-          ]}
+          style={[typography.headline, tabular, { color: aligned ? theme.accentText : theme.text }]}
         >
           {aligned
             ? t("ibadah.qibla.aligned")
@@ -294,7 +290,15 @@ function LiveCompass({ bearing }: { bearing: number }) {
  * bearing, and the fixed arrow on top is where the phone points. Facing the qibla turns the arrow, the rim and the
  * needle green and buzzes once.
  */
-function Dial({ heading, bearing, aligned }: { heading: number; bearing: number; aligned: boolean }) {
+function Dial({
+  heading,
+  bearing,
+  aligned,
+}: {
+  heading: number;
+  bearing: number;
+  aligned: boolean;
+}) {
   const { t } = useTranslation();
   const theme = useTheme();
   const reduced = useReducedMotion();
@@ -382,18 +386,13 @@ function Dial({ heading, bearing, aligned }: { heading: number; bearing: number;
               style={[StyleSheet.absoluteFill, { transform: [{ rotate: `${angle}deg` }] }]}
             >
               <Text
-                style={[
-                  styles.cardinal,
-                  { color: key === "north" ? theme.danger : theme.muted },
-                ]}
+                style={[styles.cardinal, { color: key === "north" ? theme.danger : theme.muted }]}
               >
                 {t(`ibadah.qibla.${key}`)}
               </Text>
             </View>
           ))}
-          <View
-            style={[StyleSheet.absoluteFill, { transform: [{ rotate: `${bearing}deg` }] }]}
-          >
+          <View style={[StyleSheet.absoluteFill, { transform: [{ rotate: `${bearing}deg` }] }]}>
             <View style={[styles.needle, { height: size / 2 - 72, backgroundColor: tone }]} />
             <View style={[styles.kaaba, { top: 46 }]}>
               <View style={[styles.kaabaBand, { backgroundColor: theme.gold }]} />

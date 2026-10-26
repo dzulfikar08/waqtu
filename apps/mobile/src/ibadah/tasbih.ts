@@ -53,7 +53,12 @@ export const MAX_CUSTOM_TARGET = 10_000;
 export class TasbihContentError extends Error {}
 
 export function parsePhrases(raw: unknown): TasbihPhrase[] {
-  if (typeof raw !== "object" || raw === null || !("phrases" in raw) || !Array.isArray(raw.phrases)) {
+  if (
+    typeof raw !== "object" ||
+    raw === null ||
+    !("phrases" in raw) ||
+    !Array.isArray(raw.phrases)
+  ) {
     throw new TasbihContentError("tasbih: expected phrases");
   }
   return raw.phrases.map((entry: unknown, index): TasbihPhrase => {
@@ -170,7 +175,10 @@ export function positionOf(count: number, phases: readonly Phase[]): TasbihPosit
 /** What a tap reached: a plain count, the end of a phase (33 → the next phrase), or the end of a round. */
 export type TapEvent = "tick" | "phase" | "round";
 
-export function tap(state: TasbihState, phases: readonly Phase[]): { state: TasbihState; event: TapEvent } {
+export function tap(
+  state: TasbihState,
+  phases: readonly Phase[],
+): { state: TasbihState; event: TapEvent } {
   const count = Math.min(MAX_TASBIH, state.count + 1);
   const next = { ...state, count };
   const at = positionOf(count, phases);

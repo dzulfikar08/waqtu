@@ -256,7 +256,13 @@ export function MonthCalendar({
 }
 
 /** Daily mean ratings as bars (a faint stub for a day without ratings), then the mean per aspect. */
-export function TrendChart({ trend, summary }: { trend: readonly TrendDay[]; summary: TrendSummary }) {
+export function TrendChart({
+  trend,
+  summary,
+}: {
+  trend: readonly TrendDay[];
+  summary: TrendSummary;
+}) {
   const { t } = useTranslation();
   const theme = useTheme();
   const colors = hueColors(theme, "muhasabah");
@@ -323,7 +329,9 @@ export function TrendChart({ trend, summary }: { trend: readonly TrendDay[]; sum
                     height={6}
                   />
                 </View>
-                <Text style={[typography.footnote, tabular, styles.aspectValue, { color: theme.muted }]}>
+                <Text
+                  style={[typography.footnote, tabular, styles.aspectValue, { color: theme.muted }]}
+                >
                   {value === null ? "–" : format(value)}
                 </Text>
               </View>

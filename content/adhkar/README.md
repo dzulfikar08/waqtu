@@ -3,13 +3,13 @@
 Bundled in the phone app (apps/mobile/src/ibadah/content.ts, tasbih.ts) for the Ibadah tab. Copied unmodified from the
 Mutabaah app (github.com/dzulfikar08/Mutabaah, same developer), `Mutabaah/Resources/`:
 
-| File                                                                 | What                                                | Translation            |
-| -------------------------------------------------------------------- | --------------------------------------------------- | ---------------------- |
-| `kubro-pagi.json`, `kubro-petang.json`                               | Al-Ma'tsurat kubro, morning / evening               | Indonesian             |
-| `sugro-pagi.json`, `sugro-petang.json`                               | Al-Ma'tsurat sughro, morning / evening              | Indonesian             |
-| `morning_dhikr.json`, `evening_dhikr.json`                           | Morning / evening dhikr, with hadith references     | English                |
-| `duas.json`                                                          | Daily duas by category, with hadith/Quran reference | English                |
-| `tasbih.json`                                                        | Tasbih phrases (`TasbihPreset.presets` in `Mutabaah/Core/Models/TasbihCounter.swift`), ids added | English |
+| File                                       | What                                                                                             | Translation |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------ | ----------- |
+| `kubro-pagi.json`, `kubro-petang.json`     | Al-Ma'tsurat kubro, morning / evening                                                            | Indonesian  |
+| `sugro-pagi.json`, `sugro-petang.json`     | Al-Ma'tsurat sughro, morning / evening                                                           | Indonesian  |
+| `morning_dhikr.json`, `evening_dhikr.json` | Morning / evening dhikr, with hadith references                                                  | English     |
+| `duas.json`                                | Daily duas by category, with hadith/Quran reference                                              | English     |
+| `tasbih.json`                              | Tasbih phrases (`TasbihPreset.presets` in `Mutabaah/Core/Models/TasbihCounter.swift`), ids added | English     |
 
 Al-Ma'tsurat is the wird compiled by Imam Hasan al-Banna. The files carry no further source or licence field; the hadith
 and Quran references inside them are shown with each text.

@@ -118,7 +118,9 @@ describe("bundled adhkar content", () => {
   });
 
   test("Arabic is passed through exactly as stored", () => {
-    const file = json("kubro-pagi.json") as { data: { arabic: string; data?: { arabic: string }[] }[] };
+    const file = json("kubro-pagi.json") as {
+      data: { arabic: string; data?: { arabic: string }[] }[];
+    };
     const session = loadSession("matsurat-kubro-pagi");
     for (const [i, entry] of file.data.entries()) {
       const item = session.items[i];
@@ -325,9 +327,9 @@ describe("reader counters", () => {
     expect(parseProgress(stored, "2027-02-12")).toEqual({ a: 1, b: 2 });
     expect(parseProgress(stored, "2027-02-13")).toEqual({});
     expect(parseProgress("nonsense", "2027-02-12")).toEqual({});
-    expect(parseProgress('{"day":"2027-02-12","counts":{"a":-1,"b":1.5,"c":2}}', "2027-02-12")).toEqual(
-      { c: 2 },
-    );
+    expect(
+      parseProgress('{"day":"2027-02-12","counts":{"a":-1,"b":1.5,"c":2}}', "2027-02-12"),
+    ).toEqual({ c: 2 });
     expect(progressKey("matsurat-sughro-pagi")).toBe("ibadah.progress.matsurat-sughro-pagi");
     expect(isSyncedSettingKey(progressKey("dzikir-pagi"))).toBe(false);
   });
@@ -399,9 +401,7 @@ describe("tasbih", () => {
   });
 
   test("100 of one phrase, and the free count with and without a target", () => {
-    expect(presetPhases("istighfar", phrases, 0)).toEqual([
-      { phrase: phrases[4], target: 100 },
-    ]);
+    expect(presetPhases("istighfar", phrases, 0)).toEqual([{ phrase: phrases[4], target: 100 }]);
     const open = presetPhases("custom", phrases, 0);
     expect(positionOf(250, open)).toMatchObject({ inPhase: 250, target: 0, roundComplete: false });
     expect(tap({ ...DEFAULT_TASBIH, preset: "custom", count: 5 }, open).event).toBe("tick");

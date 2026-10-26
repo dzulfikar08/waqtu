@@ -94,9 +94,7 @@ export default function DoaListScreen() {
                     accessibilityLabel={
                       starred ? `${title}, ${t("ibadah.doa.isFavourite")}` : title
                     }
-                    onPress={() =>
-                      router.push({ pathname: "/doa/[id]", params: { id: dua.id } })
-                    }
+                    onPress={() => router.push({ pathname: "/doa/[id]", params: { id: dua.id } })}
                     scaleTo={0.985}
                     style={styles.row}
                   >
@@ -104,10 +102,7 @@ export default function DoaListScreen() {
                       <Text style={[typography.body, { color: theme.text, fontWeight: "600" }]}>
                         {title}
                       </Text>
-                      <Text
-                        numberOfLines={1}
-                        style={[typography.footnote, { color: theme.muted }]}
-                      >
+                      <Text numberOfLines={1} style={[typography.footnote, { color: theme.muted }]}>
                         {dua.transliteration}
                       </Text>
                       <Text style={[typography.caption, { color: theme.faint }]}>

@@ -143,7 +143,11 @@ export function Reader({
   const uiLang = i18n.language === "en" ? "en" : "id";
   const translationNote =
     session.translationLang !== uiLang
-      ? t(session.translationLang === "en" ? "ibadah.reader.translationEn" : "ibadah.reader.translationId")
+      ? t(
+          session.translationLang === "en"
+            ? "ibadah.reader.translationEn"
+            : "ibadah.reader.translationId",
+        )
       : null;
 
   return (
@@ -157,7 +161,10 @@ export function Reader({
         <Card hue={hue}>
           <View style={styles.progressHead}>
             <Text style={[typography.headline, { color: theme.text, flex: 1 }]}>
-              {t("ibadah.reader.progress", { done: progress.itemsDone, total: progress.itemsTotal })}
+              {t("ibadah.reader.progress", {
+                done: progress.itemsDone,
+                total: progress.itemsTotal,
+              })}
             </Text>
             <Text style={[typography.subhead, tabular, { color: colors.base, fontWeight: "700" }]}>
               {Math.round(progress.fraction * 100)}%
@@ -266,7 +273,9 @@ function ItemCard({
         {done ? <Ionicons name="checkmark-circle" size={22} color={colors.base} /> : null}
       </View>
       {item.heading ? (
-        <View style={[styles.heading, { backgroundColor: colors.wash, borderColor: theme.separator }]}>
+        <View
+          style={[styles.heading, { backgroundColor: colors.wash, borderColor: theme.separator }]}
+        >
           <ArabicText size={24} color={colors.base} center>
             {item.heading.arabic}
           </ArabicText>
@@ -338,15 +347,7 @@ function ItemCard({
 }
 
 /** The end of the session: a short du'a-like close and the mutabaah tick for this morning or evening. */
-function Complete({
-  time,
-  hue,
-  model,
-}: {
-  time: ReaderTime;
-  hue: Hue;
-  model: MutabaahModel;
-}) {
+function Complete({ time, hue, model }: { time: ReaderTime; hue: Hue; model: MutabaahModel }) {
   const db = useSQLiteContext();
   const router = useRouter();
   const { t } = useTranslation();
@@ -364,7 +365,9 @@ function Complete({
           {t("ibadah.reader.completeTitle")}
         </Text>
       </View>
-      <Text style={[typography.body, { color: theme.muted }]}>{t("ibadah.reader.completeBody")}</Text>
+      <Text style={[typography.body, { color: theme.muted }]}>
+        {t("ibadah.reader.completeBody")}
+      </Text>
       {!item ? (
         <Text style={[typography.footnote, { color: theme.muted }]}>
           {t("ibadah.reader.notInChecklist", { item: name })}

@@ -5,12 +5,7 @@ import { useMutabaah } from "@/hooks/useMutabaah";
 import { useTranslation } from "@/i18n";
 import { Reader } from "@/ibadah/components/Reader";
 import { Segmented } from "@/ibadah/components/Segmented";
-import {
-  loadSession,
-  matsuratSession,
-  type MatsuratKind,
-  type ReaderTime,
-} from "@/ibadah/content";
+import { loadSession, matsuratSession, type MatsuratKind, type ReaderTime } from "@/ibadah/content";
 import { suggestTimeAt } from "@/ibadah/suggest";
 
 /** Al-Ma'tsurat, kubro or sughro, morning or evening; opens on the part of the day it is now. */
@@ -24,7 +19,10 @@ export default function MatsuratScreen() {
   );
   const suggested = model ? suggestTimeAt(model.settings, new Date()) : null;
   const time = chosen ?? suggested;
-  const session = useMemo(() => (time ? loadSession(matsuratSession(kind, time)) : null), [kind, time]);
+  const session = useMemo(
+    () => (time ? loadSession(matsuratSession(kind, time)) : null),
+    [kind, time],
+  );
   if (!time || !session || !suggested) return null;
 
   return (

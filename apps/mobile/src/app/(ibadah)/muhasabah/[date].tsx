@@ -57,7 +57,9 @@ export default function MuhasabahEntryScreen() {
     return (
       <View style={[styles.content, { flex: 1, backgroundColor: theme.background }]}>
         <Stack.Screen options={{ title }} />
-        <Text style={[typography.body, { color: theme.muted }]}>{t("ibadah.muhasabah.future")}</Text>
+        <Text style={[typography.body, { color: theme.muted }]}>
+          {t("ibadah.muhasabah.future")}
+        </Text>
       </View>
     );
   }

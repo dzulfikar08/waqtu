@@ -6,14 +6,7 @@ import { Alert, ScrollView, StyleSheet, Text, Vibration, View } from "react-nati
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { itemLabel } from "@/components/itemLabel";
-import {
-  Card,
-  PressableScale,
-  ProgressTrack,
-  Row,
-  Section,
-  StepperRow,
-} from "@/components/ui";
+import { Card, PressableScale, ProgressTrack, Row, Section, StepperRow } from "@/components/ui";
 import { setEntry } from "@/db/entries";
 import { useMutabaah } from "@/hooks/useMutabaah";
 import { useTranslation } from "@/i18n";

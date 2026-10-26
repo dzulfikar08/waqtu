@@ -128,7 +128,9 @@ export function monthWeeks(year: number, month: number): (DayKey | null)[][] {
   const lead = (first.getUTCDay() + 6) % 7;
   const cells: (DayKey | null)[] = Array.from({ length: lead }, () => null);
   for (let d = 1; d <= days; d++) {
-    cells.push(`${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(d).padStart(2, "0")}`);
+    cells.push(
+      `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(d).padStart(2, "0")}`,
+    );
   }
   while (cells.length % 7 !== 0) cells.push(null);
   return Array.from({ length: cells.length / 7 }, (_, w) => cells.slice(w * 7, w * 7 + 7));
@@ -238,10 +240,7 @@ export async function getMuhasabah(
   db: SQLiteDatabase,
   date: DayKey,
 ): Promise<MuhasabahEntry | null> {
-  const row = await db.getFirstAsync<Row>(
-    `SELECT ${COLUMNS} FROM muhasabah WHERE date = ?`,
-    date,
-  );
+  const row = await db.getFirstAsync<Row>(`SELECT ${COLUMNS} FROM muhasabah WHERE date = ?`, date);
   return row ? fromRow(row) : null;
 }
 
