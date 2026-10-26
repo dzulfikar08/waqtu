@@ -56,6 +56,11 @@ GitHub Actions builds everything; no local Mac is needed.
   release builds download it on launch and run it on the next launch. Only JS/asset changes: the `fingerprint`
   runtime version means a native change is never offered to an older build; ship those with the release workflows.
   `gh workflow run ota-update.yml -f message="..."`.
+- **Deploy** (`deploy.yml`, manual, input `target`: `both` | `api` | `web`): `api` applies pending `waqtu-db`
+  migrations on the remote D1 (`wrangler d1 migrations apply waqtu-db --remote`), then deploys `services/api`
+  (worker `waqt-updates`, api.getwaqtu.com); `web` builds and deploys `apps/web` like `bun run deploy:web`. The step
+  summary lists the deployed URLs and a health check (`/v1/me` answers 401, getwaqtu.com answers 200). Secrets in
+  the `release` environment: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`. `gh workflow run deploy.yml -f target=both`.
 
 ## Premium
 
