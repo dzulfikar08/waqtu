@@ -746,9 +746,13 @@ def prepare_subscriptions(asc: Asc) -> list[dict]:
                 screenshot = asc.get_or_none(f"/v1/subscriptions/{sid}/appStoreReviewScreenshot")
                 editable = sub["attributes"]["state"] in ("MISSING_METADATA", "READY_TO_SUBMIT", "DEVELOPER_ACTION_NEEDED", "REJECTED")
                 if screenshot and editable and screenshot["attributes"].get("sourceFileChecksum") != md5(shot):
-                    asc.delete(f"/v1/subscriptionAppStoreReviewScreenshots/{screenshot['id']}")
-                    log(f"{product}: outdated review screenshot removed")
-                    screenshot = None
+                    try:
+                        asc.delete(f"/v1/subscriptionAppStoreReviewScreenshots/{screenshot['id']}")
+                        log(f"{product}: outdated review screenshot removed")
+                        screenshot = None
+                    except AscError as e:
+                        # Locked while the subscription sits in a draft review submission.
+                        log(f"{product}: review screenshot kept ({e.status}: cannot replace it now)")
                 if not screenshot:
                     id_ = upload_asset(
                         asc, "subscriptionAppStoreReviewScreenshots", "subscription", "subscriptions", sid, shot
