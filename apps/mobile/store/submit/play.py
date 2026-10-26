@@ -69,8 +69,12 @@ class Play:
     def request(self, method: str, url: str, **kwargs):
         r = self.http.request(method, url, timeout=300, **kwargs)
         if r.status_code >= 400:
-            raise SystemExit(f"{method} {url.replace(API, '')} -> {r.status_code}: {r.text[:3000]}")
+            raise PlayError(f"{method} {url.replace(API, '')} -> {r.status_code}: {r.text[:3000]}")
         return r.json() if r.content else None
+
+
+class PlayError(Exception):
+    pass
 
 
 def text(folder: str, name: str) -> str:
@@ -143,33 +147,55 @@ def main() -> None:
 
         current = play.request("GET", f"{API}/edits/{edit}/tracks/production")
         log(f"Production before: {json.dumps(current.get('releases', []))}")
-        play.request(
-            "PUT",
-            f"{API}/edits/{edit}/tracks/production",
-            json={
-                "track": "production",
-                "releases": [
-                    {
-                        "name": version_name,
-                        "versionCodes": [version_code],
-                        "status": "completed",
-                        "releaseNotes": [
-                            {"language": languages["id"], "text": RELEASE_NOTES["id"]},
-                            {"language": "en-US", "text": RELEASE_NOTES["en"]},
-                        ],
-                    }
-                ],
-            },
-        )
-        note(f"Production: release {version_name} ({version_code}), status completed")
+
+        def put_production(status: str) -> None:
+            play.request(
+                "PUT",
+                f"{API}/edits/{edit}/tracks/production",
+                json={
+                    "track": "production",
+                    "releases": [
+                        {
+                            "name": version_name,
+                            "versionCodes": [version_code],
+                            "status": status,
+                            "releaseNotes": [
+                                {"language": languages["id"], "text": RELEASE_NOTES["id"]},
+                                {"language": "en-US", "text": RELEASE_NOTES["en"]},
+                            ],
+                        }
+                    ],
+                },
+            )
+
+        put_production("completed")
+        status = "completed"
+        try:
+            play.request("POST", f"{API}/edits/{edit}:validate")
+        except PlayError as e:
+            # An app that was never published ("draft app") only takes draft releases through the API; its first
+            # production release has to be rolled out once in Play Console.
+            if "draft app" not in str(e):
+                raise
+            put_production("draft")
+            status = "draft"
+            play.request("POST", f"{API}/edits/{edit}:validate")
+        note(f"Production: release {version_name} ({version_code}), status {status}")
 
         if not submit:
-            play.request("POST", f"{API}/edits/{edit}:validate")
             note("Edit validated; submit=false, so it was not committed")
             return
         play.request("POST", f"{API}/edits/{edit}:commit")
         committed = True
-        note("Edit committed (managed publishing is off, so the changes go to review)")
+        if status == "completed":
+            note("Edit committed (managed publishing is off, so the changes go to review)")
+        else:
+            note(
+                "Edit committed. HUMAN-ONLY: the app has never been published, so Google Play only accepts a draft"
+                " production release through the API. Play Console > Test and release > Production > edit the draft"
+                f" release {version_name} > Next > Save and publish (pick countries/regions if asked); that sends"
+                " it to review."
+            )
 
         check = play.request("POST", f"{API}/edits", json={})["id"]
         try:
@@ -179,6 +205,9 @@ def main() -> None:
                     note(f"Final: {track} {r.get('name')} {r.get('versionCodes')} {r.get('status')}")
         finally:
             play.request("DELETE", f"{API}/edits/{check}")
+    except PlayError as e:
+        note(f"ERROR {e}")
+        raise SystemExit(1)
     finally:
         if not committed:
             play.request("DELETE", f"{API}/edits/{edit}")
