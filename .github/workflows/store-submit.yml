@@ -10,8 +10,9 @@
 #   android-graphics
 #            apps/mobile/store/submit/play_graphics.py replaces only the hi-res icon and feature graphic of every Play
 #            listing language (from the play-listing-assets release) and commits; the release and listing text stay
-#            as they are, so no build is needed. The images Play then serves are attached as `play-check`. Not part
-#            of `both`.
+#            as they are, so no build is needed. The images Play then serves are attached as `play-check`. While the
+#            app has a rejected release Play will not send the change for review through the API; it is committed
+#            as "not sent" and goes out with Publishing overview > Send changes for review. Not part of `both`.
 #   mac      the same appstore.py with STORE_PLATFORM=mac fills the Mac App Store version of Waqtu for Mac (text from
 #            apps/apple/store, 2880x1800 screenshots and the subscription review screenshot from the latest successful
 #            "Mac screenshots" run, the demo account review@getwaqtu.com) with the newest uploaded build (Release Mac

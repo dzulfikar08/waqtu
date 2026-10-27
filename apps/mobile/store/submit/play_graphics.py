@@ -3,8 +3,10 @@
 
 Run by .github/workflows/store-submit.yml with platform=android-graphics. The release, the listing text and the phone
 screenshots are not touched, so no build is needed. One edit, committed at the end; with managed publishing off the
-commit sends the listing change to review. After the commit a fresh edit reads the listings back, downloads each image
-from Play and checks its hash against the uploaded file.
+commit sends the listing change to review. While the app has a rejected release Play refuses that ("Changes cannot be
+sent for review automatically"); the edit is then committed with changesNotSentForReview=true and the changes wait in
+Play Console > Publishing overview for "Send for review". After the commit a fresh edit reads the listings back,
+downloads each image from Play and checks its hash against the uploaded file.
 
 Environment:
   PLAY_SERVICE_ACCOUNT_JSON   service account key (raw JSON)
@@ -66,13 +68,26 @@ def main() -> None:
                 update_images(play, edit, language, image_type, [assets / name])
             note(f"Listing {language}: icon, feature graphic")
 
-        play.request("POST", f"{API}/edits/{edit}:validate")
+        params = None
+        try:
+            play.request("POST", f"{API}/edits/{edit}:validate")
+        except PlayError as e:
+            if "changesNotSentForReview" not in str(e):
+                raise
+            params = {"changesNotSentForReview": "true"}
+            play.request("POST", f"{API}/edits/{edit}:validate", params=params)
         if not submit:
             note("Edit validated; submit=false, so it was not committed")
             return
-        play.request("POST", f"{API}/edits/{edit}:commit")
+        play.request("POST", f"{API}/edits/{edit}:commit", params=params)
         committed = True
-        note("Edit committed (managed publishing is off, so the listing change goes to review)")
+        if params:
+            note(
+                "Edit committed, but Play cannot send it for review through the API while the app has a rejected"
+                " release. HUMAN-ONLY: Play Console > Publishing overview > Send changes for review."
+            )
+        else:
+            note("Edit committed (managed publishing is off, so the listing change goes to review)")
         verify(play, languages, assets, out)
     except PlayError as e:
         note(f"ERROR {e}")
