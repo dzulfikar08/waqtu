@@ -226,7 +226,7 @@ private struct DuaDetailView: View {
                 Text(dua.arabic)
                     .font(QuranFont.font(size: 32))
                     .foregroundStyle(Color.wqInk)
-                    .lineSpacing(11)
+                    .lineSpacing(0)
                     .multilineTextAlignment(.trailing)
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .textSelection(.enabled)

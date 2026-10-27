@@ -21,7 +21,7 @@ struct IbadahWindowView: View {
 
     /// Room above the sidebar for the traffic lights.
     static let titlebarInset: CGFloat = 46
-    static let sidebarWidth: CGFloat = 244
+    static let sidebarWidth: CGFloat = 256
 
     var body: some View {
         HStack(spacing: 0) {
@@ -129,6 +129,7 @@ private struct IbadahSidebarRow: View {
                 Text(tool.title)
                     .font(.system(size: 13.5, weight: selected ? .semibold : .medium))
                     .lineLimit(1)
+                    .minimumScaleFactor(0.85)
                 Spacer(minLength: 0)
             }
             .foregroundStyle(selected ? Color.wqAccent : Color.wqInk)

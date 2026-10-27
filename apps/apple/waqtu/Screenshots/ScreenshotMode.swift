@@ -242,7 +242,7 @@ enum ScreenshotMode {
         let screens: [(name: String, tool: IbadahModel.Tool, height: CGFloat)] = [
             ("01-qibla", .qibla, 740),
             ("02-matsurat", .matsurat, 1500),
-            ("03-dzikir", .dzikir, 1500),
+            ("03-dzikir", .dzikir, 2200),
             ("04-doa", .doa, 740),
             ("05-tasbih", .tasbih, 960),
             ("06-muhasabah", .muhasabah, 900),
@@ -271,14 +271,15 @@ enum ScreenshotMode {
     private static func seedIbadah(_ model: IbadahModel) {
         model.dzikirTime = .pagi
         model.matsuratTime = .pagi
-        for (id, items) in [(ReaderSessionID.dzikirPagi, 4), (ReaderSessionID.matsuratSughroPagi, 3)] {
+        // (session, texts finished, one more text started with this many recitations).
+        let progress: [(ReaderSessionID, Int, Int)] = [(.dzikirPagi, 3, 37), (.matsuratSughroPagi, 2, 0)]
+        for (id, finished, started) in progress {
             guard let session = IbadahLibrary.session(id) else { continue }
-            for index in 0..<items {
+            for index in 0..<finished {
                 for _ in 0..<session.items[index].repeatCount { _ = model.tap(session, index: index) }
             }
-            // The next text started, not finished.
-            if session.items.indices.contains(items), session.items[items].repeatCount > 1 {
-                _ = model.tap(session, index: items)
+            if session.items.indices.contains(finished) {
+                for _ in 0..<min(started, session.items[finished].repeatCount - 1) { _ = model.tap(session, index: finished) }
             }
         }
         for category in IbadahLibrary.duas.prefix(2) {

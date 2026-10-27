@@ -1091,6 +1091,7 @@ struct PremiumOfferView: View {
             Link("Privacy Policy", destination: LegalLinks.privacy(language: language))
         }
         .font(.system(size: 11))
+        .tint(.waqtuLight)
     }
 
     /// "1 week free, then Rp 29.000/month": an eligible introductory free trial and the price after it.

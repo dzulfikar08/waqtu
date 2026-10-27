@@ -64,8 +64,9 @@ struct MuhasabahView: View {
                         HStack(alignment: .top, spacing: 20) {
                             calendar(today: today)
                             trends(today: today)
+                                .frame(minWidth: 260, idealWidth: 280)
                         }
-                        VStack(spacing: 20) {
+                        VStack(alignment: .leading, spacing: 20) {
                             calendar(today: today)
                             trends(today: today)
                         }

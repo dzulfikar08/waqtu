@@ -242,7 +242,7 @@ private struct ItemCard: View {
             header
             if let heading = item.heading {
                 VStack(spacing: 6) {
-                    ArabicText(text: heading.arabic, size: 26)
+                    ArabicText(text: heading.arabic, size: 26, centered: true)
                         .foregroundStyle(Color.wqAccent)
                     if let translation = heading.translation {
                         Text(translation)
@@ -333,17 +333,19 @@ private struct ItemCard: View {
     }
 }
 
-/// Arabic exactly as stored, right to left, with room between lines for the harakat.
+/// Arabic exactly as stored, right to left. Amiri Quran's own line height already leaves room for the
+/// harakat, so no extra line spacing (a half-em of it made lines drift apart).
 private struct ArabicText: View {
     let text: String
     let size: CGFloat
+    var centered = false
 
     var body: some View {
         Text(text)
             .font(QuranFont.font(size: size))
-            .lineSpacing(size * 0.32)
-            .multilineTextAlignment(.trailing)
-            .frame(maxWidth: .infinity, alignment: .trailing)
+            .lineSpacing(0)
+            .multilineTextAlignment(centered ? .center : .trailing)
+            .frame(maxWidth: .infinity, alignment: centered ? .center : .trailing)
             .textSelection(.enabled)
     }
 }
