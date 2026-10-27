@@ -16,6 +16,10 @@ on:
         type: choice
         options: [both, ios, mac]
         default: both
+      grant_app_access:
+        description: "Give App Store Connect users without access to the app access to it, so they join the internal group"
+        type: boolean
+        default: false
       build:
         description: "CFBundleVersion (empty = newest build)"
         type: string
@@ -57,6 +61,7 @@ jobs:
           REVIEW_CONTACT_PHONE: ${{ secrets.REVIEW_CONTACT_PHONE }}
           TESTFLIGHT_EMAILS: ${{ inputs.emails }}
           BUILD_NUMBER: ${{ inputs.build }}
+          GRANT_APP_ACCESS: ${{ inputs.grant_app_access }}
         run: |
           umask 077
           export ASC_KEY_PATH="$RUNNER_TEMP/asc.p8"
