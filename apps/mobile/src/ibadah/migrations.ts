@@ -1,6 +1,6 @@
 /**
- * The private muhasabah journal; spread into `MIGRATIONS` in db/migrations.ts as one step. Device-local: the sync engine
- * only reads `entries` and `settings`, so these rows never leave the phone.
+ * The private muhasabah journal; one step in `MIGRATIONS` (db/migrations.ts). Device-local by default: the mutabaah sync
+ * engine only reads `entries` and `settings`, and rows leave the phone only through the opt-in cloud sync (cloud.ts).
  */
 export const MUHASABAH_MIGRATION: readonly string[] = [
   `CREATE TABLE muhasabah (
@@ -15,4 +15,13 @@ export const MUHASABAH_MIGRATION: readonly string[] = [
     created_at INTEGER NOT NULL,
     updated_at INTEGER NOT NULL
   )`,
+];
+
+/**
+ * Cloud sync bookkeeping for the journal. `dirty` marks days the server has not seen; `deleted` is a tombstone (the
+ * day's fields stay null) so a deletion reaches other devices. Existing rows start dirty so opting in uploads them.
+ */
+export const MUHASABAH_CLOUD_MIGRATION: readonly string[] = [
+  "ALTER TABLE muhasabah ADD COLUMN dirty INTEGER NOT NULL DEFAULT 1",
+  "ALTER TABLE muhasabah ADD COLUMN deleted INTEGER NOT NULL DEFAULT 0",
 ];

@@ -5,6 +5,7 @@ import { Alert, ScrollView, StyleSheet, Text, TextInput, View } from "react-nati
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Card } from "@/components/ui";
+import { useMuhasabahCloud } from "@/hooks/useMuhasabahCloud";
 import { useMutabaah } from "@/hooks/useMutabaah";
 import { useTranslation } from "@/i18n";
 import { RatingPicker, formatDay } from "@/ibadah/components/Muhasabah";
@@ -22,7 +23,7 @@ import { isDayKey } from "@/mutabaah/dates";
 import { Button } from "@/ramadhan/components/fields";
 import { hueColors, radius, spacing, typography, useTheme } from "@/theme";
 
-/** One day's muhasabah: the seven questions in order on one page, saved to this phone only. */
+/** One day's muhasabah: the seven questions in order on one page, saved to this phone, and to the account when cloud sync is on. */
 export default function MuhasabahEntryScreen() {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
@@ -30,6 +31,7 @@ export default function MuhasabahEntryScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const model = useMutabaah();
+  const { enabled: cloud } = useMuhasabahCloud();
   const { date } = useLocalSearchParams<{ date: string }>();
   const valid = typeof date === "string" && isDayKey(date);
   const [entry, setEntry] = useState<MuhasabahEntry | null>(null);
@@ -76,14 +78,18 @@ export default function MuhasabahEntryScreen() {
   };
 
   const remove = () =>
-    Alert.alert(t("ibadah.muhasabah.deleteTitle"), t("ibadah.muhasabah.deleteBody"), [
-      { text: t("ibadah.muhasabah.cancel"), style: "cancel" },
-      {
-        text: t("ibadah.muhasabah.confirmDelete"),
-        style: "destructive",
-        onPress: () => void deleteMuhasabah(db, date).then(() => router.back()),
-      },
-    ]);
+    Alert.alert(
+      t("ibadah.muhasabah.deleteTitle"),
+      t(cloud ? "ibadah.muhasabah.deleteBodySynced" : "ibadah.muhasabah.deleteBody"),
+      [
+        { text: t("ibadah.muhasabah.cancel"), style: "cancel" },
+        {
+          text: t("ibadah.muhasabah.confirmDelete"),
+          style: "destructive",
+          onPress: () => void deleteMuhasabah(db, date).then(() => router.back()),
+        },
+      ],
+    );
 
   return (
     <ScrollView

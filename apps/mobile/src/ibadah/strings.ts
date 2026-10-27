@@ -164,7 +164,8 @@ export const ibadahId = {
     cardDone: "Hari ini sudah diisi",
     cardTodo: "Belum diisi hari ini",
     private:
-      "Pribadi: catatan muhasabah hanya tersimpan di ponsel ini. Tidak ikut sinkron dan tidak pernah dikirim ke server.",
+      "Pribadi: catatan muhasabah tetap di ponsel ini kecuali kamu mengaktifkan sinkron cloud di Pengaturan.",
+    synced: "Tersinkron ke akunmu",
     today: "Hari ini",
     start: "Mulai muhasabah hari ini",
     edit: "Ubah catatan hari ini",
@@ -222,6 +223,8 @@ export const ibadahId = {
     delete: "Hapus catatan",
     deleteTitle: "Hapus catatan muhasabah ini?",
     deleteBody: "Catatan hari ini dihapus dari ponsel. Tidak bisa dibatalkan.",
+    deleteBodySynced:
+      "Catatan hari ini dihapus dari ponsel ini dan dari salinan cloud di akunmu. Tidak bisa dibatalkan.",
     cancel: "Batal",
     confirmDelete: "Hapus",
     future: "Hari ini belum tiba.",
@@ -396,7 +399,8 @@ export const ibadahEn: Widen<typeof ibadahId> = {
     cardDone: "Written today",
     cardTodo: "Not written today",
     private:
-      "Private: your muhasabah notes are stored only on this phone. They are not synced and never sent to a server.",
+      "Private: your muhasabah notes stay on this phone unless you turn on cloud sync in Settings.",
+    synced: "Synced to your account",
     today: "Today",
     start: "Start today's muhasabah",
     edit: "Edit today's notes",
@@ -454,6 +458,8 @@ export const ibadahEn: Widen<typeof ibadahId> = {
     delete: "Delete notes",
     deleteTitle: "Delete these muhasabah notes?",
     deleteBody: "The notes for this day are deleted from the phone. This can't be undone.",
+    deleteBodySynced:
+      "The notes for this day are deleted from this phone and from the cloud copy in your account. This can't be undone.",
     cancel: "Cancel",
     confirmDelete: "Delete",
     future: "This day hasn't come yet.",

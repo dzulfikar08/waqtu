@@ -1,0 +1,93 @@
+# Runnable Mac build of any branch for testing: builds the direct-download scheme `waqtu` (Release,
+# universal), signs it ad-hoc and uploads waqtu-mac-preview.zip as the `waqtu-mac-preview` artifact
+# (kept 7 days). Nothing is published: no R2, no Sparkle appcast, no App Store Connect, no secrets.
+#
+# Manual only; the branch is the one picked with `gh workflow run mac-preview.yml --ref <branch>`.
+#
+# Ad-hoc signing has no team or provisioning profile, so make-entitlements.py drops the restricted
+# entitlements (Sign in with Apple, iCloud key-value store) that the kernel would kill the app for.
+# Hardened runtime is NOT enabled: its library validation would refuse to load the ad-hoc signed
+# Sparkle.framework. The build stays unsigned in xcodebuild and is signed here, inside-out, the same
+# order as apps/apple/scripts/sign-app.sh.
+#
+# Not for auto-update: automatic update checks are switched off in the built Info.plist. The app
+# takes its appcast URL from AppDelegate, so a manual "Check for Updates" would still offer a
+# release build; do not use it on a preview.
+name: Mac preview
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+
+      - name: Build waqtu (Release, unsigned)
+        working-directory: apps/apple
+        run: |
+          xcodebuild build \
+            -project waqt.xcodeproj \
+            -scheme waqtu \
+            -configuration Release \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath build/DerivedData \
+            -quiet \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+
+      - name: Disable Sparkle and sign ad-hoc
+        working-directory: apps/apple
+        run: |
+          set -euo pipefail
+          app="build/DerivedData/Build/Products/Release/waqtu.app"
+          test -d "$app"
+          tmp="$(mktemp -d)"
+
+          plist="$app/Contents/Info.plist"
+          /usr/libexec/PlistBuddy -c "Add :SUEnableAutomaticChecks bool false" "$plist" \
+            || /usr/libexec/PlistBuddy -c "Set :SUEnableAutomaticChecks false" "$plist"
+
+          sign() { codesign --force --sign - "$@"; }
+
+          sparkle="$app/Contents/Frameworks/Sparkle.framework"
+          if [ -d "$sparkle" ]; then
+            find "$sparkle" -type d -name "*.xpc" -print0 | while IFS= read -r -d '' p; do sign --preserve-metadata=entitlements "$p"; done
+            find "$sparkle" -type f -name Autoupdate -print0 | while IFS= read -r -d '' p; do sign --preserve-metadata=entitlements "$p"; done
+            find "$sparkle" -type d -name Updater.app -print0 | while IFS= read -r -d '' p; do sign --preserve-metadata=entitlements "$p"; done
+            sign "$sparkle"
+          fi
+
+          if [ -d "$app/Contents/PlugIns" ]; then
+            find "$app/Contents/PlugIns" -maxdepth 1 -type d -name "*.appex" -print0 | while IFS= read -r -d '' appex; do
+              python3 scripts/make-entitlements.py macos-widget/macos-widget.entitlements "$tmp/widget.entitlements" dat.waqtu.mac-widget
+              sign --entitlements "$tmp/widget.entitlements" "$appex"
+            done
+          fi
+
+          python3 scripts/make-entitlements.py waqtu/waqtu.entitlements "$tmp/app.entitlements" dat.waqtu
+          sign --entitlements "$tmp/app.entitlements" "$app"
+
+          codesign --verify --deep --strict --verbose=2 "$app"
+          codesign -d --entitlements :- "$app"
+          lipo -archs "$app/Contents/MacOS/waqtu"
+
+      - name: Zip
+        working-directory: apps/apple/build/DerivedData/Build/Products/Release
+        run: ditto -c -k --sequesterRsrc --keepParent waqtu.app "$GITHUB_WORKSPACE/waqtu-mac-preview.zip"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: waqtu-mac-preview
+          path: waqtu-mac-preview.zip
+          retention-days: 7
+          if-no-files-found: error

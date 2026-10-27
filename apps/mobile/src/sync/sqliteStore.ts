@@ -1,3 +1,4 @@
+import { CLOUD_CURSOR_KEY, CLOUD_USER_KEY } from "../ibadah/cloud";
 import type { SyncEntry, SyncSetting } from "../mutabaah/merge";
 import { isSyncedSettingKey } from "../mutabaah/syncKeys";
 import type { SyncStore } from "../mutabaah/syncEngine";
@@ -138,13 +139,16 @@ export function createSqliteStore(db: SqlDb, userId: string): SyncStore {
 /**
  * Detaches this phone from a deleted account: the cursors and the account marker go, the data stays
  * and is marked unsynced. The next sign-in then adopts and uploads it as a first sign-in does,
- * instead of treating it as another person's.
+ * instead of treating it as another person's. The muhasabah cloud switch belonged to the deleted
+ * account, so it goes too; the journal stays on the phone, queued again for a later opt-in.
  */
 export async function forgetAccount(db: SqlDb): Promise<void> {
   await db.withTransactionAsync(async () => {
     await db.runAsync("DELETE FROM settings WHERE key LIKE 'sync.cursor.%'");
     await db.runAsync("DELETE FROM settings WHERE key = ?", SYNC_USER_KEY);
+    await db.runAsync("DELETE FROM settings WHERE key IN (?, ?)", CLOUD_USER_KEY, CLOUD_CURSOR_KEY);
     await db.runAsync("UPDATE entries SET dirty = 1");
+    await db.runAsync("UPDATE muhasabah SET dirty = 1");
     const keys = await db.getAllAsync<{ key: string }>("SELECT key FROM settings");
     for (const { key } of keys) {
       if (isSyncedSettingKey(key)) {

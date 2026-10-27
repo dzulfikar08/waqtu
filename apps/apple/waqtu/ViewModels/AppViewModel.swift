@@ -24,6 +24,8 @@ final class AppViewModel {
     let pomodoroManager: PomodoroManager
     let account: WaqtuAccount
     let syncController: MutabaahSyncController
+    /// The muhasabah journal and its opt-in cloud copy.
+    let muhasabahCloud: MuhasabahCloudController
     let audioLibrary = AudioLibraryManager()
     let sharedBridge = SharedDataBridge()
 
@@ -116,6 +118,10 @@ final class AppViewModel {
         self.syncController = MutabaahSyncController(
             account: account, streakManager: streakManager, settings: settings
         )
+        let muhasabahCloud = MuhasabahCloudController(account: account)
+        self.muhasabahCloud = muhasabahCloud
+        // The muhasabah cloud copy (only when the user turned it on) syncs on the checklist sync's triggers.
+        syncController.onSyncPass = { [weak muhasabahCloud] in await muhasabahCloud?.syncNow() }
         #if MAS
         let storeSubscription = MacStoreSubscription()
         self.storeSubscription = storeSubscription

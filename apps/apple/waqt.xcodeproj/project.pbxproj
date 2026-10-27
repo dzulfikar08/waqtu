@@ -28,6 +28,22 @@
 		CC21837216F3B7FFA7AF00CC /* AmiriQuran-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D94241551BCE880E056DBFFA /* AmiriQuran-Regular.ttf */; };
 		C754C9AC9AA1437D02B3A5F3 /* AmiriQuran-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = BBEC023C812E2512FE606408 /* AmiriQuran-OFL.txt */; };
 		A1A186797C2E67C6C58EDD62 /* AmiriQuran-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = BBEC023C812E2512FE606408 /* AmiriQuran-OFL.txt */; };
+		68AFBA642522CA060CD706B7 /* duas.json in Resources */ = {isa = PBXBuildFile; fileRef = 971703FEBC9C43CE4F67844D /* duas.json */; };
+		D13D99239E90A102927FCD39 /* duas.json in Resources */ = {isa = PBXBuildFile; fileRef = 971703FEBC9C43CE4F67844D /* duas.json */; };
+		B32684CF3AE0B5EAEEF20BC1 /* evening_dhikr.json in Resources */ = {isa = PBXBuildFile; fileRef = 1D819DF596A6C96F883C846D /* evening_dhikr.json */; };
+		481A6EBECD7516127FE3C926 /* evening_dhikr.json in Resources */ = {isa = PBXBuildFile; fileRef = 1D819DF596A6C96F883C846D /* evening_dhikr.json */; };
+		2C190CFA748042BEEE657637 /* kubro-pagi.json in Resources */ = {isa = PBXBuildFile; fileRef = 2C854B0FD220402A41F3AFFA /* kubro-pagi.json */; };
+		34937B22A803FC4A56504951 /* kubro-pagi.json in Resources */ = {isa = PBXBuildFile; fileRef = 2C854B0FD220402A41F3AFFA /* kubro-pagi.json */; };
+		4F7FA49AFE918DA9ED66C7F4 /* kubro-petang.json in Resources */ = {isa = PBXBuildFile; fileRef = 198CF8FA72D11CCC1C81DD32 /* kubro-petang.json */; };
+		EBA25BC30D3CB66468D47E69 /* kubro-petang.json in Resources */ = {isa = PBXBuildFile; fileRef = 198CF8FA72D11CCC1C81DD32 /* kubro-petang.json */; };
+		A2C8181F81B6F33B5283CD20 /* morning_dhikr.json in Resources */ = {isa = PBXBuildFile; fileRef = B4A8981729E2D992BCFCF4F2 /* morning_dhikr.json */; };
+		F699FFDEFC92A0ABA0CAB50E /* morning_dhikr.json in Resources */ = {isa = PBXBuildFile; fileRef = B4A8981729E2D992BCFCF4F2 /* morning_dhikr.json */; };
+		14705D07EB23F2DCFDA3C2F0 /* sugro-pagi.json in Resources */ = {isa = PBXBuildFile; fileRef = AB71C36E4D755F8E4DF59D63 /* sugro-pagi.json */; };
+		FC51314941A0B0509DB27FBB /* sugro-pagi.json in Resources */ = {isa = PBXBuildFile; fileRef = AB71C36E4D755F8E4DF59D63 /* sugro-pagi.json */; };
+		5EA5348DE15FBCEEA333BF0E /* sugro-petang.json in Resources */ = {isa = PBXBuildFile; fileRef = 2A405DDA78C8C26CCFFDB114 /* sugro-petang.json */; };
+		FF0B212705F355FCB4B53FFF /* sugro-petang.json in Resources */ = {isa = PBXBuildFile; fileRef = 2A405DDA78C8C26CCFFDB114 /* sugro-petang.json */; };
+		53C6B331ED08B28C0CB95518 /* tasbih.json in Resources */ = {isa = PBXBuildFile; fileRef = 0452AA7B37464296E2FFA91B /* tasbih.json */; };
+		43399FF73D00A6AE100A9201 /* tasbih.json in Resources */ = {isa = PBXBuildFile; fileRef = 0452AA7B37464296E2FFA91B /* tasbih.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -129,6 +145,14 @@
 		8874B94D3460E39AC80B111E /* quran-uthmani-1.1.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = quran-uthmani-1.1.txt; path = "../../content/quran/quran-uthmani-1.1.txt"; sourceTree = SOURCE_ROOT; };
 		D94241551BCE880E056DBFFA /* AmiriQuran-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = AmiriQuran-Regular.ttf; path = "../mobile/assets/fonts/AmiriQuran-Regular.ttf"; sourceTree = SOURCE_ROOT; };
 		BBEC023C812E2512FE606408 /* AmiriQuran-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = AmiriQuran-OFL.txt; path = "../mobile/assets/fonts/AmiriQuran-OFL.txt"; sourceTree = SOURCE_ROOT; };
+		971703FEBC9C43CE4F67844D /* duas.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = duas.json; path = "../../content/adhkar/duas.json"; sourceTree = SOURCE_ROOT; };
+		1D819DF596A6C96F883C846D /* evening_dhikr.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = evening_dhikr.json; path = "../../content/adhkar/evening_dhikr.json"; sourceTree = SOURCE_ROOT; };
+		2C854B0FD220402A41F3AFFA /* kubro-pagi.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = kubro-pagi.json; path = "../../content/adhkar/kubro-pagi.json"; sourceTree = SOURCE_ROOT; };
+		198CF8FA72D11CCC1C81DD32 /* kubro-petang.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = kubro-petang.json; path = "../../content/adhkar/kubro-petang.json"; sourceTree = SOURCE_ROOT; };
+		B4A8981729E2D992BCFCF4F2 /* morning_dhikr.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = morning_dhikr.json; path = "../../content/adhkar/morning_dhikr.json"; sourceTree = SOURCE_ROOT; };
+		AB71C36E4D755F8E4DF59D63 /* sugro-pagi.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = sugro-pagi.json; path = "../../content/adhkar/sugro-pagi.json"; sourceTree = SOURCE_ROOT; };
+		2A405DDA78C8C26CCFFDB114 /* sugro-petang.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = sugro-petang.json; path = "../../content/adhkar/sugro-petang.json"; sourceTree = SOURCE_ROOT; };
+		0452AA7B37464296E2FFA91B /* tasbih.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = tasbih.json; path = "../../content/adhkar/tasbih.json"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -372,6 +396,14 @@
 				8874B94D3460E39AC80B111E /* quran-uthmani-1.1.txt */,
 				D94241551BCE880E056DBFFA /* AmiriQuran-Regular.ttf */,
 				BBEC023C812E2512FE606408 /* AmiriQuran-OFL.txt */,
+				971703FEBC9C43CE4F67844D /* duas.json */,
+				1D819DF596A6C96F883C846D /* evening_dhikr.json */,
+				2C854B0FD220402A41F3AFFA /* kubro-pagi.json */,
+				198CF8FA72D11CCC1C81DD32 /* kubro-petang.json */,
+				B4A8981729E2D992BCFCF4F2 /* morning_dhikr.json */,
+				AB71C36E4D755F8E4DF59D63 /* sugro-pagi.json */,
+				2A405DDA78C8C26CCFFDB114 /* sugro-petang.json */,
+				0452AA7B37464296E2FFA91B /* tasbih.json */,
 			);
 			name = BundledContent;
 			sourceTree = "<group>";
@@ -759,6 +791,14 @@
 				449DBAFB2DFCC9F35541E7C9 /* quran-uthmani-1.1.txt in Resources */,
 				CC21837216F3B7FFA7AF00CC /* AmiriQuran-Regular.ttf in Resources */,
 				A1A186797C2E67C6C58EDD62 /* AmiriQuran-OFL.txt in Resources */,
+				D13D99239E90A102927FCD39 /* duas.json in Resources */,
+				481A6EBECD7516127FE3C926 /* evening_dhikr.json in Resources */,
+				34937B22A803FC4A56504951 /* kubro-pagi.json in Resources */,
+				EBA25BC30D3CB66468D47E69 /* kubro-petang.json in Resources */,
+				F699FFDEFC92A0ABA0CAB50E /* morning_dhikr.json in Resources */,
+				FC51314941A0B0509DB27FBB /* sugro-pagi.json in Resources */,
+				FF0B212705F355FCB4B53FFF /* sugro-petang.json in Resources */,
+				43399FF73D00A6AE100A9201 /* tasbih.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -777,6 +817,14 @@
 				EB6528E2EC9462EB77181441 /* quran-uthmani-1.1.txt in Resources */,
 				8D82A52D5780943215F772E7 /* AmiriQuran-Regular.ttf in Resources */,
 				C754C9AC9AA1437D02B3A5F3 /* AmiriQuran-OFL.txt in Resources */,
+				68AFBA642522CA060CD706B7 /* duas.json in Resources */,
+				B32684CF3AE0B5EAEEF20BC1 /* evening_dhikr.json in Resources */,
+				2C190CFA748042BEEE657637 /* kubro-pagi.json in Resources */,
+				4F7FA49AFE918DA9ED66C7F4 /* kubro-petang.json in Resources */,
+				A2C8181F81B6F33B5283CD20 /* morning_dhikr.json in Resources */,
+				14705D07EB23F2DCFDA3C2F0 /* sugro-pagi.json in Resources */,
+				5EA5348DE15FBCEEA333BF0E /* sugro-petang.json in Resources */,
+				53C6B331ED08B28C0CB95518 /* tasbih.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

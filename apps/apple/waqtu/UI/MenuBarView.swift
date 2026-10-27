@@ -2,19 +2,6 @@ import SwiftUI
 import AppKit
 import EventKit
 
-// MARK: - Mutabaah-inspired Colors
-extension Color {
-    static let waqtuPrimary = Color(hex: "#4A8B6F")
-    static let waqtuLight = Color(hex: "#6BA888")
-    static let waqtuDark = Color(hex: "#2D5F4C")
-    static let waqtuBackground = Color(hex: "#1A2E25")
-    static let waqtuGold = Color(hex: "#D4A574")
-    static let waqtuText = Color(hex: "#E8F0ED")
-    static let waqtuMuted = Color(hex: "#A8C9B8")
-    static let waqtuSecondary = Color(hex: "#6B8FAD")
-    static let waqtuSecondaryDark = Color(hex: "#5A7D9A")
-}
-
 struct MenuBarView: View {
     @Bindable var viewModel: AppViewModel
     #if !MAS
@@ -27,11 +14,16 @@ struct MenuBarView: View {
     }
 
     var body: some View {
-        if viewModel.hasAccess {
-            menuBarContent
-        } else {
-            UpgradeMenuView()
+        Group {
+            if viewModel.hasAccess {
+                menuBarContent
+            } else {
+                UpgradeMenuView()
+            }
         }
+        // The module windows (Worship, Circles) open Settings through this action; AppKit has no other
+        // way to reach the Settings scene that works on current macOS.
+        .onAppear { SettingsOpener.register(openSettings) }
     }
 
     @ViewBuilder
@@ -109,17 +101,8 @@ struct MenuBarView: View {
 
             Divider()
 
-            // Controls
-            ControlsSection(
-                overlayEnabled: $viewModel.settings.overlayEnabled,
-                onTestOverlay: { viewModel.showTestOverlay() },
-                onImsakiyah: { viewModel.showImsakiyah() }
-            )
-
-            Divider()
-
-            // Bottom buttons
-            BottomButtons()
+            // Imsakiyah, Settings, Quit; the overlay switch and its test live in Settings > General
+            MenuFooter(onImsakiyah: { viewModel.showImsakiyah() })
         }
         .frame(width: 320)
         .background(Color.waqtuBackground)
@@ -136,7 +119,7 @@ struct TrialBannerView: View {
             .font(.system(size: 11))
             .foregroundColor(.waqtuMuted)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 6)
+            .padding(.vertical, 4)
             .background(Color.waqtuDark.opacity(0.4))
     }
 }
@@ -171,6 +154,8 @@ struct TrialEndingSoonModal: View {
 /// The menu without access: Mac App Store build before subscribing, direct-download build once the
 /// local trial ended.
 struct UpgradeMenuView: View {
+    @Environment(\.openSettings) private var openSettings
+
     var body: some View {
         VStack(spacing: 14) {
             #if MAS
@@ -186,7 +171,8 @@ struct UpgradeMenuView: View {
                 .multilineTextAlignment(.center)
             #endif
             Button("Upgrade") {
-                openUpgradeWindow()
+                SettingsOpener.register(openSettings)
+                SettingsOpener.show(pane: SettingsView.Pane.upgrade)
             }
             .buttonStyle(.borderedProminent)
             .tint(.waqtuPrimary)
@@ -199,13 +185,6 @@ struct UpgradeMenuView: View {
         .frame(width: 260)
         .padding(20)
         .background(Color.waqtuBackground)
-    }
-
-    private func openUpgradeWindow() {
-        NSApp.activate(ignoringOtherApps: true)
-        if NSApp.responds(to: Selector(("showSettingsWindow:"))) {
-            NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-        }
     }
 }
 
@@ -235,7 +214,9 @@ struct NextPrayerHeader: View {
                             .foregroundColor(.waqtuGold)
                     }
                 }
-                .padding(12)
+                .padding(.horizontal, 12)
+                .padding(.top, 10)
+                .padding(.bottom, 4)
             } else {
                 Text("Loading...")
                     .font(.system(size: 13))
@@ -272,7 +253,7 @@ struct LocationDisplayView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 6) {
                 Image(systemName: "location.fill")
                     .font(.system(size: 10))
@@ -301,7 +282,7 @@ struct LocationDisplayView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
-        .padding(.bottom, 8)
+        .padding(.bottom, 6)
     }
 }
 
@@ -311,13 +292,13 @@ struct PrayerTimesList: View {
     let nextPrayerId: UUID?
 
     var body: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 2) {
             ForEach(prayers) { prayer in
                 PrayerRow(prayer: prayer, isNext: prayer.id == nextPrayerId)
             }
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 8)
+        .padding(.vertical, 6)
     }
 }
 
@@ -346,7 +327,7 @@ struct PrayerRow: View {
                 .monospacedDigit()
                 .foregroundColor(prayer.hasPassed ? .waqtuMuted.opacity(0.4) : (isNext ? .waqtuGold : .waqtuText))
         }
-        .padding(.vertical, 6)
+        .padding(.vertical, 4)
         .padding(.horizontal, 8)
         .background(
             isNext ? Color.waqtuPrimary.opacity(0.12) : (isHovering ? Color.waqtuPrimary.opacity(0.06) : Color.clear)
@@ -395,7 +376,7 @@ struct StreakReportView: View {
                         .foregroundColor(.waqtuMuted)
                 }
                 .padding(.horizontal, 12)
-                .padding(.vertical, 8)
+                .padding(.vertical, 6)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -464,65 +445,42 @@ struct StreakReportView: View {
     }
 }
 
-// MARK: - Controls Section
-struct ControlsSection: View {
-    @Binding var overlayEnabled: Bool
-    let onTestOverlay: () -> Void
+// MARK: - Footer
+/// Imsakiyah, Settings and Quit as one row of compact buttons. The overlay switch and its test
+/// button live in Settings > General.
+struct MenuFooter: View {
     let onImsakiyah: () -> Void
+    @Environment(\.openSettings) private var openSettings
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Overlay toggle - bell, text, and switch on one line
-            HStack(spacing: 0) {
-                HStack(spacing: 10) {
-                    Image(systemName: "bell")
-                        .foregroundColor(.waqtuGold)
-                        .font(.system(size: 12))
-                        .frame(width: 18, alignment: .center)
-                    Text("Enable Overlay")
-                        .font(.system(size: 13))
-                        .foregroundColor(.waqtuText)
-                }
-                Spacer(minLength: 8)
-                Toggle(isOn: $overlayEnabled) { EmptyView() }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
+        HStack(spacing: 0) {
+            footerButton("Imsakiyah", systemImage: "calendar", action: onImsakiyah)
+            footerButton("Settings", systemImage: "gearshape") {
+                NSApp.activate(ignoringOtherApps: true)
+                openSettings()
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-
-            // Test overlay button
-            Button(action: onTestOverlay) {
-                HStack {
-                    Image(systemName: "play.circle")
-                        .foregroundColor(.waqtuPrimary)
-                        .font(.system(size: 12))
-                    Text("Test Overlay")
-                        .font(.system(size: 13))
-                        .foregroundColor(.waqtuText)
-                    Spacer()
-                }
+            footerButton("Quit", systemImage: "power", muted: true) {
+                NSApplication.shared.terminate(nil)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .buttonStyle(ControlRowButtonStyle())
-
-            // Ramadhan month table
-            Button(action: onImsakiyah) {
-                HStack {
-                    Image(systemName: "calendar")
-                        .foregroundColor(.waqtuPrimary)
-                        .font(.system(size: 12))
-                    Text("Imsakiyah")
-                        .font(.system(size: 13))
-                        .foregroundColor(.waqtuText)
-                    Spacer()
-                }
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .buttonStyle(ControlRowButtonStyle())
         }
+        .padding(.horizontal, 4)
+    }
+
+    private func footerButton(
+        _ title: LocalizedStringKey,
+        systemImage: String,
+        muted: Bool = false,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: systemImage)
+                .font(.system(size: 11))
+                .foregroundColor(muted ? .waqtuMuted : .waqtuText)
+                .lineLimit(1)
+                .frame(maxWidth: .infinity, minHeight: 30)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(ControlRowButtonStyle())
     }
 }
 
@@ -539,105 +497,109 @@ struct ControlRowButtonStyle: ButtonStyle {
 }
 
 // MARK: - Pomodoro Section
+/// One row: phase (with its cycle dots or caption), time and the controls inline.
 struct PomodoroSection: View {
     @Bindable var pomodoroManager: PomodoroManager
     var nextPrayer: PrayerTime?
 
     var body: some View {
         VStack(spacing: 0) {
-            // Phase + countdown header
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 Image(systemName: pomodoroManager.phase.symbolName)
                     .foregroundColor(.waqtuGold)
                     .font(.system(size: 12))
                     .frame(width: 18, alignment: .center)
 
-                VStack(alignment: .leading, spacing: 1) {
+                VStack(alignment: .leading, spacing: 3) {
                     Text(pomodoroManager.phase.displayName)
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(.waqtuText)
+                        .lineLimit(1)
                     if let prayer = pomodoroManager.clampedBeforePrayer {
                         Text("Stops before \(prayer)")
                             .font(.system(size: 10))
                             .foregroundColor(.waqtuMuted)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     } else if pomodoroManager.isPaused {
                         Text("Paused")
                             .font(.system(size: 10))
                             .foregroundColor(.waqtuMuted)
+                    } else {
+                        HStack(spacing: 3) {
+                            ForEach(0..<pomodoroManager.cycleTarget, id: \.self) { i in
+                                Circle()
+                                    .fill(i < pomodoroManager.cyclesCompleted ? Color.waqtuPrimary : Color.waqtuDark)
+                                    .frame(width: 5, height: 5)
+                            }
+                        }
                     }
                 }
 
-                Spacer(minLength: 8)
+                Spacer(minLength: 6)
 
                 Text(pomodoroManager.timeText)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: 14, weight: .semibold))
                     .monospacedDigit()
                     .foregroundColor(.waqtuGold)
+
+                controls
             }
             .padding(.horizontal, 12)
-            .padding(.vertical, 10)
+            .padding(.vertical, 6)
 
-            // Progress bar
             if pomodoroManager.isRunning {
                 ProgressView(value: pomodoroManager.progress)
                     .tint(.waqtuPrimary)
                     .padding(.horizontal, 12)
                     .padding(.bottom, 6)
             }
+        }
+    }
 
-            // Cycle dots
+    @ViewBuilder
+    private var controls: some View {
+        if pomodoroManager.phase == .idle {
+            Button {
+                pomodoroManager.start(nextPrayer: nextPrayer)
+            } label: {
+                Label("Start", systemImage: "play.fill")
+                    .font(.system(size: 11, weight: .medium))
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+            .tint(.waqtuPrimary)
+        } else {
             HStack(spacing: 4) {
-                ForEach(0..<pomodoroManager.cycleTarget, id: \.self) { i in
-                    Circle()
-                        .fill(i < pomodoroManager.cyclesCompleted ? Color.waqtuPrimary : Color.waqtuDark)
-                        .frame(width: 6, height: 6)
+                Button {
+                    pomodoroManager.isPaused ? pomodoroManager.resume() : pomodoroManager.pause()
+                } label: {
+                    Label(pomodoroManager.isPaused ? String(localized: "Resume") : String(localized: "Pause"),
+                          systemImage: pomodoroManager.isPaused ? "play.fill" : "pause.fill")
+                        .labelStyle(.iconOnly)
                 }
-                Spacer()
-            }
-            .padding(.horizontal, 12)
-            .padding(.bottom, 8)
+                .tint(.waqtuPrimary)
+                .help(pomodoroManager.isPaused ? String(localized: "Resume") : String(localized: "Pause"))
 
-            // Controls
-            HStack(spacing: 8) {
-                if pomodoroManager.phase == .idle {
-                    Button {
-                        pomodoroManager.start(nextPrayer: nextPrayer)
-                    } label: {
-                        Label("Start", systemImage: "play.fill")
-                            .font(.system(size: 12, weight: .medium))
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(.waqtuPrimary)
-                } else {
-                    Button {
-                        pomodoroManager.isPaused ? pomodoroManager.resume() : pomodoroManager.pause()
-                    } label: {
-                        Label(pomodoroManager.isPaused ? String(localized: "Resume") : String(localized: "Pause"),
-                              systemImage: pomodoroManager.isPaused ? "play.fill" : "pause.fill")
-                            .font(.system(size: 12, weight: .medium))
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(.waqtuPrimary)
-
-                    Button {
-                        pomodoroManager.skip(nextPrayer: nextPrayer)
-                    } label: {
-                        Label("Skip", systemImage: "forward.fill")
-                            .font(.system(size: 12, weight: .medium))
-                    }
-                    .buttonStyle(.bordered)
-
-                    Button {
-                        pomodoroManager.reset()
-                    } label: {
-                        Image(systemName: "arrow.counterclockwise")
-                            .font(.system(size: 12))
-                    }
-                    .buttonStyle(.bordered)
+                Button {
+                    pomodoroManager.skip(nextPrayer: nextPrayer)
+                } label: {
+                    Label("Skip", systemImage: "forward.fill")
+                        .labelStyle(.iconOnly)
                 }
+                .help(String(localized: "Skip"))
+
+                Button {
+                    pomodoroManager.reset()
+                } label: {
+                    Label("Reset", systemImage: "arrow.counterclockwise")
+                        .labelStyle(.iconOnly)
+                }
+                .help(String(localized: "Reset"))
             }
-            .padding(.horizontal, 12)
-            .padding(.bottom, 10)
+            .font(.system(size: 11))
+            .buttonStyle(.bordered)
+            .controlSize(.small)
         }
     }
 }
@@ -770,48 +732,6 @@ struct PomodoroSettingsTab: View {
     }
 }
 
-// MARK: - Bottom Buttons
-struct BottomButtons: View {
-    @Environment(\.openSettings) private var openSettings
-
-    var body: some View {
-        VStack(spacing: 0) {
-            Button(action: {
-                NSApp.activate(ignoringOtherApps: true)
-                openSettings()
-            }) {
-                HStack {
-                    Text("Settings")
-                        .font(.system(size: 13))
-                        .foregroundColor(.waqtuText)
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity, minHeight: 28)
-                .contentShape(Rectangle())
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-            }
-            .buttonStyle(ControlRowButtonStyle())
-
-            Button {
-                NSApplication.shared.terminate(nil)
-            } label: {
-                HStack {
-                    Text("Quit")
-                        .font(.system(size: 13))
-                        .foregroundColor(.waqtuMuted)
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity, minHeight: 28)
-                .contentShape(Rectangle())
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-            }
-            .buttonStyle(ControlRowButtonStyle())
-        }
-    }
-}
-
 // MARK: - Settings View
 struct SettingsView: View {
     @Bindable var settings: AppSettings
@@ -854,7 +774,7 @@ struct SettingsView: View {
                 settingsTabs
             }
         }
-        .frame(width: 520, height: 520)
+        .frame(width: 600, height: 540)
         .background(Color.waqtuBackground)
         .onAppear {
             NSApp.activate(ignoringOtherApps: true)
@@ -876,70 +796,118 @@ struct SettingsView: View {
                 TrialBannerView(daysRemaining: vm.trialManager.trialDaysRemaining)
             }
             #endif
-            TabView(selection: $selectedTab) {
-                GeneralSettingsTab(settings: settings, viewModel: viewModel)
-                    .tabItem {
-                        Label("General", systemImage: "gearshape.fill")
-                    }
-                    .tag(Pane.general)
+            SettingsTabBar(panes: panes, selection: Binding(get: { activePane }, set: { selectedTab = $0 }))
+            Divider()
+            paneContent(activePane)
+                .id(activePane)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
 
-                PrayerTimesSettingsTab(settings: settings, viewModel: viewModel)
-                    .tabItem {
-                        Label("Prayer Times", systemImage: "clock.fill")
-                    }
-                    .tag(Pane.prayerTimes)
+    /// One entry of the tab bar.
+    struct PaneItem: Identifiable {
+        let id: String
+        let title: LocalizedStringKey
+        let symbol: String
+    }
 
-                if let vm = viewModel {
-                    MutabaahSettingsTab(sync: vm.syncController)
-                        .tabItem {
-                            Label("Mutabaah", systemImage: "checklist")
-                        }
-                        .tag(Pane.mutabaah)
-                }
+    /// The panes in order; the ones that need the app's model are left out without it.
+    private var panes: [PaneItem] {
+        var list = [
+            PaneItem(id: Pane.general, title: "General", symbol: "gearshape.fill"),
+            PaneItem(id: Pane.prayerTimes, title: "Prayer Times", symbol: "clock.fill"),
+        ]
+        if viewModel != nil { list.append(PaneItem(id: Pane.mutabaah, title: "Mutabaah", symbol: "checklist")) }
+        list.append(PaneItem(id: Pane.pomodoro, title: "Pomodoro", symbol: "timer"))
+        list.append(PaneItem(id: Pane.location, title: "Location", symbol: "location.fill"))
+        if viewModel != nil {
+            list.append(PaneItem(id: Pane.account, title: "Account", symbol: "person.crop.circle.fill"))
+            list.append(PaneItem(id: Pane.slack, title: "Slack", symbol: "message.fill"))
+            list.append(PaneItem(id: Pane.upgrade, title: "Upgrade", symbol: "crown.fill"))
+        }
+        list.append(PaneItem(id: Pane.about, title: "About", symbol: "info.circle.fill"))
+        return list
+    }
 
-                PomodoroSettingsTab(settings: settings, onBrowse: { showAudioBrowser = true })
-                    .tabItem {
-                        Label("Pomodoro", systemImage: "timer.fill")
-                    }
-                    .tag(Pane.pomodoro)
+    /// The stored pane, or General when it is not one of these (an old value, or one that needs the model).
+    private var activePane: String {
+        panes.contains { $0.id == selectedTab } ? selectedTab : Pane.general
+    }
 
-                LocationSettingsTab(settings: settings, viewModel: viewModel)
-                    .tabItem {
-                        Label("Location", systemImage: "location.fill")
-                    }
-                    .tag(Pane.location)
-
-                if let vm = viewModel {
-                    AccountSettingsTab(
-                        account: vm.account,
-                        sync: vm.syncController,
-                        settings: settings
-                    )
-                    .tabItem {
-                        Label("Account", systemImage: "person.crop.circle.fill")
-                    }
-                    .tag(Pane.account)
-
-                    SlackSettingsTab(settings: settings, slackManager: vm.slackManager)
-                        .tabItem {
-                            Label("Slack", systemImage: "message.fill")
-                        }
-                        .tag(Pane.slack)
-
-                    UpgradeSettingsTab(viewModel: vm)
-                        .tabItem {
-                            Label("Upgrade", systemImage: "crown.fill")
-                        }
-                        .tag(Pane.upgrade)
-                }
-
+    @ViewBuilder
+    private func paneContent(_ pane: String) -> some View {
+        switch pane {
+        case Pane.prayerTimes:
+            PrayerTimesSettingsTab(settings: settings, viewModel: viewModel)
+        case Pane.mutabaah:
+            if let vm = viewModel { MutabaahSettingsTab(sync: vm.syncController) }
+        case Pane.pomodoro:
+            PomodoroSettingsTab(settings: settings, onBrowse: { showAudioBrowser = true })
+        case Pane.location:
+            LocationSettingsTab(settings: settings, viewModel: viewModel)
+        case Pane.account:
+            if let vm = viewModel {
+                AccountSettingsTab(
+                    account: vm.account,
+                    sync: vm.syncController,
+                    muhasabah: vm.muhasabahCloud,
+                    settings: settings
+                )
+            }
+        case Pane.slack:
+            if let vm = viewModel { SlackSettingsTab(settings: settings, slackManager: vm.slackManager) }
+        case Pane.upgrade:
+            if let vm = viewModel { UpgradeSettingsTab(viewModel: vm) }
+        case Pane.about:
+            ScrollView {
                 AboutSettingsTab(localTrialDaysRemaining: viewModel?.localTrialDaysRemaining ?? 0, hasStoreSubscription: viewModel?.hasStoreSubscription ?? false, hasAccountPremium: viewModel?.account.serverPremium ?? false, onCheckForUpdates: onCheckForUpdates, onResetWaqtu: viewModel.map { vm in { vm.resetAllAndQuit() } })
-                    .tabItem {
-                        Label("About", systemImage: "info.circle.fill")
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 16)
+            }
+        default:
+            GeneralSettingsTab(settings: settings, viewModel: viewModel)
+        }
+    }
+}
+
+/// The Settings window's tab strip. Every tab is a plain button that sets the pane, and the strip is
+/// wide enough for all nine (the system tab view put the last ones, Upgrade and About, out of reach
+/// in a window this width).
+private struct SettingsTabBar: View {
+    let panes: [SettingsView.PaneItem]
+    @Binding var selection: String
+
+    var body: some View {
+        HStack(spacing: 2) {
+            ForEach(panes) { pane in
+                let selected = pane.id == selection
+                Button {
+                    selection = pane.id
+                } label: {
+                    VStack(spacing: 3) {
+                        Image(systemName: pane.symbol)
+                            .font(.system(size: 15))
+                            .frame(height: 18)
+                        Text(pane.title)
+                            .font(.system(size: 10.5, weight: .medium))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
                     }
-                    .tag(Pane.about)
+                    .foregroundColor(selected ? .waqtuLight : .waqtuMuted)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 6)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .fill(selected ? Color.waqtuPrimary.opacity(0.22) : Color.clear))
+                    .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(selected ? .isSelected : [])
             }
         }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(Color.waqtuBackground)
     }
 }
 
@@ -988,6 +956,7 @@ struct UpgradeFullScreenView: View {
             AccountSettingsTab(
                 account: viewModel.account,
                 sync: viewModel.syncController,
+                muhasabah: viewModel.muhasabahCloud,
                 settings: viewModel.settings
             )
             .tabItem {
@@ -1126,6 +1095,7 @@ struct PremiumOfferView: View {
             Link("Privacy Policy", destination: LegalLinks.privacy(language: language))
         }
         .font(.system(size: 11))
+        .tint(.waqtuLight)
     }
 
     /// "1 week free, then Rp 29.000/month": an eligible introductory free trial and the price after it.
@@ -2015,33 +1985,5 @@ struct AboutSettingsTab: View {
                 .background(Color.waqtuDark.opacity(0.6))
                 .cornerRadius(8)
         }
-    }
-}
-
-// MARK: - Color Extension
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3:
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6:
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8:
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            (a, r, g, b) = (255, 0, 0, 0)
-        }
-
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue: Double(b) / 255,
-            opacity: Double(a) / 255
-        )
     }
 }

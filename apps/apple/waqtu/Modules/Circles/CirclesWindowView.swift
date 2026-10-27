@@ -22,10 +22,10 @@ struct CirclesWindowView: View {
                 ProgressView(mstr("circles.loading"))
             case .signedOut:
                 notice(title: mstr("circles.signIn.title"), body: mstr("circles.signIn.body"),
-                       action: mstr("circles.openSettings"), perform: Self.openSettings)
+                       action: mstr("circles.openSettings"), perform: { SettingsOpener.show(pane: SettingsView.Pane.account) })
             case .gated:
                 notice(title: mstr("circles.premium.locked"), body: mstr("circles.premium.lockedBody"),
-                       action: mstr("circles.premium.see"), perform: Self.openSettings)
+                       action: mstr("circles.premium.see"), perform: { SettingsOpener.show(pane: SettingsView.Pane.upgrade) })
             case .noProfile:
                 notice(title: mstr("circles.title"), body: mstr("circles.setUpOnPhone"),
                        action: mstr("circles.retry"), perform: { Task { await model.reload() } })
@@ -39,12 +39,6 @@ struct CirclesWindowView: View {
         .frame(minWidth: 760, minHeight: 520)
         .task { await model.reload() }
         .onDisappear { model.stopPlayback() }
-    }
-
-    /// The Mac's Settings window, where the account and Premium live.
-    static func openSettings() {
-        NSApp.activate(ignoringOtherApps: true)
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
     }
 
     private func notice(title: String, body: String, action: String?, perform: @escaping () -> Void) -> some View {

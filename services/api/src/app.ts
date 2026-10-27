@@ -5,6 +5,14 @@ import { errorResponse, HttpError } from "./circles/http";
 import { handleCircles, isCirclesPath } from "./circles/router";
 import type { AppEnv } from "./env";
 import { parseErrorsSince, readErrorGroups, receiveErrors } from "./errors";
+import {
+  applyMuhasabah,
+  deleteMuhasabah,
+  MAX_MUHASABAH_BODY_BYTES,
+  parseMuhasabahLimit,
+  parseMuhasabahPush,
+  readMuhasabah,
+} from "./muhasabah";
 import { applyWrites, readChanges } from "./sync";
 import { parseLimit, parseSince, parseSyncBody, ValidationError } from "./validate";
 
@@ -13,13 +21,13 @@ const MAX_BODY_BYTES = 1_000_000;
 const tooLarge = () => new ValidationError(413, "request body too large");
 
 /**
- * Reads the request body as text, rejecting it once it exceeds MAX_BODY_BYTES. A declared
+ * Reads the request body as text, rejecting it once it exceeds `limit` bytes. A declared
  * content-length over the limit is refused without reading; otherwise the stream is counted in
  * bytes as it arrives so chunked uploads are cut off too.
  */
-async function readLimitedText(request: Request): Promise<string> {
+async function readLimitedText(request: Request, limit = MAX_BODY_BYTES): Promise<string> {
   const declared = request.headers.get("content-length");
-  if (declared !== null && Number(declared) > MAX_BODY_BYTES) throw tooLarge();
+  if (declared !== null && Number(declared) > limit) throw tooLarge();
   if (!request.body) return "";
 
   const reader = request.body.getReader();
@@ -29,7 +37,7 @@ async function readLimitedText(request: Request): Promise<string> {
     const { done, value } = await reader.read();
     if (done) break;
     received += value.byteLength;
-    if (received > MAX_BODY_BYTES) {
+    if (received > limit) {
       await reader.cancel();
       throw tooLarge();
     }
@@ -44,6 +52,15 @@ async function readLimitedText(request: Request): Promise<string> {
   return new TextDecoder().decode(bytes);
 }
 
+async function readJsonBody(request: Request, limit = MAX_BODY_BYTES): Promise<unknown> {
+  const text = await readLimitedText(request, limit);
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new ValidationError(400, "body must be valid JSON");
+  }
+}
+
 function json(body: unknown, status = 200): Response {
   return Response.json(body, { status, headers: { "cache-control": "no-store" } });
 }
@@ -51,6 +68,7 @@ function json(body: unknown, status = 200): Response {
 /** Methods per non-circles `/v1` route; anything else is 404. */
 const V1_METHODS: Record<string, readonly string[]> = {
   "/v1/sync": ["GET", "POST"],
+  "/v1/muhasabah": ["GET", "POST", "DELETE"],
   "/v1/me": ["GET"],
   "/v1/errors": ["POST"],
   "/v1/admin/errors": ["GET"],
@@ -93,20 +111,29 @@ async function handleV1(request: Request, env: AppEnv, url: URL): Promise<Respon
   if (route === "/v1/me") return json({ id: user.id, email: user.email, name: user.name });
 
   try {
+    if (route === "/v1/muhasabah") {
+      if (request.method === "DELETE") {
+        return json({ deleted: await deleteMuhasabah(env.APP_DB, user.id) });
+      }
+      if (request.method === "GET") {
+        const since = parseSince(url.searchParams.get("since"));
+        const limit = parseMuhasabahLimit(url.searchParams.get("limit"));
+        return json(await readMuhasabah(env.APP_DB, user.id, since, limit));
+      }
+      const entries = parseMuhasabahPush(
+        await readJsonBody(request, MAX_MUHASABAH_BODY_BYTES),
+        Date.now(),
+      );
+      return json(await applyMuhasabah(env.APP_DB, user.id, entries));
+    }
+
     if (request.method === "GET") {
       const since = parseSince(url.searchParams.get("since"));
       const limit = parseLimit(url.searchParams.get("limit"));
       return json(await readChanges(env.APP_DB, user.id, since, limit));
     }
 
-    const text = await readLimitedText(request);
-    let body: unknown;
-    try {
-      body = JSON.parse(text);
-    } catch {
-      throw new ValidationError(400, "body must be valid JSON");
-    }
-    const { entries, settings } = parseSyncBody(body, Date.now());
+    const { entries, settings } = parseSyncBody(await readJsonBody(request), Date.now());
     return json(await applyWrites(env.APP_DB, user.id, entries, settings));
   } catch (e) {
     if (e instanceof ValidationError) {

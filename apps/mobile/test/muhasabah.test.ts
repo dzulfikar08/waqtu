@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import { MIGRATIONS } from "../src/db/migrations";
-import { MUHASABAH_MIGRATION } from "../src/ibadah/migrations";
+import { MUHASABAH_CLOUD_MIGRATION, MUHASABAH_MIGRATION } from "../src/ibadah/migrations";
 import {
   QUESTIONS,
   averageRating,
@@ -20,7 +20,7 @@ import {
   type MuhasabahEntry,
 } from "../src/ibadah/muhasabah";
 import { addDays } from "../src/mutabaah/dates";
-import { migratedDb } from "./helpers/sqlite";
+import { migratedDb, openTestDb } from "./helpers/sqlite";
 
 const TODAY = "2027-02-12";
 
@@ -29,9 +29,23 @@ function entry(date: string, fields: Partial<MuhasabahEntry> = {}): MuhasabahEnt
 }
 
 describe("muhasabah storage", () => {
-  test("its table is the newest migration step, appended after the shipped ones", () => {
-    expect(MIGRATIONS.at(-1)).toBe(MUHASABAH_MIGRATION);
+  test("its table and cloud columns are the newest migration steps, appended after the shipped ones", () => {
     expect(MIGRATIONS.indexOf(MUHASABAH_MIGRATION)).toBe(7);
+    expect(MIGRATIONS.at(-1)).toBe(MUHASABAH_CLOUD_MIGRATION);
+    expect(MIGRATIONS.indexOf(MUHASABAH_CLOUD_MIGRATION)).toBe(8);
+  });
+
+  test("days written before the cloud columns existed come out dirty and not deleted", () => {
+    const raw = openTestDb();
+    for (const statements of MIGRATIONS.slice(0, 8)) for (const sql of statements) raw.run(sql);
+    raw.run(
+      "INSERT INTO muhasabah (date, taqwa, created_at, updated_at) VALUES ('2027-01-01', 5, 1, 1)",
+    );
+    for (const sql of MUHASABAH_CLOUD_MIGRATION) raw.run(sql);
+    expect(raw.query("SELECT dirty, deleted FROM muhasabah").get()).toEqual({
+      dirty: 1,
+      deleted: 0,
+    });
   });
 
   test("save, read back, update and delete one day", async () => {
@@ -52,6 +66,54 @@ describe("muhasabah storage", () => {
 
     await deleteMuhasabah(db, TODAY);
     expect(await getMuhasabah(db, TODAY)).toBeNull();
+  });
+
+  test("deleting leaves a dirty tombstone that every read ignores", async () => {
+    const { db, raw } = await migratedDb();
+    await saveMuhasabah(db, entry(TODAY, { feelings: "Rahasia", taqwa: 8 }), 1000);
+    raw.run("UPDATE muhasabah SET dirty = 0");
+    await deleteMuhasabah(db, TODAY, 3000);
+    expect(raw.query("SELECT * FROM muhasabah").get()).toEqual({
+      date: TODAY,
+      feelings: null,
+      new_action: null,
+      taqwa: null,
+      gratitude: null,
+      energy: null,
+      willingness: null,
+      continue_tomorrow: null,
+      created_at: 1000,
+      updated_at: 3000,
+      dirty: 1,
+      deleted: 1,
+    });
+    expect(await getMuhasabah(db, TODAY)).toBeNull();
+    expect(await getMuhasabahBetween(db, TODAY, TODAY)).toEqual([]);
+  });
+
+  test("deleting a day that was never written stores nothing; saving again revives a tombstone", async () => {
+    const { db, raw } = await migratedDb();
+    await deleteMuhasabah(db, TODAY);
+    expect(raw.query("SELECT COUNT(*) AS n FROM muhasabah").get()).toEqual({ n: 0 });
+
+    await saveMuhasabah(db, entry(TODAY, { taqwa: 4 }), 1000);
+    await deleteMuhasabah(db, TODAY, 2000);
+    await saveMuhasabah(db, entry(TODAY, { taqwa: 6 }), 3000);
+    expect(await getMuhasabah(db, TODAY)).toEqual(entry(TODAY, { taqwa: 6 }));
+    expect(raw.query("SELECT deleted, dirty, updated_at FROM muhasabah").get()).toEqual({
+      deleted: 0,
+      dirty: 1,
+      updated_at: 3000,
+    });
+  });
+
+  test("an edit never gets an older stamp than the stored day, so it beats what was pulled", async () => {
+    const { db, raw } = await migratedDb();
+    await saveMuhasabah(db, entry(TODAY, { taqwa: 4 }), 9000);
+    await saveMuhasabah(db, entry(TODAY, { taqwa: 5 }), 2000);
+    expect(raw.query("SELECT updated_at FROM muhasabah").get()).toEqual({ updated_at: 9001 });
+    await deleteMuhasabah(db, TODAY, 100);
+    expect(raw.query("SELECT updated_at FROM muhasabah").get()).toEqual({ updated_at: 9002 });
   });
 
   test("an update keeps the first creation time", async () => {
@@ -94,7 +156,7 @@ describe("muhasabah storage", () => {
     expect(rows.map((r) => r.date)).toEqual(["2027-02-09", "2027-02-11", "2027-02-12"]);
   });
 
-  test("private: nothing is queued for sync", async () => {
+  test("private by default: nothing reaches the mutabaah sync", async () => {
     const { db, raw } = await migratedDb();
     await saveMuhasabah(db, entry(TODAY, { feelings: "Rahasia", taqwa: 8 }));
     expect(raw.query("SELECT COUNT(*) AS n FROM entries").get()).toEqual({ n: 0 });
