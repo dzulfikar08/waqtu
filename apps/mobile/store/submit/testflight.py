@@ -99,6 +99,9 @@ def ensure_tester(asc: Asc, email: str, group: dict, user: dict | None) -> str:
         a.log(f"{email}: existing beta tester {tester['id']} {tester['attributes']}")
         members = {t["id"] for t in asc.all(f"/v1/betaGroups/{group['id']}/betaTesters")}
         if tester["id"] not in members:
+            groups = asc.all(f"/v1/betaTesters/{tester['id']}/betaGroups")
+            apps = asc.all(f"/v1/betaTesters/{tester['id']}/apps")
+            a.log(f"{email}: in groups {[(g['attributes']['name'], g['attributes']['isInternalGroup']) for g in groups]} apps {[x['id'] for x in apps]}")
             asc.post(
                 f"/v1/betaGroups/{group['id']}/relationships/betaTesters",
                 {"data": [{"type": "betaTesters", "id": tester["id"]}]},
