@@ -10,6 +10,7 @@ export const REPO_URL = "https://github.com/dzulfikar08/waqtu";
 export const SUPPORT_EMAIL = "dzulfikar.at@gmail.com";
 export const APP_STORE_URL = "https://apps.apple.com/id/app/id6826628861";
 export const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=dat.waqtu.app";
+export const MAC_APP_STORE_URL = "https://apps.apple.com/app/id6827054953";
 
 export interface LandingCopy {
   htmlLang: string;
@@ -26,7 +27,24 @@ export interface LandingCopy {
     switchHref: string;
     menu: string;
   };
-  hero: { status: string; title: string; lede: string; audience: string; target: string };
+  hero: {
+    status: string;
+    /** Shown instead of `status` and `target` once the store badges are live (src/config.ts). */
+    statusLive: string;
+    title: string;
+    lede: string;
+    audience: string;
+    target: string;
+  };
+  stores: {
+    label: string;
+    /** Small line above the store name, per store. */
+    appStoreKicker: string;
+    playKicker: string;
+    macKicker: string;
+    /** Accessible name; `{store}` is replaced with the store name. */
+    linkLabel: string;
+  };
   form: {
     heading: string;
     emailLabel: string;
@@ -126,11 +144,19 @@ const id: LandingCopy = {
   },
   hero: {
     status: "Segera di iOS dan Android. Sudah tersedia di Mac.",
+    statusLive: "Sudah tersedia di iPhone, Android, dan Mac.",
     title: "Halaqah tanpa macet.",
     lede: "Waktu sholat, mutabaah yaumiyah, dan halaqah yang kamu ikuti kapan sempat. Tidak ada perjalanan, dan tidak ada rasa bersalah kalau hari ini terlewat.",
     audience:
       "Dibuat untuk muslim yang jadwalnya padat, atau yang lebih tenang beribadah tanpa keramaian.",
     target: "Target rilis: sebelum Ramadhan 1448H.",
+  },
+  stores: {
+    label: "Unduh Waqtu",
+    appStoreKicker: "Unduh di",
+    playKicker: "Dapatkan di",
+    macKicker: "Unduh di",
+    linkLabel: "Unduh Waqtu di {store}",
   },
   form: {
     heading: "Dapat kabar saat Waqtu rilis",
@@ -315,11 +341,19 @@ const en: LandingCopy = {
   },
   hero: {
     status: "Coming soon to iOS and Android. Available now on Mac.",
+    statusLive: "Available now on iPhone, Android and Mac.",
     title: "Halaqah without the commute.",
     lede: "Prayer times, mutabaah yaumiyah, and a halaqah you join whenever you can. No travel, and no guilt when today slips by.",
     audience:
       "Made for Muslims with packed schedules, and for anyone who worships more calmly without a crowd.",
     target: "Target release: before Ramadhan 1448H.",
+  },
+  stores: {
+    label: "Get Waqtu",
+    appStoreKicker: "Download on the",
+    playKicker: "Get it on",
+    macKicker: "Download on the",
+    linkLabel: "Get Waqtu on {store}",
   },
   form: {
     heading: "Hear when Waqtu launches",
