@@ -20,6 +20,7 @@ Environment:
 
 import hashlib
 import os
+import re
 import sys
 import tempfile
 import time
@@ -887,10 +888,20 @@ def draft_version(asc: Asc, path: str, create_kind: str, parent: str, parent_kin
             return v
     if any(v["attributes"].get("state") in ("WAITING_FOR_REVIEW", "IN_REVIEW", "APPROVED", "ACCEPTED") for v in versions):
         return None
-    created = asc.post(
-        f"/v1/{create_kind}",
-        {"data": {"type": create_kind, "relationships": {parent: ref(parent_kind, parent_id)}}},
-    )["data"]
+    if versions:
+        log(f"{path}: " + ", ".join(f"{v['id']}={v['attributes'].get('state')}" for v in versions))
+    try:
+        created = asc.post(
+            f"/v1/{create_kind}",
+            {"data": {"type": create_kind, "relationships": {parent: ref(parent_kind, parent_id)}}},
+        )["data"]
+    except AscError as e:
+        # A review submission that was canceled leaves its version "in flight"; it goes into the next submission.
+        inflight = re.search(r"inflight version with id '([^']+)'", str(e))
+        if e.status != 409 or not inflight:
+            raise
+        log(f"{create_kind}: reusing in-flight {inflight.group(1)} for {parent_kind} {parent_id}")
+        return {"type": create_kind, "id": inflight.group(1), "attributes": {}}
     log(f"{create_kind}: created {created['id']} for {parent_kind} {parent_id}")
     return created
 
