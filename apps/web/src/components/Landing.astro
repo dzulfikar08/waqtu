@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import WaitlistForm from "./WaitlistForm.astro";
+import StoreBadges from "./StoreBadges.astro";
+import { STORE_BADGES_LIVE } from "../config";
 import { landing, REPO_URL, APP_STORE_URL, PLAY_STORE_URL, type Locale } from "../i18n/landing";
 import { ramadhan1448 } from "../lib/ramadhan";
 
@@ -151,13 +153,23 @@ const nav = [
     <section class="px-6 pb-20 pt-12 sm:px-10 md:px-14 md:pb-28 md:pt-20">
       <div class="mx-auto grid max-w-6xl items-start gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-20">
         <div>
-          <p class="text-sm font-semibold text-[var(--waqtu-primary)]">{t.hero.status}</p>
+          <p class="text-sm font-semibold text-[var(--waqtu-primary)]">
+            {STORE_BADGES_LIVE ? t.hero.statusLive : t.hero.status}
+          </p>
           <h1 class="font-display mt-4 text-[2.9rem] font-semibold leading-[1.03] tracking-tight text-[var(--waqtu-text)] sm:text-6xl lg:text-[4.75rem]">
             {t.hero.title}
           </h1>
           <p class="mt-6 max-w-xl text-lg leading-relaxed text-[var(--waqtu-text)] sm:text-xl">{t.hero.lede}</p>
           <p class="mt-4 max-w-xl leading-relaxed text-[var(--waqtu-muted)]">{t.hero.audience}</p>
-          <p class="mt-8 text-sm font-semibold text-[var(--waqtu-gold-dim)]">{t.hero.target}</p>
+          {
+            STORE_BADGES_LIVE ? (
+              <div class="mt-8">
+                <StoreBadges locale={locale} location="hero" />
+              </div>
+            ) : (
+              <p class="mt-8 text-sm font-semibold text-[var(--waqtu-gold-dim)]">{t.hero.target}</p>
+            )
+          }
         </div>
 
         <div class="neu-card p-6 sm:p-8">

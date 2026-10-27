@@ -40,7 +40,7 @@ Review the calendar on the first of each month against real analytics (Revklik) 
 
 ## Waitlist email sequence (id)
 
-Sent to the getwaqtu.com waitlist. Plain text, one link each, unsubscribe line in the footer. Subject lines are suggestions. The one bracketed line in email 2 must be filled with the real store status at send time.
+Sent to the getwaqtu.com waitlist. Plain text, one link each, unsubscribe line in the footer. Ready-to-send copies and the recipient export are in `docs/marketing/emails/`. Subject lines are suggestions. The one bracketed line in email 2 must be filled with the real store status at send time.
 
 ### Email 1: Terima kasih sudah daftar (send immediately after sign-up)
 
@@ -109,7 +109,7 @@ Before:
 - [ ] Privacy policy at getwaqtu.com/privacy covers the phone app (sync, circles, microphone) and matches the store privacy answers.
 - [ ] Premium purchase tested with a sandbox tester (App Store) and a license tester (Play); restore purchase works.
 - [ ] Production API reachable from the release build (`api.getwaqtu.com`): sign-in, sync and entitlement check.
-- [ ] Landing page store badges point at the live listings; waitlist form still works.
+- [ ] Landing page store badges point at the live listings; waitlist form still works. (Badges are behind the `STORE_BADGES_LIVE` flag, see `apps/web/README.md`.)
 - [ ] Support inbox (dzulfikar.at@gmail.com) watched; saved replies for the five most likely questions (prayer times differ from the mosque, Hijri date off by one, adhan not arriving on Android, Premium restore, account deletion).
 - [ ] Email 3 scheduled, social posts queued with UTM links.
 

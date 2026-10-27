@@ -1,0 +1,86 @@
+---
+// Store links behind the launch flag (src/config.ts). Renders nothing while the flag is off, so callers
+// can drop it in unconditionally. Plain styled links: no store artwork is bundled or hotlinked.
+import { STORE_BADGES_LIVE } from "../config";
+import { landing, APP_STORE_URL, PLAY_STORE_URL, MAC_APP_STORE_URL, type Locale } from "../i18n/landing";
+
+interface Props {
+  locale: Locale;
+  /** Where the badges sit, sent with the store_click analytics event. */
+  location: string;
+  /** Which stores to show; defaults to all three. */
+  only?: ("app_store" | "google_play" | "mac_app_store")[];
+}
+
+const { locale, location, only } = Astro.props;
+const t = landing[locale].stores;
+
+const stores = [
+  { key: "app_store", kicker: t.appStoreKicker, name: "App Store", href: APP_STORE_URL },
+  { key: "google_play", kicker: t.playKicker, name: "Google Play", href: PLAY_STORE_URL },
+  { key: "mac_app_store", kicker: t.macKicker, name: "Mac App Store", href: MAC_APP_STORE_URL },
+].filter((s) => !only || only.includes(s.key as (typeof only)[number]));
+---
+
+{
+  STORE_BADGES_LIVE && (
+    <ul class="store-badges" aria-label={t.label}>
+      {stores.map((s) => (
+        <li>
+          <a
+            href={s.href}
+            rel="noopener"
+            class="store-badge"
+            aria-label={t.linkLabel.replace("{store}", s.name)}
+            data-store-badge={s.key}
+            data-s-event="store_click"
+            data-s-event-props={JSON.stringify({ location, store: s.key })}
+          >
+            <span class="store-badge-kicker">{s.kicker}</span>
+            <span class="store-badge-name">{s.name}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .store-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .store-badge {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 10.5rem;
+    min-height: 3.5rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 12px;
+    background: #16201c;
+    color: #f6f5f1;
+    line-height: 1.15;
+    transition: background 0.2s ease;
+  }
+  .store-badge:hover {
+    background: #2a3a33;
+  }
+  .store-badge:focus-visible {
+    outline: 2px solid var(--waqtu-primary);
+    outline-offset: 3px;
+  }
+  .store-badge-kicker {
+    font-size: 0.75rem;
+    opacity: 0.8;
+  }
+  .store-badge-name {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+</style>
