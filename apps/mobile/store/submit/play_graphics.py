@@ -4,7 +4,8 @@
 Run by .github/workflows/store-submit.yml with platform=android-graphics. The release, the listing text and the phone
 screenshots are not touched, so no build is needed. One edit, committed at the end; with managed publishing off the
 commit sends the listing change to review. While the app has a rejected release Play refuses that ("Changes cannot be
-sent for review automatically"); the edit is then committed with changesNotSentForReview=true and the changes wait in
+sent for review automatically", answered by validate); the edit is then committed with changesNotSentForReview=true
+(a commit-only parameter) and the changes wait in
 Play Console > Publishing overview for "Send for review". After the commit a fresh edit reads the listings back,
 downloads each image from Play and checks its hash against the uploaded file.
 
@@ -74,10 +75,10 @@ def main() -> None:
         except PlayError as e:
             if "changesNotSentForReview" not in str(e):
                 raise
+            # Only commit takes the parameter; validate has no way to accept it, so commit is the check then.
             params = {"changesNotSentForReview": "true"}
-            play.request("POST", f"{API}/edits/{edit}:validate", params=params)
         if not submit:
-            note("Edit validated; submit=false, so it was not committed")
+            note("Edit " + ("uploaded the images" if params else "validated") + "; submit=false, so it was not committed")
             return
         play.request("POST", f"{API}/edits/{edit}:commit", params=params)
         committed = True
