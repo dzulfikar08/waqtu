@@ -44,7 +44,9 @@ jobs:
           mkdir -p out
           convert apps/mobile/assets/icon.png -resize 512x512 -strip out/icon-512.png
           convert -size 1024x500 gradient:'#1A2E25'-'#2D5F4C' \
-            \( apps/mobile/assets/icon.png -resize 260x260 \) -geometry +90+120 -composite \
+            \( apps/mobile/assets/icon.png -resize 260x260 -alpha set \
+               \( -size 260x260 xc:none -fill white -draw "roundrectangle 0,0 259,259 58,58" \) \
+               -compose DstIn -composite \) -compose Over -geometry +90+120 -composite \
             -font DejaVu-Sans-Bold -pointsize 78 -fill '#E8F0ED' -annotate +400+235 'Waqtu' \
             -font DejaVu-Sans -pointsize 34 -fill '#D4A574' -annotate +404+300 'Sholat · Mutabaah · Ramadhan' \
             -font DejaVu-Sans -pointsize 26 -fill '#A8C9B8' -annotate +404+350 'Lokasi tidak keluar dari ponsel' \

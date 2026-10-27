@@ -7,6 +7,11 @@
 #   android  apps/mobile/store/submit/play.py updates the id + en-US listings (graphics from the play-listing-assets
 #            release) and releases android.versionCode to production. With managed publishing off, the commit sends it
 #            to review.
+#   android-graphics
+#            apps/mobile/store/submit/play_graphics.py replaces only the hi-res icon and feature graphic of every Play
+#            listing language (from the play-listing-assets release) and commits; the release and listing text stay
+#            as they are, so no build is needed. The images Play then serves are attached as `play-check`. Not part
+#            of `both`.
 #   mac      the same appstore.py with STORE_PLATFORM=mac fills the Mac App Store version of Waqtu for Mac (text from
 #            apps/apple/store, 2880x1800 screenshots and the subscription review screenshot from the latest successful
 #            "Mac screenshots" run, the demo account review@getwaqtu.com) with the newest uploaded build (Release Mac
@@ -31,7 +36,7 @@ on:
       platform:
         description: "Which store"
         type: choice
-        options: [both, ios, android, mac]
+        options: [both, ios, android, android-graphics, mac]
         default: both
       submit:
         description: "Submit for review (off = upload metadata and stop before submitting)"
@@ -128,6 +133,43 @@ jobs:
           export VERSION_NAME=$(jq -r .expo.version apps/mobile/app.json)
           export PLAY_ASSETS_DIR="$RUNNER_TEMP/play"
           "$RUNNER_TEMP/venv/bin/python" apps/mobile/store/submit/play.py
+
+  android-graphics:
+    if: inputs.platform == 'android-graphics'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Python dependencies
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet --only-binary :all: -r apps/mobile/store/submit/requirements.txt
+
+      - name: Play listing assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download play-listing-assets -R "$GITHUB_REPOSITORY" -D "$RUNNER_TEMP/play" -p 'icon-512.png' -p 'feature-graphic.png'
+
+      - name: Google Play graphics
+        env:
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          SUBMIT: ${{ inputs.submit }}
+        run: |
+          export PLAY_ASSETS_DIR="$RUNNER_TEMP/play"
+          export PLAY_CHECK_DIR="$RUNNER_TEMP/play-check"
+          "$RUNNER_TEMP/venv/bin/python" apps/mobile/store/submit/play_graphics.py
+
+      - name: Images Play serves
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: play-check
+          path: ${{ runner.temp }}/play-check
+          if-no-files-found: ignore
 
   mac:
     if: inputs.platform == 'mac'
