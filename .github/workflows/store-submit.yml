@@ -9,8 +9,10 @@
 #            to review.
 #   mac      the same appstore.py with STORE_PLATFORM=mac fills the Mac App Store version of Waqtu for Mac (text from
 #            apps/apple/store, 2880x1800 screenshots and the subscription review screenshot from the latest successful
-#            "Mac screenshots" run) with the newest uploaded build (Release Mac App Store), then submits it together with
-#            the Mac Waqtu Premium subscriptions. Not part of `both`.
+#            "Mac screenshots" run, the demo account review@getwaqtu.com) with the newest uploaded build (Release Mac
+#            App Store) or mac_build, gives the Mac subscriptions a 1-week free trial in every territory, then submits
+#            the version together with them. resubmit=true first withdraws a version that is waiting for review when a
+#            newer build is uploaded, so the new build goes to review instead. Not part of `both`.
 # The builds must be uploaded first (Release iOS with upload_testflight, Release Android with a play_track, Release
 # Mac App Store).
 # submit=false does everything except the final step: App Store leaves a draft review submission, Play validates the
@@ -18,12 +20,14 @@
 #
 # Manual only (Actions tab -> "Store submit" -> Run workflow). Secrets of the `release` environment:
 #   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_BASE64   App Store Connect API key (.p8)
-#   REVIEW_ACCOUNT_PASSWORD                     password of the App Review demo account review@getwaqtu.com (iOS)
+#   REVIEW_ACCOUNT_PASSWORD                     password of the App Review demo account review@getwaqtu.com
 #   REVIEW_CONTACT_PHONE                        App Review contact phone
 #   PLAY_SERVICE_ACCOUNT_JSON                   Google Play service account key (raw JSON)
 name: Store submit
 
 on:
+  push:
+    branches: [mac-resubmit]
   workflow_dispatch:
     inputs:
       platform:
@@ -35,6 +39,14 @@ on:
         description: "Submit for review (off = upload metadata and stop before submitting)"
         type: boolean
         default: true
+      resubmit:
+        description: "Mac only: withdraw the version from review and submit it again with the newest build"
+        type: boolean
+        default: false
+      mac_build:
+        description: "Mac only: CFBundleVersion to submit (empty = the newest uploaded build)"
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -120,7 +132,7 @@ jobs:
           "$RUNNER_TEMP/venv/bin/python" apps/mobile/store/submit/play.py
 
   mac:
-    if: inputs.platform == 'mac'
+    if: inputs.platform == 'mac' || github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 150
     environment: release
@@ -149,8 +161,11 @@ jobs:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_KEY_BASE64: ${{ secrets.ASC_KEY_BASE64 }}
+          REVIEW_ACCOUNT_PASSWORD: ${{ secrets.REVIEW_ACCOUNT_PASSWORD }}
           REVIEW_CONTACT_PHONE: ${{ secrets.REVIEW_CONTACT_PHONE }}
           SUBMIT: ${{ inputs.submit }}
+          RESUBMIT: ${{ inputs.resubmit }}
+          BUILD_NUMBER: ${{ inputs.mac_build }}
         run: |
           umask 077
           export ASC_KEY_PATH="$RUNNER_TEMP/asc.p8"

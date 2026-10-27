@@ -77,8 +77,13 @@ The app calculates prayer times on-device from location; no login or account is 
 
 The listing lives in `apps/apple/store/appstore` (`id/` primary, `en/`, `review_notes.txt`) and is pushed with
 `.github/workflows/store-submit.yml` (platform `mac`), together with the screenshots of `mas-screenshots.yml` and the
-subscriptions `dat.waqtu.mac.premium.monthly` / `.yearly` (group "Waqtu Premium", Rp 29.000 / Rp 249.000). App Privacy
-is not available to API keys; it is answered by hand in App Store Connect.
+subscriptions `dat.waqtu.mac.premium.monthly` / `.yearly` (group "Waqtu Premium", Rp 29.000 / Rp 249.000). The script
+gives both subscriptions a 1-week free trial (introductory offer) in every territory where they are sold, and fills the
+Sign-In Information with the review account `review@getwaqtu.com` (the same one as the phone app; password in the
+`REVIEW_ACCOUNT_PASSWORD` secret). To replace a build that is already waiting for review, upload the new one with
+`release-mas.yml` and run Store submit with `platform=mac`, `submit` and `resubmit` on (optionally `mac_build`): it
+cancels the review submission, attaches the new build and submits the version and subscriptions again. App Privacy is
+not available to API keys; it is answered by hand in App Store Connect.
 
 ---
 
