@@ -30,7 +30,7 @@ export interface SupportDoc {
 }
 
 /** Date both legal pages and the policy text refer to. Bump it whenever either document changes. */
-export const LEGAL_UPDATED = "2026-10-26";
+export const LEGAL_UPDATED = "2026-10-27";
 
 const mail = `<a href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a>`;
 
@@ -71,12 +71,14 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
     sections: [
       {
         heading: "Yang tetap di perangkatmu",
-        paragraphs: ["Hal-hal ini tidak pernah kami terima, dengan atau tanpa akun:"],
+        paragraphs: [
+          "Hal-hal ini tidak pernah kami terima, dengan atau tanpa akun (muhasabah hanya bila kamu mengaktifkan sinkron, lihat di bawah):",
+        ],
         items: [
           "<strong>Lokasi.</strong> Koordinat dipakai untuk menghitung waktu sholat dan disimpan di perangkat. Di aplikasi ponsel tidak ada pencarian nama kota lewat server; di Mac kami memakai CoreLocation dengan akurasi kasar (sekitar satu kilometer). Lokasi tidak ikut sinkron.",
           "<strong>Refleksi halaqah.</strong> Catatan yang kamu tulis dan refleksi suara yang kamu rekam setelah halaqah hanya tersimpan di ponsel ini (rekaman dikecualikan dari cadangan, seperti rekaman hafalan). Yang tersinkron hanyalah tanda bahwa halaqah hari itu sudah dicentang di daftar mutabaah, sama seperti item lain. Refleksi baru meninggalkan ponsel bila kamu sendiri membagikannya ke sebuah lingkaran; saat itu ia menjadi kiriman lingkaran biasa (lihat bagian Lingkaran).",
           "<strong>Rencana dan rekaman hafalan.</strong> Rencana hafalan dan rekaman bacaanmu hanya ada di ponsel ini. Rekaman dikecualikan dari cadangan (di iOS lewat penanda &quot;exclude from backup&quot;, di Android karena cadangan aplikasi dimatikan), jadi tidak ikut pindah ke ponsel baru. Tanda murojaah di daftar mutabaah tersinkron seperti item lain; isi bacaan dan rekamannya tidak.",
-          "<strong>Muhasabah dan alat ibadah.</strong> Catatan muhasabah (jurnal refleksi harian: perasaan, nilai takwa, syukur, energi dan tekad, serta niatmu) hanya tersimpan di basis data aplikasi di ponsel ini dan tidak ikut sinkron, begitu pula hitungan tasbih, doa favorit, dan progres bacaan dzikir dan Al-Ma'tsurat. Kompas kiblat membaca arah ponsel hanya selama layarnya terbuka (sistem memberikannya lewat izin lokasi); arah kiblat dihitung dari lokasi sholat yang tersimpan, dan tidak ada yang disimpan atau dikirim dari kompas. Yang tersinkron hanyalah centang dzikir pagi/petang atau hitungan tasbih yang kamu tambahkan sendiri ke daftar mutabaah, sama seperti item lain.",
+          "<strong>Muhasabah dan alat ibadah.</strong> Catatan muhasabah (jurnal refleksi harian: perasaan, nilai takwa, syukur, energi dan tekad, serta niatmu) tetap di basis data aplikasi di perangkat ini dan tidak dikirim ke mana pun kecuali kamu sendiri mengaktifkan &quot;Sinkronkan muhasabah ke cloud&quot; di Pengaturan (lihat bagian Sinkron muhasabah). Hitungan tasbih, doa favorit, dan progres bacaan dzikir dan Al-Ma'tsurat juga hanya di ponsel ini dan tidak ikut sinkron. Kompas kiblat membaca arah ponsel hanya selama layarnya terbuka (sistem memberikannya lewat izin lokasi); arah kiblat dihitung dari lokasi sholat yang tersimpan, dan tidak ada yang disimpan atau dikirim dari kompas. Yang tersinkron hanyalah centang dzikir pagi/petang atau hitungan tasbih yang kamu tambahkan sendiri ke daftar mutabaah, sama seperti item lain.",
           "<strong>Pengingat adzan dan halaqah.</strong> Dijadwalkan lokal di perangkat. Kami tidak memakai notifikasi push.",
           "<strong>Isi kalender (Mac).</strong> Jika kamu mengizinkan, Waqtu menulis blok sholat ke kalendermu lewat EventKit. Isi kalendermu tidak dikirim ke server kami.",
         ],
@@ -98,6 +100,13 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
           "centang harian: tanggal, item, dan nilainya;",
           "sebagian pengaturan: daftar item mutabaah (termasuk nama item buatanmu sendiri), pengaturan streak, metode hisab, mazhab ashar, koreksi tanggal Hijriah, dan koreksi menit per waktu sholat.",
           "Lokasi, bahasa, refleksi halaqah, dan hafalan tidak termasuk.",
+        ],
+      },
+      {
+        heading: "Sinkron muhasabah (opsional, mati secara bawaan)",
+        paragraphs: [
+          "Muhasabah tetap di perangkatmu kecuali kamu masuk dan menyalakan &quot;Sinkronkan muhasabah ke cloud&quot; di Pengaturan (di Mac dan di ponsel; di ponsel butuh Premium). Setelah menyala, server kami menyimpan catatan harianmu (perasaan, niat, tindakan baru, dan nilai 1-10 untuk takwa, syukur, energi, dan tekad) yang terkait dengan akunmu, supaya tersinkron antara Mac dan ponselmu. Catatan itu bersifat pribadi untuk akunmu: tidak pernah ditampilkan ke orang lain, tidak masuk ke Lingkaran, dan tidak dipakai untuk iklan atau analitik. Pengaturan ini berlaku per perangkat dan per akun.",
+          "Mematikan pengaturan menghentikan sinkron, dan aplikasi menawarkan untuk sekalian menghapus salinan di cloud. Menghapus akunmu juga menghapusnya dari server. Data di perangkatmu tidak pernah terhapus karena mematikan sinkron.",
         ],
       },
       {
@@ -159,7 +168,7 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
         heading: "Penyimpanan dan penghapusan data",
         paragraphs: [
           "Data akun, sinkron, lingkaran, dan catatan Premium disimpan selama akunmu ada.",
-          "<strong>Menghapus akun di aplikasi ponsel:</strong> buka Pengaturan, bagian Akun, lalu ketuk Hapus akun dan konfirmasi. Ini menghapus di server kami: akun dan sesi masuk, sinkron mutabaah dan pengaturan, profil lingkaran, keanggotaan, kiriman, reaksi, blokir, laporan yang kamu kirim, catatan hak Premium, dan semua pesan suaramu (berkas di R2 dihapus lebih dulu; kalau gagal, akun tetap ada dan kamu bisa mencoba lagi). Tindakan ini tidak bisa dibatalkan.",
+          "<strong>Menghapus akun di aplikasi ponsel:</strong> buka Pengaturan, bagian Akun, lalu ketuk Hapus akun dan konfirmasi. Ini menghapus di server kami: akun dan sesi masuk, sinkron mutabaah dan pengaturan, catatan muhasabah yang kamu sinkronkan (jika ada), profil lingkaran, keanggotaan, kiriman, reaksi, blokir, laporan yang kamu kirim, catatan hak Premium, dan semua pesan suaramu (berkas di R2 dihapus lebih dulu; kalau gagal, akun tetap ada dan kamu bisa mencoba lagi). Tindakan ini tidak bisa dibatalkan. Untuk hanya menghapus salinan muhasabah di cloud tanpa menghapus akun, matikan &quot;Sinkronkan muhasabah ke cloud&quot; di Pengaturan dan pilih hapus salinan cloud.",
           "<strong>Yang tidak ikut terhapus:</strong> data di ponselmu (hapus dengan mencopot aplikasi), langganan di App Store atau Google Play (batalkan di toko), catatan transaksi yang disimpan Apple, Google, atau Polar sendiri, dan salinan cadangan basis data Cloudflare yang kami tidak kendalikan. Masuk lagi setelah menghapus akan membuat akun baru yang kosong.",
           "<strong>Menghapus akun di aplikasi Mac:</strong> buka Pengaturan, tab Akun, klik Hapus akun dan konfirmasi. Yang terhapus sama dengan di aplikasi ponsel; data di Mac-mu tetap ada sampai kamu menghapus aplikasinya. Bisa juga lewat email ke " +
             mail +
@@ -213,12 +222,14 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
     sections: [
       {
         heading: "What stays on your device",
-        paragraphs: ["We never receive these, with or without an account:"],
+        paragraphs: [
+          "We never receive these, with or without an account (muhasabah only if you turn on sync, see below):",
+        ],
         items: [
           "<strong>Location.</strong> Coordinates are used to calculate prayer times and stored on the device. The phone app does not look up city names through a server; the Mac app uses CoreLocation at coarse accuracy (about one kilometer). Location is not synced.",
           "<strong>Halaqah reflections.</strong> The notes you write and the voice reflections you record after a halaqah stay on this phone (recordings are excluded from backups, like hafalan recordings). Only the tick that marks that day's halaqah as done in your mutabaah checklist syncs, like any other checklist item. A reflection leaves the phone only if you share it to a circle yourself; it then becomes an ordinary circle post (see Circles).",
           "<strong>Hafalan plans and recordings.</strong> Your memorization plans and recitation recordings exist only on this phone. Recordings are excluded from backups (on iOS through the &quot;exclude from backup&quot; flag, on Android because app backup is turned off), so they do not move to a new phone. The murojaah tick in your checklist syncs like any other item; the recitation and recordings do not.",
-          "<strong>Muhasabah and the worship tools.</strong> Your muhasabah notes (the daily reflection journal: feelings, your taqwa, gratitude, energy and resolve ratings, and your intentions) are stored only in the app's database on this phone and are not synced; the same goes for the tasbih count, favourite duas, and your progress through the dhikr and Al-Ma'thurat. The qibla compass reads the phone's heading only while its screen is open (the system serves it under the location permission); the qibla is calculated from your saved prayer location, and nothing from the compass is stored or sent. Only the morning/evening dhikr tick, or a tasbih count you add yourself to a checklist item, syncs, like any other checklist item.",
+          "<strong>Muhasabah and the worship tools.</strong> Your muhasabah notes (the daily reflection journal: feelings, your taqwa, gratitude, energy and resolve ratings, and your intentions) stay in the app's database on this device and are not sent anywhere unless you yourself turn on &quot;Sync muhasabah to the cloud&quot; in Settings (see the Muhasabah sync section). The tasbih count, favourite duas, and your progress through the dhikr and Al-Ma'thurat also stay on this phone and are not synced. The qibla compass reads the phone's heading only while its screen is open (the system serves it under the location permission); the qibla is calculated from your saved prayer location, and nothing from the compass is stored or sent. Only the morning/evening dhikr tick, or a tasbih count you add yourself to a checklist item, syncs, like any other checklist item.",
           "<strong>Adhan and halaqah reminders.</strong> Scheduled locally on the device. We do not use push notifications.",
           "<strong>Calendar content (Mac).</strong> If you allow it, Waqtu writes prayer blocks to your calendar through EventKit. Your calendar content is not sent to our servers.",
         ],
@@ -240,6 +251,13 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
           "daily checks: date, item and value;",
           "some settings: your checklist items (including names of custom items you create), streak settings, calculation method, asr method, Hijri date adjustment, and per-prayer minute offsets.",
           "Location, language, halaqah reflections and hafalan are not included.",
+        ],
+      },
+      {
+        heading: "Muhasabah sync (optional, off by default)",
+        paragraphs: [
+          "Muhasabah stays on your device unless you are signed in and turn on &quot;Sync muhasabah to the cloud&quot; in Settings (on the Mac and on the phone; on the phone it needs Premium). Once on, our server stores your daily entries (feelings, intentions, new action, and the 1-10 ratings for taqwa, gratitude, energy and resolve) tied to your account so they sync between your Mac and phone. They are private to your account: never shown to other people, not in Circles, and not used for ads or analytics. The setting is per device and per account.",
+          "Turning the setting off stops syncing, and the app offers to delete the cloud copy at the same time. Deleting your account also deletes it from the server. Turning sync off never deletes data on your device.",
         ],
       },
       {
@@ -301,7 +319,7 @@ export const privacy: Record<LegalLocale, LegalDoc> = {
         heading: "Retention and deletion",
         paragraphs: [
           "Account, sync, circle and entitlement data are kept as long as your account exists.",
-          "<strong>Deleting your account in the phone app:</strong> open Settings, find the Account section, tap Delete account and confirm. On our server this removes: your account and sign-in sessions, mutabaah sync and settings, circle profile, memberships, posts, reactions, blocks, reports you sent, entitlement records, and all your voice notes (the R2 files are deleted first; if that fails the account stays and you can try again). It cannot be undone.",
+          "<strong>Deleting your account in the phone app:</strong> open Settings, find the Account section, tap Delete account and confirm. On our server this removes: your account and sign-in sessions, mutabaah sync and settings, any muhasabah entries you synced, circle profile, memberships, posts, reactions, blocks, reports you sent, entitlement records, and all your voice notes (the R2 files are deleted first; if that fails the account stays and you can try again). It cannot be undone. To delete only the cloud copy of your muhasabah without deleting your account, turn off &quot;Sync muhasabah to the cloud&quot; in Settings and choose to delete the cloud copy.",
           "<strong>What is not removed:</strong> data on your phone (delete it by uninstalling the app), subscriptions in the App Store or Google Play (cancel them in the store), transaction records that Apple, Google or Polar keep themselves, and Cloudflare database backups that we do not control. Signing in again after deletion creates a new, empty account.",
           "<strong>Deleting your account in the Mac app:</strong> open Settings, the Account tab, click Delete account and confirm. It removes the same as the phone app; data on your Mac stays until you delete the app. You can also email " +
             mail +
