@@ -1,0 +1,69 @@
+# Invites testers to TestFlight with the newest uploaded build (apps/mobile/store/submit/testflight.py).
+# App Store Connect users go to the internal group "Owner"; everyone else to the external group "Family" (needs Beta App
+# Review, which the script submits). Manual only. Secrets of the `release` environment: ASC_KEY_ID, ASC_ISSUER_ID,
+# ASC_KEY_BASE64, REVIEW_ACCOUNT_PASSWORD, REVIEW_CONTACT_PHONE.
+name: TestFlight invite
+
+on:
+  workflow_dispatch:
+    inputs:
+      emails:
+        description: "Email addresses, comma or space separated"
+        type: string
+        required: true
+      platform:
+        description: "Which app"
+        type: choice
+        options: [both, ios, mac]
+        default: both
+      build:
+        description: "CFBundleVersion (empty = newest build)"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: testflight-invite
+  cancel-in-progress: false
+
+jobs:
+  invite:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ios, mac]
+    if: inputs.platform == 'both' || inputs.platform == matrix.platform
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Python dependencies
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet --only-binary :all: -r apps/mobile/store/submit/requirements.txt
+
+      - name: TestFlight
+        env:
+          STORE_PLATFORM: ${{ matrix.platform }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_BASE64: ${{ secrets.ASC_KEY_BASE64 }}
+          REVIEW_ACCOUNT_PASSWORD: ${{ secrets.REVIEW_ACCOUNT_PASSWORD }}
+          REVIEW_CONTACT_PHONE: ${{ secrets.REVIEW_CONTACT_PHONE }}
+          TESTFLIGHT_EMAILS: ${{ inputs.emails }}
+          BUILD_NUMBER: ${{ inputs.build }}
+        run: |
+          umask 077
+          export ASC_KEY_PATH="$RUNNER_TEMP/asc.p8"
+          printf '%s' "$ASC_KEY_BASE64" | base64 -d > "$ASC_KEY_PATH"
+          "$RUNNER_TEMP/venv/bin/python" apps/mobile/store/submit/testflight.py
+
+      - name: Remove API key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/asc.p8"
