@@ -11,8 +11,10 @@ Environment:
   BUILD_NUMBER                              CFBundleVersion of the build to submit (iOS: app.json ios.buildNumber;
                                             Mac: the newest processed build when unset)
   SCREENSHOTS_DIR                           unpacked screenshots artifact (screenshots-ios-iphone-pro-max / screenshots-mac)
-  REVIEW_ACCOUNT_PASSWORD (iOS only), REVIEW_CONTACT_PHONE
+  REVIEW_ACCOUNT_PASSWORD, REVIEW_CONTACT_PHONE
   SUBMIT                                    "true" submits the review submission; anything else stops before it
+  RESUBMIT                                  Mac only: "true" withdraws the Mac version from review when a newer build
+                                            is uploaded, then fills and submits it again with that build
   GITHUB_STEP_SUMMARY                       optional, the final state table goes there
 """
 
@@ -30,7 +32,8 @@ from PIL import Image
 API = "https://api.appstoreconnect.apple.com"
 APPS = Path(__file__).resolve().parents[3]
 # Per app: App Store Connect app id and platform, the folder with appstore/<locale folder>/*.txt and review_notes.txt,
-# the screenshot display type, the demo account (None: no sign-in information) and the subscription review screenshot.
+# the screenshot display type, the demo account (None: no sign-in information), the subscription review screenshot and
+# the introductory offer every subscription gets in each territory where it is sold (None: no offer).
 PLATFORMS = {
     "ios": {
         "app_id": "6826628861",
@@ -40,6 +43,7 @@ PLATFORMS = {
         "screenshot_type": "APP_IPHONE_67",
         "demo_account": "review@getwaqtu.com",
         "subscription_screenshots": ("en-23-circles.png", "en-06-settings.png", "en-01-*.png"),
+        "intro_offer": None,
     },
     "mac": {
         "app_id": "6827054953",
@@ -47,10 +51,12 @@ PLATFORMS = {
         "store": APPS / "apple" / "store",
         # 2880x1800 renders of the app (mas-screenshots.yml).
         "screenshot_type": "APP_DESKTOP",
-        # The Mac app signs in only with Apple or Google, so App Review gets no demo account; the notes explain that
-        # the 7-day trial covers the whole app and that Premium can be bought with a sandbox Apple ID.
-        "demo_account": None,
+        # The same review account as the phone app (Waqtu Premium, email sign-in limited to REVIEW_ACCOUNT_EMAILS);
+        # the Mac app has the same small "App reviewer? Sign in with email" link under Settings > Account.
+        "demo_account": "review@getwaqtu.com",
         "subscription_screenshots": ("review-premium-en.png",),
+        # The Mac app needs Waqtu Premium, so new subscribers get a week free through StoreKit.
+        "intro_offer": {"offerMode": "FREE_TRIAL", "duration": "ONE_WEEK", "numberOfPeriods": 1},
     },
 }
 PLATFORM = os.environ.get("STORE_PLATFORM", "ios")
@@ -61,6 +67,7 @@ ASC_PLATFORM = PLATFORMS[PLATFORM]["asc_platform"]
 STORE = PLATFORMS[PLATFORM]["store"]
 SCREENSHOT_TYPE = PLATFORMS[PLATFORM]["screenshot_type"]
 DEMO_ACCOUNT = PLATFORMS[PLATFORM]["demo_account"]
+INTRO_OFFER = PLATFORMS[PLATFORM]["intro_offer"]
 # store/appstore/<folder> -> App Store Connect locale; the first one is the primary locale.
 LOCALES = {"id": "id", "en": "en-US"}
 PRIMARY_LOCALE = "id"
@@ -132,6 +139,8 @@ EDITABLE_VERSION_STATES = {
     "INVALID_BINARY",
 }
 SUBMITTED_VERSION_STATES = {"WAITING_FOR_REVIEW", "IN_REVIEW"}
+# A canceled review submission passes through CANCELING; COMPLETE (or CANCELED) means it is out of review.
+SUBMISSION_GONE_STATES = {"COMPLETE", "CANCELED"}
 
 summary: list[str] = []
 
@@ -697,6 +706,84 @@ def subscription_screenshot() -> Path:
     raise SystemExit("No screenshot for the subscription review")
 
 
+def territory_of(item: dict) -> str | None:
+    data = ((item.get("relationships") or {}).get("territory") or {}).get("data")
+    return data["id"] if data else None
+
+
+def intro_offers(asc: Asc, sid: str) -> dict[str, list[dict]]:
+    """Territory id -> the subscription's introductory offers there."""
+    offers: dict[str, list[dict]] = {}
+    for offer in asc.all(f"/v1/subscriptions/{sid}/introductoryOffers", include="territory"):
+        territory = territory_of(offer)
+        if territory:
+            offers.setdefault(territory, []).append(offer)
+    return offers
+
+
+def offer_label(attributes: dict) -> str:
+    return f"{attributes.get('offerMode')} {attributes.get('duration')} x{attributes.get('numberOfPeriods')}"
+
+
+def is_intro_offer(offer: dict) -> bool:
+    return all(offer["attributes"].get(k) == v for k, v in INTRO_OFFER.items())
+
+
+def ensure_intro_offer(asc: Asc, sid: str, product: str, strict: bool) -> None:
+    """Creates INTRO_OFFER in every territory where the subscription is available and priced and has none yet.
+
+    strict: stop the run when some territory could not get it (rerunning fills the gaps)."""
+    availability = asc.get_or_none(f"/v1/subscriptions/{sid}/subscriptionAvailability")
+    available = (
+        {t["id"] for t in asc.all(f"/v1/subscriptionAvailabilities/{availability['id']}/availableTerritories")}
+        if availability
+        else set()
+    )
+    priced = {t for p in asc.all(f"/v1/subscriptions/{sid}/prices", include="territory") if (t := territory_of(p))}
+    wanted = available & priced
+    if available - priced:
+        log(f"{product}: no price in {', '.join(sorted(available - priced))}; no introductory offer there")
+    offers = intro_offers(asc, sid)
+    other = sorted(t for t in wanted if t in offers and not any(is_intro_offer(o) for o in offers[t]))
+    missing = sorted(t for t in wanted if t not in offers)
+    created, failed = 0, []
+    for territory in missing:
+        try:
+            asc.post(
+                "/v1/subscriptionIntroductoryOffers",
+                {
+                    "data": {
+                        "type": "subscriptionIntroductoryOffers",
+                        "attributes": INTRO_OFFER,
+                        "relationships": {
+                            "subscription": ref("subscriptions", sid),
+                            "territory": ref("territories", territory),
+                        },
+                    }
+                },
+            )
+            created += 1
+        except AscError as e:
+            failed.append(f"{territory}: {e}")
+            if created == 0 and len(failed) >= 3:
+                # The same refusal everywhere (for example while the subscription is locked in review).
+                break
+    have = len(wanted) - len(missing) - len(other) + created
+    note(
+        f"{product}: introductory offer {offer_label(INTRO_OFFER)} in {have} of {len(wanted)} territories"
+        f" ({created} created now)"
+    )
+    if other:
+        note(f"::warning::{product}: a different introductory offer in {', '.join(other)}; left as is")
+    if failed:
+        for line in failed[:3]:
+            note(f"{product}: introductory offer not created in {line}")
+        if len(failed) > 3:
+            note(f"{product}: ... and {len(failed) - 3} more territories")
+        if strict:
+            raise SystemExit(f"{product}: introductory offer missing in {len(missing) - created} territories")
+
+
 def prepare_subscriptions(asc: Asc) -> list[dict]:
     """Completes the subscriptions' metadata. Returns [{'group'|'subscription': ..., ...}] for the summary."""
     groups = asc.all(f"/v1/apps/{APP_ID}/subscriptionGroups")
@@ -780,6 +867,8 @@ def prepare_subscriptions(asc: Asc) -> list[dict]:
                 prices = asc.get(f"/v1/subscriptions/{sid}/prices", limit=1)
                 if not prices["data"]:
                     log(f"::warning::{product} has no price; set it in App Store Connect")
+                if INTRO_OFFER:
+                    ensure_intro_offer(asc, sid, product, strict=True)
                 state = asc.get(f"/v1/subscriptions/{sid}")["data"]["attributes"]["state"]
                 note(f"Subscription {product}: {state}")
                 result.append({"kind": "subscription", "id": sid, "name": product, "state": state})
@@ -893,28 +982,118 @@ def review_submission(asc: Asc, version: dict, products: list[dict], submit: boo
     note(f"Review submission {rid} submitted")
 
 
+def app_subscriptions(asc: Asc) -> list[dict]:
+    return [
+        sub
+        for group in asc.all(f"/v1/apps/{APP_ID}/subscriptionGroups")
+        for sub in asc.all(f"/v1/subscriptionGroups/{group['id']}/subscriptions")
+    ]
+
+
+def withdraw_for_new_build(asc: Asc, version: dict) -> dict:
+    """RESUBMIT: cancels the app's review submission when a newer build than the one in review is uploaded and
+    processed, and waits until the version and its subscriptions can be edited again. Returns the version."""
+    vid = version["id"]
+    current = asc.get_or_none(f"/v1/appStoreVersions/{vid}/build")
+    current_number = current["attributes"]["version"] if current else None
+    number = os.environ.get("BUILD_NUMBER") or latest_build_number(asc)
+    if number is None or number == current_number:
+        note(f"Resubmit: build {current_number} is the newest and already in review; nothing withdrawn")
+        return version
+    # Leave review only once the replacement build is ready.
+    wait_for_build(asc, number, wait=True)
+    submissions = asc.all(
+        "/v1/reviewSubmissions",
+        **{
+            "filter[app]": APP_ID,
+            "filter[platform]": ASC_PLATFORM,
+            "filter[state]": "WAITING_FOR_REVIEW,IN_REVIEW",
+            "include": "app",
+        },
+    )
+    if not submissions:
+        raise SystemExit(f"Version is {version_state(version)} but no review submission of app {APP_ID} is in review")
+    for s in submissions:
+        app = ((s.get("relationships") or {}).get("app") or {}).get("data") or {}
+        if app.get("id") != APP_ID or s["attributes"].get("platform") != ASC_PLATFORM:
+            raise SystemExit(f"Review submission {s['id']} is not one of app {APP_ID} ({ASC_PLATFORM}); not canceling")
+    for s in submissions:
+        asc.patch(
+            f"/v1/reviewSubmissions/{s['id']}",
+            {"data": {"type": "reviewSubmissions", "id": s["id"], "attributes": {"canceled": True}}},
+        )
+        note(f"Resubmit: review submission {s['id']} ({s['attributes']['state']}) canceled to replace build {current_number} with {number}")
+    deadline = time.time() + 30 * 60
+    while True:
+        states = [asc.get(f"/v1/reviewSubmissions/{s['id']}")["data"]["attributes"]["state"] for s in submissions]
+        version = asc.get(f"/v1/appStoreVersions/{vid}")["data"]
+        subscriptions = {s["attributes"]["productId"]: s["attributes"]["state"] for s in app_subscriptions(asc)}
+        log(f"Resubmit: submissions {states}, version {version_state(version)}, subscriptions {subscriptions}")
+        if (
+            all(state in SUBMISSION_GONE_STATES for state in states)
+            and version_state(version) in EDITABLE_VERSION_STATES
+            and not any(state in SUBMITTED_VERSION_STATES for state in subscriptions.values())
+        ):
+            note(f"Resubmit: out of review (version {version_state(version)}, subscriptions {subscriptions})")
+            return version
+        if time.time() > deadline:
+            raise SystemExit("The canceled review submission did not finish canceling within 30 minutes")
+        time.sleep(20)
+
+
 def final_state(asc: Asc, vid: str) -> None:
-    version = asc.get(f"/v1/appStoreVersions/{vid}")["data"]["attributes"]
+    page = asc.get(f"/v1/appStoreVersions/{vid}", include="build")
+    version = page["data"]["attributes"]
+    build = next((i for i in page.get("included", []) if i["type"] == "builds"), None)
     note(
         f"Final: version {version['versionString']} appVersionState={version.get('appVersionState')}"
-        f" appStoreState={version.get('appStoreState')}"
+        f" appStoreState={version.get('appStoreState')} build {build['attributes']['version'] if build else 'none'}"
     )
     for s in asc.all("/v1/reviewSubmissions", **{"filter[app]": APP_ID, "filter[platform]": ASC_PLATFORM})[:5]:
-        note(f"Final: review submission {s['id']} {s['attributes']['state']} submitted {s['attributes'].get('submittedDate')}")
-    for group in asc.all(f"/v1/apps/{APP_ID}/subscriptionGroups"):
-        for sub in asc.all(f"/v1/subscriptionGroups/{group['id']}/subscriptions"):
-            note(f"Final: subscription {sub['attributes']['productId']} {sub['attributes']['state']}")
+        line = f"Final: review submission {s['id']} {s['attributes']['state']} submitted {s['attributes'].get('submittedDate')}"
+        if s["attributes"]["state"] not in SUBMISSION_GONE_STATES:
+            items = asc.all(
+                f"/v1/reviewSubmissions/{s['id']}/items",
+                include="appStoreVersion,subscriptionVersion,subscriptionGroupVersion",
+            )
+            kinds = [
+                rel for item in items for rel, value in (item.get("relationships") or {}).items() if (value or {}).get("data")
+            ]
+            line += f" items {', '.join(sorted(kinds)) or 'none'}"
+        note(line)
+    for sub in app_subscriptions(asc):
+        offers = intro_offers(asc, sub["id"])
+        line = f"Final: subscription {sub['attributes']['productId']} {sub['attributes']['state']}"
+        if offers:
+            sample = next(iter(offers.values()))[0]["attributes"]
+            kinds = {offer_label(o["attributes"]) for territory in offers.values() for o in territory}
+            line += (
+                f"; introductory offers in {len(offers)} territories ({', '.join(sorted(kinds))}),"
+                f" e.g. {offer_label(sample)} start {sample.get('startDate')} end {sample.get('endDate')}"
+            )
+        else:
+            line += "; no introductory offer"
+        note(line)
 
 
 def main() -> None:
     submit = os.environ.get("SUBMIT", "false") == "true"
+    resubmit = os.environ.get("RESUBMIT", "false") == "true"
+    if resubmit and (PLATFORM != "mac" or not submit):
+        raise SystemExit("RESUBMIT needs STORE_PLATFORM=mac and SUBMIT=true")
     asc = Asc()
     try:
         version = find_version(asc)
+        if resubmit and version_state(version) in SUBMITTED_VERSION_STATES:
+            version = withdraw_for_new_build(asc, version)
         vid = version["id"]
         note(f"App Store version {version['attributes']['versionString']}: {version_state(version)}")
         if version_state(version) in SUBMITTED_VERSION_STATES:
             note("Version is already submitted; not changing it")
+            if INTRO_OFFER:
+                # Offers are not part of the review; add any missing ones, reporting (not failing) a refusal.
+                for sub in app_subscriptions(asc):
+                    ensure_intro_offer(asc, sub["id"], sub["attributes"]["productId"], strict=False)
         else:
             attach_build(asc, version, wait=submit)
             update_version_attributes(asc, vid)

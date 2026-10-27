@@ -22,7 +22,7 @@ Halaqah and hafalan
 • The halaqah program and a memorization (hafalan) companion, and Circles: small anonymous halaqah circles to share reflections and voice notes.
 
 Waqtu Premium
-Every new install includes a 7-day free trial of the whole app. After that, Waqtu for Mac needs Waqtu Premium, an auto-renewing subscription: Rp 29.000 per month or Rp 249.000 per year (prices in your currency are shown before you buy). Signing in with your Waqtu account (Apple or Google) is optional; with it, the same subscription also unlocks Waqtu on iPhone and Android, syncs your mutabaah across devices and opens Circles.
+Waqtu for Mac requires Waqtu Premium, an auto-renewing subscription: Rp 29.000 per month or Rp 249.000 per year (prices in your currency are shown before you buy). New subscribers get a 1-week free trial; the subscription starts after the trial unless cancelled at least 24 hours before it ends. Signing in with your Waqtu account (Apple or Google) is optional; with it, the same subscription also unlocks Waqtu on iPhone and Android, syncs your mutabaah across devices and opens Circles.
 
 Subscriptions renew automatically unless cancelled at least 24 hours before the end of the period. Payment is charged to your Apple ID and you can manage or cancel the subscription in your App Store account settings.
 Terms of use: https://getwaqtu.com/en/terms
