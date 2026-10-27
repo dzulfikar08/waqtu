@@ -30,16 +30,19 @@ struct ModulesMenuSection: View {
 
     private func moduleButton(_ title: String, systemImage: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Label(title, systemImage: systemImage)
-                .font(.system(size: 11, weight: .medium))
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .frame(maxWidth: .infinity)
+            VStack(spacing: 3) {
+                Image(systemName: systemImage)
+                    .font(.system(size: 14))
+                    .foregroundColor(.waqtuLight)
+                Text(title)
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(.waqtuText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .frame(maxWidth: .infinity)
         }
-        .buttonStyle(.bordered)
-        .controlSize(.small)
-        .tint(.waqtuPrimary)
-        .foregroundColor(.waqtuText)
+        .buttonStyle(ModuleTileStyle())
     }
 
     private func openHalaqah() {
@@ -76,5 +79,18 @@ struct ModulesMenuSection: View {
         ModuleWindows.shared.open(.circles, title: mstr("modules.circles"), size: NSSize(width: 980, height: 720)) {
             CirclesWindowView(model: CirclesModel(account: account))
         }
+    }
+}
+
+/// Equal-width tile behind a module button's icon and name.
+private struct ModuleTileStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.vertical, 6)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color.waqtuPrimary.opacity(configuration.isPressed ? 0.30 : 0.16))
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 8))
     }
 }
