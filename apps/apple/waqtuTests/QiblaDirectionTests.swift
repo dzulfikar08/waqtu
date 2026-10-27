@@ -83,8 +83,10 @@ struct QiblaDirectionTests {
     }
 
     @Test func dueSouthFromNorthOfTheKaabaDueNorthFromSouthOfIt() {
-        #expect(abs(QiblaDirection.bearing(latitude: 30, longitude: QiblaDirection.kaabaLongitude) - 180) < 1e-6)
-        #expect(abs(QiblaDirection.bearing(latitude: 10, longitude: QiblaDirection.kaabaLongitude)) < 1e-6)
+        let south: Double = QiblaDirection.bearing(latitude: 30, longitude: QiblaDirection.kaabaLongitude)
+        let north: Double = QiblaDirection.bearing(latitude: 10, longitude: QiblaDirection.kaabaLongitude)
+        #expect(abs(south - 180) < 1e-6)
+        #expect(abs(north) < 1e-6)
     }
 
     @Test func turningAndAlignment() {

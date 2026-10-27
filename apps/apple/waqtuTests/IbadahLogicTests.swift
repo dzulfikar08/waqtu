@@ -408,7 +408,9 @@ struct MuhasabahTests {
         #expect(!Muhasabah.hasContent(entry(today)))
         #expect(!Muhasabah.hasContent(entry(today) { $0.feelings = " " }))
         #expect(Muhasabah.hasContent(entry(today) { $0.energy = 3 }))
-        #expect(abs(Muhasabah.completion(entry(today) { $0.feelings = "a"; $0.taqwa = 2 }) - 2.0 / 7.0) < 1e-9)
+        let twoOfSeven = entry(today) { $0.feelings = "a"; $0.taqwa = 2 }
+        let completion: Double = Muhasabah.completion(twoOfSeven)
+        #expect(abs(completion - 2.0 / 7.0) < 1e-9)
         #expect(Muhasabah.averageRating(entry(today) { $0.taqwa = 8; $0.gratitude = 9; $0.energy = 4 }) == 7)
         #expect(Muhasabah.averageRating(entry(today) { $0.feelings = "a" }) == nil)
     }
@@ -442,10 +444,14 @@ struct MuhasabahTests {
     @Test func summaryDaysWrittenMeanPerAspectAndTheChangeBetweenHalves() throws {
         let summary = Muhasabah.summarizeTrend(trendEntries, today: today, days: 30)
         #expect(summary.daysWritten == 4)
-        #expect(abs(try #require(summary.average) - (5.0 + 4.0 + 8.0) / 3.0) < 1e-9)
-        #expect(summary.aspects == [.taqwa: 6, .gratitude: 7, .energy: 5, .willingness: 10])
+        let average: Double = try #require(summary.average)
+        let expectedAverage: Double = (5.0 + 4.0 + 8.0) / 3.0
+        #expect(abs(average - expectedAverage) < 1e-9)
+        let expectedAspects: [MuhasabahAspect: Double] = [.taqwa: 6, .gratitude: 7, .energy: 5, .willingness: 10]
+        #expect(summary.aspects == expectedAspects)
         // Earlier half (days 29..15 back): 5 and 4 → 4.5; later half: 8.
-        #expect(abs(try #require(summary.change) - 3.5) < 1e-9)
+        let change: Double = try #require(summary.change)
+        #expect(abs(change - 3.5) < 1e-9)
     }
 
     @Test func noRatingsMeansNoMeanAndNoChange() {
