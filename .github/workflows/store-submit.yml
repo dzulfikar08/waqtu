@@ -26,8 +26,6 @@
 name: Store submit
 
 on:
-  push:
-    branches: [mac-resubmit]
   workflow_dispatch:
     inputs:
       platform:
@@ -132,7 +130,7 @@ jobs:
           "$RUNNER_TEMP/venv/bin/python" apps/mobile/store/submit/play.py
 
   mac:
-    if: inputs.platform == 'mac' || github.event_name == 'push'
+    if: inputs.platform == 'mac'
     runs-on: ubuntu-latest
     timeout-minutes: 150
     environment: release
