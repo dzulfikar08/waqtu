@@ -176,7 +176,7 @@ enum ScreenshotMode {
 
         let menuBarLabel = try await capture(MenuBarLabel(title: model.fastingTitle))
 
-        // 1. Menu bar popover: next prayer, today's times, checklist (bleeds off the bottom).
+        // 1. Menu bar popover, whole: next prayer, today's times, the prayer chips, modules, Pomodoro.
         let popover = try await capture(MenuBarView(viewModel: model))
         try write(
             Canvas.store(caption: caption(1, language), ui: popover, layout: .menuBar(label: menuBarLabel)),
@@ -186,7 +186,7 @@ enum ScreenshotMode {
         // 2. Mutabaah checklist and the streak report, opened.
         let mutabaah = try await capture(
             VStack(spacing: 0) {
-                MutabaahChecklistView(sync: model.syncController)
+                MutabaahChecklistView(sync: model.syncController, alwaysExpanded: true)
                 Divider()
                 StreakReportView(sync: model.syncController, isExpanded: true)
             }

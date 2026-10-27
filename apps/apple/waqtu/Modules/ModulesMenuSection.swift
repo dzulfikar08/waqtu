@@ -2,8 +2,8 @@
 //  ModulesMenuSection.swift
 //  waqtu
 //
-//  The menu bar's rows of module buttons; each opens its own window (ModuleWindows). Halaqah only
-//  shows when its content may be released in this build.
+//  The menu bar's one row of module buttons (Hafalan, Circles, Worship; Halaqah too where its
+//  content may be released); each opens its own window (ModuleWindows).
 //
 
 import AppKit
@@ -14,21 +14,16 @@ struct ModulesMenuSection: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 8) {
+            HStack(spacing: 6) {
                 if HalaqahModel.isAvailable {
                     moduleButton(mstr("modules.halaqah"), systemImage: "play.rectangle", action: openHalaqah)
                 }
                 moduleButton(mstr("modules.hafalan"), systemImage: "book", action: openHafalan)
                 moduleButton(mstr("modules.circles"), systemImage: "person.3", action: openCircles)
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 10)
-            HStack(spacing: 8) {
                 moduleButton(istr("ibadah.window"), systemImage: "moon.stars", action: openIbadah)
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
-            .padding(.bottom, 10)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
             Divider()
         }
     }
@@ -36,10 +31,13 @@ struct ModulesMenuSection: View {
     private func moduleButton(_ title: String, systemImage: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Label(title, systemImage: systemImage)
-                .font(.system(size: 12, weight: .medium))
+                .font(.system(size: 11, weight: .medium))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(.bordered)
+        .controlSize(.small)
         .tint(.waqtuPrimary)
         .foregroundColor(.waqtuText)
     }

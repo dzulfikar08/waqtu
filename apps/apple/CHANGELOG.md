@@ -10,6 +10,12 @@
 - **Delete account** — Settings → Account → Delete account (signed in) deletes the Waqtu account and its server data after a confirmation, like the phone app.
 - **Store build** — `release-mas.yml` archives `waqtu-mas` (now `Waqtu.app`), signs it with the Apple Distribution certificate and Mac App Store profiles, and uploads a signed .pkg; `store-submit.yml` (platform `mac`) fills the listing from `apps/apple/store` and submits it with the Mac subscriptions. The MAS build gets the location entitlement it needs under the sandbox, declares exempt encryption, and ships a full macOS icon set; the widget extension is sandboxed.
 
+### Compact menu bar popover (DEV-17)
+
+- **Fits a laptop screen** — The popover is about 500 pt tall by default (it used to run off the screen). Prayer rows are tighter; Hafalan, Circles and Worship (and Halaqah where released) are one row of buttons; the Pomodoro is one row with the time and Start inline; the footer is one row with Imsakiyah, Settings and Quit.
+- **Mutabaah folds** — The five prayer chips stay; the other practices fold into a "3/8 more" row (Indonesian "3/8 lainnya") that opens them, and the choice is remembered. "Manage checklist" is the icon at the end of that row.
+- **Overlay switch and test** — "Enable Overlay" and "Test Overlay" are only in Settings → General now, no longer rows in the menu.
+
 ### Ibadah tools on the Mac (DEV-17)
 
 - **Menu bar → Ibadah (Indonesian) / Worship (English)** opens one window with the phone's Ibadah tools in a sidebar: qibla, Al-Ma'tsurat, dzikir pagi & petang, doa, tasbih and muhasabah. Everything works offline.
