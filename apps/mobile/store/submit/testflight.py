@@ -96,6 +96,7 @@ def ensure_tester(asc: Asc, email: str, group: dict, user: dict | None) -> str:
     found = asc.all("/v1/betaTesters", **{"filter[email]": email})
     if found:
         tester = found[0]
+        a.log(f"{email}: existing beta tester {tester['id']} {tester['attributes']}")
         members = {t["id"] for t in asc.all(f"/v1/betaGroups/{group['id']}/betaTesters")}
         if tester["id"] not in members:
             asc.post(
@@ -198,6 +199,9 @@ def main() -> None:
     build = set_export_compliance(asc, newest_build(asc))
     note(f"Build {build['attributes']['version']} is VALID")
     users = asc_users(asc)
+    for e in emails:
+        u = users.get(e)
+        a.log(f"{e}: ASC user {u['attributes'] if u else None}")
     internal = [e for e in emails if e in users]
     external = [e for e in emails if e not in users]
     ensure_build_localization(asc, build)
