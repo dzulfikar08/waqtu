@@ -25,24 +25,30 @@ struct TasbihView: View {
         let _ = model.sync.revision
         let state = model.tasbih
         let phases = model.tasbihPhases
-        ScrollView {
-            if phases.isEmpty {
-                Text(istr("ibadah.tasbih.missing"))
-                    .foregroundStyle(.secondary)
-                    .padding(40)
-            } else {
-                let at = Tasbih.position(of: state.count, in: phases)
-                let phase = phases[min(at.phase, phases.count - 1)]
-                VStack(spacing: 20) {
-                    presets(state)
-                    phraseCard(phase: phase, phases: phases, at: at)
-                    counter(at: at, state: state)
-                    options(state)
-                    mutabaah(state)
+        IbadahScreen(
+            title: istr("ibadah.tasbih.title"),
+            subtitle: presetHint(state.preset),
+            controls: AnyView(presets(state))
+        ) {
+            ScrollView {
+                if phases.isEmpty {
+                    Text(istr("ibadah.tasbih.missing"))
+                        .foregroundStyle(Color.wqInkMuted)
+                        .padding(40)
+                } else {
+                    let at = Tasbih.position(of: state.count, in: phases)
+                    let phase = phases[min(at.phase, phases.count - 1)]
+                    VStack(spacing: 20) {
+                        phraseCard(phase: phase, phases: phases, at: at)
+                        counter(at: at, state: state)
+                        options(state)
+                        mutabaah(state)
+                    }
+                    .padding(.horizontal, 28)
+                    .padding(.vertical, 20)
+                    .frame(maxWidth: 640)
+                    .frame(maxWidth: .infinity)
                 }
-                .padding(24)
-                .frame(maxWidth: 620)
-                .frame(maxWidth: .infinity)
             }
         }
     }
@@ -50,19 +56,10 @@ struct TasbihView: View {
     // MARK: - Presets and phrase
 
     private func presets(_ state: TasbihState) -> some View {
-        VStack(spacing: 6) {
-            Picker(istr("ibadah.tasbih.presets"), selection: Binding(
-                get: { state.preset }, set: { choose($0) })) {
-                ForEach(TasbihPreset.allCases, id: \.self) { preset in
-                    Text(presetName(preset)).tag(preset)
-                }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            Text(presetHint(state.preset))
-                .font(.callout)
-                .foregroundStyle(.secondary)
-        }
+        WQSegmented(
+            options: TasbihPreset.allCases.map { WQOption(value: $0, title: presetName($0)) },
+            selection: Binding(get: { state.preset }, set: { choose($0) }))
+            .accessibilityLabel(istr("ibadah.tasbih.presets"))
     }
 
     private func presetName(_ preset: TasbihPreset) -> String {
@@ -91,90 +88,108 @@ struct TasbihView: View {
     }
 
     private func phraseCard(phase: TasbihPhase, phases: [TasbihPhase], at: TasbihPosition) -> some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             if let phrase = phase.phrase {
                 Text(phrase.arabic)
-                    .font(QuranFont.font(size: 36))
+                    .font(QuranFont.font(size: 40))
+                    .foregroundStyle(Color.wqInk)
                     .textSelection(.enabled)
                 Text(phrase.transliteration)
-                    .font(.headline)
-                    .foregroundStyle(Color.waqtuPrimary)
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(Color.wqAccent)
                 // The phrases' translations are in English, like the phone shows them.
                 if english {
                     Text(phrase.translation)
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color.wqInk.opacity(0.82))
                 }
             } else {
                 Text(istr("ibadah.tasbih.presetHint.custom"))
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 14))
+                    .foregroundStyle(Color.wqInkMuted)
             }
             if phases.count > 1 {
                 HStack(spacing: 4) {
                     ForEach(0..<phases.count, id: \.self) { i in
                         Capsule()
                             .fill(i < at.phase || (i == at.phase && at.inPhase == at.target)
-                                  ? Color.waqtuPrimary
-                                  : (i == at.phase ? Color.waqtuPrimary.opacity(0.35) : Color.secondary.opacity(0.2)))
-                            .frame(height: 6)
+                                  ? Color.wqAccent
+                                  : (i == at.phase ? Color.wqAccent.opacity(0.4) : Color.wqInk.opacity(0.14)))
+                            .frame(height: 5)
                     }
                 }
+                .padding(.top, 6)
             }
         }
-        .padding(18)
+        .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity)
-        .background(RoundedRectangle(cornerRadius: 12).fill(Color.secondary.opacity(0.07)))
+        .wqCard(padding: 22)
     }
 
     // MARK: - Counter
 
     private func counter(at: TasbihPosition, state: TasbihState) -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 14) {
             Button {
                 recorded = nil
                 model.tasbihTap()
             } label: {
-                VStack(spacing: 4) {
-                    Text("\(at.inPhase)")
-                        .font(.system(size: 64, weight: .bold, design: .rounded))
-                        .monospacedDigit()
-                    Text(at.target > 0 ? istr("ibadah.tasbih.of \(at.target)") : istr("ibadah.tasbih.tap"))
-                        .foregroundStyle(.secondary)
-                    if at.roundComplete {
-                        Label(istr("ibadah.tasbih.roundDone"), systemImage: "checkmark.circle.fill")
-                            .font(.footnote.weight(.bold))
-                            .foregroundStyle(Color.waqtuPrimary)
+                ZStack {
+                    Circle().fill(Color.wqSurface)
+                    Circle().strokeBorder(Color.wqStroke, lineWidth: 1)
+                    if at.target > 0 {
+                        Circle()
+                            .stroke(Color.wqInk.opacity(0.10), lineWidth: 8)
+                            .padding(10)
+                        Circle()
+                            .trim(from: 0, to: max(0.001, min(1, Double(at.inPhase) / Double(at.target))))
+                            .stroke(Color.wqAccent, style: StrokeStyle(lineWidth: 8, lineCap: .round))
+                            .rotationEffect(.degrees(-90))
+                            .padding(10)
+                            .animation(.easeOut(duration: 0.2), value: at.inPhase)
+                    }
+                    VStack(spacing: 2) {
+                        Text("\(at.inPhase)")
+                            .font(.system(size: 72, weight: .bold, design: .rounded))
+                            .monospacedDigit()
+                            .foregroundStyle(Color.wqGold)
+                            .contentTransition(.numericText())
+                        Text(at.target > 0 ? istr("ibadah.tasbih.of \(at.target)") : istr("ibadah.tasbih.tap"))
+                            .font(.system(size: 14))
+                            .foregroundStyle(Color.wqInkMuted)
+                        if at.roundComplete {
+                            Label(istr("ibadah.tasbih.roundDone"), systemImage: "checkmark.circle.fill")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundStyle(Color.wqAccent)
+                                .padding(.top, 2)
+                        }
                     }
                 }
-                .frame(width: 230, height: 230)
-                .background(Circle().fill(Color.waqtuPrimary.opacity(0.14)))
-                .overlay(Circle().stroke(Color.waqtuPrimary.opacity(at.roundComplete ? 1 : 0.55), lineWidth: 3))
+                .frame(width: 240, height: 240)
                 .contentShape(Circle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(WQPressStyle())
             .keyboardShortcut(.space, modifiers: [])
             .accessibilityLabel(istr("ibadah.tasbih.counterLabel \(at.inPhase)"))
-            if at.target > 0 {
-                ProgressView(value: Double(at.inPhase), total: Double(at.target))
-                    .tint(.waqtuPrimary)
-                    .frame(maxWidth: 300)
-            }
             Text(totalLine(state: state, at: at))
-                .font(.callout)
+                .font(.system(size: 13))
                 .monospacedDigit()
-                .foregroundStyle(.secondary)
-            HStack(spacing: 12) {
+                .foregroundStyle(Color.wqInkMuted)
+            HStack(spacing: 10) {
                 Button {
                     recorded = nil
                     model.tasbihUndo()
                 } label: {
                     Label(istr("ibadah.tasbih.undo"), systemImage: "minus.circle")
                 }
+                .buttonStyle(WQTintedButtonStyle(tint: .wqInkMuted))
                 .disabled(state.count == 0)
                 Button {
                     confirmReset = true
                 } label: {
                     Label(istr("ibadah.tasbih.reset"), systemImage: "arrow.counterclockwise")
                 }
+                .buttonStyle(WQTintedButtonStyle(tint: .wqInkMuted))
                 .disabled(state.count == 0)
                 .confirmationDialog(
                     istr("ibadah.tasbih.resetTitle"), isPresented: $confirmReset, titleVisibility: .visible
@@ -189,9 +204,10 @@ struct TasbihView: View {
                 }
             }
             Text(istr("ibadah.tasbih.keepsCount"))
-                .font(.caption)
-                .foregroundStyle(.tertiary)
+                .font(.system(size: 11.5))
+                .foregroundStyle(Color.wqInkMuted.opacity(0.8))
         }
+        .frame(maxWidth: .infinity)
     }
 
     private func totalLine(state: TasbihState, at: TasbihPosition) -> String {
@@ -202,7 +218,7 @@ struct TasbihView: View {
     // MARK: - Options
 
     private func options(_ state: TasbihState) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 14) {
             if state.preset == .custom {
                 Picker(istr("ibadah.tasbih.target"), selection: Binding(
                     get: { state.customTarget }, set: { model.tasbihSetTarget($0) })) {
@@ -215,13 +231,18 @@ struct TasbihView: View {
             Toggle(isOn: Binding(get: { state.feedback }, set: { model.tasbihSetFeedback($0) })) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(istr("ibadah.tasbih.feedback"))
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(Color.wqInk)
                     Text(istr("ibadah.tasbih.feedbackHint"))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.wqInkMuted)
                 }
             }
+            .toggleStyle(.switch)
+            .tint(Color.wqAccentFill)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .wqCard()
     }
 
     /// The steps, plus the stored target when it is none of them.
@@ -235,40 +256,52 @@ struct TasbihView: View {
         let items = model.sync.items
         let linkable = Tasbih.linkableItems(items)
         let linked = Tasbih.linkedItem(of: state, in: items)
-        return VStack(alignment: .leading, spacing: 10) {
+        return VStack(alignment: .leading, spacing: 12) {
             Text(istr("ibadah.tasbih.mutabaah"))
-                .font(.headline)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(Color.wqInk)
             if linkable.isEmpty {
                 Text(istr("ibadah.tasbih.noCounters"))
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color.wqInkMuted)
                     .fixedSize(horizontal: false, vertical: true)
                 Button(istr("ibadah.tasbih.manage")) {
                     ModuleWindows.openSettings(pane: SettingsView.Pane.mutabaah)
                 }
+                .buttonStyle(WQTintedButtonStyle())
             } else {
                 Text(istr("ibadah.tasbih.linkHint"))
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color.wqInkMuted)
                     .fixedSize(horizontal: false, vertical: true)
-                ForEach(linkable, id: \.id) { item in
-                    let selected = linked?.id == item.id
-                    Button {
-                        recorded = nil
-                        model.tasbihLink(selected ? nil : item.id)
-                    } label: {
-                        HStack {
-                            Image(systemName: selected ? "checkmark.circle.fill" : "circle")
-                                .foregroundStyle(selected ? Color.waqtuPrimary : Color.secondary)
-                            Text(MutabaahItemLabel.text(item))
-                            Spacer()
-                            Text(istr("ibadah.tasbih.todayValue \(model.sync.value(date: model.today, itemId: item.id))"))
-                                .foregroundStyle(.secondary)
-                                .monospacedDigit()
+                VStack(spacing: 4) {
+                    ForEach(linkable, id: \.id) { item in
+                        let selected = linked?.id == item.id
+                        Button {
+                            recorded = nil
+                            model.tasbihLink(selected ? nil : item.id)
+                        } label: {
+                            HStack(spacing: 10) {
+                                Image(systemName: selected ? "checkmark.circle.fill" : "circle")
+                                    .foregroundStyle(selected ? Color.wqAccent : Color.wqInkMuted)
+                                Text(MutabaahItemLabel.text(item))
+                                    .foregroundStyle(Color.wqInk)
+                                Spacer()
+                                Text(istr("ibadah.tasbih.todayValue \(model.sync.value(date: model.today, itemId: item.id))"))
+                                    .foregroundStyle(Color.wqInkMuted)
+                                    .monospacedDigit()
+                            }
+                            .font(.system(size: 13.5))
+                            .padding(.horizontal, 12)
+                            .frame(minHeight: 38)
+                            .background(
+                                RoundedRectangle(cornerRadius: WQ.controlRadius, style: .continuous)
+                                    .fill(selected ? Color.wqAccent.opacity(0.14) : Color.wqSurfaceRaised.opacity(0.6)))
+                            .contentShape(RoundedRectangle(cornerRadius: WQ.controlRadius, style: .continuous))
                         }
-                        .contentShape(Rectangle())
+                        .buttonStyle(WQPressStyle(scale: 0.98))
+                        .accessibilityAddTraits(selected ? .isSelected : [])
                     }
-                    .buttonStyle(.plain)
                 }
                 if let linked {
                     Button {
@@ -279,19 +312,17 @@ struct TasbihView: View {
                         Label(istr("ibadah.tasbih.record \(state.count) \(MutabaahItemLabel.text(linked))"),
                               systemImage: "checkmark.circle")
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.waqtuPrimary)
+                    .buttonStyle(WQTintedButtonStyle(prominent: true))
                     .disabled(state.count == 0)
                 }
                 if let recorded {
                     Text(recorded)
-                        .font(.callout)
-                        .foregroundStyle(Color.waqtuPrimary)
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color.wqAccent)
                 }
             }
         }
-        .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 10).fill(Color.secondary.opacity(0.07)))
+        .wqCard()
     }
 }

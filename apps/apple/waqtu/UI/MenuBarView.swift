@@ -2,19 +2,6 @@ import SwiftUI
 import AppKit
 import EventKit
 
-// MARK: - Mutabaah-inspired Colors
-extension Color {
-    static let waqtuPrimary = Color(hex: "#4A8B6F")
-    static let waqtuLight = Color(hex: "#6BA888")
-    static let waqtuDark = Color(hex: "#2D5F4C")
-    static let waqtuBackground = Color(hex: "#1A2E25")
-    static let waqtuGold = Color(hex: "#D4A574")
-    static let waqtuText = Color(hex: "#E8F0ED")
-    static let waqtuMuted = Color(hex: "#A8C9B8")
-    static let waqtuSecondary = Color(hex: "#6B8FAD")
-    static let waqtuSecondaryDark = Color(hex: "#5A7D9A")
-}
-
 struct MenuBarView: View {
     @Bindable var viewModel: AppViewModel
     #if !MAS
@@ -27,11 +14,16 @@ struct MenuBarView: View {
     }
 
     var body: some View {
-        if viewModel.hasAccess {
-            menuBarContent
-        } else {
-            UpgradeMenuView()
+        Group {
+            if viewModel.hasAccess {
+                menuBarContent
+            } else {
+                UpgradeMenuView()
+            }
         }
+        // The module windows (Worship, Circles) open Settings through this action; AppKit has no other
+        // way to reach the Settings scene that works on current macOS.
+        .onAppear { SettingsOpener.register(openSettings) }
     }
 
     @ViewBuilder
@@ -162,6 +154,8 @@ struct TrialEndingSoonModal: View {
 /// The menu without access: Mac App Store build before subscribing, direct-download build once the
 /// local trial ended.
 struct UpgradeMenuView: View {
+    @Environment(\.openSettings) private var openSettings
+
     var body: some View {
         VStack(spacing: 14) {
             #if MAS
@@ -177,7 +171,8 @@ struct UpgradeMenuView: View {
                 .multilineTextAlignment(.center)
             #endif
             Button("Upgrade") {
-                openUpgradeWindow()
+                SettingsOpener.register(openSettings)
+                SettingsOpener.show(pane: SettingsView.Pane.upgrade)
             }
             .buttonStyle(.borderedProminent)
             .tint(.waqtuPrimary)
@@ -190,13 +185,6 @@ struct UpgradeMenuView: View {
         .frame(width: 260)
         .padding(20)
         .background(Color.waqtuBackground)
-    }
-
-    private func openUpgradeWindow() {
-        NSApp.activate(ignoringOtherApps: true)
-        if NSApp.responds(to: Selector(("showSettingsWindow:"))) {
-            NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-        }
     }
 }
 
@@ -786,7 +774,7 @@ struct SettingsView: View {
                 settingsTabs
             }
         }
-        .frame(width: 520, height: 520)
+        .frame(width: 600, height: 540)
         .background(Color.waqtuBackground)
         .onAppear {
             NSApp.activate(ignoringOtherApps: true)
@@ -808,71 +796,114 @@ struct SettingsView: View {
                 TrialBannerView(daysRemaining: vm.trialManager.trialDaysRemaining)
             }
             #endif
-            TabView(selection: $selectedTab) {
-                GeneralSettingsTab(settings: settings, viewModel: viewModel)
-                    .tabItem {
-                        Label("General", systemImage: "gearshape.fill")
-                    }
-                    .tag(Pane.general)
+            SettingsTabBar(panes: panes, selection: Binding(get: { activePane }, set: { selectedTab = $0 }))
+            Divider()
+            paneContent(activePane)
+                .id(activePane)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
 
-                PrayerTimesSettingsTab(settings: settings, viewModel: viewModel)
-                    .tabItem {
-                        Label("Prayer Times", systemImage: "clock.fill")
-                    }
-                    .tag(Pane.prayerTimes)
+    /// One entry of the tab bar.
+    struct PaneItem: Identifiable {
+        let id: String
+        let title: LocalizedStringKey
+        let symbol: String
+    }
 
-                if let vm = viewModel {
-                    MutabaahSettingsTab(sync: vm.syncController)
-                        .tabItem {
-                            Label("Mutabaah", systemImage: "checklist")
-                        }
-                        .tag(Pane.mutabaah)
+    /// The panes in order; the ones that need the app's model are left out without it.
+    private var panes: [PaneItem] {
+        var list = [
+            PaneItem(id: Pane.general, title: "General", symbol: "gearshape.fill"),
+            PaneItem(id: Pane.prayerTimes, title: "Prayer Times", symbol: "clock.fill"),
+        ]
+        if viewModel != nil { list.append(PaneItem(id: Pane.mutabaah, title: "Mutabaah", symbol: "checklist")) }
+        list.append(PaneItem(id: Pane.pomodoro, title: "Pomodoro", symbol: "timer"))
+        list.append(PaneItem(id: Pane.location, title: "Location", symbol: "location.fill"))
+        if viewModel != nil {
+            list.append(PaneItem(id: Pane.account, title: "Account", symbol: "person.crop.circle.fill"))
+            list.append(PaneItem(id: Pane.slack, title: "Slack", symbol: "message.fill"))
+            list.append(PaneItem(id: Pane.upgrade, title: "Upgrade", symbol: "crown.fill"))
+        }
+        list.append(PaneItem(id: Pane.about, title: "About", symbol: "info.circle.fill"))
+        return list
+    }
+
+    /// The stored pane, or General when it is not one of these (an old value, or one that needs the model).
+    private var activePane: String {
+        panes.contains { $0.id == selectedTab } ? selectedTab : Pane.general
+    }
+
+    @ViewBuilder
+    private func paneContent(_ pane: String) -> some View {
+        switch pane {
+        case Pane.prayerTimes:
+            PrayerTimesSettingsTab(settings: settings, viewModel: viewModel)
+        case Pane.mutabaah:
+            if let vm = viewModel { MutabaahSettingsTab(sync: vm.syncController) }
+        case Pane.pomodoro:
+            PomodoroSettingsTab(settings: settings, onBrowse: { showAudioBrowser = true })
+        case Pane.location:
+            LocationSettingsTab(settings: settings, viewModel: viewModel)
+        case Pane.account:
+            if let vm = viewModel {
+                AccountSettingsTab(
+                    account: vm.account,
+                    sync: vm.syncController,
+                    muhasabah: vm.muhasabahCloud,
+                    settings: settings
+                )
+            }
+        case Pane.slack:
+            if let vm = viewModel { SlackSettingsTab(settings: settings, slackManager: vm.slackManager) }
+        case Pane.upgrade:
+            if let vm = viewModel { UpgradeSettingsTab(viewModel: vm) }
+        case Pane.about:
+            AboutSettingsTab(localTrialDaysRemaining: viewModel?.localTrialDaysRemaining ?? 0, hasStoreSubscription: viewModel?.hasStoreSubscription ?? false, hasAccountPremium: viewModel?.account.serverPremium ?? false, onCheckForUpdates: onCheckForUpdates, onResetWaqtu: viewModel.map { vm in { vm.resetAllAndQuit() } })
+        default:
+            GeneralSettingsTab(settings: settings, viewModel: viewModel)
+        }
+    }
+}
+
+/// The Settings window's tab strip. Every tab is a plain button that sets the pane, and the strip is
+/// wide enough for all nine (the system tab view put the last ones, Upgrade and About, out of reach
+/// in a window this width).
+private struct SettingsTabBar: View {
+    let panes: [SettingsView.PaneItem]
+    @Binding var selection: String
+
+    var body: some View {
+        HStack(spacing: 2) {
+            ForEach(panes) { pane in
+                let selected = pane.id == selection
+                Button {
+                    selection = pane.id
+                } label: {
+                    VStack(spacing: 3) {
+                        Image(systemName: pane.symbol)
+                            .font(.system(size: 15))
+                            .frame(height: 18)
+                        Text(pane.title)
+                            .font(.system(size: 10.5, weight: .medium))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                    }
+                    .foregroundColor(selected ? .waqtuLight : .waqtuMuted)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 6)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .fill(selected ? Color.waqtuPrimary.opacity(0.22) : Color.clear))
+                    .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 }
-
-                PomodoroSettingsTab(settings: settings, onBrowse: { showAudioBrowser = true })
-                    .tabItem {
-                        Label("Pomodoro", systemImage: "timer.fill")
-                    }
-                    .tag(Pane.pomodoro)
-
-                LocationSettingsTab(settings: settings, viewModel: viewModel)
-                    .tabItem {
-                        Label("Location", systemImage: "location.fill")
-                    }
-                    .tag(Pane.location)
-
-                if let vm = viewModel {
-                    AccountSettingsTab(
-                        account: vm.account,
-                        sync: vm.syncController,
-                        muhasabah: vm.muhasabahCloud,
-                        settings: settings
-                    )
-                    .tabItem {
-                        Label("Account", systemImage: "person.crop.circle.fill")
-                    }
-                    .tag(Pane.account)
-
-                    SlackSettingsTab(settings: settings, slackManager: vm.slackManager)
-                        .tabItem {
-                            Label("Slack", systemImage: "message.fill")
-                        }
-                        .tag(Pane.slack)
-
-                    UpgradeSettingsTab(viewModel: vm)
-                        .tabItem {
-                            Label("Upgrade", systemImage: "crown.fill")
-                        }
-                        .tag(Pane.upgrade)
-                }
-
-                AboutSettingsTab(localTrialDaysRemaining: viewModel?.localTrialDaysRemaining ?? 0, hasStoreSubscription: viewModel?.hasStoreSubscription ?? false, hasAccountPremium: viewModel?.account.serverPremium ?? false, onCheckForUpdates: onCheckForUpdates, onResetWaqtu: viewModel.map { vm in { vm.resetAllAndQuit() } })
-                    .tabItem {
-                        Label("About", systemImage: "info.circle.fill")
-                    }
-                    .tag(Pane.about)
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(selected ? .isSelected : [])
             }
         }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(Color.waqtuBackground)
     }
 }
 
@@ -1949,33 +1980,5 @@ struct AboutSettingsTab: View {
                 .background(Color.waqtuDark.opacity(0.6))
                 .cornerRadius(8)
         }
-    }
-}
-
-// MARK: - Color Extension
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3:
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6:
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8:
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            (a, r, g, b) = (255, 0, 0, 0)
-        }
-
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue: Double(b) / 255,
-            opacity: Double(a) / 255
-        )
     }
 }

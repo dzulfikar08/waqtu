@@ -39,21 +39,43 @@ struct MuhasabahView: View {
         let _ = model.journalVersion
         let today = model.today
         let entry = model.journalEntry(today)
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                Label(
-                    model.cloud.isEnabled ? istr("ibadah.muhasabah.privateCloud") : istr("ibadah.muhasabah.private"),
-                    systemImage: model.cloud.isEnabled ? "icloud" : "lock")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                todayCard(entry: entry)
-                calendar(today: today)
-                trends(today: today)
+        IbadahScreen(
+            title: istr("ibadah.muhasabah.title"),
+            subtitle: Self.dayTitle(today),
+            trailing: AnyView(
+                Button {
+                    editing = EditingDay(date: model.today)
+                } label: {
+                    Label(entry == nil ? istr("ibadah.muhasabah.start") : istr("ibadah.muhasabah.edit"),
+                          systemImage: entry == nil ? "square.and.pencil" : "pencil")
+                }
+                .buttonStyle(WQTintedButtonStyle(prominent: true)))
+        ) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Label(
+                        model.cloud.isEnabled ? istr("ibadah.muhasabah.privateCloud") : istr("ibadah.muhasabah.private"),
+                        systemImage: model.cloud.isEnabled ? "icloud" : "lock")
+                        .font(.system(size: 12.5))
+                        .foregroundStyle(Color.wqInkMuted)
+                        .fixedSize(horizontal: false, vertical: true)
+                    todayCard(entry: entry)
+                    ViewThatFits(in: .horizontal) {
+                        HStack(alignment: .top, spacing: 20) {
+                            calendar(today: today)
+                            trends(today: today)
+                        }
+                        VStack(spacing: 20) {
+                            calendar(today: today)
+                            trends(today: today)
+                        }
+                    }
+                }
+                .padding(.horizontal, 28)
+                .padding(.vertical, 20)
+                .frame(maxWidth: 860, alignment: .leading)
+                .frame(maxWidth: .infinity)
             }
-            .padding(24)
-            .frame(maxWidth: 720, alignment: .leading)
-            .frame(maxWidth: .infinity)
         }
         .sheet(item: $editing) { day in
             MuhasabahEditor(model: model, date: day.date) { editing = nil }
@@ -63,27 +85,22 @@ struct MuhasabahView: View {
     // MARK: - Today
 
     private func todayCard(entry: MuhasabahEntry?) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(istr("ibadah.muhasabah.today"))
-                .font(.headline)
-            if let entry, let average = Muhasabah.averageRating(entry) {
-                Text(istr("ibadah.muhasabah.averageToday \(Self.oneDecimal(average))"))
-                    .foregroundStyle(.secondary)
+        HStack(spacing: 16) {
+            WQProgressRing(fraction: entry.map { Muhasabah.completion($0) } ?? 0, complete: (entry.map { Muhasabah.completion($0) } ?? 0) >= 1)
+                .frame(width: 46, height: 46)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(istr("ibadah.muhasabah.today"))
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(Color.wqInk)
+                if let entry, let average = Muhasabah.averageRating(entry) {
+                    Text(istr("ibadah.muhasabah.averageToday \(Self.oneDecimal(average))"))
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color.wqInkMuted)
+                }
             }
-            if let entry {
-                ProgressView(value: Muhasabah.completion(entry))
-                    .tint(.waqtuPrimary)
-                    .frame(maxWidth: 280)
-            }
-            Button(entry == nil ? istr("ibadah.muhasabah.start") : istr("ibadah.muhasabah.edit")) {
-                editing = EditingDay(date: model.today)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.waqtuPrimary)
+            Spacer()
         }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 10).fill(Color.secondary.opacity(0.07)))
+        .wqCard()
     }
 
     // MARK: - Calendar
@@ -91,35 +108,26 @@ struct MuhasabahView: View {
     private func calendar(today: String) -> some View {
         let weeks = Muhasabah.monthWeeks(year: year, month: month)
         let weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-        return VStack(alignment: .leading, spacing: 10) {
-            HStack {
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 6) {
                 Text(istr("ibadah.muhasabah.calendar"))
-                    .font(.headline)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(Color.wqInk)
                 Spacer()
-                Button {
-                    shift(-1)
-                } label: {
-                    Image(systemName: "chevron.left")
-                }
-                .help(istr("ibadah.muhasabah.prevMonth"))
-                .accessibilityLabel(istr("ibadah.muhasabah.prevMonth"))
+                monthButton("chevron.left", label: istr("ibadah.muhasabah.prevMonth")) { shift(-1) }
                 Text(Self.monthTitle(year: year, month: month))
+                    .font(.system(size: 13, weight: .medium))
                     .monospacedDigit()
-                    .frame(minWidth: 130)
-                Button {
-                    shift(1)
-                } label: {
-                    Image(systemName: "chevron.right")
-                }
-                .help(istr("ibadah.muhasabah.nextMonth"))
-                .accessibilityLabel(istr("ibadah.muhasabah.nextMonth"))
+                    .foregroundStyle(Color.wqInk)
+                    .frame(minWidth: 116)
+                monthButton("chevron.right", label: istr("ibadah.muhasabah.nextMonth")) { shift(1) }
             }
             Grid(horizontalSpacing: 6, verticalSpacing: 6) {
                 GridRow {
                     ForEach(weekdays, id: \.self) { name in
                         Text(AppLanguage.weekdayInitial(englishShortName: name))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(.system(size: 11.5, weight: .medium))
+                            .foregroundStyle(Color.wqInkMuted)
                             .frame(maxWidth: .infinity)
                     }
                 }
@@ -135,8 +143,23 @@ struct MuhasabahView: View {
                     }
                 }
             }
-            .frame(maxWidth: 420)
         }
+        .frame(width: 340, alignment: .leading)
+        .wqCard()
+    }
+
+    private func monthButton(_ symbol: String, label: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.system(size: 11, weight: .bold))
+                .foregroundStyle(Color.wqInkMuted)
+                .frame(width: 28, height: 28)
+                .background(RoundedRectangle(cornerRadius: WQ.chipRadius, style: .continuous).fill(Color.wqSurfaceRaised))
+                .contentShape(RoundedRectangle(cornerRadius: WQ.chipRadius, style: .continuous))
+        }
+        .buttonStyle(WQPressStyle())
+        .help(label)
+        .accessibilityLabel(label)
     }
 
     private func dayCell(_ key: String, today: String) -> some View {
@@ -147,14 +170,16 @@ struct MuhasabahView: View {
             editing = EditingDay(date: key)
         } label: {
             Text("\(number)")
+                .font(.system(size: 13, weight: written || key == today ? .semibold : .regular))
                 .monospacedDigit()
                 .frame(maxWidth: .infinity)
                 .frame(height: 34)
-                .foregroundStyle(written ? Color.white : (future ? Color.secondary.opacity(0.5) : Color.primary))
-                .background(Circle().fill(written ? Color.waqtuPrimary : Color.clear).padding(1))
-                .overlay(Circle().stroke(Color.waqtuPrimary, lineWidth: key == today ? 2 : 0).padding(1))
+                .foregroundStyle(written ? Color.white : (future ? Color.wqInkMuted.opacity(0.45) : Color.wqInk))
+                .background(Circle().fill(written ? Color.wqAccentFill : Color.clear).padding(1))
+                .overlay(Circle().strokeBorder(Color.wqGold, lineWidth: key == today ? 2 : 0).padding(1))
+                .contentShape(Circle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(WQPressStyle())
         .disabled(future)
         .accessibilityLabel(written
             ? istr("ibadah.muhasabah.dayLabel \(Self.dayTitle(key))")
@@ -175,45 +200,69 @@ struct MuhasabahView: View {
         let entries = model.journal.entries(from: from, to: today)
         let trend = Muhasabah.ratingTrend(entries, today: today, days: days)
         let summary = Muhasabah.summarizeTrend(entries, today: today, days: days)
-        return VStack(alignment: .leading, spacing: 10) {
+        return VStack(alignment: .leading, spacing: 12) {
             Text(istr("ibadah.muhasabah.trends"))
-                .font(.headline)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(Color.wqInk)
             Text(istr("ibadah.muhasabah.daysWritten \(summary.daysWritten)"))
-                .foregroundStyle(.secondary)
+                .font(.system(size: 13))
+                .foregroundStyle(Color.wqInkMuted)
             if let average = summary.average {
-                Text("\(istr("ibadah.muhasabah.average")): \(Self.oneDecimal(average)) / 10")
-                    .font(.title3.weight(.semibold))
-                    .monospacedDigit()
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text("\(istr("ibadah.muhasabah.average")):")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color.wqInkMuted)
+                    Text("\(Self.oneDecimal(average)) / 10")
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundStyle(Color.wqGold)
+                }
                 if let change = summary.change {
                     Text(Self.changeText(change))
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color.wqInkMuted)
                 }
                 chart(trend)
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(istr("ibadah.muhasabah.chartLabel"))
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(spacing: 8) {
                     ForEach(MuhasabahAspect.allCases, id: \.self) { aspect in
                         if let value = summary.aspects[aspect] {
-                            HStack {
-                                Text(Self.aspectName(aspect))
-                                Spacer()
-                                Text(Self.oneDecimal(value))
-                                    .monospacedDigit()
-                                    .foregroundStyle(.secondary)
-                            }
-                            .frame(maxWidth: 280)
+                            aspectRow(aspect, value)
                         }
                     }
                 }
             } else {
                 Text(istr("ibadah.muhasabah.noRatings"))
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color.wqInkMuted)
             }
         }
-        .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 10).fill(Color.secondary.opacity(0.07)))
+        .wqCard()
+    }
+
+    private func aspectRow(_ aspect: MuhasabahAspect, _ value: Double) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(Self.aspectName(aspect))
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color.wqInk)
+                Spacer()
+                Text(Self.oneDecimal(value))
+                    .font(.system(size: 13, weight: .semibold))
+                    .monospacedDigit()
+                    .foregroundStyle(Color.wqGold)
+            }
+            GeometryReader { proxy in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(Color.wqInk.opacity(0.10))
+                    Capsule().fill(Color.wqAccent)
+                        .frame(width: proxy.size.width * max(0, min(1, value / 10)))
+                }
+            }
+            .frame(height: 5)
+        }
     }
 
     /// The mean rating of each of the last days as a bar, oldest on the left.
@@ -221,13 +270,12 @@ struct MuhasabahView: View {
         HStack(alignment: .bottom, spacing: 3) {
             ForEach(trend, id: \.date) { day in
                 RoundedRectangle(cornerRadius: 2)
-                    .fill(day.average == nil ? Color.secondary.opacity(0.2) : Color.waqtuPrimary)
+                    .fill(day.average == nil ? Color.wqInk.opacity(0.12) : Color.wqAccent)
                     .frame(height: day.average.map { max(4, CGFloat($0) / 10 * 80) } ?? 4)
                     .frame(maxWidth: .infinity)
             }
         }
         .frame(height: 80, alignment: .bottom)
-        .frame(maxWidth: 420)
     }
 
     // MARK: - Formatting
@@ -295,19 +343,21 @@ private struct MuhasabahEditor: View {
     var body: some View {
         VStack(spacing: 0) {
             ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
+                VStack(alignment: .leading, spacing: 20) {
                     Text(istr("ibadah.muhasabah.entryTitle \(MuhasabahView.dayTitle(date))"))
-                        .font(.title3.bold())
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(Color.wqInk)
                     ForEach(0..<Muhasabah.questions.count, id: \.self) { index in
                         question(Muhasabah.questions[index])
                     }
                 }
                 .padding(24)
             }
-            Divider()
-            HStack {
+            Rectangle().fill(Color.wqStroke).frame(height: 1)
+            HStack(spacing: 10) {
                 if model.journalEntry(date) != nil {
                     Button(istr("ibadah.muhasabah.delete"), role: .destructive) { confirmDelete = true }
+                        .buttonStyle(WQTintedButtonStyle(tint: .wqAlert))
                         .confirmationDialog(
                             istr("ibadah.muhasabah.deleteTitle"), isPresented: $confirmDelete, titleVisibility: .visible
                         ) {
@@ -323,16 +373,17 @@ private struct MuhasabahEditor: View {
                 Spacer()
                 Button(istr("ibadah.muhasabah.cancel"), role: .cancel, action: onClose)
                     .keyboardShortcut(.cancelAction)
+                    .buttonStyle(WQTintedButtonStyle(tint: .wqInkMuted))
                 Button(istr("ibadah.muhasabah.save")) {
                     model.saveJournal(draft)
                     onClose()
                 }
                 .keyboardShortcut(.defaultAction)
-                .buttonStyle(.borderedProminent)
-                .tint(.waqtuPrimary)
+                .buttonStyle(WQTintedButtonStyle(prominent: true))
             }
             .padding(16)
         }
+        .background(Color.wqCanvas)
         .frame(minWidth: 520, idealWidth: 560, minHeight: 560, idealHeight: 680)
     }
 
@@ -340,23 +391,27 @@ private struct MuhasabahEditor: View {
     private func question(_ question: MuhasabahQuestion) -> some View {
         switch question {
         case .text(let field):
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(Self.prompt(field))
-                    .font(.headline)
+                    .font(.system(size: 14.5, weight: .semibold))
+                    .foregroundStyle(Color.wqInk)
                 TextEditor(text: Binding(
                     get: { draft.text(field) ?? "" },
                     set: { draft.set(field, $0) }))
-                    .font(.body)
+                    .font(.system(size: 14))
+                    .foregroundStyle(Color.wqInk)
                     .scrollContentBackground(.hidden)
                     .frame(height: 76)
-                    .padding(4)
-                    .background(RoundedRectangle(cornerRadius: 6).fill(Color.secondary.opacity(0.08)))
+                    .padding(6)
+                    .background(RoundedRectangle(cornerRadius: WQ.controlRadius, style: .continuous).fill(Color.wqSurface))
+                    .overlay(RoundedRectangle(cornerRadius: WQ.controlRadius, style: .continuous).strokeBorder(Color.wqStroke, lineWidth: 1))
                     .overlay(alignment: .topLeading) {
                         if (draft.text(field) ?? "").isEmpty {
                             Text(Self.placeholder(field))
-                                .foregroundStyle(.tertiary)
-                                .padding(.horizontal, 9)
-                                .padding(.vertical, 12)
+                                .font(.system(size: 14))
+                                .foregroundStyle(Color.wqInkMuted.opacity(0.7))
+                                .padding(.horizontal, 11)
+                                .padding(.vertical, 14)
                                 .allowsHitTesting(false)
                         }
                     }
@@ -369,22 +424,25 @@ private struct MuhasabahEditor: View {
     private func ratingRow(_ aspect: MuhasabahAspect) -> some View {
         let value = draft.rating(aspect)
         let emoji = Muhasabah.emoji(aspect)
-        return VStack(alignment: .leading, spacing: 6) {
+        return VStack(alignment: .leading, spacing: 8) {
             Text(Self.ratingPrompt(aspect))
-                .font(.headline)
+                .font(.system(size: 14.5, weight: .semibold))
+                .foregroundStyle(Color.wqInk)
             HStack(spacing: 4) {
                 ForEach(Muhasabah.ratingMin...Muhasabah.ratingMax, id: \.self) { n in
                     Button {
                         draft.set(aspect, value == n ? nil : n)
                     } label: {
                         Text("\(n)")
+                            .font(.system(size: 13, weight: .semibold))
                             .monospacedDigit()
                             .frame(width: 34, height: 30)
-                            .foregroundStyle(value == n ? Color.white : Color.primary)
-                            .background(RoundedRectangle(cornerRadius: 6)
-                                .fill(value == n ? Color.waqtuPrimary : Color.secondary.opacity(0.12)))
+                            .foregroundStyle(value == n ? Color.white : Color.wqInk)
+                            .background(RoundedRectangle(cornerRadius: WQ.chipRadius, style: .continuous)
+                                .fill(value == n ? Color.wqAccentFill : Color.wqSurfaceRaised))
+                            .contentShape(RoundedRectangle(cornerRadius: WQ.chipRadius, style: .continuous))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(WQPressStyle())
                     .accessibilityLabel(istr("ibadah.muhasabah.rate \(MuhasabahView.aspectName(aspect)) \(n)"))
                 }
             }
@@ -395,13 +453,13 @@ private struct MuhasabahEditor: View {
                     Text(emoji[value - 1])
                         .font(.title2)
                     Button(istr("ibadah.muhasabah.clearRating")) { draft.set(aspect, nil) }
-                        .buttonStyle(.link)
+                        .buttonStyle(WQTintedButtonStyle(tint: .wqInkMuted))
                 }
                 Spacer()
                 Text(Self.highLabel(aspect))
             }
-            .font(.caption)
-            .foregroundStyle(.secondary)
+            .font(.system(size: 12))
+            .foregroundStyle(Color.wqInkMuted)
         }
     }
 

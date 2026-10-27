@@ -358,23 +358,6 @@
         }
       }
     },
-    "ibadah.hubSubtitle" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Qibla, dhikr, duas, tasbih and muhasabah. Everything works offline."
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kiblat, dzikir, doa, tasbih dan muhasabah. Semua bisa dipakai tanpa internet."
-          }
-        }
-      }
-    },
     "ibadah.matsurat.kubro" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1990,6 +1973,23 @@
         }
       }
     },
+    "ibadah.reader.subtitle %lld %lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld texts · %2$lld recitations"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld bacaan · %2$lld hitungan"
+          }
+        }
+      }
+    },
     "ibadah.reader.tapToCount" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2003,6 +2003,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Klik untuk menghitung"
+          }
+        }
+      }
+    },
+    "ibadah.reader.textsDone" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "texts read"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bacaan selesai"
           }
         }
       }

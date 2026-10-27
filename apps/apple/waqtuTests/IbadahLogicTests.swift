@@ -133,6 +133,80 @@ struct IbadahReaderTests {
     }
 }
 
+/// What a reader card is headed with: never "Text 13".
+struct IbadahReaderLabelTests {
+    private func item(_ key: String, title: String?, translation: String?, latin: String? = nil) -> ReaderItem {
+        ReaderItem(
+            key: key, title: title, heading: nil,
+            lines: [ReaderLine(label: nil, arabic: "ب", latin: latin, translation: translation)],
+            repeatCount: 1, reference: nil)
+    }
+
+    private func session(_ items: [ReaderItem]) -> ReaderSession {
+        ReaderSession(id: .dzikirPagi, sourceTitle: "t", translationLang: .en, items: items)
+    }
+
+    @Test func aTitleOnlyOneTextHasIsKept() {
+        let items = [item("a", title: "Surat Al-Ikhlas", translation: "Say: He is Allah"), item("b", title: "Taawudz", translation: "I seek refuge")]
+        #expect(IbadahReader.label(for: items[0], in: session(items)) == ReaderItemLabel(title: "Surat Al-Ikhlas", kicker: nil))
+    }
+
+    @Test func aTitleSharedByManyTextsGivesWayToTheOpeningOfTheText() {
+        let items = [
+            item("a", title: "Doa Al-Ma'tsurat", translation: "O Allah, by You we enter the morning, and by You we enter the evening"),
+            item("b", title: "Doa Al-Ma'tsurat", translation: "We have entered morning"),
+        ]
+        let label = IbadahReader.label(for: items[0], in: session(items))
+        #expect(label == ReaderItemLabel(title: "O Allah, by You we enter the…", kicker: "Doa Al-Ma'tsurat"))
+    }
+
+    @Test func aTextWithoutATitleUsesItsTranslationThenItsTransliteration() {
+        let items = [
+            item("a", title: nil, translation: "We have entered morning and the dominion belongs to Allah"),
+            item("b", title: nil, translation: nil, latin: "Subhanallahi wa bihamdihi"),
+            item("c", title: nil, translation: nil),
+        ]
+        let s = session(items)
+        #expect(IbadahReader.label(for: items[0], in: s)?.title == "We have entered morning and the dominion…")
+        #expect(IbadahReader.label(for: items[1], in: s) == ReaderItemLabel(title: "Subhanallahi wa bihamdihi", kicker: nil))
+        #expect(IbadahReader.label(for: items[2], in: s) == nil)
+    }
+
+    @Test func openingWordsCutAtTheFirstClauseOfThreeWordsOrMore() {
+        #expect(IbadahReader.openingWords("Glory be to Allah, and praise") == "Glory be to Allah…")
+        // A clause of two words is too short to stand for the text.
+        #expect(IbadahReader.openingWords("Say, He is Allah the One") == "Say, He is Allah the One")
+        #expect(IbadahReader.openingWords("  \n ") == nil)
+        #expect(IbadahReader.openingWords("Short") == "Short")
+    }
+}
+
+/// The window's sidebar and the "time for the morning dhikr" shortcut drive one value.
+@MainActor
+struct IbadahNavigationTests {
+    @Test func everyToolInTheSidebarCanBeSelected() {
+        var navigation = IbadahNavigation()
+        #expect(navigation.tool == .dzikir)
+        for tool in IbadahModel.Tool.allCases {
+            navigation.select(tool)
+            #expect(navigation.tool == tool)
+        }
+        #expect(Set(IbadahModel.Tool.allCases.map(\.id)).count == IbadahModel.Tool.allCases.count)
+    }
+
+    @Test func theShortcutOpensTheReaderOnTheTimeOfDay() {
+        var navigation = IbadahNavigation()
+        navigation.openReader(.matsurat, time: .petang)
+        #expect(navigation.tool == .matsurat)
+        #expect(navigation.matsuratTime == .petang)
+        #expect(navigation.dzikirTime == nil)
+        navigation.openReader(.dzikir, time: .pagi)
+        #expect(navigation.tool == .dzikir)
+        #expect(navigation.dzikirTime == .pagi)
+        #expect(navigation.matsuratTime == .petang)
+    }
+}
+
 /// Finishing a session ticks `dzikir_pagi` / `dzikir_petang` in the account replica, as the phone's `setEntry(..., 1)`.
 @MainActor
 struct IbadahMutabaahTickTests {

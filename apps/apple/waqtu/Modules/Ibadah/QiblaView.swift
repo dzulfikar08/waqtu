@@ -35,20 +35,31 @@ struct QiblaView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                if let place {
-                    figures(for: place)
-                } else {
-                    noLocation
+        IbadahScreen(title: istr("ibadah.qibla.title"), subtitle: subtitle) {
+            ScrollView {
+                Group {
+                    if let place {
+                        figures(for: place)
+                    } else {
+                        noLocation
+                    }
                 }
+                .padding(28)
+                .frame(maxWidth: 760)
+                .frame(maxWidth: .infinity)
             }
-            .padding(28)
-            .frame(maxWidth: .infinity)
         }
         .onReceive(NotificationCenter.default.publisher(for: Notification.Name("prayerTimeSettingsChanged"))) { _ in
             settingsVersion += 1
         }
+    }
+
+    /// Where the bearing is measured from.
+    private var subtitle: String? {
+        guard place != nil else { return nil }
+        return viewModel.settings.autoDetectLocation
+            ? istr("ibadah.qibla.from \(viewModel.locationDisplay)")
+            : istr("ibadah.qibla.fromManual \(viewModel.locationDisplay)")
     }
 
     @ViewBuilder
@@ -56,68 +67,104 @@ struct QiblaView: View {
         let distance = QiblaDirection.distanceKm(latitude: place.latitude, longitude: place.longitude)
         if distance < QiblaDirection.atKaabaKm {
             Text(istr("ibadah.qibla.atKaaba"))
-                .font(.title3)
+                .font(.system(size: 17))
+                .foregroundStyle(Color.wqInk)
                 .multilineTextAlignment(.center)
-                .padding(.vertical, 40)
+                .frame(maxWidth: .infinity)
+                .wqCard(padding: 32)
         } else {
             let bearing = QiblaDirection.bearing(latitude: place.latitude, longitude: place.longitude)
             let rounded = Int(bearing.rounded()) % 360
-            VStack(spacing: 4) {
-                Text(istr("ibadah.qibla.bearing"))
-                    .font(.headline)
-                    .foregroundStyle(.secondary)
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 20) {
+                    dialCard(bearing: bearing, rounded: rounded)
+                    statCards(rounded: rounded, distance: distance)
+                        .frame(width: 270)
+                }
+                VStack(spacing: 20) {
+                    dialCard(bearing: bearing, rounded: rounded)
+                    statCards(rounded: rounded, distance: distance)
+                }
+            }
+        }
+    }
+
+    private func dialCard(bearing: Double, rounded: Int) -> some View {
+        QiblaDial(bearing: bearing)
+            .frame(width: 330, height: 330)
+            .padding(20)
+            .frame(maxWidth: .infinity)
+            .wqCard(padding: 0)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(istr("ibadah.qibla.dialLabel \(rounded)"))
+    }
+
+    private func statCards(rounded: Int, distance: Double) -> some View {
+        VStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 4) {
+                WQLabel(text: istr("ibadah.qibla.bearing"))
                 Text("\(rounded)°")
-                    .font(.system(size: 54, weight: .bold, design: .rounded))
+                    .font(.system(size: 56, weight: .bold, design: .rounded))
                     .monospacedDigit()
-                    .foregroundStyle(Color.waqtuPrimary)
+                    .foregroundStyle(Color.wqGold)
                     .textSelection(.enabled)
                 Text(istr("ibadah.qibla.fromNorth"))
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color.wqInkMuted)
             }
-            QiblaDial(bearing: bearing)
-                .frame(width: 320, height: 320)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(istr("ibadah.qibla.dialLabel \(rounded)"))
-            VStack(spacing: 4) {
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .wqCard(padding: 20)
+            VStack(alignment: .leading, spacing: 6) {
+                Image(systemName: "arrow.triangle.swap")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Color.wqAccent)
+                    .accessibilityHidden(true)
                 Text(istr("ibadah.qibla.distance \(Self.kilometres(distance))"))
-                    .font(.title3)
-                Text(viewModel.settings.autoDetectLocation
-                     ? istr("ibadah.qibla.from \(viewModel.locationDisplay)")
-                     : istr("ibadah.qibla.fromManual \(viewModel.locationDisplay)"))
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(Color.wqInk)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            Text(istr("ibadah.qibla.macTip"))
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .frame(maxWidth: 460)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .wqCard(padding: 20)
+            Label(istr("ibadah.qibla.macTip"), systemImage: "info.circle")
+                .font(.system(size: 12.5))
+                .foregroundStyle(Color.wqInkMuted)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 4)
         }
     }
 
     private var noLocation: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
+            Image(systemName: "location.slash.fill")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(Color.wqGold)
+                .frame(width: 48, height: 48)
+                .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Color.wqGold.opacity(0.14)))
+                .accessibilityHidden(true)
             Text(istr("ibadah.qibla.noLocation"))
+                .font(.system(size: 14))
+                .foregroundStyle(Color.wqInk)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-            HStack(spacing: 12) {
+            HStack(spacing: 10) {
                 Button(istr("ibadah.qibla.locate")) { viewModel.refreshLocation() }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.waqtuPrimary)
+                    .buttonStyle(WQTintedButtonStyle(prominent: true))
                 Button(istr("ibadah.qibla.openSettings")) {
                     ModuleWindows.openSettings(pane: SettingsView.Pane.location)
                 }
+                .buttonStyle(WQTintedButtonStyle())
             }
             if locationManager.authorizationStatus == .denied || locationManager.authorizationStatus == .restricted {
                 Text(istr("ibadah.qibla.denied"))
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 12.5))
+                    .foregroundStyle(Color.wqInkMuted)
                     .multilineTextAlignment(.center)
             }
         }
         .frame(maxWidth: 440)
-        .padding(.vertical, 40)
+        .wqCard(padding: 32)
+        .padding(.top, 24)
     }
 
     /// 7,920 km: whole kilometres with the reader's grouping.
@@ -150,35 +197,41 @@ private struct QiblaDial: View {
             let radius = size / 2
             ZStack {
                 Circle()
-                    .fill(Color.secondary.opacity(0.07))
+                    .fill(Color.wqSurfaceRaised.opacity(0.55))
                 Circle()
-                    .stroke(Color.secondary.opacity(0.35), lineWidth: 1.5)
+                    .strokeBorder(Color.wqInk.opacity(0.22), lineWidth: 1.5)
+                Circle()
+                    .strokeBorder(Color.wqStroke, lineWidth: 1)
+                    .padding(radius * 0.36)
                 ForEach(0..<72, id: \.self) { i in
                     let major = i % 6 == 0
                     Rectangle()
-                        .fill(Color.secondary.opacity(major ? 0.7 : 0.35))
+                        .fill(Color.wqInk.opacity(major ? 0.55 : 0.22))
                         .frame(width: major ? 2 : 1, height: major ? 12 : 6)
                         .offset(y: -radius + (major ? 6 : 3) + 1.5)
                         .rotationEffect(.degrees(Double(i) * 5))
                 }
                 ForEach(cardinals, id: \.key) { cardinal in
                     Text(label(cardinal.key))
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
-                        .foregroundStyle(cardinal.key == "N" ? Color.red : Color.secondary)
+                        .font(.system(size: 17, weight: .bold, design: .rounded))
+                        .foregroundStyle(cardinal.key == "N" ? Color.wqAlert : Color.wqInkMuted)
                         .offset(
                             x: sin(cardinal.angle * .pi / 180) * (radius - 34),
                             y: -cos(cardinal.angle * .pi / 180) * (radius - 34))
                 }
                 ZStack {
                     Capsule()
-                        .fill(Color.waqtuPrimary)
+                        .fill(Color.wqAccent)
                         .frame(width: 6, height: radius * 0.58)
                         .offset(y: -radius * 0.29)
                     kaaba
                         .offset(y: -radius * 0.58 - 16)
                     Circle()
-                        .fill(Color.waqtuPrimary)
+                        .fill(Color.wqAccent)
                         .frame(width: 14, height: 14)
+                    Circle()
+                        .fill(Color.wqSurface)
+                        .frame(width: 5, height: 5)
                 }
                 .frame(width: size, height: size)
                 .rotationEffect(.degrees(bearing))

@@ -190,7 +190,6 @@ struct IbadahCatalogTests {
         "ibadah.heroDone %@": "heroDone",
         "ibadah.heroPagi": "heroPagi",
         "ibadah.heroPetang": "heroPetang",
-        "ibadah.hubSubtitle": "hubSubtitle",
         "ibadah.matsurat.kubro": "matsurat.kubro",
         "ibadah.matsurat.sughro": "matsurat.sughro",
         "ibadah.matsurat.title": "matsurat.title",

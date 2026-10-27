@@ -157,3 +157,59 @@ enum IbadahReader {
         time == .pagi ? "dzikir_pagi" : "dzikir_petang"
     }
 }
+
+/// What a reader card is headed with.
+struct ReaderItemLabel: Equatable {
+    let title: String
+    /// The stored title when it is shared by several texts of the session ("Doa Al-Ma'tsurat" on
+    /// thirty of them) and so says little on its own; the title is then the opening of the text.
+    let kicker: String?
+}
+
+extension IbadahReader {
+    /// The heading of an item: its own title when that tells it apart from the others of the session,
+    /// else the opening words of its translation (or transliteration), else nil.
+    static func label(for item: ReaderItem, in session: ReaderSession) -> ReaderItemLabel? {
+        let named = trimmedTitle(item)
+        if let named, session.items.filter({ trimmedTitle($0) == named }).count == 1 {
+            return ReaderItemLabel(title: named, kicker: nil)
+        }
+        for line in item.lines {
+            for text in [line.translation, line.latin] {
+                if let text, let words = openingWords(text) {
+                    return ReaderItemLabel(title: words, kicker: named)
+                }
+            }
+        }
+        return named.map { ReaderItemLabel(title: $0, kicker: nil) }
+    }
+
+    private static func trimmedTitle(_ item: ReaderItem) -> String? {
+        guard let title = item.title?.trimmingCharacters(in: .whitespacesAndNewlines), !title.isEmpty else { return nil }
+        return title
+    }
+
+    /// The first clause of `text`, or its first words, with an ellipsis when something follows.
+    static func openingWords(_ text: String, maxWords: Int = 7, maxCharacters: Int = 56) -> String? {
+        let flat = text.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+        guard !flat.isEmpty else { return nil }
+        // A first clause of three words or more reads better than a cut through the middle of one.
+        var clause = flat
+        if let cut = flat.firstIndex(where: { ",.;:!?".contains($0) }) {
+            let head = String(flat[..<cut])
+            if head.split(separator: " ").count >= 3 { clause = head }
+        }
+        let words = clause.split(separator: " ")
+        var kept: [Substring] = []
+        var length = 0
+        for word in words {
+            let added = word.count + (kept.isEmpty ? 0 : 1)
+            if kept.count == maxWords || (!kept.isEmpty && length + added > maxCharacters) { break }
+            kept.append(word)
+            length += added
+        }
+        let title = kept.joined(separator: " ").trimmingCharacters(in: CharacterSet(charactersIn: ",.;:!?-–—"))
+        guard !title.isEmpty else { return nil }
+        return kept.count < words.count || clause.count < flat.count ? title + "…" : title
+    }
+}

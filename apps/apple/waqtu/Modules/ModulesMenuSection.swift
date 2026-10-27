@@ -66,7 +66,10 @@ struct ModulesMenuSection: View {
     }
 
     private func openIbadah() {
-        ModuleWindows.shared.open(.ibadah, title: istr("ibadah.window"), size: NSSize(width: 980, height: 720)) {
+        ModuleWindows.shared.open(
+            .ibadah, title: istr("ibadah.window"), size: NSSize(width: 1000, height: 740),
+            minSize: NSSize(width: 780, height: 540), unifiedTitlebar: true
+        ) {
             IbadahWindowView(model: IbadahModel(
                 viewModel: viewModel,
                 store: IbadahStore(fileURL: IbadahStore.defaultFileURL()),

@@ -43,14 +43,40 @@ final class IbadahModel {
             case .muhasabah: return "square.and.pencil"
             }
         }
+
+        /// The filled variant marks the selected tool.
+        var selectedImage: String {
+            switch self {
+            case .qibla: return "location.north.circle.fill"
+            case .matsurat: return "book.fill"
+            case .dzikir: return "sun.and.horizon.fill"
+            case .doa: return "heart.fill"
+            case .tasbih: return "circle.dotted"
+            case .muhasabah: return "square.and.pencil"
+            }
+        }
     }
 
     let viewModel: AppViewModel
-    var selectedTool: Tool? = .dzikir
-    /// Al-Ma'tsurat version and time of day; nil time follows the part of the day.
+    /// The tool shown and the time each reader opens on (nil follows the part of the day).
+    var navigation = IbadahNavigation()
+    /// Al-Ma'tsurat version.
     var matsuratKind: MatsuratKind = .sughro
-    var matsuratTime: ReaderTime?
-    var dzikirTime: ReaderTime?
+
+    var selectedTool: Tool {
+        get { navigation.tool }
+        set { navigation.select(newValue) }
+    }
+
+    var matsuratTime: ReaderTime? {
+        get { navigation.matsuratTime }
+        set { navigation.matsuratTime = newValue }
+    }
+
+    var dzikirTime: ReaderTime? {
+        get { navigation.dzikirTime }
+        set { navigation.dzikirTime = newValue }
+    }
 
     private(set) var today: String
     private(set) var suggestedTime: ReaderTime = .pagi
@@ -246,5 +272,27 @@ final class IbadahModel {
         journal.delete(date, now: FardhMapping.millis(Date()))
         localJournalVersion += 1
         cloud.journalChanged()
+    }
+}
+
+/// Which tool the window shows, and which time of day the readers were asked to open on. A plain
+/// value so the sidebar's choices are testable without the app's model.
+struct IbadahNavigation: Equatable {
+    var tool: IbadahModel.Tool = .dzikir
+    var matsuratTime: ReaderTime?
+    var dzikirTime: ReaderTime?
+
+    mutating func select(_ tool: IbadahModel.Tool) {
+        self.tool = tool
+    }
+
+    /// The "time for the morning dhikr" shortcut: opens a reader on `time`.
+    mutating func openReader(_ tool: IbadahModel.Tool, time: ReaderTime) {
+        switch tool {
+        case .matsurat: matsuratTime = time
+        case .dzikir: dzikirTime = time
+        default: break
+        }
+        select(tool)
     }
 }

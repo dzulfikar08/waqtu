@@ -1,0 +1,105 @@
+# Screenshots of the Mac Worship (Ibadah) window for design review, not for the stores: an unsigned
+# Debug build of waqtu-mas runs its DEBUG screenshot mode (apps/apple/waqtu/Screenshots/ScreenshotMode.swift)
+# with WAQTU_SCREENSHOTS_SET=ibadah, once per language, and uploads the PNGs as the `ibadah-mac`
+# artifact (kept 7 days):
+#   ibadah-<dark|light>-<id|en>-01-qibla … 06-muhasabah.png   the window, 1000 pt wide at 3x
+#   settings-<upgrade|about>-<id|en>.png                       the Settings window on those tabs
+# It does not touch the `screenshots-mac` artifact of mas-screenshots.yml (store canvases). The app
+# sees a fixed moment (12 Feb 2027 17:00 WIB) through apps/apple/scripts/screenshots/fake-clock.c.
+# No secrets.
+name: Mac Ibadah screenshots
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+
+      - name: Build waqtu-mas (Debug, unsigned)
+        working-directory: apps/apple
+        run: |
+          xcodebuild build \
+            -project waqt.xcodeproj \
+            -scheme waqtu-mas \
+            -configuration Debug \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath build \
+            -quiet \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+
+      - name: Build the fake clock
+        working-directory: apps/apple
+        run: clang -dynamiclib -O2 -framework CoreFoundation -o build/fake-clock.dylib scripts/screenshots/fake-clock.c
+
+      - name: Render screenshots (id, en)
+        working-directory: apps/apple
+        run: |
+          set -euo pipefail
+          app=""
+          for candidate in build/Build/Products/Debug/*.app; do
+            if [ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$candidate/Contents/Info.plist")" = "dat.waqtu" ]; then
+              app="$candidate"
+            fi
+          done
+          if [ -z "$app" ]; then echo "::error::No dat.waqtu app in build/Build/Products/Debug"; exit 1; fi
+          exe="$app/Contents/MacOS/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Contents/Info.plist")"
+          echo "App: $app"
+          out="$PWD/build/screenshots"
+          rm -rf "$out" && mkdir -p "$out"
+          # 12 Feb 2027 17:00 in Jakarta (UTC+7).
+          epoch="$(date -j -u -f '%Y-%m-%d %H:%M:%S' '2027-02-12 10:00:00' +%s)"
+          for lang in id en; do
+            if [ "$lang" = id ]; then locale=id_ID; else locale=en_US; fi
+            echo "::group::$lang"
+            WAQTU_SCREENSHOTS_DIR="$out" \
+            WAQTU_SCREENSHOTS_SET=ibadah \
+            WAQTU_SCREENSHOTS_EXPECT_DAY=2027-02-12 \
+            WAQTU_FAKE_UNIX_TIME="$epoch" \
+            TZ=Asia/Jakarta \
+            DYLD_INSERT_LIBRARIES="$PWD/build/fake-clock.dylib" \
+              "$exe" -AppleLanguages "($lang)" -AppleLocale "$locale" &
+            pid=$!
+            ( sleep 300; kill -9 "$pid" 2>/dev/null ) &
+            watchdog=$!
+            status=0
+            wait "$pid" || status=$?
+            kill "$watchdog" 2>/dev/null || true
+            echo "::endgroup::"
+            if [ "$status" -ne 0 ]; then echo "::error::Screenshot mode ($lang) exited with $status"; exit 1; fi
+          done
+
+      - name: Check the PNGs
+        working-directory: apps/apple/build/screenshots
+        run: |
+          set -euo pipefail
+          ls -la
+          fail=0
+          for lang in id en; do
+            for theme in dark light; do
+              n="$(ls ibadah-"$theme"-"$lang"-0*.png | wc -l | tr -d ' ')"
+              if [ "$n" -ne 6 ]; then echo "::error::$n $theme $lang Ibadah screenshots, expected 6"; fail=1; fi
+            done
+            for pane in upgrade about; do
+              if [ ! -f "settings-$pane-$lang.png" ]; then echo "::error::settings-$pane-$lang.png is missing"; fail=1; fi
+            done
+          done
+          exit "$fail"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ibadah-mac
+          path: apps/apple/build/screenshots/*.png
+          if-no-files-found: error
+          retention-days: 7

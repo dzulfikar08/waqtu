@@ -8,6 +8,9 @@
 //  (`dzikir_pagi` / `dzikir_petang`, the same ids as the phone). Progress is kept on this Mac for
 //  the rest of the day.
 //
+//  The header holds the title, the count of texts read and the controls (morning or evening, kind,
+//  Latin and translation switches); the cards scroll below it.
+//
 
 import SwiftUI
 
@@ -17,24 +20,14 @@ struct MatsuratReaderView: View {
 
     var body: some View {
         let time = model.matsuratTime ?? model.suggestedTime
+        let id = ReaderSessionID.matsurat(model.matsuratKind, time)
         ReaderPane(
             model: model,
-            sessionID: .matsurat(model.matsuratKind, time),
-            header: AnyView(
-                HStack(spacing: 16) {
-                    TimePicker(
-                        selection: Binding(get: { time }, set: { model.matsuratTime = $0 }),
-                        suggested: model.suggestedTime,
-                        label: istr("ibadah.reader.timeChoice"))
-                    Picker(istr("ibadah.reader.kindChoice"), selection: Binding(
-                        get: { model.matsuratKind }, set: { model.matsuratKind = $0 })) {
-                        Text(istr("ibadah.matsurat.sughro")).tag(MatsuratKind.sughro)
-                        Text(istr("ibadah.matsurat.kubro")).tag(MatsuratKind.kubro)
-                    }
-                    .pickerStyle(.segmented)
-                    .frame(maxWidth: 240)
-                }))
-            .id(ReaderSessionID.matsurat(model.matsuratKind, time))
+            sessionID: id,
+            title: istr("ibadah.matsurat.title"),
+            time: Binding(get: { time }, set: { model.matsuratTime = $0 }),
+            kind: Binding(get: { model.matsuratKind }, set: { model.matsuratKind = $0 }))
+            .id(id)
     }
 }
 
@@ -44,285 +37,381 @@ struct DzikirReaderView: View {
 
     var body: some View {
         let time = model.dzikirTime ?? model.suggestedTime
+        let id = ReaderSessionID.dzikir(time)
         ReaderPane(
             model: model,
-            sessionID: .dzikir(time),
-            header: AnyView(
-                TimePicker(
-                    selection: Binding(get: { time }, set: { model.dzikirTime = $0 }),
-                    suggested: model.suggestedTime,
-                    label: istr("ibadah.reader.timeChoice"))))
-            .id(ReaderSessionID.dzikir(time))
-    }
-}
-
-/// Morning / evening choice; the suggested one is marked "now".
-private struct TimePicker: View {
-    @Binding var selection: ReaderTime
-    let suggested: ReaderTime
-    let label: String
-
-    var body: some View {
-        Picker(label, selection: $selection) {
-            ForEach(ReaderTime.allCases, id: \.self) { time in
-                Text(title(time)).tag(time)
-            }
-        }
-        .pickerStyle(.segmented)
-        .frame(maxWidth: 280)
-    }
-
-    private func title(_ time: ReaderTime) -> String {
-        let name = time == .pagi ? istr("ibadah.timeTitle.pagi") : istr("ibadah.timeTitle.petang")
-        return time == suggested ? "\(name) · \(istr("ibadah.reader.now"))" : name
+            sessionID: id,
+            title: istr("ibadah.dzikir.title"),
+            time: Binding(get: { time }, set: { model.dzikirTime = $0 }),
+            kind: nil)
+            .id(id)
     }
 }
 
 private struct ReaderPane: View {
     let model: IbadahModel
     let sessionID: ReaderSessionID
-    let header: AnyView
+    let title: String
+    let time: Binding<ReaderTime>
+    let kind: Binding<MatsuratKind>?
     @State private var confirmRestart = false
-
-    private var time: ReaderTime {
-        switch sessionID {
-        case .matsuratKubroPagi, .matsuratSughroPagi, .dzikirPagi: return .pagi
-        case .matsuratKubroPetang, .matsuratSughroPetang, .dzikirPetang: return .petang
-        }
-    }
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         if let session = IbadahLibrary.session(sessionID) {
             content(session)
         } else {
-            Text(istr("ibadah.reader.missing"))
-                .foregroundStyle(.secondary)
-                .padding(40)
+            IbadahScreen(title: title) {
+                Text(istr("ibadah.reader.missing"))
+                    .foregroundStyle(Color.wqInkMuted)
+                    .padding(40)
+            }
         }
     }
 
     private func content(_ session: ReaderSession) -> some View {
         let counts = model.readerCounts(for: session.id)
         let progress = IbadahReader.progress(session, counts)
-        return ScrollViewReader { scroll in
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    header
-                    progressCard(session, progress)
-                    ForEach(Array(session.items.enumerated()), id: \.element.key) { index, item in
-                        ItemCard(
-                            item: item,
-                            index: index,
-                            left: IbadahReader.remaining(counts, item),
-                            view: model.readerView,
-                            onTap: {
-                                if model.tap(session, index: index) {
-                                    scrollToNext(session, from: index, proxy: scroll)
-                                }
-                            },
-                            onReset: { model.reset(session, index: index) })
-                            .id(item.key)
+        return IbadahScreen(
+            title: title,
+            subtitle: subtitle(session, progress),
+            progress: progress.fraction,
+            trailing: AnyView(summary(progress)),
+            controls: AnyView(controls(session, progress))
+        ) {
+            ScrollViewReader { scroll in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        if let note = translationNote(session) {
+                            Label(note, systemImage: "info.circle")
+                                .font(.system(size: 12))
+                                .foregroundStyle(Color.wqInkMuted)
+                        }
+                        ForEach(Array(session.items.enumerated()), id: \.element.key) { index, item in
+                            ItemCard(
+                                item: item,
+                                index: index,
+                                label: IbadahReader.label(for: item, in: session),
+                                left: IbadahReader.remaining(counts, item),
+                                view: model.readerView,
+                                onTap: {
+                                    if model.tap(session, index: index) {
+                                        scrollToNext(session, from: index, proxy: scroll)
+                                    }
+                                },
+                                onReset: { model.reset(session, index: index) })
+                                .id(item.key)
+                        }
+                        if progress.complete {
+                            CompleteCard(model: model, time: time.wrappedValue)
+                        }
                     }
-                    if progress.complete {
-                        CompleteCard(model: model, time: time)
-                    }
+                    .padding(.horizontal, 28)
+                    .padding(.vertical, 20)
+                    .frame(maxWidth: 820)
+                    .frame(maxWidth: .infinity)
                 }
-                .padding(24)
-                .frame(maxWidth: 820)
-                .frame(maxWidth: .infinity)
             }
         }
     }
 
+    // MARK: - Header
+
+    private func subtitle(_ session: ReaderSession, _ progress: ReaderProgress) -> String {
+        let counted = istr("ibadah.reader.subtitle \(progress.itemsTotal) \(progress.total)")
+        guard let kind else { return counted }
+        let name = kind.wrappedValue == .sughro ? istr("ibadah.matsurat.sughro") : istr("ibadah.matsurat.kubro")
+        return "\(name) · \(counted)"
+    }
+
+    /// "5/14" texts read and a ring that fills with the recitations.
+    private func summary(_ progress: ReaderProgress) -> some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .trailing, spacing: 1) {
+                Text("\(progress.itemsDone)/\(progress.itemsTotal)")
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(Color.wqGold)
+                Text(istr("ibadah.reader.textsDone"))
+                    .font(.system(size: 11.5))
+                    .foregroundStyle(Color.wqInkMuted)
+            }
+            WQProgressRing(fraction: progress.fraction, complete: progress.complete)
+                .frame(width: 38, height: 38)
+        }
+        .help(istr("ibadah.reader.reps \(progress.done) \(progress.total)"))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(istr("ibadah.reader.progress \(progress.itemsDone) \(progress.itemsTotal)"))
+    }
+
+    private func controls(_ session: ReaderSession, _ progress: ReaderProgress) -> some View {
+        HStack(spacing: 10) {
+            WQSegmented(
+                options: ReaderTime.allCases.map { WQOption(value: $0, title: timeTitle($0)) },
+                selection: time)
+                .accessibilityLabel(istr("ibadah.reader.timeChoice"))
+            if let kind {
+                WQSegmented(
+                    options: [
+                        WQOption(value: MatsuratKind.sughro, title: istr("ibadah.matsurat.sughro")),
+                        WQOption(value: MatsuratKind.kubro, title: istr("ibadah.matsurat.kubro")),
+                    ],
+                    selection: kind)
+                    .accessibilityLabel(istr("ibadah.reader.kindChoice"))
+            }
+            Spacer(minLength: 8)
+            WQToggleChip(title: istr("ibadah.reader.showLatin"), isOn: Binding(
+                get: { model.readerView.latin },
+                set: { value in
+                    var next = model.readerView
+                    next.latin = value
+                    model.setReaderView(next)
+                }))
+            WQToggleChip(title: istr("ibadah.reader.showTranslation"), isOn: Binding(
+                get: { model.readerView.translation },
+                set: { value in
+                    var next = model.readerView
+                    next.translation = value
+                    model.setReaderView(next)
+                }))
+            if progress.done > 0 {
+                Button {
+                    confirmRestart = true
+                } label: {
+                    Label(istr("ibadah.reader.restart"), systemImage: "arrow.counterclockwise")
+                        .labelStyle(.titleAndIcon)
+                }
+                .buttonStyle(WQTintedButtonStyle(tint: .wqInkMuted))
+                .confirmationDialog(
+                    istr("ibadah.reader.restartTitle"), isPresented: $confirmRestart, titleVisibility: .visible
+                ) {
+                    Button(istr("ibadah.reader.confirmRestart"), role: .destructive) { model.restart(session) }
+                    Button(istr("ibadah.reader.cancel"), role: .cancel) {}
+                } message: {
+                    Text(istr("ibadah.reader.restartBody"))
+                }
+            }
+        }
+    }
+
+    private func timeTitle(_ value: ReaderTime) -> String {
+        let name = value == .pagi ? istr("ibadah.timeTitle.pagi") : istr("ibadah.timeTitle.petang")
+        return value == model.suggestedTime ? "\(name) · \(istr("ibadah.reader.now"))" : name
+    }
+
+    private func translationNote(_ session: ReaderSession) -> String? {
+        let english = ModuleLocale.english
+        if (session.translationLang == .en) == english { return nil }
+        return session.translationLang == .en ? istr("ibadah.reader.translationEn") : istr("ibadah.reader.translationId")
+    }
+
+    /// After the last recitation of a text: a beat to see it done, then the next open one comes up.
     private func scrollToNext(_ session: ReaderSession, from index: Int, proxy: ScrollViewProxy) {
         let counts = model.readerCounts(for: session.id)
         guard let next = IbadahReader.nextOpenItem(session, counts, from: index), next > index else { return }
-        withAnimation { proxy.scrollTo(session.items[next].key, anchor: .top) }
-    }
-
-    private func progressCard(_ session: ReaderSession, _ progress: ReaderProgress) -> some View {
-        let english = ModuleLocale.english
-        let translationNote: String? = (session.translationLang == .en) == english
-            ? nil
-            : (session.translationLang == .en ? istr("ibadah.reader.translationEn") : istr("ibadah.reader.translationId"))
-        return VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text(istr("ibadah.reader.progress \(progress.itemsDone) \(progress.itemsTotal)"))
-                    .font(.headline)
-                Spacer()
-                Text("\(Int((progress.fraction * 100).rounded()))%")
-                    .font(.headline)
-                    .monospacedDigit()
-                    .foregroundStyle(Color.waqtuPrimary)
-            }
-            ProgressView(value: progress.fraction)
-                .tint(.waqtuPrimary)
-            HStack {
-                Text(istr("ibadah.reader.reps \(progress.done) \(progress.total)"))
-                    .font(.callout)
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
-                Spacer()
-                if progress.done > 0 {
-                    Button(istr("ibadah.reader.restart")) { confirmRestart = true }
-                        .buttonStyle(.link)
-                        .confirmationDialog(
-                            istr("ibadah.reader.restartTitle"), isPresented: $confirmRestart, titleVisibility: .visible
-                        ) {
-                            Button(istr("ibadah.reader.confirmRestart"), role: .destructive) { model.restart(session) }
-                            Button(istr("ibadah.reader.cancel"), role: .cancel) {}
-                        } message: {
-                            Text(istr("ibadah.reader.restartBody"))
-                        }
-                }
-            }
-            HStack(spacing: 8) {
-                Toggle(istr("ibadah.reader.showLatin"), isOn: Binding(
-                    get: { model.readerView.latin },
-                    set: { value in
-                        var next = model.readerView
-                        next.latin = value
-                        model.setReaderView(next)
-                    }))
-                Toggle(istr("ibadah.reader.showTranslation"), isOn: Binding(
-                    get: { model.readerView.translation },
-                    set: { value in
-                        var next = model.readerView
-                        next.translation = value
-                        model.setReaderView(next)
-                    }))
-            }
-            .toggleStyle(.button)
-            if let translationNote {
-                Text(translationNote)
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+        let key = session.items[next].key
+        let animated = !reduceMotion
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 350_000_000)
+            if animated {
+                withAnimation(.easeOut(duration: 0.35)) { proxy.scrollTo(key, anchor: UnitPoint(x: 0.5, y: 0.04)) }
+            } else {
+                proxy.scrollTo(key, anchor: UnitPoint(x: 0.5, y: 0.04))
             }
         }
-        .padding(16)
-        .background(RoundedRectangle(cornerRadius: 10).fill(Color.secondary.opacity(0.07)))
     }
 }
+
+// MARK: - One text
 
 /// One text with its counter: click the counter to count one recitation down.
 private struct ItemCard: View {
     let item: ReaderItem
     let index: Int
+    let label: ReaderItemLabel?
     let left: Int
     let view: ReaderView
     let onTap: () -> Void
     let onReset: () -> Void
 
     private var done: Bool { left == 0 }
-    private var title: String { item.title ?? istr("ibadah.reader.item \(index + 1)") }
+    private var title: String { label?.title ?? istr("ibadah.reader.item \(index + 1)") }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 10) {
-                Text(istr("ibadah.reader.times \(item.repeatCount)"))
-                    .font(.caption.weight(.heavy))
-                    .monospacedDigit()
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(Capsule().fill(Color.waqtuPrimary.opacity(0.18)))
-                    .foregroundStyle(Color.waqtuPrimary)
-                Text(title)
-                    .font(.headline)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                if done {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(Color.waqtuPrimary)
-                        .accessibilityHidden(true)
-                }
-            }
+        VStack(alignment: .leading, spacing: 16) {
+            header
             if let heading = item.heading {
-                VStack(spacing: 4) {
-                    arabic(heading.arabic, size: 26)
-                        .foregroundStyle(Color.waqtuPrimary)
+                VStack(spacing: 6) {
+                    ArabicText(text: heading.arabic, size: 26)
+                        .foregroundStyle(Color.wqAccent)
                     if let translation = heading.translation {
                         Text(translation)
-                            .font(.callout)
-                            .foregroundStyle(.secondary)
+                            .font(.system(size: 13))
+                            .foregroundStyle(Color.wqInkMuted)
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .padding(10)
-                .background(RoundedRectangle(cornerRadius: 8).fill(Color.waqtuPrimary.opacity(0.08)))
+                .padding(12)
+                .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Color.wqAccent.opacity(0.10)))
             }
-            ForEach(Array(item.lines.enumerated()), id: \.offset) { _, line in
-                VStack(alignment: .leading, spacing: 6) {
+            ForEach(Array(item.lines.enumerated()), id: \.offset) { offset, line in
+                if offset > 0 {
+                    Rectangle().fill(Color.wqStroke).frame(height: 1)
+                }
+                VStack(alignment: .leading, spacing: 10) {
                     if let label = line.label {
-                        Text(label)
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
+                        WQLabel(text: label)
                     }
-                    arabic(line.arabic, size: 28)
+                    ArabicText(text: line.arabic, size: 30)
+                        .foregroundStyle(Color.wqInk)
                     if view.latin, let latin = line.latin {
                         Text(latin)
-                            .font(.callout)
-                            .foregroundStyle(Color.waqtuPrimary)
+                            .font(.system(size: 13.5, weight: .medium))
+                            .foregroundStyle(Color.wqAccent)
+                            .lineSpacing(3)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             .textSelection(.enabled)
                     }
                     if view.translation, let translation = line.translation {
                         Text(translation)
-                            .foregroundStyle(.secondary)
+                            .font(.system(size: 14.5))
+                            .foregroundStyle(Color.wqInk.opacity(0.82))
+                            .lineSpacing(3)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             .textSelection(.enabled)
                     }
                 }
             }
             if let reference = item.reference {
-                Text(istr("ibadah.reader.reference \(reference)"))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Label(istr("ibadah.reader.reference \(reference)"), systemImage: "book.closed")
+                    .font(.system(size: 11.5))
+                    .foregroundStyle(Color.wqInkMuted)
             }
-            counter
+            CounterButton(
+                title: title, left: left, total: item.repeatCount,
+                onTap: onTap, onReset: onReset)
         }
-        .padding(16)
-        .background(RoundedRectangle(cornerRadius: 10).fill(Color.secondary.opacity(done ? 0.04 : 0.09)))
+        .wqCard(padding: 20)
         .opacity(done ? 0.8 : 1)
+        .animation(.easeOut(duration: 0.2), value: done)
     }
 
-    /// Arabic exactly as stored, right to left, with room between lines for the harakat.
-    private func arabic(_ text: String, size: CGFloat) -> some View {
+    private var header: some View {
+        HStack(spacing: 12) {
+            ZStack {
+                Circle().fill(done ? Color.wqAccent.opacity(0.18) : Color.wqSurfaceRaised)
+                if done {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(Color.wqAccent)
+                } else {
+                    Text("\(index + 1)")
+                        .font(.system(size: 12, weight: .bold))
+                        .monospacedDigit()
+                        .foregroundStyle(Color.wqInkMuted)
+                }
+            }
+            .frame(width: 28, height: 28)
+            .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 1) {
+                if let kicker = label?.kicker {
+                    Text(kicker)
+                        .font(.system(size: 11.5))
+                        .foregroundStyle(Color.wqInkMuted)
+                        .lineLimit(1)
+                }
+                Text(title)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(Color.wqInk)
+                    .lineLimit(2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            if item.repeatCount > 1 {
+                WQBadge(text: istr("ibadah.reader.times \(item.repeatCount)"))
+            }
+        }
+    }
+}
+
+/// Arabic exactly as stored, right to left, with room between lines for the harakat.
+private struct ArabicText: View {
+    let text: String
+    let size: CGFloat
+
+    var body: some View {
         Text(text)
             .font(QuranFont.font(size: size))
-            .lineSpacing(size * 0.5)
+            .lineSpacing(size * 0.32)
             .multilineTextAlignment(.trailing)
             .frame(maxWidth: .infinity, alignment: .trailing)
             .textSelection(.enabled)
     }
+}
 
-    private var counter: some View {
+/// The counter of a text: a wide button that fills with the recitations done, the number left in
+/// gold, a check once it is finished. Right-click resets it.
+private struct CounterButton: View {
+    let title: String
+    let left: Int
+    let total: Int
+    let onTap: () -> Void
+    let onReset: () -> Void
+    @State private var hovering = false
+
+    private var done: Bool { left == 0 }
+    private var fraction: Double { total > 0 ? Double(total - left) / Double(total) : 0 }
+
+    var body: some View {
         Button(action: onTap) {
-            HStack {
-                Text(done ? istr("ibadah.reader.itemDone") : istr("ibadah.reader.tapToCount"))
-                    .fontWeight(.semibold)
-                    .foregroundStyle(done ? Color.secondary : Color.primary)
-                Spacer()
+            HStack(spacing: 10) {
                 if done {
-                    Image(systemName: "checkmark")
-                        .foregroundStyle(Color.waqtuPrimary)
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 18))
+                        .foregroundStyle(Color.wqAccent)
+                    Text(istr("ibadah.reader.itemDone"))
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Color.wqAccent)
                 } else {
+                    Text(istr("ibadah.reader.tapToCount"))
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Color.wqInk)
+                }
+                Spacer()
+                if !done {
                     Text("\(left)")
-                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
                         .monospacedDigit()
-                        .foregroundStyle(Color.waqtuPrimary)
+                        .foregroundStyle(Color.wqGold)
+                        .contentTransition(.numericText(countsDown: true))
                 }
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 10)
-            .frame(maxWidth: .infinity)
-            .background(RoundedRectangle(cornerRadius: 8).fill(Color.waqtuPrimary.opacity(done ? 0.05 : 0.14)))
-            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.waqtuPrimary.opacity(done ? 0.2 : 0.6), lineWidth: 1))
-            .contentShape(RoundedRectangle(cornerRadius: 8))
+            .padding(.horizontal, 18)
+            .frame(maxWidth: .infinity, minHeight: 56)
+            .background {
+                ZStack(alignment: .leading) {
+                    Rectangle().fill(done ? Color.wqAccent.opacity(0.10) : Color.wqSurfaceRaised.opacity(hovering ? 1 : 0.85))
+                    GeometryReader { proxy in
+                        Rectangle()
+                            .fill(Color.wqAccent.opacity(0.22))
+                            .frame(width: proxy.size.width * fraction)
+                    }
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(done ? Color.wqAccent.opacity(0.35) : Color.wqAccent.opacity(hovering ? 0.55 : 0.35), lineWidth: 1))
+            .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(WQPressStyle(scale: 0.98))
+        .animation(.easeOut(duration: 0.18), value: left)
+        .onHover { hovering = $0 }
         .contextMenu {
             Button(istr("ibadah.reader.resetItem"), action: onReset)
         }
         .accessibilityLabel(done
             ? istr("ibadah.reader.doneLabel \(title)")
-            : istr("ibadah.reader.countLabel \(title) \(left) \(item.repeatCount)"))
+            : istr("ibadah.reader.countLabel \(title) \(left) \(total)"))
     }
 }
 
@@ -337,34 +426,37 @@ private struct CompleteCard: View {
         let itemId = IbadahReader.mutabaahItem(for: time)
         let item = model.checklistItem(for: time)
         let name = MutabaahItemLabel.text(item ?? ItemDef(id: itemId, kind: .check))
-        VStack(alignment: .leading, spacing: 10) {
-            Label(istr("ibadah.reader.completeTitle"), systemImage: "sparkles")
-                .font(.title3.bold())
-                .foregroundStyle(Color.waqtuPrimary)
+        VStack(alignment: .leading, spacing: 12) {
+            Label(istr("ibadah.reader.completeTitle"), systemImage: "checkmark.seal.fill")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(Color.wqAccent)
             Text(istr("ibadah.reader.completeBody"))
-                .foregroundStyle(.secondary)
+                .font(.system(size: 14))
+                .foregroundStyle(Color.wqInk.opacity(0.82))
             if item == nil {
                 Text(istr("ibadah.reader.notInChecklist \(name)"))
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color.wqInkMuted)
                 Button(istr("ibadah.reader.manage")) {
                     ModuleWindows.openSettings(pane: SettingsView.Pane.mutabaah)
                 }
+                .buttonStyle(WQTintedButtonStyle())
             } else if model.isTicked(time) {
                 Label(istr("ibadah.reader.marked \(name)"), systemImage: "checkmark.circle.fill")
-                    .foregroundStyle(Color.waqtuPrimary)
+                    .font(.system(size: 13.5, weight: .semibold))
+                    .foregroundStyle(Color.wqAccent)
             } else {
                 Button {
                     model.tick(time)
                 } label: {
                     Label(istr("ibadah.reader.markMutabaah \(name)"), systemImage: "checkmark.circle")
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.waqtuPrimary)
+                .buttonStyle(WQTintedButtonStyle(prominent: true))
             }
         }
-        .padding(16)
+        .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 10).fill(Color.waqtuPrimary.opacity(0.1)))
+        .background(RoundedRectangle(cornerRadius: WQ.cardRadius, style: .continuous).fill(Color.wqAccent.opacity(0.12)))
+        .overlay(RoundedRectangle(cornerRadius: WQ.cardRadius, style: .continuous).strokeBorder(Color.wqAccent.opacity(0.3), lineWidth: 1))
     }
 }
