@@ -2,9 +2,9 @@
 //  MuhasabahView.swift
 //  waqtu
 //
-//  The private muhasabah journal (apps/mobile/src/app/(ibadah)/muhasabah): today's reflection, a
+//  The muhasabah journal (apps/mobile/src/app/(ibadah)/muhasabah): today's reflection, a
 //  month calendar of the days written and the 30-day trend of the ratings. The notes stay on this
-//  Mac (MuhasabahStore): they are not synced and never sent to a server.
+//  Mac (MuhasabahStore) unless the user turns on "Sync muhasabah to the cloud" in Settings.
 //
 
 import SwiftUI
@@ -41,7 +41,9 @@ struct MuhasabahView: View {
         let entry = model.journalEntry(today)
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Label(istr("ibadah.muhasabah.private"), systemImage: "lock")
+                Label(
+                    model.cloud.isEnabled ? istr("ibadah.muhasabah.privateCloud") : istr("ibadah.muhasabah.private"),
+                    systemImage: model.cloud.isEnabled ? "icloud" : "lock")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)

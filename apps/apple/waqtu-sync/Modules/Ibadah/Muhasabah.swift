@@ -2,10 +2,11 @@
 //  Muhasabah.swift
 //  waqtu
 //
-//  The private muhasabah journal, a port of apps/mobile/src/ibadah/muhasabah.ts: a daily
-//  self-reflection (two open questions, four 1–10 ratings, an intention for tomorrow). Local to
-//  this Mac: one JSON file in Application Support, never written to the sync replica and never
-//  sent anywhere. Day keys are `YYYY-MM-DD` like the rest of the app. Main-thread use only.
+//  The muhasabah journal, a port of apps/mobile/src/ibadah/muhasabah.ts: a daily self-reflection
+//  (two open questions, four 1–10 ratings, an intention for tomorrow). Local to this Mac: one JSON
+//  file in Application Support, never written to the sync replica. It reaches a server only when
+//  the user turns on "Sync muhasabah to the cloud" (MuhasabahCloud.swift). Day keys are
+//  `YYYY-MM-DD` like the rest of the app. Main-thread use only.
 //
 
 import Foundation
@@ -220,11 +221,20 @@ enum Muhasabah {
 }
 
 /// The journal's file. One record per day; a day with nothing in it is deleted, not stored blank.
+/// A deleted day stays in the file as a record without an entry (a tombstone), so that turning on
+/// cloud sync carries the deletion to the other devices too. `dirty` marks what the cloud copy has
+/// not seen yet. The store never talks to a server: MuhasabahCloud.swift does, and only for a user
+/// who turned "Sync muhasabah to the cloud" on.
 final class MuhasabahStore {
     private struct Record: Codable, Equatable {
-        var entry: MuhasabahEntry
+        /// nil: the day was deleted.
+        var entry: MuhasabahEntry?
         var createdAt: Int64
         var updatedAt: Int64
+        /// Nil in files from before cloud sync existed: those days were never uploaded.
+        var dirty: Bool?
+
+        var isDirty: Bool { dirty ?? true }
     }
 
     private var records: [String: Record]
@@ -254,11 +264,13 @@ final class MuhasabahStore {
 
     /// Entries for the days in `[from, to]` (day keys sort as text), oldest first.
     func entries(from: String, to: String) -> [MuhasabahEntry] {
-        records.values.map(\.entry).filter { $0.date >= from && $0.date <= to }.sorted { $0.date < $1.date }
+        records.values.compactMap(\.entry).filter { $0.date >= from && $0.date <= to }.sorted { $0.date < $1.date }
     }
 
-    /// Every day written, newest first.
-    var allDates: [String] { records.keys.sorted(by: >) }
+    /// Every day written (deleted days are not), newest first.
+    var allDates: [String] {
+        records.filter { $0.value.entry != nil }.keys.sorted(by: >)
+    }
 
     /// Saves a day's reflection (cleaned); an entry with nothing in it deletes the day instead.
     /// Returns what was kept. An update keeps the first creation time.
@@ -266,18 +278,83 @@ final class MuhasabahStore {
     func save(_ entry: MuhasabahEntry, now: Int64) -> MuhasabahEntry? {
         let cleaned = Muhasabah.clean(entry)
         guard Muhasabah.hasContent(cleaned) else {
-            delete(entry.date)
+            delete(entry.date, now: now)
             return nil
         }
         let created = records[cleaned.date]?.createdAt ?? now
-        records[cleaned.date] = Record(entry: cleaned, createdAt: created, updatedAt: now)
+        records[cleaned.date] = Record(entry: cleaned, createdAt: created, updatedAt: now, dirty: true)
         commit()
         return cleaned
     }
 
-    func delete(_ date: String) {
-        guard records.removeValue(forKey: date) != nil else { return }
+    func delete(_ date: String, now: Int64) {
+        guard let record = records[date], record.entry != nil else { return }
+        records[date] = Record(entry: nil, createdAt: record.createdAt, updatedAt: now, dirty: true)
         commit()
+    }
+
+    // MARK: - Cloud copy (used only while the user has cloud sync on)
+
+    /// Days the cloud copy has not seen yet, oldest edit first; deleted days carry no entry.
+    func dirtyWires() -> [MuhasabahWire] {
+        var out: [MuhasabahWire] = []
+        for (date, record) in records where record.isDirty {
+            var body: MuhasabahWireEntry?
+            if let entry = record.entry { body = MuhasabahWireEntry(entry) }
+            out.append(MuhasabahWire(date: date, updatedAt: record.updatedAt, entry: body))
+        }
+        out.sort { left, right in
+            if left.updatedAt != right.updatedAt { return left.updatedAt < right.updatedAt }
+            return left.date < right.date
+        }
+        return out
+    }
+
+    /// Clears the dirty flag only for days still at the pushed `updatedAt`, so an edit made while
+    /// the push was in flight stays queued.
+    func markClean(_ wires: [MuhasabahWire]) {
+        var changed = false
+        for wire in wires {
+            guard var record = records[wire.date], record.updatedAt == wire.updatedAt, record.isDirty else { continue }
+            record.dirty = false
+            records[wire.date] = record
+            changed = true
+        }
+        if changed { commit() }
+    }
+
+    /// Queues every day for upload (cloud sync was just turned on, so the whole journal goes up).
+    func markAllDirty() {
+        var changed = false
+        for date in Array(records.keys) {
+            guard var record = records[date], !record.isDirty else { continue }
+            record.dirty = true
+            records[date] = record
+            changed = true
+        }
+        if changed { commit() }
+    }
+
+    /// Merges a page of the cloud copy, last write wins per day: a day replaces ours only when its
+    /// edit is strictly newer, an equal timestamp keeps the local day. What it stores is clean.
+    /// Returns the days that changed here.
+    @discardableResult
+    func merge(remote wires: [MuhasabahWire]) -> [String] {
+        var changed: [String] = []
+        for wire in wires {
+            let current = records[wire.date]
+            if let current, current.updatedAt >= wire.updatedAt { continue }
+            var kept: MuhasabahEntry?
+            if let body = wire.entry {
+                let cleaned = Muhasabah.clean(body.entry(date: wire.date))
+                if Muhasabah.hasContent(cleaned) { kept = cleaned }
+            }
+            records[wire.date] = Record(
+                entry: kept, createdAt: current?.createdAt ?? wire.updatedAt, updatedAt: wire.updatedAt, dirty: false)
+            changed.append(wire.date)
+        }
+        if !changed.isEmpty { commit() }
+        return changed
     }
 
     private func commit() {

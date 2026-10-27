@@ -69,7 +69,7 @@ struct ModulesMenuSection: View {
             IbadahWindowView(model: IbadahModel(
                 viewModel: viewModel,
                 store: IbadahStore(fileURL: IbadahStore.defaultFileURL()),
-                journal: MuhasabahStore(fileURL: MuhasabahStore.defaultFileURL())))
+                journal: viewModel.muhasabahCloud.store))
         }
     }
 

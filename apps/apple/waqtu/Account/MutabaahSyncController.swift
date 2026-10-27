@@ -43,6 +43,9 @@ final class MutabaahSyncController {
     @ObservationIgnored var onRemoteChanges: ((RemoteChanges) -> Void)?
     /// Called after a checklist edit made on this Mac (entries or the item list).
     @ObservationIgnored var onLocalChecklistChange: (() -> Void)?
+    /// Runs at the end of every pass (launch, foreground, periodic, after edits): the muhasabah
+    /// cloud copy follows the same triggers when the user has it on.
+    @ObservationIgnored var onSyncPass: (@MainActor () async -> Void)?
 
     @ObservationIgnored private var inFlight = false
     @ObservationIgnored private var pendingRerun = false
@@ -268,6 +271,7 @@ final class MutabaahSyncController {
         }
         // Launch, foreground and periodic syncs also pick up a subscription bought on the phone.
         await account.refreshEntitlement()
+        await onSyncPass?()
     }
 
     /// Writes what a pull brought into the prayer log and the prayer preferences.

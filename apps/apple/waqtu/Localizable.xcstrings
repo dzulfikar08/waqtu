@@ -1018,6 +1018,16 @@
         }
       }
     },
+    "Could not delete the cloud copy. Check your connection and try again." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salinan cloud tidak bisa dihapus. Periksa koneksimu lalu coba lagi."
+          }
+        }
+      }
+    },
     "Could not sign in. Check your connection and try again." : {
       "localizations" : {
         "id" : {
@@ -1144,6 +1154,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hapus akun…"
+          }
+        }
+      }
+    },
+    "Delete cloud copy" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hapus salinan cloud"
+          }
+        }
+      }
+    },
+    "Delete cloud copy…" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hapus salinan cloud…"
+          }
+        }
+      }
+    },
+    "Delete the muhasabah copy on Waqtu's servers?" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hapus salinan muhasabah di server Waqtu?"
           }
         }
       }
@@ -1770,6 +1810,16 @@
         }
       }
     },
+    "Keep cloud copy" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simpan salinan cloud"
+          }
+        }
+      }
+    },
     "Kemenag RI (Indonesia)" : {
       "localizations" : {
         "id" : {
@@ -2046,6 +2096,16 @@
         }
       }
     },
+    "Muhasabah" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muhasabah"
+          }
+        }
+      }
+    },
     "Murattal" : {
       "shouldTranslate" : false
     },
@@ -2177,6 +2237,16 @@
     },
     "OK" : {
       "shouldTranslate" : false
+    },
+    "Off by default: your muhasabah notes stay on this Mac. When you turn this on they are stored on Waqtu's servers, tied to your account, so they sync with your iPhone or Android. Only you can read them." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mati secara bawaan: catatan muhasabahmu tetap di Mac ini. Kalau kamu menyalakannya, catatan disimpan di server Waqtu, terikat ke akunmu, sehingga ikut sinkron ke iPhone atau Android. Hanya kamu yang bisa membacanya."
+          }
+        }
+      }
     },
     "On time" : {
       "localizations" : {
@@ -3090,6 +3160,16 @@
         }
       }
     },
+    "Sync muhasabah to the cloud" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sinkronkan muhasabah ke cloud"
+          }
+        }
+      }
+    },
     "Sync now" : {
       "localizations" : {
         "id" : {
@@ -3180,12 +3260,12 @@
         }
       }
     },
-    "This deletes your account on our server: synced prayer checklist and settings, your Circles profile, posts and voice notes, and premium records linked to it. It cannot be undone. Data on this Mac stays, and so does any App Store subscription; cancel that in the App Store." : {
+    "This deletes your account on our server: synced prayer checklist and settings, synced muhasabah notes, your Circles profile, posts and voice notes, and premium records linked to it. It cannot be undone. Data on this Mac stays, and so does any App Store subscription; cancel that in the App Store." : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ini menghapus akunmu di server kami: mutabaah dan pengaturan yang tersinkron, profil Lingkaran, kiriman dan pesan suara, serta catatan premium yang terkait. Tindakan ini tidak bisa dibatalkan. Data di Mac ini tetap ada, begitu pula langganan App Store; batalkan langganan itu di App Store."
+            "value" : "Ini menghapus akunmu di server kami: mutabaah dan pengaturan yang tersinkron, catatan muhasabah yang tersinkron, profil Lingkaran, kiriman dan pesan suara, serta catatan premium yang terkait. Tindakan ini tidak bisa dibatalkan. Data di Mac ini tetap ada, begitu pula langganan App Store; batalkan langganan itu di App Store."
           }
         }
       }
@@ -3545,6 +3625,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Daftar amalan kosong. Tambahkan dari Pengaturan."
+          }
+        }
+      }
+    },
+    "Your notes on this Mac are not touched. Syncing is off, and your other devices keep their own copy." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Catatan di Mac ini tidak disentuh. Sinkron mati, dan perangkatmu yang lain tetap menyimpan salinannya sendiri."
           }
         }
       }

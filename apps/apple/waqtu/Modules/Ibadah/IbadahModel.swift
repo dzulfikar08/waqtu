@@ -4,9 +4,10 @@
 //
 //  The Ibadah window's state (apps/mobile/src/ibadah): the tool shown, today's reader counters,
 //  doa favourites, the tasbih count and the muhasabah journal. Device-local state lives in
-//  IbadahStore and MuhasabahStore; the only thing that reaches the account is the mutabaah tick
+//  IbadahStore and MuhasabahStore; the only things that reach the account are the mutabaah tick
 //  of a finished dzikir session (`dzikir_pagi` / `dzikir_petang`) and a tasbih count added to one
-//  of the user's own counters, both written through the sync controller like the phone does.
+//  of the user's own counters, both written through the sync controller like the phone does, and
+//  the muhasabah journal, but only when the user turned on "Sync muhasabah to the cloud".
 //
 
 import AppKit
@@ -57,8 +58,12 @@ final class IbadahModel {
     private(set) var readerView: ReaderView
     private(set) var favourites: Set<String>
     private(set) var tasbih: TasbihState
-    /// Bumped on every journal change, so the views redraw (the store is not observable).
-    private(set) var journalVersion = 0
+    /// Bumped on every journal change made on this Mac.
+    private(set) var localJournalVersion = 0
+
+    /// Changes on every journal change, local or pulled from the cloud copy, so the views redraw
+    /// (the store is not observable).
+    var journalVersion: Int { localJournalVersion + cloud.revision }
 
     @ObservationIgnored private let store: IbadahStore
     @ObservationIgnored let journal: MuhasabahStore
@@ -226,15 +231,20 @@ final class IbadahModel {
 
     func journalEntry(_ date: String) -> MuhasabahEntry? { journal.entry(date) }
 
+    /// The opt-in cloud copy of the journal.
+    var cloud: MuhasabahCloudController { viewModel.muhasabahCloud }
+
     @discardableResult
     func saveJournal(_ entry: MuhasabahEntry) -> MuhasabahEntry? {
         let kept = journal.save(entry, now: FardhMapping.millis(Date()))
-        journalVersion += 1
+        localJournalVersion += 1
+        cloud.journalChanged()
         return kept
     }
 
     func deleteJournal(_ date: String) {
-        journal.delete(date)
-        journalVersion += 1
+        journal.delete(date, now: FardhMapping.millis(Date()))
+        localJournalVersion += 1
+        cloud.journalChanged()
     }
 }

@@ -1010,13 +1010,30 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Private: your muhasabah notes are stored only on this Mac. They are not synced and never sent to a server."
+            "value" : "Private: your muhasabah notes stay on this Mac unless you turn on cloud sync in Settings → Account."
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pribadi: catatan muhasabah hanya tersimpan di Mac ini. Tidak ikut sinkron dan tidak pernah dikirim ke server."
+            "value" : "Pribadi: catatan muhasabah tetap di Mac ini kecuali kamu menyalakan sinkron cloud di Pengaturan → Akun."
+          }
+        }
+      }
+    },
+    "ibadah.muhasabah.privateCloud" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Private: your muhasabah notes sync to your Waqtu account, and only you can read them. Turn this off in Settings → Account."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pribadi: catatan muhasabah ikut sinkron ke akun Waqtu-mu, dan hanya kamu yang bisa membacanya. Matikan di Pengaturan → Akun."
           }
         }
       }

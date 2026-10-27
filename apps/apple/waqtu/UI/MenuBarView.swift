@@ -913,6 +913,7 @@ struct SettingsView: View {
                     AccountSettingsTab(
                         account: vm.account,
                         sync: vm.syncController,
+                        muhasabah: vm.muhasabahCloud,
                         settings: settings
                     )
                     .tabItem {
@@ -988,6 +989,7 @@ struct UpgradeFullScreenView: View {
             AccountSettingsTab(
                 account: viewModel.account,
                 sync: viewModel.syncController,
+                muhasabah: viewModel.muhasabahCloud,
                 settings: viewModel.settings
             )
             .tabItem {

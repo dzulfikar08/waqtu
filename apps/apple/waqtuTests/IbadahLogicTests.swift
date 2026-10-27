@@ -354,7 +354,7 @@ struct MuhasabahTests {
         store.save(entry(today) { $0.feelings = "Lebih baik"; $0.energy = 5 }, now: 2000)
         #expect(store.entry(today) == entry(today) { $0.feelings = "Lebih baik"; $0.energy = 5 })
 
-        store.delete(today)
+        store.delete(today, now: 3000)
         #expect(store.entry(today) == nil)
     }
 
