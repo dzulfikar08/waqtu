@@ -91,75 +91,42 @@ def asc_users(asc: Asc) -> dict[str, dict]:
     return {u["attributes"]["username"].lower(): u for u in asc.all("/v1/users")}
 
 
-def tester_app_group(asc: Asc, tester_id: str) -> dict | None:
-    """The group of this app (Owner or Family) the tester already belongs to, if any."""
+def tester_app_group(asc: Asc, testers: list[dict]) -> dict | None:
+    """The group of this app (Owner or Family) one of these tester records already belongs to, if any."""
     mine = {g["id"]: g for g in asc.all(f"/v1/apps/{APP_ID}/betaGroups")}
-    for g in asc.all(f"/v1/betaTesters/{tester_id}/betaGroups"):
-        if g["id"] in mine:
-            return mine[g["id"]]
-    for gid, g in mine.items():
-        if tester_id in {t["id"] for t in asc.all(f"/v1/betaGroups/{gid}/betaTesters")}:
-            return g
+    for tester in testers:
+        for g in asc.all(f"/v1/betaTesters/{tester['id']}/betaGroups"):
+            if g["id"] in mine:
+                return mine[g["id"]]
     return None
 
 
 def ensure_tester(asc: Asc, email: str, group: dict, user: dict | None) -> dict:
-    """Puts the tester into `group`; returns the group of this app the tester is in afterwards (already a member of
-    Owner or Family counts as done)."""
-    found = asc.all("/v1/betaTesters", **{"filter[email]": email})
-    if not found:
-        attributes = {"email": email}
-        if user:
-            attributes["firstName"] = user["attributes"].get("firstName") or ""
-            attributes["lastName"] = user["attributes"].get("lastName") or ""
-        asc.post(
-            "/v1/betaTesters",
-            {
-                "data": {
-                    "type": "betaTesters",
-                    "attributes": attributes,
-                    "relationships": {"betaGroups": {"data": [{"type": "betaGroups", "id": group["id"]}]}},
-                }
-            },
-        )
-        return group
-    tester = found[0]
-    current = tester_app_group(asc, tester["id"])
+    """Puts the email into `group`; returns the group of this app the tester is in afterwards (already a member of
+    Owner or Family counts as done).
+
+    Beta tester records are per app: the same email has one record for every app it tests, and a record of another
+    app cannot be assigned to this app's groups ("Tester(s) cannot be assigned"). So only a record already in one of
+    this app's groups counts; otherwise a new record is created with the group.
+    """
+    current = tester_app_group(asc, asc.all("/v1/betaTesters", **{"filter[email]": email}))
     if current:
         return current
-    # A tester that belongs to another app (or is an App Store Connect user) is refused by some of these endpoints and
-    # accepted by others, so try each. A 409 only counts as success when membership confirms it.
-    group_ref = {"data": [{"type": "betaGroups", "id": group["id"]}]}
-    attempts = [
-        lambda: asc.post(
-            f"/v1/betaGroups/{group['id']}/relationships/betaTesters",
-            {"data": [{"type": "betaTesters", "id": tester["id"]}]},
-        ),
-        lambda: asc.post(f"/v1/betaTesters/{tester['id']}/relationships/betaGroups", group_ref),
-        lambda: asc.post(
-            "/v1/betaTesters",
-            {
-                "data": {
-                    "type": "betaTesters",
-                    "attributes": {"email": email},
-                    "relationships": {"betaGroups": group_ref},
-                }
-            },
-        ),
-    ]
-    for attempt in attempts:
-        try:
-            attempt()
-        except AscError as e:
-            if e.status != 409:
-                raise
-            current = tester_app_group(asc, tester["id"])
-            if current:
-                return current
-            error = e
-            continue
-        return tester_app_group(asc, tester["id"]) or group
-    raise error
+    attributes = {"email": email}
+    if user:
+        attributes["firstName"] = user["attributes"].get("firstName") or ""
+        attributes["lastName"] = user["attributes"].get("lastName") or ""
+    asc.post(
+        "/v1/betaTesters",
+        {
+            "data": {
+                "type": "betaTesters",
+                "attributes": attributes,
+                "relationships": {"betaGroups": {"data": [{"type": "betaGroups", "id": group["id"]}]}},
+            }
+        },
+    )
+    return group
 
 
 def ensure_beta_review_info(asc: Asc) -> None:
