@@ -50,7 +50,7 @@ jobs:
             -font DejaVu-Sans-Bold -pointsize 78 -fill '#E8F0ED' -annotate +400+235 'Waqtu' \
             -font DejaVu-Sans -pointsize 34 -fill '#D4A574' -annotate +404+300 'Sholat · Mutabaah · Ramadhan' \
             -font DejaVu-Sans -pointsize 26 -fill '#A8C9B8' -annotate +404+350 'Lokasi tidak keluar dari ponsel' \
-            -strip out/feature-graphic.png
+            -alpha off -depth 8 -strip out/feature-graphic.png
           identify out/icon-512.png out/feature-graphic.png
 
       - name: Phone screenshots
