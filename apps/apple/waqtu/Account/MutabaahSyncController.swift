@@ -131,6 +131,13 @@ final class MutabaahSyncController {
         }
     }
 
+    /// Ticks or unticks a `check` item without toggling it.
+    func setCheck(_ on: Bool, itemId: String, date: String) {
+        if MutabaahChecklist.setCheck(on, itemId: itemId, date: date, in: replica, at: FardhMapping.millis(Date())) {
+            localEdit()
+        }
+    }
+
     func setCount(_ count: Int, itemId: String, date: String) {
         if MutabaahChecklist.setCount(count, itemId: itemId, date: date, in: replica, at: FardhMapping.millis(Date())) {
             localEdit()

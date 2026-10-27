@@ -2,7 +2,7 @@
 //  ModulesMenuSection.swift
 //  waqtu
 //
-//  The menu bar's row of module buttons; each opens its own window (ModuleWindows). Halaqah only
+//  The menu bar's rows of module buttons; each opens its own window (ModuleWindows). Halaqah only
 //  shows when its content may be released in this build.
 //
 
@@ -22,7 +22,13 @@ struct ModulesMenuSection: View {
                 moduleButton(mstr("modules.circles"), systemImage: "person.3", action: openCircles)
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 10)
+            .padding(.top, 10)
+            HStack(spacing: 8) {
+                moduleButton(istr("ibadah.window"), systemImage: "moon.stars", action: openIbadah)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 10)
             Divider()
         }
     }
@@ -55,6 +61,15 @@ struct ModulesMenuSection: View {
             HafalanWindowView(model: HafalanModel(
                 text: text,
                 store: HafalanPlanStore(fileURL: HafalanPlanStore.defaultFileURL())))
+        }
+    }
+
+    private func openIbadah() {
+        ModuleWindows.shared.open(.ibadah, title: istr("ibadah.window"), size: NSSize(width: 980, height: 720)) {
+            IbadahWindowView(model: IbadahModel(
+                viewModel: viewModel,
+                store: IbadahStore(fileURL: IbadahStore.defaultFileURL()),
+                journal: MuhasabahStore(fileURL: MuhasabahStore.defaultFileURL())))
         }
     }
 

@@ -37,7 +37,7 @@ enum ModuleLocale {
 @MainActor
 final class ModuleWindows {
     enum Module: String {
-        case halaqah, hafalan, circles
+        case halaqah, hafalan, circles, ibadah
     }
 
     static let shared = ModuleWindows()
@@ -71,6 +71,13 @@ final class ModuleWindows {
             MainActor.assumeIsolated { self?.forget(module) }
         }
         window.makeKeyAndOrderFront(nil)
+    }
+
+    /// The Mac's Settings window, on `pane` (a `SettingsView.Pane` id) when given.
+    static func openSettings(pane: String? = nil) {
+        if let pane { SettingsView.requestedPane = pane }
+        NSApp.activate(ignoringOtherApps: true)
+        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
     }
 
     private func forget(_ module: Module) {

@@ -10,6 +10,16 @@
 - **Delete account** — Settings → Account → Delete account (signed in) deletes the Waqtu account and its server data after a confirmation, like the phone app.
 - **Store build** — `release-mas.yml` archives `waqtu-mas` (now `Waqtu.app`), signs it with the Apple Distribution certificate and Mac App Store profiles, and uploads a signed .pkg; `store-submit.yml` (platform `mac`) fills the listing from `apps/apple/store` and submits it with the Mac subscriptions. The MAS build gets the location entitlement it needs under the sandbox, declares exempt encryption, and ships a full macOS icon set; the widget extension is sandboxed.
 
+### Ibadah tools on the Mac (DEV-17)
+
+- **Menu bar → Ibadah (Indonesian) / Worship (English)** opens one window with the phone's Ibadah tools in a sidebar: qibla, Al-Ma'tsurat, dzikir pagi & petang, doa, tasbih and muhasabah. Everything works offline.
+- **Qibla** — Bearing and distance to the Kaaba from the location the prayer times use (the detected fix, or the manual coordinates), with a dial that shows the direction against north. A Mac has no compass, so the dial does not turn. The bearing is `@waqtu/core`'s `qiblaBearing` (CI compares both against the same city figures; nothing is stored or sent).
+- **Al-Ma'tsurat and dzikir** — Kubro and sughro, morning and evening, and the morning/evening dhikr with their hadith references, read from `content/adhkar` (bundled byte for byte; CI checks the SHA-256 pins the phone uses). A counter on every text counts down with each click (right-click resets it), progress is kept on this Mac for the day, and finishing a session offers to tick `dzikir_pagi` / `dzikir_petang` in today's mutabaah, which syncs to the phone like any other checklist edit.
+- **Doa** — The 13 daily duas by category with search across title, transliteration, translation, Arabic and source, favourites, and the source shown with each dua.
+- **Tasbih** — 33 · 33 · 34, 100 of one phrase or a free count with a target, undo, reset, trackpad haptics, and an optional "add to my own counter" for the mutabaah checklist. The count is kept between launches.
+- **Muhasabah** — The daily reflection journal (two questions, four 1–10 ratings, an intention), a month calendar and the 30-day trend. Local only: one file on this Mac, never synced and never sent anywhere.
+- Strings are in a catalog of their own (`waqtu/Resources/Ibadah.xcstrings`, Indonesian and English); CI checks it against the keys the views use and against the phone's copy (`apps/mobile/src/ibadah/strings.ts`).
+
 ### Imsakiyah on the Mac (DEV-13)
 
 - **Ramadhan month table** — Menu bar → Imsakiyah opens the table for the current or next Ramadhan: imsak (fajr − 10 min), Subuh, Dzuhur, Ashar, Maghrib, Isya for every day, today highlighted, with the start date, the day of Ramadhan and Idul Fitri. Uses the Mac's location, calculation method (incl. Kemenag), madhab, minute corrections and the moon-sighting correction synced from the phone; numbers match `@waqtu/core`'s `imsakiyahTable`.
