@@ -859,7 +859,11 @@ struct SettingsView: View {
         case Pane.upgrade:
             if let vm = viewModel { UpgradeSettingsTab(viewModel: vm) }
         case Pane.about:
-            AboutSettingsTab(localTrialDaysRemaining: viewModel?.localTrialDaysRemaining ?? 0, hasStoreSubscription: viewModel?.hasStoreSubscription ?? false, hasAccountPremium: viewModel?.account.serverPremium ?? false, onCheckForUpdates: onCheckForUpdates, onResetWaqtu: viewModel.map { vm in { vm.resetAllAndQuit() } })
+            ScrollView {
+                AboutSettingsTab(localTrialDaysRemaining: viewModel?.localTrialDaysRemaining ?? 0, hasStoreSubscription: viewModel?.hasStoreSubscription ?? false, hasAccountPremium: viewModel?.account.serverPremium ?? false, onCheckForUpdates: onCheckForUpdates, onResetWaqtu: viewModel.map { vm in { vm.resetAllAndQuit() } })
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 16)
+            }
         default:
             GeneralSettingsTab(settings: settings, viewModel: viewModel)
         }

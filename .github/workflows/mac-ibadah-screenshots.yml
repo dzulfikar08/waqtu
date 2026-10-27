@@ -3,7 +3,7 @@
 # with WAQTU_SCREENSHOTS_SET=ibadah, once per language, and uploads the PNGs as the `ibadah-mac`
 # artifact (kept 7 days):
 #   ibadah-<dark|light>-<id|en>-01-qibla … 06-muhasabah.png   the window, 1000 pt wide at 3x
-#   settings-<upgrade|about>-<id|en>.png                       the Settings window on those tabs
+#   settings-<pane>-<id|en>.png                                the Settings window, one per tab (general … about)
 # It does not touch the `screenshots-mac` artifact of mas-screenshots.yml (store canvases). The app
 # sees a fixed moment (12 Feb 2027 17:00 WIB) through apps/apple/scripts/screenshots/fake-clock.c.
 # No secrets.

@@ -255,8 +255,13 @@ enum ScreenshotMode {
             }
         }
 
-        // Settings: the tab strip with every tab, on the two panes that did not respond.
-        for pane in [SettingsView.Pane.upgrade, SettingsView.Pane.about] {
+        // Settings: the tab strip with every tab, every pane once (Upgrade and About are the two that did not respond).
+        let panes = [
+            SettingsView.Pane.general, SettingsView.Pane.prayerTimes, SettingsView.Pane.mutabaah, SettingsView.Pane.pomodoro,
+            SettingsView.Pane.location, SettingsView.Pane.account, SettingsView.Pane.slack, SettingsView.Pane.upgrade,
+            SettingsView.Pane.about,
+        ]
+        for pane in panes {
             SettingsView.requestedPane = pane
             let image = try await capture(
                 WindowChrome(title: String(localized: "Settings")) {
