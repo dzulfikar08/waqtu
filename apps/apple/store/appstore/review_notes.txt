@@ -1,10 +1,10 @@
-Waqtu for Mac is a menu bar app (LSUIElement, no Dock icon). After launch, click the Waqtu icon in the menu bar at the top right of the screen to open it; the Settings button is at the bottom of that menu.
+Waqtu for Mac is a menu bar app (LSUIElement, no Dock icon). After launch, click the Waqtu icon in the menu bar at the top right of the screen to open it. Waqtu for Mac requires Waqtu Premium: without it, the menu says "Subscribe to Waqtu Premium to use Waqtu, or sign in with a Waqtu account that has it." with an Upgrade button.
 
 Demo account (already has Waqtu Premium, so everything unlocks, including Circles and sync): the email and password are in the Sign-In Information. Sign in with them like this:
-1. Click the Waqtu icon in the menu bar, then Settings at the bottom of the menu.
+1. Click the Waqtu icon in the menu bar, then Upgrade. The "Get Waqtu Premium" window opens with the tabs Upgrade and Account. (Once signed in, the same window is Settings, opened from the Settings button at the bottom of the menu.)
 2. Open the Account tab.
 3. Click the small link "App reviewer? Sign in with email" (Indonesian: "Peninjau aplikasi? Masuk dengan email") below the Sign in with Apple and Google buttons.
-4. Enter the demo email and password and click Sign in. Settings > Account then shows the account with Waqtu Premium active.
+4. Enter the demo email and password and click Sign in. The account shows Waqtu Premium active and the whole app unlocks.
 This email sign-in only accepts the review account; regular users sign in with Apple or Google.
 
 How to review:
@@ -13,7 +13,7 @@ How to review:
 3. Settings > General: the full-screen prayer reminder ("Test Overlay" in the menu shows it), notifications before prayers, and Calendar protection, which adds "busy" prayer blocks to a calendar the user picks (EventKit, only after the user turns it on and grants access).
 4. Optional, off by default: Settings > Slack sets the user's Slack status during prayers after the user connects Slack.
 
-In-app purchase: Waqtu Premium auto-renewing subscriptions in the group "Waqtu Premium": dat.waqtu.mac.premium.monthly (Rp 29.000/month) and dat.waqtu.mac.premium.yearly (Rp 249.000/year). New subscribers get a 1-week free trial (StoreKit introductory offer), then the subscription renews at that price. Without Premium the app shows the paywall (Settings > Upgrade) with the subscribe buttons, Restore Purchases, the auto-renewal terms and links to the Terms of Use and Privacy Policy. To test a purchase, use a sandbox Apple ID: sign out of the demo account first (Settings > Account > Sign out) to see the paywall, or use a fresh install. Buying does not require a Waqtu account. If the user is signed in, the purchase is also linked to the Waqtu account so it unlocks Waqtu on iPhone (the "Waqtu" app, 6826628861) and Android.
+In-app purchase: Waqtu Premium auto-renewing subscriptions in the group "Waqtu Premium": dat.waqtu.mac.premium.monthly (Rp 29.000/month) and dat.waqtu.mac.premium.yearly (Rp 249.000/year). New subscribers get a 1-week free trial (StoreKit introductory offer); for an eligible Apple ID the paywall shows the free week and the price after it. Without Premium the app shows the paywall (menu bar > Upgrade, tab Upgrade) with the subscribe buttons, Restore Purchases, the trial and auto-renewal terms and links to the Terms of Use and Privacy Policy. To test a purchase, use a sandbox Apple ID before signing in with the demo account, or sign out of it first (Account tab > Sign out). Buying does not require a Waqtu account. If the user is signed in, the purchase is also linked to the Waqtu account so it unlocks Waqtu on iPhone (the "Waqtu" app, 6826628861) and Android.
 
 Account: Settings > Account. Sync across devices and Circles (small anonymous halaqah groups with posts and voice notes, with report and block) need a signed-in account with Premium. Account deletion: Settings > Account > Delete account (signed-in users), with a confirmation dialog; it deletes the account and its server data. Please do not delete the demo account.
 
