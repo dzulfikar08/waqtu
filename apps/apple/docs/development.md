@@ -36,7 +36,7 @@ waqtu/
 │   ├── PrayerStreakManager.swift  # Prayer log + streak tracking
 │   ├── PrayerTimeCalculator.swift # Adhan library wrapper
 │   ├── SlackManager.swift         # Slack status integration
-│   ├── TrialManager.swift         # 7-day trial logic
+│   ├── TrialManager.swift         # 7-day local trial (direct-download build only)
 │   ├── CustomSoundManager.swift   # Custom notification sounds
 │   └── DailyHadithProvider.swift  # Daily hadith/dua
 ├── Models/
@@ -168,10 +168,12 @@ Auto-detect via CoreLocation or manual coordinates. Location never leaves the de
 
 ### 10. Trial & Premium
 
-- 7-day free trial
-- Then Waqtu Premium (one subscription for Mac, iPhone and Android): bought in the Mac App Store build,
-  or held by the signed-in Waqtu account (subscribed on the phone) in either build
-- Trial banner in menu bar (days remaining)
+- Direct-download build: 7-day local trial (`TrialManager`, Keychain), with a trial banner in the menu bar
+  (days remaining); then Waqtu Premium held by the signed-in Waqtu account (subscribed on the phone)
+- Mac App Store build: no local trial. Waqtu needs Waqtu Premium: an App Store subscription (monthly or
+  yearly, each with a one-week free trial as its introductory offer) or premium on the signed-in account;
+  without it the menu bar and Settings show the subscribe screen
+- Waqtu Premium is one subscription for Mac, iPhone and Android
 
 ### 11. First-Run Onboarding
 

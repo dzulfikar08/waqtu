@@ -87,7 +87,48 @@ enum WaqtuAPIError: Error, LocalizedError, Equatable {
     }
 }
 
-/// Pure helpers for the cookie strings better-auth hands back.
+/// Why a store reviewer's email + password sign-in failed; the same cases and wording as the
+/// phone (apps/mobile/src/auth/emailSignIn.ts, `settings.reviewer*`).
+enum EmailSignInProblem: Error, LocalizedError, Equatable {
+    case missing
+    case invalid
+    case rateLimited
+    case failed
+
+    var errorDescription: String? {
+        switch self {
+        case .missing: return String(localized: "Enter the email and password.")
+        case .invalid: return String(localized: "Wrong email or password.")
+        case .rateLimited: return String(localized: "Too many attempts. Wait a moment and try again.")
+        case .failed: return String(localized: "Could not sign in. Check your connection and try again.")
+        }
+    }
+}
+
+/// Email + password sign-in exists only for store reviewer accounts (App Store, Google Play): the
+/// server has no sign-up and refuses every email outside its REVIEW_ACCOUNT_EMAILS list.
+enum EmailSignIn {
+    /// Trimmed, lowercased email and the password as typed; nil when either is empty or the email
+    /// has no `@`.
+    static func credentials(email: String, password: String) -> (email: String, password: String)? {
+        let normalized = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard normalized.contains("@"), !password.isEmpty else { return nil }
+        return (normalized, password)
+    }
+
+    /// What a failed `POST /api/auth/sign-in/email` (HTTP status plus better-auth error code) means
+    /// to the user. The server answers 401 `INVALID_EMAIL_OR_PASSWORD` both for a wrong password and
+    /// for an address that is not a reviewer account.
+    static func problem(status: Int, code: String?) -> EmailSignInProblem {
+        if status == 429 { return .rateLimited }
+        if status == 401 || status == 403 || code == "INVALID_EMAIL_OR_PASSWORD" || code == "INVALID_EMAIL" {
+            return .invalid
+        }
+        return .failed
+    }
+}
+
+/// Pure helpers for the tokens and cookie strings better-auth hands back.
 enum AuthParsing {
     private static func cookieValue(named suffix: String, in header: String) -> String? {
         let pattern = "(?:^|,\\s*)(?:__Secure-)?[A-Za-z0-9_.-]*\(suffix)=([^;]*)"
@@ -97,6 +138,17 @@ enum AuthParsing {
               let valueRange = Range(match.range(at: 1), in: header) else { return nil }
         let value = String(header[valueRange]).trimmingCharacters(in: .whitespaces)
         return value.isEmpty ? nil : value
+    }
+
+    /// The bearer session token of a better-auth sign-in response: the bearer plugin's
+    /// `set-auth-token` header, else the `token` field of the JSON body.
+    static func sessionToken(authTokenHeader: String?, body: Data) throws -> String {
+        if let authTokenHeader, !authTokenHeader.isEmpty { return authTokenHeader }
+        if let obj = try? JSONSerialization.jsonObject(with: body) as? [String: Any],
+           let token = obj["token"] as? String, !token.isEmpty {
+            return token
+        }
+        throw WaqtuAPIError.missingToken
     }
 
     /// The signed session token inside a `Set-Cookie` header (possibly several cookies joined by
@@ -162,8 +214,12 @@ final class WaqtuAPIClient {
         return (data, http)
     }
 
+    private static func errorBody(_ data: Data) -> [String: Any]? {
+        try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+    }
+
     private static func errorMessage(_ data: Data) -> String? {
-        guard let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
+        guard let obj = errorBody(data) else { return nil }
         return (obj["message"] as? String) ?? (obj["error"] as? String)
     }
 
@@ -192,12 +248,36 @@ final class WaqtuAPIClient {
             method: "POST",
             body: ["provider": "apple", "idToken": tokenBody]
         ))
-        if let header = http.value(forHTTPHeaderField: "set-auth-token"), !header.isEmpty { return header }
-        if let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-           let token = obj["token"] as? String, !token.isEmpty {
-            return token
+        return try AuthParsing.sessionToken(authTokenHeader: http.value(forHTTPHeaderField: "set-auth-token"), body: data)
+    }
+
+    /// Email + password, for store reviewer accounts only (`POST /api/auth/sign-in/email`, with the
+    /// headers the phone's better-auth expo client sends). Returns the bearer session token; every
+    /// failure is an `EmailSignInProblem`.
+    func signInWithEmail(email: String, password: String) async throws -> String {
+        guard let credentials = EmailSignIn.credentials(email: email, password: password) else {
+            throw EmailSignInProblem.missing
         }
-        throw WaqtuAPIError.missingToken
+        let result: (Data, HTTPURLResponse)
+        do {
+            result = try await perform(
+                "/api/auth/sign-in/email",
+                method: "POST",
+                body: ["email": credentials.email, "password": credentials.password],
+                extraHeaders: ["expo-origin": "\(WaqtuAPI.callbackScheme)://", "x-skip-oauth-proxy": "true"]
+            )
+        } catch {
+            throw EmailSignInProblem.failed
+        }
+        let (data, http) = result
+        guard (200..<300).contains(http.statusCode) else {
+            throw EmailSignIn.problem(status: http.statusCode, code: Self.errorBody(data)?["code"] as? String)
+        }
+        do {
+            return try AuthParsing.sessionToken(authTokenHeader: http.value(forHTTPHeaderField: "set-auth-token"), body: data)
+        } catch {
+            throw EmailSignInProblem.failed
+        }
     }
 
     /// First leg of the browser flow. Returns the URL to open in the web authentication session:
@@ -253,7 +333,7 @@ final class WaqtuAPIClient {
             extraHeaders: ["expo-origin": "\(WaqtuAPI.callbackScheme)://"]
         )
         guard (200..<300).contains(http.statusCode) else {
-            let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+            let obj = Self.errorBody(data)
             if obj?["code"] as? String == "SESSION_EXPIRED" { throw WaqtuAPIError.sessionStale }
             throw WaqtuAPIError.http(status: http.statusCode, message: Self.errorMessage(data))
         }

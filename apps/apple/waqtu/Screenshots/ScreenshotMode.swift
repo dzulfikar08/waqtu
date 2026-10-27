@@ -4,7 +4,8 @@
 //
 //  DEBUG-only Mac App Store screenshots (.github/workflows/mas-screenshots.yml). When the
 //  environment variable WAQTU_SCREENSHOTS_DIR is set, the app starts on demo data (Jakarta,
-//  Kemenag RI, a checked mutabaah with a streak, an active trial), renders its real views in
+//  Kemenag RI, a checked mutabaah with a streak, full access as a subscriber has it, and on the
+//  Upgrade pane the subscriptions with their one-week free trial), renders its real views in
 //  offscreen windows, writes the store canvases as PNGs into that directory and quits.
 //
 //  The moment shown is the process clock: CI fixes it to a Ramadan afternoon with
@@ -38,12 +39,14 @@ enum ScreenshotMode {
         guard isActive else { return nil }
         if let viewModel { return viewModel }
         seedSettings()
-        // Own keychain entry, so the trial starts at the demo moment whatever this Mac holds.
-        let model = AppViewModel(trialManager: TrialManager(bundleIdentifier: "dat.waqtu.screenshots"))
+        let model = AppViewModel()
+        // The app as a subscriber sees it, without a trial banner; the Upgrade pane still shows the offer.
+        model.screenshotAccess = true
         #if MAS
+        let freeWeek = SubscriptionTerm(value: 1, unit: .week)
         model.storeSubscription.demoOffers = [
-            MacStoreSubscription.Offer(id: MacStoreSubscription.monthlyProductID, displayPrice: "Rp 29.000"),
-            MacStoreSubscription.Offer(id: MacStoreSubscription.yearlyProductID, displayPrice: "Rp 249.000"),
+            MacStoreSubscription.Offer(id: MacStoreSubscription.monthlyProductID, displayPrice: "Rp 29.000", freeTrial: freeWeek),
+            MacStoreSubscription.Offer(id: MacStoreSubscription.yearlyProductID, displayPrice: "Rp 249.000", freeTrial: freeWeek),
         ]
         #endif
         seedMutabaah(model.syncController)
@@ -164,7 +167,7 @@ enum ScreenshotMode {
         if let expected = ProcessInfo.processInfo.environment["WAQTU_SCREENSHOTS_EXPECT_DAY"], expected != today {
             throw ScreenshotError(description: "clock shows \(today), expected \(expected) (fake clock not loaded?)")
         }
-        guard model.hasAccess else { throw ScreenshotError(description: "trial not active") }
+        guard model.hasAccess else { throw ScreenshotError(description: "no access") }
 
         // Let the timers set the countdown and the menu bar title, and the geocoder answer.
         try await Task.sleep(nanoseconds: 2_000_000_000)
@@ -237,8 +240,8 @@ enum ScreenshotMode {
 
     private static func reviewCaption(_ language: Language) -> Caption {
         switch language {
-        case .en: return Caption(title: "Waqtu Premium", subtitle: "Auto-renewing subscription: monthly or yearly")
-        case .id: return Caption(title: "Waqtu Premium", subtitle: "Langganan perpanjangan otomatis: bulanan atau tahunan")
+        case .en: return Caption(title: "Waqtu Premium", subtitle: "Auto-renewing subscription, monthly or yearly, with a 1-week free trial")
+        case .id: return Caption(title: "Waqtu Premium", subtitle: "Langganan perpanjangan otomatis, bulanan atau tahunan, dengan uji coba gratis 1 minggu")
         }
     }
 

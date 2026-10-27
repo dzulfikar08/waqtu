@@ -17,7 +17,9 @@ extension Color {
 
 struct MenuBarView: View {
     @Bindable var viewModel: AppViewModel
+    #if !MAS
     @State private var showTrialEndingSoonModal = false
+    #endif
     @Environment(\.openSettings) private var openSettings
 
     init(viewModel: AppViewModel) {
@@ -28,16 +30,38 @@ struct MenuBarView: View {
         if viewModel.hasAccess {
             menuBarContent
         } else {
-            TrialExpiredMenuView()
+            UpgradeMenuView()
         }
     }
 
+    @ViewBuilder
     private var menuBarContent: some View {
+        #if MAS
+        menuBarStack
+        #else
+        menuBarStack
+            .onAppear {
+                if !viewModel.isPremium, viewModel.trialManager.shouldShowTrialEndingSoonModal {
+                    showTrialEndingSoonModal = true
+                }
+            }
+            .sheet(isPresented: $showTrialEndingSoonModal) {
+                TrialEndingSoonModal(trialManager: viewModel.trialManager) {
+                    viewModel.trialManager.recordTrialEndingSoonModalShown()
+                    showTrialEndingSoonModal = false
+                }
+            }
+        #endif
+    }
+
+    private var menuBarStack: some View {
         VStack(spacing: 0) {
-            // Trial banner only without paid premium (license or Waqtu account)
+            #if !MAS
+            // Local trial banner (direct-download build) only without paid premium (Waqtu account)
             if !viewModel.isPremium, viewModel.trialManager.trialDaysRemaining >= 2 {
                 TrialBannerView(daysRemaining: viewModel.trialManager.trialDaysRemaining)
             }
+            #endif
 
             // Next prayer header
             NextPrayerHeader(
@@ -99,21 +123,11 @@ struct MenuBarView: View {
         }
         .frame(width: 320)
         .background(Color.waqtuBackground)
-        .onAppear {
-            if !viewModel.isPremium, viewModel.trialManager.shouldShowTrialEndingSoonModal {
-                showTrialEndingSoonModal = true
-            }
-        }
-        .sheet(isPresented: $showTrialEndingSoonModal) {
-            TrialEndingSoonModal(trialManager: viewModel.trialManager) {
-                viewModel.trialManager.recordTrialEndingSoonModalShown()
-                showTrialEndingSoonModal = false
-            }
-        }
     }
 }
 
-// MARK: - Trial banner (Day 1–5: subtle)
+#if !MAS
+// MARK: - Trial banner (Day 1–5: subtle), direct-download build
 struct TrialBannerView: View {
     let daysRemaining: Int
 
@@ -127,7 +141,7 @@ struct TrialBannerView: View {
     }
 }
 
-// MARK: - Day 6: Trial ending soon modal
+// MARK: - Day 6: Trial ending soon modal, direct-download build
 struct TrialEndingSoonModal: View {
     let trialManager: TrialManager
     let onDismiss: () -> Void
@@ -151,15 +165,26 @@ struct TrialEndingSoonModal: View {
         .background(Color.waqtuBackground)
     }
 }
+#endif
 
-// MARK: - Day 7: Trial expired (menu bar → Upgrade)
-struct TrialExpiredMenuView: View {
+// MARK: - No access (menu bar → Upgrade)
+/// The menu without access: Mac App Store build before subscribing, direct-download build once the
+/// local trial ended.
+struct UpgradeMenuView: View {
     var body: some View {
         VStack(spacing: 14) {
+            #if MAS
+            Text("Subscribe to Waqtu Premium to use Waqtu, or sign in with a Waqtu account that has it.")
+                .font(.system(size: 13))
+                .foregroundColor(.waqtuText)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            #else
             Text("Subscribe to Waqtu Premium or sign in with your Waqtu account to keep using Waqtu.")
                 .font(.system(size: 13))
                 .foregroundColor(.waqtuText)
                 .multilineTextAlignment(.center)
+            #endif
             Button("Upgrade") {
                 openUpgradeWindow()
             }
@@ -846,9 +871,11 @@ struct SettingsView: View {
 
     private var settingsTabs: some View {
         VStack(spacing: 0) {
+            #if !MAS
             if let vm = viewModel, !vm.isPremium, vm.trialManager.trialDaysRemaining >= 2 {
                 TrialBannerView(daysRemaining: vm.trialManager.trialDaysRemaining)
             }
+            #endif
             TabView(selection: $selectedTab) {
                 GeneralSettingsTab(settings: settings, viewModel: viewModel)
                     .tabItem {
@@ -906,7 +933,7 @@ struct SettingsView: View {
                         .tag(Pane.upgrade)
                 }
 
-                AboutSettingsTab(trialManager: viewModel?.trialManager, hasStoreSubscription: viewModel?.hasStoreSubscription ?? false, hasAccountPremium: viewModel?.account.serverPremium ?? false, onCheckForUpdates: onCheckForUpdates, onResetWaqtu: viewModel.map { vm in { vm.resetAllAndQuit() } })
+                AboutSettingsTab(localTrialDaysRemaining: viewModel?.localTrialDaysRemaining ?? 0, hasStoreSubscription: viewModel?.hasStoreSubscription ?? false, hasAccountPremium: viewModel?.account.serverPremium ?? false, onCheckForUpdates: onCheckForUpdates, onResetWaqtu: viewModel.map { vm in { vm.resetAllAndQuit() } })
                     .tabItem {
                         Label("About", systemImage: "info.circle.fill")
                     }
@@ -916,7 +943,7 @@ struct SettingsView: View {
     }
 }
 
-// MARK: - Upgrade tab in Settings (visible before and after trial)
+// MARK: - Upgrade tab in Settings (always visible)
 struct UpgradeSettingsTab: View {
     let viewModel: AppViewModel
 
@@ -929,9 +956,10 @@ struct UpgradeSettingsTab: View {
     }
 }
 
-// MARK: - Day 7: Full-screen upgrade (Settings)
-/// Shown instead of the settings tabs once the trial ended: the offer, plus the account tab so a
-/// subscriber can sign in and unlock this Mac.
+// MARK: - Full-screen upgrade (Settings)
+/// Shown instead of the settings tabs without access (Mac App Store build: not subscribed;
+/// direct-download build: the local trial ended): the offer, plus the account tab so a subscriber
+/// can sign in and unlock this Mac.
 struct UpgradeFullScreenView: View {
     let viewModel: AppViewModel
 
@@ -939,9 +967,15 @@ struct UpgradeFullScreenView: View {
         TabView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    #if MAS
+                    Text("Get Waqtu Premium")
+                        .font(.system(size: 22, weight: .semibold))
+                        .foregroundColor(.waqtuText)
+                    #else
                     Text("Your trial has ended")
                         .font(.system(size: 22, weight: .semibold))
                         .foregroundColor(.waqtuText)
+                    #endif
                     PremiumOfferView(viewModel: viewModel)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -975,8 +1009,6 @@ struct PremiumOfferView: View {
     private static let iPhoneURL = URL(string: "https://apps.apple.com/id/app/id6826628861")!
     private static let androidURL = URL(string: "https://play.google.com/store/apps/details?id=dat.waqtu.app")!
     private static let pricingURL = URL(string: "https://getwaqtu.com/mac#pricing")!
-    private static let termsURL = URL(string: "https://getwaqtu.com/terms")!
-    private static let privacyURL = URL(string: "https://getwaqtu.com/privacy")!
     private static let manageURL = URL(string: "https://apps.apple.com/account/subscriptions")!
 
     var body: some View {
@@ -984,11 +1016,13 @@ struct PremiumOfferView: View {
             if viewModel.isPremium {
                 activeSection
             } else {
+                #if !MAS
                 if viewModel.trialManager.isTrialActive, viewModel.trialManager.trialDaysRemaining > 0 {
                     Text("\(viewModel.trialManager.trialDaysRemaining) days left in trial. Subscribe anytime to keep access.")
                         .font(.system(size: 13))
                         .foregroundColor(.waqtuMuted)
                 }
+                #endif
                 Text("Waqtu Premium is one subscription for your Mac, iPhone and Android, kept by your Waqtu account. It includes sync across your devices and Circles.")
                     .font(.system(size: 13))
                     .foregroundColor(.waqtuText)
@@ -1034,21 +1068,28 @@ struct PremiumOfferView: View {
                 ProgressView().controlSize(.small)
             }
             ForEach(store.offers) { offer in
-                Button {
-                    purchase(productID: offer.id)
-                } label: {
-                    Group {
-                        if offer.isYearly {
-                            Text("Subscribe yearly: \(offer.displayPrice)/year")
-                        } else {
-                            Text("Subscribe monthly: \(offer.displayPrice)/month")
+                VStack(alignment: .leading, spacing: 4) {
+                    Button {
+                        purchase(productID: offer.id)
+                    } label: {
+                        Group {
+                            if offer.isYearly {
+                                Text("Subscribe yearly: \(offer.displayPrice)/year")
+                            } else {
+                                Text("Subscribe monthly: \(offer.displayPrice)/month")
+                            }
                         }
+                        .frame(minWidth: 240)
                     }
-                    .frame(minWidth: 240)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.waqtuPrimary)
+                    .disabled(isPurchasing)
+                    if let trial = offer.freeTrial {
+                        Text(Self.freeTrialText(trial, offer: offer))
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.waqtuGold)
+                    }
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.waqtuPrimary)
-                .disabled(isPurchasing)
             }
             if let purchaseError {
                 Text(purchaseError)
@@ -1069,15 +1110,36 @@ struct PremiumOfferView: View {
                 .foregroundColor(.waqtuMuted)
                 .fixedSize(horizontal: false, vertical: true)
         }
+        if store.offers.contains(where: { $0.freeTrial != nil }) {
+            Text("After the free trial, the subscription starts at the price shown unless you cancel at least 24 hours before the trial ends. The free trial is for new subscribers only.")
+                .font(.system(size: 11))
+                .foregroundColor(.waqtuMuted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
         Text("Payment is charged to your Apple ID. The subscription renews automatically unless cancelled at least 24 hours before the end of the period; manage or cancel it in your App Store account settings.")
             .font(.system(size: 11))
             .foregroundColor(.waqtuMuted)
             .fixedSize(horizontal: false, vertical: true)
         HStack(spacing: 16) {
-            Link("Terms of Use", destination: Self.termsURL)
-            Link("Privacy Policy", destination: Self.privacyURL)
+            let language = Bundle.main.preferredLocalizations.first
+            Link("Terms of Use", destination: LegalLinks.terms(language: language))
+            Link("Privacy Policy", destination: LegalLinks.privacy(language: language))
         }
         .font(.system(size: 11))
+    }
+
+    /// "1 week free, then Rp 29.000/month": an eligible introductory free trial and the price after it.
+    private static func freeTrialText(_ trial: SubscriptionTerm, offer: MacStoreSubscription.Offer) -> String {
+        let free: String
+        switch trial.unit {
+        case .day: free = String(localized: "\(trial.value) days free")
+        case .week: free = String(localized: "\(trial.value) weeks free")
+        case .month: free = String(localized: "\(trial.value) months free")
+        case .year: free = String(localized: "\(trial.value) years free")
+        }
+        return offer.isYearly
+            ? String(localized: "\(free), then \(offer.displayPrice)/year")
+            : String(localized: "\(free), then \(offer.displayPrice)/month")
     }
 
     private func purchase(productID: String) {
@@ -1808,7 +1870,8 @@ struct LocationSettingsTab: View {
 
 // MARK: - About Settings Tab
 struct AboutSettingsTab: View {
-    var trialManager: TrialManager?
+    /// Days left in the direct-download build's local trial (0: none; always 0 in the Mac App Store build).
+    var localTrialDaysRemaining: Int = 0
     /// An active Mac App Store subscription on this Mac (MAS build).
     var hasStoreSubscription: Bool = false
     /// Premium on the signed-in Waqtu account (e.g. a subscription bought on the phone).
@@ -1943,8 +2006,8 @@ struct AboutSettingsTab: View {
             .padding(.vertical, 6)
             .background(Color.waqtuDark.opacity(0.6))
             .cornerRadius(8)
-        } else if let trial = trialManager, trial.hasAccess, trial.isTrialActive, trial.trialDaysRemaining > 0 {
-            Text("\(trial.trialDaysRemaining) days left in trial")
+        } else if localTrialDaysRemaining > 0 {
+            Text("\(localTrialDaysRemaining) days left in trial")
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(.waqtuGold)
                 .padding(.horizontal, 12)

@@ -2,8 +2,9 @@
 //  WaqtuAccount.swift
 //  waqtu
 //
-//  The Waqtu account on the Mac: Sign in with Apple (native identity token) and Google (system
-//  browser session), with the better-auth bearer token kept in the Keychain.
+//  The Waqtu account on the Mac: Sign in with Apple (native identity token), Google (system
+//  browser session) and, for store reviewer accounts only, email + password, with the better-auth
+//  bearer token kept in the Keychain.
 //  State is only touched on the main thread; the async entry points are main-actor.
 //
 
@@ -117,6 +118,29 @@ final class WaqtuAccount {
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    // MARK: - Email (store reviewers)
+
+    /// Email + password sign-in, which the server only accepts for store reviewer accounts. Returns
+    /// true once signed in.
+    @MainActor
+    @discardableResult
+    func signInWithEmail(email: String, password: String) async -> Bool {
+        guard !isBusy else { return false }
+        errorMessage = nil
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            let session = try await api.signInWithEmail(email: email, password: password)
+            try await finishSignIn(token: session)
+            return true
+        } catch let problem as EmailSignInProblem {
+            errorMessage = problem.localizedDescription
+        } catch {
+            errorMessage = EmailSignInProblem.failed.localizedDescription
+        }
+        return false
     }
 
     // MARK: - Session
