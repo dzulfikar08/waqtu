@@ -33,8 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ios, mac]
-    if: inputs.platform == 'both' || inputs.platform == matrix.platform
+        platform: ${{ fromJSON(inputs.platform == 'both' && '["ios","mac"]' || format('["{0}"]', inputs.platform)) }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     environment: release
