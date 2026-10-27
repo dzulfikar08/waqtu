@@ -2,8 +2,9 @@
 //  AccountSettingsTab.swift
 //  waqtu
 //
-//  Settings → Account: sign in with Apple or Google, sync status, sign out and account deletion. The Waqtu account
-//  also carries Waqtu Premium: a subscription bought on any device unlocks this Mac.
+//  Settings → Account: sign in with Apple or Google (plus email for store reviewers), sync status,
+//  sign out and account deletion. The Waqtu account also carries Waqtu Premium: a subscription
+//  bought on any device unlocks this Mac.
 //
 
 import SwiftUI
@@ -16,6 +17,9 @@ struct AccountSettingsTab: View {
 
     @State private var appleNonce: String?
     @State private var confirmingDelete = false
+    @State private var showingReviewerSignIn = false
+    @State private var reviewerEmail = ""
+    @State private var reviewerPassword = ""
 
     var body: some View {
         Form {
@@ -78,6 +82,8 @@ struct AccountSettingsTab: View {
             .controlSize(.large)
             .disabled(account.isBusy)
 
+            reviewerSignIn
+
             if account.isBusy {
                 ProgressView().controlSize(.small)
             }
@@ -88,6 +94,52 @@ struct AccountSettingsTab: View {
             }
         } header: {
             Text("Waqtu account")
+        }
+    }
+
+    /// Email + password for store reviewers (App Store), behind a quiet link like on the phone: the
+    /// server only accepts the reviewer accounts it was configured with, and nobody can sign up.
+    @ViewBuilder
+    private var reviewerSignIn: some View {
+        if showingReviewerSignIn {
+            TextField("Email", text: $reviewerEmail)
+                .textContentType(.username)
+                .autocorrectionDisabled()
+            SecureField("Password", text: $reviewerPassword)
+                .textContentType(.password)
+                .onSubmit(submitReviewerSignIn)
+            HStack {
+                Button("Cancel") {
+                    showingReviewerSignIn = false
+                    reviewerPassword = ""
+                }
+                .disabled(account.isBusy)
+                Spacer()
+                Button("Sign in", action: submitReviewerSignIn)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.waqtuPrimary)
+                    .disabled(account.isBusy)
+            }
+        } else {
+            Button {
+                showingReviewerSignIn = true
+            } label: {
+                Text("App reviewer? Sign in with email")
+                    .font(.caption)
+                    .foregroundColor(.waqtuMuted)
+                    .underline()
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private func submitReviewerSignIn() {
+        Task { @MainActor in
+            if await account.signInWithEmail(email: reviewerEmail, password: reviewerPassword) {
+                showingReviewerSignIn = false
+                reviewerEmail = ""
+                reviewerPassword = ""
+            }
         }
     }
 

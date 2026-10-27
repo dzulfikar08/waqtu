@@ -2,10 +2,13 @@
 //  TrialManager.swift
 //  waqtu
 //
-//  7-day free trial stored in Keychain (persists across app reinstalls).
-//  Uses kSecClassGenericPassword; stores firstLaunchDate and trialUsed.
+//  Direct-download (Developer ID) build only: 7-day free trial stored in Keychain (persists across
+//  app reinstalls). Uses kSecClassGenericPassword; stores firstLaunchDate and trialUsed.
+//  The Mac App Store build has no local trial: its free trial is the subscription's introductory
+//  offer (MacStoreSubscription).
 //
 
+#if !MAS
 import Foundation
 import Security
 
@@ -149,3 +152,4 @@ final class TrialManager {
         SecItemDelete(query as CFDictionary)
     }
 }
+#endif

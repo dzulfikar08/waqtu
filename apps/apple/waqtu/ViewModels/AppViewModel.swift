@@ -11,10 +11,13 @@ final class AppViewModel {
     let reminderScheduler: PrayerReminderScheduler
     let locationManager: LocationManager
     let calendarManager: CalendarManager
-    let trialManager: TrialManager
     #if MAS
-    /// Waqtu Premium bought in the Mac App Store (auto-renewing subscription).
+    /// Waqtu Premium bought in the Mac App Store (auto-renewing subscription). Its one-week free
+    /// trial is the subscription's introductory offer; this build has no local trial.
     let storeSubscription: MacStoreSubscription
+    #else
+    /// Direct-download build only: the local 7-day trial.
+    let trialManager: TrialManager
     #endif
     let streakManager: PrayerStreakManager
     let slackManager: SlackManager
@@ -49,12 +52,36 @@ final class AppViewModel {
     /// True while calendar access is being refreshed.
     var isRefreshingCalendarAccess: Bool = false
 
-    /// Full access: trial active, trial used (legacy), or paid premium.
+    /// Full access. Mac App Store build: Waqtu Premium only (a StoreKit subscription, including one
+    /// in its free trial, or premium on the signed-in account). Direct-download build: the local
+    /// trial, trial used (legacy), or premium.
     var hasAccess: Bool {
-        trialManager.hasAccess || isPremium
+        #if DEBUG
+        if screenshotAccess { return true }
+        #endif
+        #if MAS
+        return isPremium
+        #else
+        return trialManager.hasAccess || isPremium
+        #endif
     }
 
-    /// Paid premium, as opposed to the trial: an active Mac App Store subscription (MAS build) or
+    #if DEBUG
+    /// Screenshot mode only (Screenshots/ScreenshotMode.swift): the app as a subscriber sees it,
+    /// while the Upgrade pane still shows the offer.
+    @ObservationIgnored var screenshotAccess = false
+    #endif
+
+    /// Days left in the direct-download build's local trial; always 0 in the Mac App Store build.
+    var localTrialDaysRemaining: Int {
+        #if MAS
+        return 0
+        #else
+        return trialManager.trialDaysRemaining
+        #endif
+    }
+
+    /// Paid premium, as opposed to the local trial: an active Mac App Store subscription (MAS build) or
     /// premium on the signed-in Waqtu account (one subscription unlocks mobile and the Mac).
     var isPremium: Bool {
         hasStoreSubscription || account.serverPremium
@@ -71,10 +98,12 @@ final class AppViewModel {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(trialManager: TrialManager = TrialManager()) {
+    init() {
         let settings = AppSettings()
         self.settings = settings
-        self.trialManager = trialManager
+        #if !MAS
+        self.trialManager = TrialManager()
+        #endif
         self.calculator = PrayerTimeCalculator(settings: settings)
         self.reminderScheduler = PrayerReminderScheduler(settings: settings)
         self.locationManager = LocationManager()

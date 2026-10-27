@@ -98,6 +98,11 @@ struct LocalizationCatalogTests {
             "Slow and steady. What matters is to keep going.": "going",
             "Today is still open.": "todayOpen", "End pause": "pauseEnd",
             "Pause (illness, travel, excuse)": "pauseStart",
+            // Store reviewer email sign-in (mobile `settings.reviewer*`).
+            "App reviewer? Sign in with email": "reviewerLink", "Password": "reviewerPassword",
+            "Enter the email and password.": "reviewerMissing", "Wrong email or password.": "reviewerInvalid",
+            "Too many attempts. Wait a moment and try again.": "reviewerRateLimited",
+            "Could not sign in. Check your connection and try again.": "reviewerFailed",
         ]
         for (key, mobileKey) in pairs {
             let expected = try #require(mobileValue(mobileKey), "mobile id.ts has no \(mobileKey)")
