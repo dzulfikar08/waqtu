@@ -10,8 +10,9 @@
 # Sparkle.framework. The build stays unsigned in xcodebuild and is signed here, inside-out, the same
 # order as apps/apple/scripts/sign-app.sh.
 #
-# Not for auto-update: automatic update checks are switched off and the appcast URL is removed, so
-# Sparkle can never replace this build with a release.
+# Not for auto-update: automatic update checks are switched off in the built Info.plist. The app
+# takes its appcast URL from AppDelegate, so a manual "Check for Updates" would still offer a
+# release build; do not use it on a preview.
 name: Mac preview
 
 on:
@@ -53,7 +54,6 @@ jobs:
           tmp="$(mktemp -d)"
 
           plist="$app/Contents/Info.plist"
-          /usr/libexec/PlistBuddy -c "Delete :SUFeedURL" "$plist"
           /usr/libexec/PlistBuddy -c "Add :SUEnableAutomaticChecks bool false" "$plist" \
             || /usr/libexec/PlistBuddy -c "Set :SUEnableAutomaticChecks false" "$plist"
 
