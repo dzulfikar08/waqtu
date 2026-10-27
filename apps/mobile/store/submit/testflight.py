@@ -140,17 +140,21 @@ def ensure_beta_review_info(asc: Asc) -> None:
         "description": "Waqtu shows prayer times, qibla, halaqah videos and Circles. Thank you for testing.",
         "feedbackEmail": a.REVIEW_CONTACT["contactEmail"],
     }
-    if not any(l["attributes"]["locale"] == "en-US" for l in locs):
-        asc.post(
-            "/v1/betaAppLocalizations",
-            {
-                "data": {
-                    "type": "betaAppLocalizations",
-                    "attributes": {"locale": "en-US", **loc_attrs},
-                    "relationships": {"app": ref("apps", APP_ID)},
-                }
-            },
-        )
+    # The submission needs a localization in the app's primary locale (App Store Connect rejects it otherwise).
+    primary = asc.get(f"/v1/apps/{APP_ID}")["data"]["attributes"]["primaryLocale"]
+    have = {l["attributes"]["locale"] for l in locs}
+    for locale in dict.fromkeys([primary, "en-US"]):
+        if locale not in have:
+            asc.post(
+                "/v1/betaAppLocalizations",
+                {
+                    "data": {
+                        "type": "betaAppLocalizations",
+                        "attributes": {"locale": locale, **loc_attrs},
+                        "relationships": {"app": ref("apps", APP_ID)},
+                    }
+                },
+            )
     note("Beta App Review information filled")
 
 
@@ -178,22 +182,16 @@ def submit_beta_review(asc: Asc, build: dict) -> str:
         return f"{sub['attributes']['betaReviewState']} ({state})"
     if state != "READY_FOR_BETA_SUBMISSION":
         return state
-    for attempt in range(6):
-        try:
-            sub = asc.post(
-                "/v1/betaAppReviewSubmissions",
-                {"data": {"type": "betaAppReviewSubmissions", "relationships": {"build": ref("builds", build["id"])}}},
-            )["data"]
-            return sub["attributes"]["betaReviewState"]
-        except AscError as e:
-            if e.status == 409:
-                return f"not submitted: {e}"
-            # A just-created beta app localization is not visible to the submission for a few seconds.
-            if "MISSING_BETA_APP_LOCALIZATION" in str(e) and attempt < 5:
-                a.log(f"Beta app localization not visible yet: {[(l['attributes']['locale']) for l in asc.all(f'/v1/apps/{APP_ID}/betaAppLocalizations')]}")
-                time.sleep(15)
-                continue
-            raise
+    try:
+        sub = asc.post(
+            "/v1/betaAppReviewSubmissions",
+            {"data": {"type": "betaAppReviewSubmissions", "relationships": {"build": ref("builds", build["id"])}}},
+        )["data"]
+    except AscError as e:
+        if e.status == 409:
+            return f"not submitted: {e}"
+        raise
+    return sub["attributes"]["betaReviewState"]
 
 
 def main() -> None:
