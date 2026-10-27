@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { type AuthClient } from "@/auth/client";
+import { API_URL } from "@/auth/config";
 import type { EmailSignInProblem } from "@/auth/emailSignIn";
 import {
   appleSignInAvailable,
@@ -14,10 +15,13 @@ import {
 import { TextField } from "@/circles/components/TextField";
 import { CIRCLES_HERO } from "@/components/GlowHero";
 import { Row, Section } from "@/components/ui";
+import { useMuhasabahCloud } from "@/hooks/useMuhasabahCloud";
 import { useSyncState } from "@/hooks/useSyncState";
 import { useTranslation } from "@/i18n";
+import { disableCloud, enableCloud, muhasabahSyncSettled, syncMuhasabah } from "@/ibadah/cloud";
+import { deleteCloudCopy } from "@/ibadah/cloudTransport";
 import { usePremium } from "@/premium/usePremium";
-import { Button, ButtonRow, Hint, Panel } from "@/ramadhan/components/fields";
+import { Button, ButtonRow, Hint, Panel, ToggleRow } from "@/ramadhan/components/fields";
 import { syncNow } from "@/sync/run";
 import { forgetAccount } from "@/sync/sqliteStore";
 import { HIT, onSky, spacing, typography, useTheme } from "@/theme";
@@ -34,6 +38,8 @@ export function AccountSection({ client }: { client: AuthClient }) {
   const [apple, setApple] = useState(false);
   const [failed, setFailed] = useState(false);
   const [deleteError, setDeleteError] = useState<"stale" | "failed" | null>(null);
+  const { enabled: cloudOn } = useMuhasabahCloud();
+  const [cloudError, setCloudError] = useState(false);
 
   useEffect(() => {
     void appleSignInAvailable().then(setApple);
@@ -57,6 +63,35 @@ export function AccountSection({ client }: { client: AuthClient }) {
     } catch {
       setFailed(true);
     }
+  };
+
+  const removeCloudCopy = async () => {
+    if (!API_URL) return;
+    try {
+      // A pass still running would upload the journal again right after the copy is gone.
+      await muhasabahSyncSettled();
+      await deleteCloudCopy(API_URL, () => client.getCookie());
+    } catch {
+      setCloudError(true);
+    }
+  };
+
+  const setCloud = async (userId: string, on: boolean) => {
+    setCloudError(false);
+    if (on) {
+      await enableCloud(db, userId);
+      void syncMuhasabah(db, client, userId, true);
+      return;
+    }
+    await disableCloud(db);
+    Alert.alert(t("sync.muhasabahOffTitle"), t("sync.muhasabahOffBody"), [
+      { text: t("sync.muhasabahOffKeep"), style: "cancel" },
+      {
+        text: t("sync.muhasabahOffDelete"),
+        style: "destructive",
+        onPress: () => void removeCloudCopy(),
+      },
+    ]);
   };
 
   const deleteAccount = async () => {
@@ -93,16 +128,28 @@ export function AccountSection({ client }: { client: AuthClient }) {
             line={t("settings.signedInAs", { name: session.user.email || session.user.name })}
           />
           {premium ? (
-            <Row
-              label={`${t("sync.now")} · ${syncLabel()}`}
-              icon="sync"
-              hue="circles"
-              onPress={() => void syncNow(db, client, session.user.id, true)}
-              disabled={sync.status === "syncing"}
-            />
+            <>
+              <Row
+                label={`${t("sync.now")} · ${syncLabel()}`}
+                icon="sync"
+                hue="circles"
+                onPress={() => {
+                  void syncNow(db, client, session.user.id, true);
+                  void syncMuhasabah(db, client, session.user.id, true);
+                }}
+                disabled={sync.status === "syncing"}
+              />
+              <ToggleRow
+                label={t("sync.muhasabah")}
+                hint={t("sync.muhasabahHint")}
+                value={cloudOn}
+                onValueChange={(on) => void setCloud(session.user.id, on)}
+              />
+            </>
           ) : (
             <Row
               label={t("sync.premium")}
+              detail={t("sync.muhasabahPremium")}
               icon="diamond-outline"
               hue="ramadhan"
               chevron
@@ -144,6 +191,11 @@ export function AccountSection({ client }: { client: AuthClient }) {
       {deleteError ? (
         <Text style={[typography.footnote, styles.note, { color: theme.danger }]}>
           {deleteError === "stale" ? t("settings.deleteStale") : t("settings.deleteFailed")}
+        </Text>
+      ) : null}
+      {cloudError ? (
+        <Text style={[typography.footnote, styles.note, { color: theme.danger }]}>
+          {t("sync.muhasabahDeleteFailed")}
         </Text>
       ) : null}
       {failed ? (

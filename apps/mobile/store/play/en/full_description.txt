@@ -29,7 +29,7 @@ Halaqah circles
 Small circles with anonymous handles, separate for brothers (ikhwan) and sisters (akhwat). Post a reflection or a voice note whenever you have a minute. You can pause or leave without anyone being told. Other members never see your name or email. Circles need an account and Premium.
 
 Privacy and open source
-Your location stays on your phone. There are no ads and no third-party trackers. If you sign in to sync, your mutabaah records are stored on our server so they can appear on your other devices. Waqtu's source code is open: github.com/dzulfikar08/waqtu
+Your location stays on your phone. There are no ads and no third-party trackers. If you sign in to sync, your mutabaah records are stored on our server so they can appear on your other devices. Your muhasabah journal stays on your phone unless you turn on cloud sync in Settings. Waqtu's source code is open: github.com/dzulfikar08/waqtu
 
 Subscriptions renew automatically unless cancelled at least 24 hours before the period ends. Payment is charged to your Google Play account and can be managed in Play Store > Payments & subscriptions.
 Terms of use: https://getwaqtu.com/en/terms

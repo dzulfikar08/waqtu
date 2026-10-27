@@ -144,6 +144,17 @@ export const en: Widen<typeof id> = {
     ok: "Synced",
     error: "Not connected. Will try again.",
     premium: "Sync across devices · Premium",
+    muhasabah: "Sync muhasabah to the cloud",
+    muhasabahHint:
+      "Your muhasabah journal stays on this phone unless you turn this on. Turn it on to keep it across all your devices.",
+    muhasabahPremium: "Includes your muhasabah journal, if you choose.",
+    muhasabahOffTitle: "Stop syncing muhasabah?",
+    muhasabahOffBody:
+      "Your muhasabah notes stay on this phone. Also delete the copy stored in the cloud?",
+    muhasabahOffDelete: "Delete cloud copy",
+    muhasabahOffKeep: "Keep it",
+    muhasabahDeleteFailed:
+      "The cloud copy was not deleted. Check your connection, then turn muhasabah sync on and off again to retry.",
   },
   settings: {
     language: "Language",

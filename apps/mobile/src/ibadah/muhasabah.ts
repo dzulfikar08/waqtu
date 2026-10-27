@@ -5,8 +5,9 @@ import { lastDays, type DayKey } from "../mutabaah/dates";
 
 /**
  * Muhasabah: a daily self-reflection journal, after the Mutabaah app's questions (two open questions, four 1–10 ratings,
- * an intention for tomorrow). Private: one row per day in `muhasabah` (migrations.ts), on this phone only. The sync
- * engine never reads the table and nothing here writes a mutabaah entry.
+ * an intention for tomorrow). Private: one row per day in `muhasabah` (migrations.ts), on this phone unless the user
+ * opts into cloud sync (cloud.ts). The mutabaah sync never reads the table and nothing here writes a mutabaah entry.
+ * A deleted day stays as a tombstone (`deleted = 1`) so the deletion can reach other devices; every read skips it.
  */
 
 export const RATING_ASPECTS = ["taqwa", "gratitude", "energy", "willingness"] as const;
@@ -240,7 +241,10 @@ export async function getMuhasabah(
   db: SQLiteDatabase,
   date: DayKey,
 ): Promise<MuhasabahEntry | null> {
-  const row = await db.getFirstAsync<Row>(`SELECT ${COLUMNS} FROM muhasabah WHERE date = ?`, date);
+  const row = await db.getFirstAsync<Row>(
+    `SELECT ${COLUMNS} FROM muhasabah WHERE date = ? AND deleted = 0`,
+    date,
+  );
   return row ? fromRow(row) : null;
 }
 
@@ -251,14 +255,17 @@ export async function getMuhasabahBetween(
   to: DayKey,
 ): Promise<MuhasabahEntry[]> {
   const rows = await db.getAllAsync<Row>(
-    `SELECT ${COLUMNS} FROM muhasabah WHERE date >= ? AND date <= ? ORDER BY date`,
+    `SELECT ${COLUMNS} FROM muhasabah WHERE date >= ? AND date <= ? AND deleted = 0 ORDER BY date`,
     from,
     to,
   );
   return rows.map(fromRow);
 }
 
-/** Saves a day's reflection (cleaned); an entry with nothing in it deletes the day instead. Returns what was kept. */
+/**
+ * Saves a day's reflection (cleaned) and queues it for cloud sync; an entry with nothing in it deletes the day instead.
+ * `updated_at` never moves backwards, so an edit made after a pull always beats the version pulled. Returns what was kept.
+ */
 export async function saveMuhasabah(
   db: SQLiteDatabase,
   entry: MuhasabahEntry,
@@ -270,7 +277,8 @@ export async function saveMuhasabah(
     return null;
   }
   await db.runAsync(
-    `INSERT INTO muhasabah (${COLUMNS}, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `INSERT INTO muhasabah (${COLUMNS}, created_at, updated_at, dirty, deleted)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 0)
      ON CONFLICT(date) DO UPDATE SET
        feelings = excluded.feelings,
        new_action = excluded.new_action,
@@ -279,7 +287,9 @@ export async function saveMuhasabah(
        energy = excluded.energy,
        willingness = excluded.willingness,
        continue_tomorrow = excluded.continue_tomorrow,
-       updated_at = excluded.updated_at`,
+       updated_at = MAX(excluded.updated_at, muhasabah.updated_at + 1),
+       dirty = 1,
+       deleted = 0`,
     clean.date,
     clean.feelings,
     clean.newAction,
@@ -295,7 +305,18 @@ export async function saveMuhasabah(
   return clean;
 }
 
-export async function deleteMuhasabah(db: SQLiteDatabase, date: DayKey): Promise<void> {
-  await db.runAsync("DELETE FROM muhasabah WHERE date = ?", date);
+/** Deletes a day as a tombstone, so the deletion syncs; a day with no entry is left alone. */
+export async function deleteMuhasabah(
+  db: SQLiteDatabase,
+  date: DayKey,
+  now: number = Date.now(),
+): Promise<void> {
+  await db.runAsync(
+    `UPDATE muhasabah SET feelings = NULL, new_action = NULL, taqwa = NULL, gratitude = NULL, energy = NULL,
+       willingness = NULL, continue_tomorrow = NULL, deleted = 1, dirty = 1, updated_at = MAX(?, updated_at + 1)
+     WHERE date = ? AND deleted = 0`,
+    now,
+    date,
+  );
   emitDataChanged();
 }
