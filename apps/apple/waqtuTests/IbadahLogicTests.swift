@@ -182,16 +182,15 @@ struct IbadahReaderLabelTests {
 }
 
 /// The window's sidebar and the "time for the morning dhikr" shortcut drive one value.
-@MainActor
 struct IbadahNavigationTests {
     @Test func everyToolInTheSidebarCanBeSelected() {
         var navigation = IbadahNavigation()
         #expect(navigation.tool == .dzikir)
-        for tool in IbadahModel.Tool.allCases {
+        for tool in IbadahTool.allCases {
             navigation.select(tool)
             #expect(navigation.tool == tool)
         }
-        #expect(Set(IbadahModel.Tool.allCases.map(\.id)).count == IbadahModel.Tool.allCases.count)
+        #expect(Set(IbadahTool.allCases.map(\.id)).count == IbadahTool.allCases.count)
     }
 
     @Test func theShortcutOpensTheReaderOnTheTimeOfDay() {

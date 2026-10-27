@@ -17,45 +17,7 @@ import Observation
 @MainActor
 @Observable
 final class IbadahModel {
-    enum Tool: String, CaseIterable, Identifiable {
-        case qibla, matsurat, dzikir, doa, tasbih, muhasabah
-
-        var id: String { rawValue }
-
-        var title: String {
-            switch self {
-            case .qibla: return istr("ibadah.qibla.title")
-            case .matsurat: return istr("ibadah.matsurat.title")
-            case .dzikir: return istr("ibadah.dzikir.title")
-            case .doa: return istr("ibadah.doa.title")
-            case .tasbih: return istr("ibadah.tasbih.title")
-            case .muhasabah: return istr("ibadah.muhasabah.title")
-            }
-        }
-
-        var systemImage: String {
-            switch self {
-            case .qibla: return "location.north.circle"
-            case .matsurat: return "book"
-            case .dzikir: return "sun.and.horizon"
-            case .doa: return "heart"
-            case .tasbih: return "circle.dotted"
-            case .muhasabah: return "square.and.pencil"
-            }
-        }
-
-        /// The filled variant marks the selected tool.
-        var selectedImage: String {
-            switch self {
-            case .qibla: return "location.north.circle.fill"
-            case .matsurat: return "book.fill"
-            case .dzikir: return "sun.and.horizon.fill"
-            case .doa: return "heart.fill"
-            case .tasbih: return "circle.dotted"
-            case .muhasabah: return "square.and.pencil"
-            }
-        }
-    }
+    typealias Tool = IbadahTool
 
     let viewModel: AppViewModel
     /// The tool shown and the time each reader opens on (nil follows the part of the day).
@@ -275,24 +237,15 @@ final class IbadahModel {
     }
 }
 
-/// Which tool the window shows, and which time of day the readers were asked to open on. A plain
-/// value so the sidebar's choices are testable without the app's model.
-struct IbadahNavigation: Equatable {
-    var tool: IbadahModel.Tool = .dzikir
-    var matsuratTime: ReaderTime?
-    var dzikirTime: ReaderTime?
-
-    mutating func select(_ tool: IbadahModel.Tool) {
-        self.tool = tool
-    }
-
-    /// The "time for the morning dhikr" shortcut: opens a reader on `time`.
-    mutating func openReader(_ tool: IbadahModel.Tool, time: ReaderTime) {
-        switch tool {
-        case .matsurat: matsuratTime = time
-        case .dzikir: dzikirTime = time
-        default: break
+extension IbadahTool {
+    var title: String {
+        switch self {
+        case .qibla: return istr("ibadah.qibla.title")
+        case .matsurat: return istr("ibadah.matsurat.title")
+        case .dzikir: return istr("ibadah.dzikir.title")
+        case .doa: return istr("ibadah.doa.title")
+        case .tasbih: return istr("ibadah.tasbih.title")
+        case .muhasabah: return istr("ibadah.muhasabah.title")
         }
-        select(tool)
     }
 }
