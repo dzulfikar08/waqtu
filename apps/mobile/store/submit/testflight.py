@@ -10,6 +10,8 @@ Environment:
   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH   App Store Connect API key (.p8 file path)
   TESTFLIGHT_EMAILS                         comma or whitespace separated email addresses
   BUILD_NUMBER                              CFBundleVersion to use (default: newest build)
+  GRANT_APP_ACCESS                          "true": an App Store Connect user who cannot see this app gets access to it
+                                            (visibleApps) so they can join the internal group instead of Family
   REVIEW_ACCOUNT_PASSWORD, REVIEW_CONTACT_PHONE
   GITHUB_STEP_SUMMARY                       optional
 """
@@ -68,6 +70,38 @@ def set_export_compliance(asc: Asc, build: dict) -> dict:
     else:
         note(f"Export compliance: already answered ({build['attributes']['usesNonExemptEncryption']})")
     return build
+
+
+def grant_app_access(asc: Asc, user: dict) -> None:
+    if user["attributes"].get("allAppsVisible"):
+        return
+    visible = {a_["id"] for a_ in asc.all(f"/v1/users/{user['id']}/visibleApps")}
+    if APP_ID in visible:
+        return
+    asc.post(f"/v1/users/{user['id']}/relationships/visibleApps", {"data": [{"type": "apps", "id": APP_ID}]})
+    note(f"{user['attributes']['username']}: granted access to app {APP_ID}")
+
+
+def send_invitation(asc: Asc, email: str, group: dict) -> None:
+    """Internal testers get the invite email from an explicit invitation; a repeat is refused and harmless."""
+    for tester in asc.all("/v1/betaTesters", **{"filter[email]": email}):
+        if any(g["id"] == group["id"] for g in asc.all(f"/v1/betaTesters/{tester['id']}/betaGroups")):
+            try:
+                asc.post(
+                    "/v1/betaTesterInvitations",
+                    {
+                        "data": {
+                            "type": "betaTesterInvitations",
+                            "relationships": {"app": ref("apps", APP_ID), "betaTester": ref("betaTesters", tester["id"])},
+                        }
+                    },
+                )
+                note(f"{email}: invitation email sent")
+            except AscError as e:
+                if e.status != 409:
+                    raise
+                note(f"{email}: invitation not re-sent ({e.body['errors'][0].get('detail')})")
+            return
 
 
 def ensure_group(asc: Asc, name: str, internal: bool) -> dict:
@@ -221,6 +255,8 @@ def main() -> None:
     if internal:
         group = ensure_group(asc, INTERNAL_GROUP, True)
         for email in internal:
+            if os.environ.get("GRANT_APP_ACCESS") == "true":
+                grant_app_access(asc, users[email])
             try:
                 placed[email] = ensure_tester(asc, email, group, users[email])
             except AscError as e:
@@ -251,6 +287,7 @@ def main() -> None:
         g = placed[email]
         name = g["attributes"]["name"]
         if g["attributes"]["isInternalGroup"]:
+            send_invitation(asc, email, g)
             note(f"{email}: internal ({name}); invite sent, no Beta App Review needed")
         else:
             note(f"{email}: external ({name}); invite goes out once Beta App Review approves ({review})")
