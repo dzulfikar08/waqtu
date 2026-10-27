@@ -41,6 +41,54 @@
         }
       }
     },
+    "%@, then %@/month" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, lalu %2$@/bulan"
+          }
+        }
+      }
+    },
+    "%@, then %@/year" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, lalu %2$@/tahun"
+          }
+        }
+      }
+    },
+    "%lld days free" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld day free"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld days free"
+                }
+              }
+            }
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld hari gratis"
+          }
+        }
+      }
+    },
     "%lld days left in trial" : {
       "localizations" : {
         "en" : {
@@ -163,6 +211,34 @@
         }
       }
     },
+    "%lld months free" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld month free"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld months free"
+                }
+              }
+            }
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld bulan gratis"
+          }
+        }
+      }
+    },
     "%lld pages" : {
       "localizations" : {
         "en" : {
@@ -187,6 +263,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld halaman"
+          }
+        }
+      }
+    },
+    "%lld weeks free" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld week free"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld weeks free"
+                }
+              }
+            }
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld minggu gratis"
+          }
+        }
+      }
+    },
+    "%lld years free" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld year free"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld years free"
+                }
+              }
+            }
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld tahun gratis"
           }
         }
       }
@@ -408,6 +540,16 @@
         }
       }
     },
+    "After the free trial, the subscription starts at the price shown unless you cancel at least 24 hours before the trial ends. The free trial is for new subscribers only." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Setelah uji coba gratis, langganan dimulai dengan harga yang tertera kecuali kamu membatalkannya paling lambat 24 jam sebelum uji coba berakhir. Uji coba gratis hanya untuk pelanggan baru."
+          }
+        }
+      }
+    },
     "Alert 5 minutes before each prayer block." : {
       "localizations" : {
         "id" : {
@@ -424,6 +566,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Semua pengaturan kembali ke bawaan, acara Waqtu dihapus dari kalendermu, lalu aplikasi keluar. Langgananmu tidak terpengaruh. Buka lagi Waqtu untuk memulai dari awal."
+          }
+        }
+      }
+    },
+    "App reviewer? Sign in with email" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peninjau aplikasi? Masuk dengan email"
           }
         }
       }
@@ -866,6 +1018,16 @@
         }
       }
     },
+    "Could not sign in. Check your connection and try again." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gagal masuk. Periksa koneksimu lalu coba lagi."
+          }
+        }
+      }
+    },
     "Counter" : {
       "localizations" : {
         "id" : {
@@ -1116,6 +1278,16 @@
         }
       }
     },
+    "Email" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email"
+          }
+        }
+      }
+    },
     "Enable Overlay" : {
       "localizations" : {
         "id" : {
@@ -1152,6 +1324,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Masukkan koordinat jika deteksi otomatis tidak tersedia. Contoh: Makkah 21.4225, 39.8262"
+          }
+        }
+      }
+    },
+    "Enter the email and password." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Isi email dan kata sandi."
           }
         }
       }
@@ -1282,6 +1464,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mulai"
+          }
+        }
+      }
+    },
+    "Get Waqtu Premium" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dapatkan Waqtu Premium"
           }
         }
       }
@@ -2026,6 +2218,16 @@
         }
       }
     },
+    "Password" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kata sandi"
+          }
+        }
+      }
+    },
     "Pause" : {
       "localizations" : {
         "id" : {
@@ -2585,6 +2787,16 @@
         }
       }
     },
+    "Sign in" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masuk"
+          }
+        }
+      }
+    },
     "Sign in to sync your prayer checklist and prayer settings with Waqtu on your iPhone or Android, and to use the Waqtu Premium you subscribed to there. Your location is never uploaded." : {
       "localizations" : {
         "id" : {
@@ -2818,6 +3030,16 @@
         }
       }
     },
+    "Subscribe to Waqtu Premium to use Waqtu, or sign in with a Waqtu account that has it." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berlangganan Waqtu Premium untuk memakai Waqtu, atau masuk dengan akun Waqtu yang sudah memilikinya."
+          }
+        }
+      }
+    },
     "Subscribe yearly: %@/year" : {
       "localizations" : {
         "id" : {
@@ -3004,6 +3226,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hari ini masih terbuka."
+          }
+        }
+      }
+    },
+    "Too many attempts. Wait a moment and try again." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terlalu banyak percobaan. Tunggu sebentar lalu coba lagi."
           }
         }
       }
@@ -3273,6 +3505,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Selamat Datang di Waqtu"
+          }
+        }
+      }
+    },
+    "Wrong email or password." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email atau kata sandi salah."
           }
         }
       }

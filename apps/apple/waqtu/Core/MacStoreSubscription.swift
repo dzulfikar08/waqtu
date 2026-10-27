@@ -2,8 +2,9 @@
 //  MacStoreSubscription.swift
 //  waqtu
 //
-//  Mac App Store build only: Waqtu Premium as auto-renewable subscriptions (StoreKit 2). The
-//  direct-download build sells nothing; its premium comes from the signed-in Waqtu account.
+//  Mac App Store build only: Waqtu Premium as auto-renewable subscriptions (StoreKit 2). Both
+//  products carry a one-week free trial as their introductory offer; it is the only trial this build
+//  has. The direct-download build sells nothing; its premium comes from the signed-in Waqtu account.
 //  Every verified transaction is also handed to `onSignedTransaction` so the account gets premium
 //  on the server (POST /v1/billing/apple) and the phone apps unlock too.
 //
@@ -24,11 +25,16 @@ final class MacStoreSubscription: @unchecked Sendable {
     private(set) var isActive = false
     /// Monthly first, then yearly; empty until the App Store answered.
     private(set) var products: [Product] = []
+    /// Free trial (free introductory offer) per product id, only while this Apple ID is eligible.
+    private(set) var freeTrials: [String: SubscriptionTerm] = [:]
 
     /// What the purchase buttons show, in the storefront's currency.
     struct Offer: Identifiable, Equatable {
         let id: String
         let displayPrice: String
+        /// Free trial this Apple ID gets on subscribing; nil when the product has none or the Apple
+        /// ID already used it.
+        var freeTrial: SubscriptionTerm?
         var isYearly: Bool { id == MacStoreSubscription.yearlyProductID }
     }
 
@@ -36,7 +42,7 @@ final class MacStoreSubscription: @unchecked Sendable {
         #if DEBUG
         if let demoOffers { return demoOffers }
         #endif
-        return products.map { Offer(id: $0.id, displayPrice: $0.displayPrice) }
+        return products.map { Offer(id: $0.id, displayPrice: $0.displayPrice, freeTrial: freeTrials[$0.id]) }
     }
 
     #if DEBUG
@@ -60,9 +66,39 @@ final class MacStoreSubscription: @unchecked Sendable {
 
     @MainActor
     func loadProducts() async {
-        guard products.isEmpty else { return }
-        let loaded = (try? await Product.products(for: Self.productIDs)) ?? []
-        products = loaded.sorted { lhs, rhs in lhs.id == Self.monthlyProductID && rhs.id != Self.monthlyProductID }
+        if products.isEmpty {
+            let loaded = (try? await Product.products(for: Self.productIDs)) ?? []
+            products = loaded.sorted { lhs, rhs in lhs.id == Self.monthlyProductID && rhs.id != Self.monthlyProductID }
+        }
+        await updateFreeTrials()
+    }
+
+    /// Re-reads which products still offer this Apple ID their free trial.
+    @MainActor
+    private func updateFreeTrials() async {
+        var trials: [String: SubscriptionTerm] = [:]
+        for product in products {
+            guard let subscription = product.subscription, let intro = subscription.introductoryOffer else { continue }
+            let eligible = await subscription.isEligibleForIntroOffer
+            if let trial = SubscriptionTerm.freeTrial(
+                isFree: intro.paymentMode == .freeTrial,
+                isEligible: eligible,
+                period: Self.term(intro.period),
+                periodCount: intro.periodCount
+            ) {
+                trials[product.id] = trial
+            }
+        }
+        freeTrials = trials
+    }
+
+    private static func term(_ period: Product.SubscriptionPeriod) -> SubscriptionTerm {
+        switch period.unit {
+        case .week: return SubscriptionTerm(value: period.value, unit: .week)
+        case .month: return SubscriptionTerm(value: period.value, unit: .month)
+        case .year: return SubscriptionTerm(value: period.value, unit: .year)
+        default: return SubscriptionTerm(value: period.value, unit: .day)
+        }
     }
 
     /// Presents the App Store purchase sheet. `appAccountToken` ties the purchase to the signed-in
@@ -114,6 +150,7 @@ final class MacStoreSubscription: @unchecked Sendable {
             onSignedTransaction?(result.jwsRepresentation)
         }
         isActive = active
+        await updateFreeTrials()
     }
 
     private static func isCurrent(_ transaction: Transaction) -> Bool {
