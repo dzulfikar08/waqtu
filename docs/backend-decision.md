@@ -89,3 +89,24 @@ Owner decisions: sync across devices is Premium; Circles are Premium; the Mac mo
   they can update to the subscription build, and `POST /license/validate`, which old direct builds call on
   launch with a stored key; it still answers `{ valid }`, and any failure makes them fall back to their
   trial state.
+
+## Decision record: the muhasabah journal syncs only when the user opts in (2026-10-27, DEV-17)
+
+Owner decision: the muhasabah journal (daily reflection notes and 1-10 ratings) is on-device by default on
+the Mac and the phone, and a signed-in user can turn on "Sync muhasabah to the cloud" to carry it between
+devices.
+
+- **Server.** `GET|POST|DELETE /v1/muhasabah` (`services/api/src/muhasabah.ts`, migration `0008`): one row
+  per user and day, the whole entry last-write-wins, deleted days kept as tombstones. Scoped to the session
+  user, cascades with the account, and `DELETE` removes the caller's whole cloud copy. Never read by Circles or
+  an admin route.
+- **Premium follows the rule above: gated in the apps, not on the route.** The phone offers the switch (and
+  runs the sync) only with Premium, like mutabaah sync. The Mac offers it to any signed-in account, like the
+  Mac's mutabaah sync, which runs during the free trial.
+- **The switch belongs to one account on one device.** Another account signing in finds it off; turning it on
+  uploads the whole local journal and pulls what the account already holds. Turning it off stops syncing at
+  once and offers to delete the cloud copy; it never deletes the entries on the device. Other devices that
+  keep it on keep their own copy and keep syncing until they turn it off.
+- **Privacy copy** (web privacy policy, `apps/apple/docs/PRIVACY.md`, store descriptions) says the journal stays
+  on the device unless the user turns this on; then it is stored on Waqtu's servers tied to the account and is
+  deletable.
