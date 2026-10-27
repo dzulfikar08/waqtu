@@ -99,13 +99,27 @@ def ensure_tester(asc: Asc, email: str, group: dict, user: dict | None) -> str:
         a.log(f"{email}: existing beta tester {tester['id']} {tester['attributes']}")
         members = {t["id"] for t in asc.all(f"/v1/betaGroups/{group['id']}/betaTesters")}
         if tester["id"] not in members:
-            groups = asc.all(f"/v1/betaTesters/{tester['id']}/betaGroups")
-            apps = asc.all(f"/v1/betaTesters/{tester['id']}/apps")
-            a.log(f"{email}: in groups {[(g['attributes']['name'], g['attributes']['isInternalGroup']) for g in groups]} apps {[x['id'] for x in apps]}")
-            asc.post(
-                f"/v1/betaGroups/{group['id']}/relationships/betaTesters",
-                {"data": [{"type": "betaTesters", "id": tester["id"]}]},
-            )
+            group_ref = {"data": [{"type": "betaGroups", "id": group["id"]}]}
+            # Testers that already belong to another app (or are App Store Connect users) are refused by the group
+            # endpoint; the tester-side endpoint and a re-create with the group accept them.
+            attempts = [
+                ("group endpoint", lambda: asc.post(
+                    f"/v1/betaGroups/{group['id']}/relationships/betaTesters",
+                    {"data": [{"type": "betaTesters", "id": tester["id"]}]})),
+                ("tester endpoint", lambda: asc.post(f"/v1/betaTesters/{tester['id']}/relationships/betaGroups", group_ref)),
+                ("tester create", lambda: asc.post("/v1/betaTesters", {"data": {
+                    "type": "betaTesters", "attributes": {"email": email},
+                    "relationships": {"betaGroups": group_ref}}})),
+            ]
+            for n, (how, attempt) in enumerate(attempts):
+                try:
+                    attempt()
+                    a.log(f"{email}: added to {group['attributes']['name']} via {how}")
+                    break
+                except AscError as e:
+                    a.log(f"{email}: {how} refused: {e}")
+                    if n == len(attempts) - 1:
+                        raise
         return tester["id"]
     attributes = {"email": email}
     if user:
