@@ -178,101 +178,11 @@ def ensure_tester(asc: Asc, email: str, group: dict, user: dict | None) -> dict:
         except AscError as e:
             if e.status != 409:
                 raise
+            a.log(f"{email}: internal attempt refused: {e}")
             error = e
     if current:
         return current[0][1]
     raise error
-
-
-def grant_app_access(asc: Asc, user: dict) -> None:
-    if user["attributes"].get("allAppsVisible"):
-        return
-    visible = {a_["id"] for a_ in asc.all(f"/v1/users/{user['id']}/visibleApps")}
-    if APP_ID in visible:
-        return
-    asc.post(f"/v1/users/{user['id']}/relationships/visibleApps", {"data": [{"type": "apps", "id": APP_ID}]})
-    note(f"{user['attributes']['username']}: granted access to app {APP_ID}")
-
-
-def send_invitation(asc: Asc, email: str, group: dict) -> None:
-    """Internal testers get the invite email from an explicit invitation; a repeat is refused and harmless."""
-    for tester in asc.all("/v1/betaTesters", **{"filter[email]": email}):
-        if any(g["id"] == group["id"] for g in asc.all(f"/v1/betaTesters/{tester['id']}/betaGroups")):
-            try:
-                asc.post(
-                    "/v1/betaTesterInvitations",
-                    {
-                        "data": {
-                            "type": "betaTesterInvitations",
-                            "relationships": {"app": ref("apps", APP_ID), "betaTester": ref("betaTesters", tester["id"])},
-                        }
-                    },
-                )
-                note(f"{email}: invitation email sent")
-            except AscError as e:
-                if e.status != 409:
-                    raise
-                note(f"{email}: invitation not re-sent ({e.body['errors'][0].get('detail')})")
-            return
-
-
-def ensure_group(asc: Asc, name: str, internal: bool) -> dict:
-    for g in asc.all(f"/v1/apps/{APP_ID}/betaGroups"):
-        if g["attributes"]["name"] == name:
-            return g
-    attributes = {"name": name, "isInternalGroup": internal}
-    if internal:
-        attributes["hasAccessToAllBuilds"] = True
-    else:
-        attributes["publicLinkEnabled"] = False
-    g = asc.post(
-        "/v1/betaGroups",
-        {"data": {"type": "betaGroups", "attributes": attributes, "relationships": {"app": ref("apps", APP_ID)}}},
-    )["data"]
-    note(f"Created {'internal' if internal else 'external'} beta group {name}")
-    return g
-
-
-def asc_users(asc: Asc) -> dict[str, dict]:
-    return {u["attributes"]["username"].lower(): u for u in asc.all("/v1/users")}
-
-
-def tester_app_group(asc: Asc, testers: list[dict]) -> dict | None:
-    """The group of this app (Owner or Family) one of these tester records already belongs to, if any."""
-    mine = {g["id"]: g for g in asc.all(f"/v1/apps/{APP_ID}/betaGroups")}
-    for tester in testers:
-        for g in asc.all(f"/v1/betaTesters/{tester['id']}/betaGroups"):
-            if g["id"] in mine:
-                return mine[g["id"]]
-    return None
-
-
-def ensure_tester(asc: Asc, email: str, group: dict, user: dict | None) -> dict:
-    """Puts the email into `group`; returns the group of this app the tester is in afterwards (already a member of
-    Owner or Family counts as done).
-
-    Beta tester records are per app: the same email has one record for every app it tests, and a record of another
-    app cannot be assigned to this app's groups ("Tester(s) cannot be assigned"). So only a record already in one of
-    this app's groups counts; otherwise a new record is created with the group.
-    """
-    current = tester_app_group(asc, asc.all("/v1/betaTesters", **{"filter[email]": email}))
-    if current:
-        return current
-    attributes = {"email": email}
-    if user:
-        attributes["firstName"] = user["attributes"].get("firstName") or ""
-        attributes["lastName"] = user["attributes"].get("lastName") or ""
-    asc.post(
-        "/v1/betaTesters",
-        {
-            "data": {
-                "type": "betaTesters",
-                "attributes": attributes,
-                "relationships": {"betaGroups": {"data": [{"type": "betaGroups", "id": group["id"]}]}},
-            }
-        },
-    )
-    return group
 
 
 def ensure_beta_review_info(asc: Asc) -> None:
