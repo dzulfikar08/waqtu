@@ -178,16 +178,22 @@ def submit_beta_review(asc: Asc, build: dict) -> str:
         return f"{sub['attributes']['betaReviewState']} ({state})"
     if state != "READY_FOR_BETA_SUBMISSION":
         return state
-    try:
-        sub = asc.post(
-            "/v1/betaAppReviewSubmissions",
-            {"data": {"type": "betaAppReviewSubmissions", "relationships": {"build": ref("builds", build["id"])}}},
-        )["data"]
-    except AscError as e:
-        if e.status == 409:
-            return f"not submitted: {e}"
-        raise
-    return sub["attributes"]["betaReviewState"]
+    for attempt in range(6):
+        try:
+            sub = asc.post(
+                "/v1/betaAppReviewSubmissions",
+                {"data": {"type": "betaAppReviewSubmissions", "relationships": {"build": ref("builds", build["id"])}}},
+            )["data"]
+            return sub["attributes"]["betaReviewState"]
+        except AscError as e:
+            if e.status == 409:
+                return f"not submitted: {e}"
+            # A just-created beta app localization is not visible to the submission for a few seconds.
+            if "MISSING_BETA_APP_LOCALIZATION" in str(e) and attempt < 5:
+                a.log(f"Beta app localization not visible yet: {[(l['attributes']['locale']) for l in asc.all(f'/v1/apps/{APP_ID}/betaAppLocalizations')]}")
+                time.sleep(15)
+                continue
+            raise
 
 
 def main() -> None:
