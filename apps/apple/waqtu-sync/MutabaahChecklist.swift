@@ -49,6 +49,13 @@ enum MutabaahChecklist {
         return replica.recordLocalEntry(date: date, itemId: itemId, value: next, at: at)
     }
 
+    /// Sets a `check` item ticked or not, whatever it was (the Ibadah readers tick `dzikir_pagi` and
+    /// `dzikir_petang` once a session is finished, like the phone's `setEntry(..., 1)`).
+    @discardableResult
+    static func setCheck(_ on: Bool, itemId: String, date: String, in replica: MutabaahReplica, at: Int64) -> Bool {
+        replica.recordLocalEntry(date: date, itemId: itemId, value: on ? 1 : 0, at: at)
+    }
+
     /// Sets a `count` item (pages of tilawah, ...), clamped to 0...`MutabaahItems.maxCount`.
     @discardableResult
     static func setCount(_ count: Int, itemId: String, date: String, in replica: MutabaahReplica, at: Int64) -> Bool {

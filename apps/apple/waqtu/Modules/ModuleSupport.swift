@@ -37,7 +37,7 @@ enum ModuleLocale {
 @MainActor
 final class ModuleWindows {
     enum Module: String {
-        case halaqah, hafalan, circles
+        case halaqah, hafalan, circles, ibadah
     }
 
     static let shared = ModuleWindows()
@@ -45,21 +45,33 @@ final class ModuleWindows {
     private var windows: [Module: NSWindow] = [:]
     private var closeObservers: [Module: NSObjectProtocol] = [:]
 
-    func open<Content: View>(_ module: Module, title: String, size: NSSize, content: () -> Content) {
+    /// `unifiedTitlebar`: the content runs up behind a transparent title bar (traffic lights over the
+    /// window's own sidebar, no title text), for windows that draw their own header.
+    func open<Content: View>(
+        _ module: Module, title: String, size: NSSize, minSize: NSSize? = nil, unifiedTitlebar: Bool = false,
+        content: () -> Content
+    ) {
         NSApp.activate(ignoringOtherApps: true)
         if let existing = windows[module] {
             existing.makeKeyAndOrderFront(nil)
             return
         }
+        var style: NSWindow.StyleMask = [.titled, .closable, .miniaturizable, .resizable]
+        if unifiedTitlebar { style.insert(.fullSizeContentView) }
         let window = NSWindow(
             contentRect: NSRect(origin: .zero, size: size),
-            styleMask: [.titled, .closable, .miniaturizable, .resizable],
+            styleMask: style,
             backing: .buffered,
             defer: false
         )
         window.title = title
+        if unifiedTitlebar {
+            window.titlebarAppearsTransparent = true
+            window.titleVisibility = .hidden
+            window.backgroundColor = NSColor(Color.wqCanvas)
+        }
         window.isReleasedWhenClosed = false
-        window.contentMinSize = NSSize(width: min(size.width, 560), height: min(size.height, 420))
+        window.contentMinSize = minSize ?? NSSize(width: min(size.width, 560), height: min(size.height, 420))
         window.contentView = NSHostingView(rootView: content())
         window.center()
         window.setFrameAutosaveName("waqtu.module.\(module.rawValue)")
@@ -73,11 +85,39 @@ final class ModuleWindows {
         window.makeKeyAndOrderFront(nil)
     }
 
+    /// The Mac's Settings window, on `pane` (a `SettingsView.Pane` id) when given.
+    static func openSettings(pane: String? = nil) {
+        SettingsOpener.show(pane: pane)
+    }
+
     private func forget(_ module: Module) {
         if let observer = closeObservers.removeValue(forKey: module) {
             NotificationCenter.default.removeObserver(observer)
         }
         windows[module]?.contentView = nil
         windows.removeValue(forKey: module)
+    }
+}
+
+/// Opens the Settings window from anywhere, on a pane. The SwiftUI `openSettings` action is the only
+/// way to reach the Settings scene on current macOS (sending `showSettingsWindow:` down the responder
+/// chain does nothing in a menu bar app whose windows are not SwiftUI scenes), so the menu bar view
+/// hands it over when it appears and every other caller, the module windows included, goes through here.
+@MainActor
+enum SettingsOpener {
+    private static var action: OpenSettingsAction?
+
+    static func register(_ action: OpenSettingsAction) {
+        self.action = action
+    }
+
+    static func show(pane: String? = nil) {
+        if let pane { SettingsView.requestedPane = pane }
+        NSApp.activate(ignoringOtherApps: true)
+        if let action {
+            action()
+        } else {
+            NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        }
     }
 }

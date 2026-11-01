@@ -174,9 +174,15 @@ enum ScreenshotMode {
         model.calculatePrayers()
         model.locationDisplay = "Jakarta, Indonesia"
 
+        // The Ibadah window set (.github/workflows/mac-ibadah-screenshots.yml) replaces the store canvases.
+        if ProcessInfo.processInfo.environment["WAQTU_SCREENSHOTS_SET"] == "ibadah" {
+            try await renderIbadah(model, language, directory)
+            return
+        }
+
         let menuBarLabel = try await capture(MenuBarLabel(title: model.fastingTitle))
 
-        // 1. Menu bar popover: next prayer, today's times, checklist (bleeds off the bottom).
+        // 1. Menu bar popover, whole: next prayer, today's times, the prayer chips, modules, Pomodoro.
         let popover = try await capture(MenuBarView(viewModel: model))
         try write(
             Canvas.store(caption: caption(1, language), ui: popover, layout: .menuBar(label: menuBarLabel)),
@@ -186,7 +192,7 @@ enum ScreenshotMode {
         // 2. Mutabaah checklist and the streak report, opened.
         let mutabaah = try await capture(
             VStack(spacing: 0) {
-                MutabaahChecklistView(sync: model.syncController)
+                MutabaahChecklistView(sync: model.syncController, alwaysExpanded: true)
                 Divider()
                 StreakReportView(sync: model.syncController, isExpanded: true)
             }
@@ -221,6 +227,105 @@ enum ScreenshotMode {
         )
         try write(Canvas.store(caption: caption(5, language), ui: upgrade, layout: .panel), "\(language.rawValue)-05-premium", in: directory)
         try write(Canvas.review(caption: reviewCaption(language), ui: upgrade), "review-premium-\(language.rawValue)", in: directory)
+    }
+
+    // MARK: - Ibadah window (dark and light), Settings tabs
+
+    /// The Worship window screen by screen, each in the dark and the light appearance, and the Settings
+    /// window on the Upgrade and About tabs: `ibadah-<dark|light>-<lang>-<n>-<screen>.png`.
+    @MainActor
+    private static func renderIbadah(_ app: AppViewModel, _ language: Language, _ directory: URL) async throws {
+        let ibadahFile = FileManager.default.temporaryDirectory.appendingPathComponent("waqtu-ibadah-shots-\(UUID().uuidString).json")
+        let model = IbadahModel(viewModel: app, store: IbadahStore(fileURL: ibadahFile), journal: app.muhasabahCloud.store)
+        seedIbadah(model)
+
+        let screens: [(name: String, tool: IbadahModel.Tool, height: CGFloat)] = [
+            ("01-qibla", .qibla, 740),
+            ("02-matsurat", .matsurat, 1500),
+            ("03-dzikir", .dzikir, 2200),
+            ("04-doa", .doa, 740),
+            ("05-tasbih", .tasbih, 960),
+            ("06-muhasabah", .muhasabah, 900),
+        ]
+        for light in [false, true] {
+            for screen in screens {
+                model.selectedTool = screen.tool
+                let image = try await capture(IbadahShot(model: model, height: screen.height), light: light)
+                try write(image, "ibadah-\(light ? "light" : "dark")-\(language.rawValue)-\(screen.name)", in: directory)
+            }
+        }
+
+        // Settings: the tab strip with every tab, every pane once (Upgrade and About are the two that did not respond).
+        let panes = [
+            SettingsView.Pane.general, SettingsView.Pane.prayerTimes, SettingsView.Pane.mutabaah, SettingsView.Pane.pomodoro,
+            SettingsView.Pane.location, SettingsView.Pane.account, SettingsView.Pane.slack, SettingsView.Pane.upgrade,
+            SettingsView.Pane.about,
+        ]
+        for pane in panes {
+            SettingsView.requestedPane = pane
+            let image = try await capture(
+                WindowChrome(title: String(localized: "Settings")) {
+                    SettingsView(settings: app.settings, viewModel: app)
+                })
+            try write(image, "settings-\(pane)-\(language.rawValue)", in: directory)
+        }
+    }
+
+    /// Today's reading half done, a few favourites, a tasbih count and a month of muhasabah.
+    @MainActor
+    private static func seedIbadah(_ model: IbadahModel) {
+        model.dzikirTime = .pagi
+        model.matsuratTime = .pagi
+        // (session, texts finished, one more text started with this many recitations).
+        let progress: [(ReaderSessionID, Int, Int)] = [(.dzikirPagi, 3, 37), (.matsuratSughroPagi, 2, 0)]
+        for (id, finished, started) in progress {
+            guard let session = IbadahLibrary.session(id) else { continue }
+            for index in 0..<finished {
+                for _ in 0..<session.items[index].repeatCount { _ = model.tap(session, index: index) }
+            }
+            if session.items.indices.contains(finished) {
+                for _ in 0..<min(started, session.items[finished].repeatCount - 1) { _ = model.tap(session, index: finished) }
+            }
+        }
+        for category in IbadahLibrary.duas.prefix(2) {
+            if let first = category.duas.first { model.toggleFavourite(first.id) }
+        }
+        model.tasbihChoose(.afterPrayer)
+        for _ in 0..<19 { model.tasbihTap() }
+
+        let today = model.today
+        for back in 0..<14 where back % 3 != 2 {
+            var entry = MuhasabahEntry(date: DayKeys.addDays(today, -back))
+            entry.set(.taqwa, 6 + (back * 3) % 4)
+            entry.set(.gratitude, 7 + (back * 5) % 3)
+            entry.set(.energy, 5 + (back * 2) % 4)
+            entry.set(.willingness, 6 + back % 3)
+            if back == 0 {
+                entry.set(.feelings, "Grateful for a quiet morning.")
+                entry.set(.continueTomorrow, "Dhikr after Fajr.")
+            }
+            model.saveJournal(entry)
+        }
+    }
+
+    /// The Worship window at a fixed size with the traffic lights a real window has over its sidebar.
+    private struct IbadahShot: View {
+        let model: IbadahModel
+        let height: CGFloat
+
+        var body: some View {
+            IbadahWindowView(model: model)
+                .frame(width: 1000, height: height)
+                .overlay(alignment: .topLeading) {
+                    HStack(spacing: 8) {
+                        ForEach(["#FF5F57", "#FEBC2E", "#28C840"], id: \.self) { hex in
+                            Circle().fill(Color(hex: hex)).frame(width: 12, height: 12)
+                        }
+                    }
+                    .padding(.leading, 20)
+                    .padding(.top, 17)
+                }
+        }
     }
 
     private static func caption(_ screen: Int, _ language: Language) -> Caption {
@@ -313,9 +418,9 @@ enum ScreenshotMode {
 
     /// Draws `view` at its fitting size in an offscreen window and returns its pixels.
     @MainActor
-    private static func capture<V: View>(_ view: V) async throws -> CGImage {
+    private static func capture<V: View>(_ view: V, light: Bool = false) async throws -> CGImage {
         let hosting = NSHostingView(rootView: view
-            .environment(\.colorScheme, .dark)
+            .environment(\.colorScheme, light ? .light : .dark)
             .environment(\.controlActiveState, .key))
         let size = hosting.fittingSize
         guard size.width >= 1, size.height >= 1 else { throw ScreenshotError(description: "empty view") }
@@ -326,8 +431,8 @@ enum ScreenshotMode {
             defer: false
         )
         window.isReleasedWhenClosed = false
-        window.appearance = NSAppearance(named: .darkAqua)
-        window.backgroundColor = NSColor(Color.waqtuBackground)
+        window.appearance = NSAppearance(named: light ? .aqua : .darkAqua)
+        window.backgroundColor = light ? NSColor(Color.wqCanvas) : NSColor(Color.waqtuBackground)
         hosting.frame = CGRect(origin: .zero, size: size)
         window.contentView = hosting
         NSApp.activate(ignoringOtherApps: true)

@@ -29,7 +29,7 @@ Lingkaran Halaqah
 Lingkaran kecil dengan nama samaran, terpisah untuk ikhwan dan akhwat. Tulis refleksi atau kirim pesan suara kapan saja kamu sempat. Kamu bisa jeda atau keluar tanpa ada yang diberi tahu. Nama dan emailmu tidak pernah terlihat oleh anggota lain. Lingkaran memerlukan akun dan Premium.
 
 Privasi dan sumber terbuka
-Lokasi hanya dipakai di ponselmu. Tidak ada iklan dan tidak ada pelacak pihak ketiga. Kalau kamu masuk akun untuk sinkron, catatan mutabaahmu disimpan di server kami agar bisa muncul di perangkat lain. Kode sumber Waqtu terbuka: github.com/dzulfikar08/waqtu
+Lokasi hanya dipakai di ponselmu. Tidak ada iklan dan tidak ada pelacak pihak ketiga. Kalau kamu masuk akun untuk sinkron, catatan mutabaahmu disimpan di server kami agar bisa muncul di perangkat lain. Jurnal muhasabahmu tetap di ponsel kecuali kamu menyalakan sinkron cloud di Pengaturan. Kode sumber Waqtu terbuka: github.com/dzulfikar08/waqtu
 
 Langganan diperpanjang otomatis kecuali dibatalkan paling lambat 24 jam sebelum periode berakhir. Pembayaran dibebankan ke akun Apple ID dan bisa dikelola di Pengaturan akun Apple.
 Syarat layanan: https://getwaqtu.com/terms

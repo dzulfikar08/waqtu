@@ -3,8 +3,8 @@
 //  waqtu
 //
 //  Settings → Account: sign in with Apple or Google (plus email for store reviewers), sync status,
-//  sign out and account deletion. The Waqtu account also carries Waqtu Premium: a subscription
-//  bought on any device unlocks this Mac.
+//  the opt-in cloud copy of the muhasabah journal, sign out and account deletion. The Waqtu
+//  account also carries Waqtu Premium: a subscription bought on any device unlocks this Mac.
 //
 
 import SwiftUI
@@ -13,10 +13,13 @@ import AuthenticationServices
 struct AccountSettingsTab: View {
     let account: WaqtuAccount
     let sync: MutabaahSyncController
+    let muhasabah: MuhasabahCloudController
     @Bindable var settings: AppSettings
 
     @State private var appleNonce: String?
     @State private var confirmingDelete = false
+    @State private var confirmingCloudDelete = false
+    @State private var cloudDeleteFailed = false
     @State private var showingReviewerSignIn = false
     @State private var reviewerEmail = ""
     @State private var reviewerPassword = ""
@@ -189,6 +192,48 @@ struct AccountSettingsTab: View {
         }
 
         Section {
+            Toggle("Sync muhasabah to the cloud", isOn: Binding(
+                get: { muhasabah.isEnabled },
+                set: { on in
+                    muhasabah.setEnabled(on)
+                    cloudDeleteFailed = false
+                    if !on { confirmingCloudDelete = true }
+                }
+            ))
+            Text("Off by default: your muhasabah notes stay on this Mac. When you turn this on they are stored on Waqtu's servers, tied to your account, so they sync with your iPhone or Android. Only you can read them.")
+                .font(.caption)
+                .foregroundColor(.waqtuMuted)
+            if muhasabah.isEnabled {
+                Text(muhasabahStatusText)
+                    .font(.system(size: 12))
+                    .foregroundColor(muhasabah.status == .failed ? .red.opacity(0.85) : .waqtuMuted)
+            } else {
+                Button("Delete cloud copy…") {
+                    cloudDeleteFailed = false
+                    confirmingCloudDelete = true
+                }
+            }
+            if cloudDeleteFailed {
+                Text("Could not delete the cloud copy. Check your connection and try again.")
+                    .font(.caption)
+                    .foregroundColor(.red.opacity(0.85))
+            }
+        } header: {
+            Text("Muhasabah")
+        }
+        .confirmationDialog("Delete the muhasabah copy on Waqtu's servers?", isPresented: $confirmingCloudDelete) {
+            Button("Delete cloud copy", role: .destructive) {
+                Task { @MainActor in
+                    let deleted = await muhasabah.deleteCloudCopy()
+                    cloudDeleteFailed = !deleted
+                }
+            }
+            Button("Keep cloud copy", role: .cancel) {}
+        } message: {
+            Text("Your notes on this Mac are not touched. Syncing is off, and your other devices keep their own copy.")
+        }
+
+        Section {
             if account.serverPremium {
                 Label("Waqtu Premium is active on this account.", systemImage: "checkmark.seal.fill")
                     .font(.system(size: 12))
@@ -225,7 +270,7 @@ struct AccountSettingsTab: View {
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("This deletes your account on our server: synced prayer checklist and settings, your Circles profile, posts and voice notes, and premium records linked to it. It cannot be undone. Data on this Mac stays, and so does any App Store subscription; cancel that in the App Store.")
+            Text("This deletes your account on our server: synced prayer checklist and settings, synced muhasabah notes, your Circles profile, posts and voice notes, and premium records linked to it. It cannot be undone. Data on this Mac stays, and so does any App Store subscription; cancel that in the App Store.")
         }
     }
 
@@ -245,5 +290,17 @@ struct AccountSettingsTab: View {
     private var lastSyncText: String {
         guard let at = sync.lastSyncAt else { return String(localized: "Not synced yet") }
         return String(localized: "Synced \(at.formatted(.relative(presentation: .named)))")
+    }
+
+    private var muhasabahStatusText: String {
+        switch muhasabah.status {
+        case .syncing:
+            return String(localized: "Syncing…")
+        case .failed:
+            return String(localized: "Sync failed. Will retry.")
+        case .idle, .ok:
+            guard let at = muhasabah.lastSyncAt else { return String(localized: "Not synced yet") }
+            return String(localized: "Synced \(at.formatted(.relative(presentation: .named)))")
+        }
     }
 }

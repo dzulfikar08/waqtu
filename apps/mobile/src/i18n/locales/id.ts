@@ -141,6 +141,16 @@ export const id = {
     ok: "Tersinkron",
     error: "Belum tersambung. Akan dicoba lagi.",
     premium: "Sinkron antarperangkat · Premium",
+    muhasabah: "Sinkronkan muhasabah ke cloud",
+    muhasabahHint:
+      "Jurnal muhasabah tetap di ponsel ini kecuali kamu mengaktifkannya. Aktifkan agar tersimpan di semua perangkatmu.",
+    muhasabahPremium: "Termasuk jurnal muhasabahmu, jika kamu mau.",
+    muhasabahOffTitle: "Hentikan sinkron muhasabah?",
+    muhasabahOffBody: "Catatan muhasabah tetap ada di ponsel ini. Hapus juga salinannya di cloud?",
+    muhasabahOffDelete: "Hapus salinan cloud",
+    muhasabahOffKeep: "Biarkan",
+    muhasabahDeleteFailed:
+      "Salinan cloud belum terhapus. Periksa koneksi, lalu aktifkan dan matikan lagi sinkron muhasabah untuk mencoba lagi.",
   },
   settings: {
     language: "Bahasa",

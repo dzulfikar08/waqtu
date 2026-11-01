@@ -2,7 +2,7 @@ import type { SQLiteDatabase } from "expo-sqlite";
 
 import { HAFALAN_MARKS_MIGRATION, HAFALAN_MIGRATION } from "@/hafalan/migrations";
 import { HALAQAH_MIGRATION, HALAQAH_VOICE_MIGRATION } from "@/halaqah/migrations";
-import { MUHASABAH_MIGRATION } from "@/ibadah/migrations";
+import { MUHASABAH_CLOUD_MIGRATION, MUHASABAH_MIGRATION } from "@/ibadah/migrations";
 import { RAMADHAN_MIGRATION } from "@/ramadhan/migrations";
 
 export const DATABASE_NAME = "waqtu.db";
@@ -39,8 +39,10 @@ export const MIGRATIONS: readonly (readonly string[])[] = [
   HALAQAH_VOICE_MIGRATION,
   // 7: ayah marks on hafalan recordings, so playback can follow the ayah being recited.
   HAFALAN_MARKS_MIGRATION,
-  // 8: private muhasabah (self-reflection) journal, one row per day; device-local, never synced.
+  // 8: private muhasabah (self-reflection) journal, one row per day.
   MUHASABAH_MIGRATION,
+  // 9: opt-in cloud sync of the journal: dirty flag and deletion tombstones.
+  MUHASABAH_CLOUD_MIGRATION,
 ];
 
 export async function migrate(db: SQLiteDatabase): Promise<void> {

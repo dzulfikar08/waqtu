@@ -36,9 +36,13 @@ enum MutabaahItemLabel {
 struct MutabaahChecklistView: View {
     let sync: MutabaahSyncController
     var onManage: () -> Void = {}
+    /// Shows every practice with no way to fold them (the App Store screenshot of the checklist).
+    var alwaysExpanded = false
 
     @State private var day = Date()
     @State private var showDatePicker = false
+    /// Whether the practices after the five prayers are open; remembered between openings.
+    @AppStorage("menuBarMutabaahExtrasExpanded") private var extrasExpanded = false
 
     private var dayKey: String { FardhMapping.dayKey(for: day) }
     private var isToday: Bool { dayKey == FardhMapping.dayKey(for: Date()) }
@@ -55,8 +59,10 @@ struct MutabaahChecklistView: View {
         let fardhItems = items.filter { $0.kind == .fardh }
         let others = items.filter { $0.kind != .fardh }
         let done = items.filter { MutabaahItems.isDone($0.kind, sync.value(date: dayKey, itemId: $0.id)) }.count
+        let othersDone = others.filter { MutabaahItems.isDone($0.kind, sync.value(date: dayKey, itemId: $0.id)) }.count
+        let showOthers = alwaysExpanded || extrasExpanded
 
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             header(done: done, total: items.count)
 
             if items.isEmpty {
@@ -79,31 +85,63 @@ struct MutabaahChecklistView: View {
                 }
             }
 
-            ForEach(others, id: \.id) { item in
-                if item.kind == .count {
-                    CountRow(
-                        name: MutabaahItemLabel.text(item),
-                        value: sync.value(date: dayKey, itemId: item.id),
-                        set: { sync.setCount($0, itemId: item.id, date: dayKey) }
-                    )
-                } else {
-                    CheckRow(
-                        name: MutabaahItemLabel.text(item),
-                        done: sync.value(date: dayKey, itemId: item.id) > 0,
-                        toggle: { sync.toggleCheck(itemId: item.id, date: dayKey) }
-                    )
+            if showOthers {
+                ForEach(others, id: \.id) { item in
+                    if item.kind == .count {
+                        CountRow(
+                            name: MutabaahItemLabel.text(item),
+                            value: sync.value(date: dayKey, itemId: item.id),
+                            set: { sync.setCount($0, itemId: item.id, date: dayKey) }
+                        )
+                    } else {
+                        CheckRow(
+                            name: MutabaahItemLabel.text(item),
+                            done: sync.value(date: dayKey, itemId: item.id) > 0,
+                            toggle: { sync.toggleCheck(itemId: item.id, date: dayKey) }
+                        )
+                    }
                 }
             }
 
+            footer(othersDone: othersDone, othersTotal: others.count)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+    }
+
+    /// The fold toggle with how many of the other practices are done ("3/8 more"), and "Manage
+    /// checklist" as an icon at the end of the same row.
+    private func footer(othersDone: Int, othersTotal: Int) -> some View {
+        HStack(spacing: 6) {
+            if othersTotal > 0 && !alwaysExpanded {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) { extrasExpanded.toggle() }
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: extrasExpanded ? "chevron.down" : "chevron.right")
+                            .font(.system(size: 9, weight: .semibold))
+                            .frame(width: 10)
+                        Text("\(othersDone)/\(othersTotal) more")
+                            .font(.system(size: 11))
+                            .monospacedDigit()
+                    }
+                    .foregroundColor(.waqtuMuted)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .help(extrasExpanded ? String(localized: "Hide the rest of the checklist")
+                                     : String(localized: "Show the rest of the checklist"))
+            }
+            Spacer()
             Button(action: onManage) {
                 Label("Manage checklist", systemImage: "slider.horizontal.3")
+                    .labelStyle(.iconOnly)
                     .font(.system(size: 11))
                     .foregroundColor(.waqtuPrimary)
             }
             .buttonStyle(.plain)
+            .help(String(localized: "Manage checklist"))
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
     }
 
     private func header(done: Int, total: Int) -> some View {
@@ -168,25 +206,28 @@ private struct FardhChip: View {
 
     var body: some View {
         Button { apply(.done) } label: {
-            VStack(spacing: 3) {
+            VStack(spacing: 2) {
                 Image(systemName: done ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 16))
+                    .font(.system(size: 15))
                     .foregroundColor(done ? (onTime ? .waqtuPrimary : .waqtuGold) : .waqtuMuted)
                 Text(name)
                     .font(.system(size: 9, weight: .medium))
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
                     .foregroundColor(done ? .waqtuText : .waqtuMuted)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 4)
+            .overlay(alignment: .topTrailing) {
                 HStack(spacing: 2) {
                     if jamaah { Image(systemName: "person.3.fill") }
                     if qadha { Image(systemName: "arrow.uturn.backward") }
                 }
                 .font(.system(size: 7))
                 .foregroundColor(.waqtuGold)
-                .frame(height: 8)
+                .padding(.top, 3)
+                .padding(.trailing, 4)
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 5)
             .background(isHovering ? Color.waqtuPrimary.opacity(0.10) : Color.waqtuPrimary.opacity(0.04))
             .cornerRadius(8)
             .contentShape(Rectangle())

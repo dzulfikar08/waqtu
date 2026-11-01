@@ -4,6 +4,7 @@ import { AppState } from "react-native";
 
 import type { AuthClient } from "@/auth/client";
 import { onDataChanged } from "@/db/events";
+import { syncMuhasabah } from "@/ibadah/cloud";
 import { usePremium } from "@/premium/usePremium";
 
 import { syncNow } from "./run";
@@ -14,7 +15,8 @@ const EDIT_DEBOUNCE_MS = 5_000;
 /**
  * Keeps a signed-in premium account in sync (sync is a Waqtu Premium feature): on sign-in or
  * upgrade, every time the app returns to the foreground (throttled in `syncNow`), and shortly
- * after the user edits. Renders nothing.
+ * after the user edits. The muhasabah journal rides along only when the user opted in (`syncMuhasabah`
+ * checks the switch). Renders nothing.
  */
 export function SyncController({ client }: { client: AuthClient }) {
   const db = useSQLiteContext();
@@ -24,14 +26,19 @@ export function SyncController({ client }: { client: AuthClient }) {
 
   useEffect(() => {
     if (!userId || !premium) return;
-    void syncNow(db, client, userId);
+    const sync = (force: boolean) =>
+      void Promise.all([
+        syncNow(db, client, userId, force),
+        syncMuhasabah(db, client, userId, force),
+      ]);
+    sync(false);
     const sub = AppState.addEventListener("change", (state) => {
-      if (state === "active") void syncNow(db, client, userId);
+      if (state === "active") sync(false);
     });
     let timer: ReturnType<typeof setTimeout> | undefined;
     const off = onDataChanged(() => {
       clearTimeout(timer);
-      timer = setTimeout(() => void syncNow(db, client, userId, true), EDIT_DEBOUNCE_MS);
+      timer = setTimeout(() => sync(true), EDIT_DEBOUNCE_MS);
     });
     return () => {
       sub.remove();

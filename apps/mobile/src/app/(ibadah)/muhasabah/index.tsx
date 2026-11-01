@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Card, IconChip, SectionTitle } from "@/components/ui";
 import { onDataChanged } from "@/db/events";
+import { useMuhasabahCloud } from "@/hooks/useMuhasabahCloud";
 import { useMutabaah } from "@/hooks/useMutabaah";
 import { useTranslation } from "@/i18n";
 import { MonthCalendar, TrendChart } from "@/ibadah/components/Muhasabah";
@@ -30,7 +31,7 @@ function monthBounds(year: number, month: number): { from: DayKey; to: DayKey } 
   return { from: `${year}-${mm}-01`, to: `${year}-${mm}-${String(last).padStart(2, "0")}` };
 }
 
-/** Muhasabah: today's reflection, a calendar of past ones and the 30-day trend. Private to this phone. */
+/** Muhasabah: today's reflection, a calendar of past ones and the 30-day trend. Private to this phone unless cloud sync is on. */
 export default function MuhasabahScreen() {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -38,6 +39,7 @@ export default function MuhasabahScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const model = useMutabaah();
+  const cloud = useMuhasabahCloud();
   const today = model?.today;
   const colors = hueColors(theme, "muhasabah");
   const [shown, setShown] = useState<{ year: number; month: number } | null>(null);
@@ -88,6 +90,9 @@ export default function MuhasabahScreen() {
           <IconChip icon="lock-closed" color={colors.base} background={colors.soft} />
           <Text style={[typography.footnote, styles.grow, { color: theme.muted, lineHeight: 18 }]}>
             {t("ibadah.muhasabah.private")}
+            {cloud.enabled
+              ? `\n${cloud.status === "error" ? t("sync.error") : t("ibadah.muhasabah.synced")}`
+              : ""}
           </Text>
         </View>
       </Card>

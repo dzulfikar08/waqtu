@@ -1,6 +1,7 @@
 # Adhkar, Al-Ma'tsurat, doa, tasbih
 
-Bundled in the phone app (apps/mobile/src/ibadah/content.ts, tasbih.ts) for the Ibadah tab. Copied unmodified from the
+Bundled in the phone app (apps/mobile/src/ibadah/content.ts, tasbih.ts) for the Ibadah tab and in both Mac builds
+(apps/apple, Ibadah window; the files are resources of the `waqtu` and `waqtu-mas` targets, read by name). Copied unmodified from the
 Mutabaah app (github.com/dzulfikar08/Mutabaah, same developer), `Mutabaah/Resources/`:
 
 | File                                       | What                                                                                             | Translation |
@@ -16,7 +17,8 @@ and Quran references inside them are shown with each text.
 
 Rules:
 
-- The JSON files are byte-for-byte copies (SHA-256 pinned in apps/mobile/test/ibadah.test.ts) and excluded from oxfmt.
+- The JSON files are byte-for-byte copies (SHA-256 pinned in apps/mobile/test/ibadah.test.ts and, with the same hashes,
+  apps/apple/waqtuTests/IbadahContentTests.swift) and excluded from oxfmt.
   Never reformat or edit the Arabic.
 - A text is shown with the translation its file has. Missing languages are not machine-translated; the app says which
   language the translation is in.
