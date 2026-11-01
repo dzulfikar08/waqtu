@@ -2,6 +2,8 @@
 
 interface ImportMetaEnv {
   readonly PUBLIC_DOWNLOAD_URL?: string;
+  /** "true" turns on the store badges, see src/config.ts. */
+  readonly PUBLIC_STORE_BADGES_LIVE?: string;
 }
 
 interface ImportMeta {

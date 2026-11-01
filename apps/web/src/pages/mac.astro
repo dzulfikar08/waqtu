@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import HeroAppMock from "../components/HeroAppMock.astro";
+import StoreBadges from "../components/StoreBadges.astro";
+import { STORE_BADGES_LIVE } from "../config";
 import { APP_STORE_URL, PLAY_STORE_URL } from "../i18n/landing";
 
 const features = [
@@ -460,6 +462,13 @@ const trust = ["No ads", "No tracking", "Works offline", "macOS 12+", "Free tria
               See Premium
             </a>
           </div>
+          {
+            STORE_BADGES_LIVE && (
+              <div class="mt-6 flex justify-center">
+                <StoreBadges locale="en" location="download_cta" only={["mac_app_store"]} />
+              </div>
+            )
+          }
         </div>
       </section>
 

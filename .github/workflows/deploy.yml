@@ -6,6 +6,7 @@
 #           `bun run deploy:web`.
 #
 # Manual only (Actions tab -> "Deploy" -> Run workflow, or `gh workflow run deploy.yml -f target=both`).
+# Repository variable STORE_BADGES_LIVE=true turns on the store badges of the web build (launch day).
 # Secrets, in the `release` environment: CLOUDFLARE_API_TOKEN (Workers Scripts: Edit, D1: Edit, plus Workers Routes /
 # Custom Domains on the zone) and CLOUDFLARE_ACCOUNT_ID. Worker secrets (BETTER_AUTH_SECRET, ADMIN_USER_IDS, ...) are
 # not touched: they stay on the workers.
@@ -115,7 +116,11 @@ jobs:
         run: bun install --frozen-lockfile
 
       # Same as `bun run deploy:web`: astro build, then wrangler deploy of the generated dist/server/wrangler.json.
+      # STORE_BADGES_LIVE (repository variable, "true" once both stores are published) shows the store badges
+      # on the landing pages. Unset or anything else leaves them off. See apps/web/src/config.ts.
       - name: Build and deploy (waqtu-landing-astro)
+        env:
+          PUBLIC_STORE_BADGES_LIVE: ${{ vars.STORE_BADGES_LIVE }}
         run: bun run deploy:web | tee "$RUNNER_TEMP/deploy.log"
 
       - name: Health check

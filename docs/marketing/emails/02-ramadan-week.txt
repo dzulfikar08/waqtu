@@ -1,0 +1,24 @@
+Subject: Ramadhan tinggal seminggu: ini yang sudah siap
+When: ~1 Feb 2027. Replace the line {{STORE_STATUS}} with ONE of the two variants below, then delete this header and the variants.
+
+Assalamu'alaikum,
+
+Ramadhan 1448H dimulai sekitar 8 Februari 2027. Di Waqtu sudah ada:
+
+- hitung mundur imsak dan iftar, termasuk di layar kunci jika perangkatmu mendukung
+- jadwal imsakiyah sebulan yang bisa dibagikan sebagai gambar
+- rencana khatam dengan target harian yang menyesuaikan kalau kamu tertinggal
+- catatan puasa, tarawih, tadarus, dan i'tikaf, pelacak qadha, dan kalkulator zakat fitrah
+
+Waktu sholat dan mutabaah dasar gratis, tanpa iklan. {{STORE_STATUS}}
+
+Tim Waqtu
+
+--
+Kamu menerima email ini karena mendaftar di daftar tunggu getwaqtu.com. Untuk berhenti dan menghapus emailmu, balas email ini dengan kata "berhenti".
+
+== Variant A: stores live (use only if both stores show the app as published) ==
+Sudah tersedia: iPhone https://apps.apple.com/id/app/id6826628861 dan Android https://play.google.com/store/apps/details?id=dat.waqtu.app
+
+== Variant B: still in review (fill in the real date from the store consoles; if the stores gave none, drop the "perkiraan" clause) ==
+Masih dalam review di App Store dan Google Play; perkiraan tersedia {TANGGAL}. Kami kabari lagi begitu sudah bisa diunduh.

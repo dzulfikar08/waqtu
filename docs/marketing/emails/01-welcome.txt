@@ -1,0 +1,15 @@
+Subject: Kamu masuk daftar tunggu Waqtu
+When: right after sign-up (and once as a batch to everyone already on the list)
+
+Assalamu'alaikum,
+
+Terima kasih sudah mendaftar. Waqtu adalah aplikasi waktu sholat dan mutabaah yaumiyah untuk kamu yang jadwalnya padat. Waktu sholat dihitung di ponselmu, lokasimu tidak dikirim ke server, dan kodenya terbuka di github.com/dzulfikar08/waqtu.
+
+Rencananya aplikasi rilis di iOS dan Android sebelum Ramadhan 1448H. Kami akan kirim satu email lagi menjelang rilis dan satu saat aplikasi sudah bisa diunduh. Selain itu tidak ada email.
+
+Kalau ada fitur yang paling kamu tunggu, balas email ini. Kami baca semuanya.
+
+Tim Waqtu
+
+--
+Kamu menerima email ini karena mendaftar di daftar tunggu getwaqtu.com. Untuk berhenti dan menghapus emailmu, balas email ini dengan kata "berhenti".
