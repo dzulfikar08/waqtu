@@ -89,6 +89,7 @@ enum IbadahDoa {
                     categoryName(category, english: english),
                     dua.transliteration,
                     dua.translation,
+                    english ? "" : (dua.translationId ?? ""),
                     dua.arabic,
                     dua.reference,
                 ].joined(separator: " "))

@@ -15,9 +15,13 @@ import {
   parseDhikr,
   parseDuas,
   parseMatsurat,
+  type ReaderLine,
   type ReaderSession,
   type SessionId,
   type TextLang,
+  pickTranslation,
+  parseIdTranslations,
+  translationNote,
 } from "../src/ibadah/content";
 import {
   categoryName,
@@ -77,7 +81,8 @@ const json = (file: string): unknown => JSON.parse(raw(file).toString("utf8"));
 
 /**
  * SHA-256 of the files as copied from the Mutabaah app's Resources (tasbih.json: its TasbihPreset list). A formatter or
- * a hand edit that touches a byte of the Arabic fails here.
+ * a hand edit that touches a byte of the Arabic fails here. translations-id.json is not a copy: the Indonesian text
+ * taken verbatim from IslamHouse/QuranEnc (see content/adhkar/README.md), pinned so it is never reworded either.
  */
 const PINNED: Record<string, string> = {
   "duas.json": "44b92d396af50d6b4e2a113fa1c6385be8b12af407d0081e7df2ba2e56bbbb6a",
@@ -88,6 +93,7 @@ const PINNED: Record<string, string> = {
   "sugro-pagi.json": "5d66b65d960eb6b03d1f97acb88093cf7cc2b9ba3854b66284a0f3d8225f91a8",
   "sugro-petang.json": "2ffe51790503148d5e668d076c68465b5d6549f591ef5172e2c95297c370a1ff",
   "tasbih.json": "5675a8ddd44a083281841c1f36b1de2d5fcc46a4a4fa075aa7c53486f915144e",
+  "translations-id.json": "59f92e2706b7f7a3ba959ceebf6af4bb894db30def99add029be934071ad1048",
 };
 
 describe("bundled adhkar content", () => {
@@ -493,5 +499,117 @@ describe("compass", () => {
     expect(unwrapAngle(359, 1)).toBe(361);
     expect(unwrapAngle(361, 358)).toBe(358);
     expect(unwrapAngle(720, 10)).toBe(730);
+  });
+});
+
+describe("Indonesian translations of the dhikr and duas", () => {
+  const file = json("translations-id.json") as {
+    source: { pdfVersion: string };
+    quranSource: { key: string; version: string };
+    items: Record<string, { text: string; source: string; page?: number }>;
+  };
+  const base = new Map<string, string>();
+  for (const name of ["morning_dhikr.json", "evening_dhikr.json"]) {
+    const items = (json(name) as { items: { id: string; translation: string }[] }).items;
+    for (const item of items) base.set(item.id, item.translation);
+  }
+  for (const category of (json("duas.json") as { categories: { duas: { id: string }[] }[] })
+    .categories) {
+    for (const dua of category.duas) base.set(dua.id, "");
+  }
+
+  test("records its sources and versions", () => {
+    expect(file.source.pdfVersion).toBe("id24v5.0 - 04/10/2026");
+    expect(file.quranSource).toMatchObject({ key: "indonesian_affairs", version: "1.0.1" });
+  });
+
+  test("every key is an item of the base files, with text, a known source and a page for the book", () => {
+    const keys = Object.keys(file.items);
+    expect(keys.length).toBe(37);
+    for (const key of keys) {
+      expect(base.has(key)).toBe(true);
+      const entry = file.items[key];
+      expect(entry.text.trim()).toBe(entry.text);
+      expect(entry.text).not.toBe("");
+      expect(entry.text).not.toMatch(/\s{2,}/);
+      if (entry.source === "islamhouse-2846946") {
+        expect(Number.isInteger(entry.page)).toBe(true);
+      } else {
+        expect(entry.source).toBe("quranenc-indonesian_affairs");
+      }
+    }
+  });
+
+  test("items whose Arabic differs from the book stay untranslated", () => {
+    for (const key of [
+      "morning-013",
+      "evening-013",
+      "dua-after-eating",
+      "dua-leaving-home",
+      "dua-evil-eye",
+      "dua-new-blessing",
+    ]) {
+      expect(file.items[key]).toBeUndefined();
+    }
+  });
+
+  test("the loaders attach the translation by id and leave the stored English as is", () => {
+    const map = parseIdTranslations(file);
+    expect(map.size).toBe(37);
+    const morning = loadSession("dzikir-pagi");
+    const item = morning.items.find((it) => it.key === "morning-004");
+    expect(item?.lines[0].translationId).toBe(file.items["morning-004"].text);
+    expect(item?.lines[0].translation).toBe(base.get("morning-004"));
+    expect(
+      morning.items.find((it) => it.key === "morning-013")?.lines[0].translationId,
+    ).toBeUndefined();
+    expect(findDua("dua-gratitude")?.dua.translationId).toBe(
+      "Segala puji bagi Allah, Tuhan seluruh alam,",
+    );
+    expect(findDua("dua-after-eating")?.dua.translationId).toBeUndefined();
+    expect(loadSession("matsurat-kubro-pagi").items[0].lines[0].translationId).toBeUndefined();
+  });
+
+  test("Indonesian shows in an Indonesian app, English otherwise", () => {
+    expect(pickTranslation("Praise", "en", "Puji", "id")).toEqual({ text: "Puji", lang: "id" });
+    expect(pickTranslation("Praise", "en", undefined, "id")).toEqual({
+      text: "Praise",
+      lang: "en",
+    });
+    expect(pickTranslation("Praise", "en", "Puji", "en")).toEqual({ text: "Praise", lang: "en" });
+  });
+
+  test("the translation notice names the language, or says some are missing", () => {
+    const line = (translationId?: string): ReaderLine => ({
+      label: null,
+      arabic: "ب",
+      latin: null,
+      translation: "t",
+      translationId,
+    });
+    const session = (...lines: ReaderLine[]): ReaderSession => ({
+      id: "dzikir-pagi",
+      sourceTitle: "t",
+      translationLang: "en",
+      items: lines.map((l, i) => ({
+        key: String(i),
+        title: null,
+        heading: null,
+        lines: [l],
+        repeat: 1,
+        reference: null,
+      })),
+    });
+    expect(translationNote(session(line("a"), line("b")), "id")).toBeNull();
+    expect(translationNote(session(line(), line()), "id")).toBe("en");
+    expect(translationNote(session(line("a"), line()), "id")).toBe("mixed");
+    expect(translationNote(session(line("a"), line()), "en")).toBeNull();
+    expect(translationNote(loadSession("matsurat-kubro-pagi"), "en")).toBe("id");
+    expect(translationNote(loadSession("matsurat-kubro-pagi"), "id")).toBeNull();
+  });
+
+  test("malformed sidecars are rejected", () => {
+    expect(() => parseIdTranslations({})).toThrow(ContentError);
+    expect(() => parseIdTranslations({ ...file, items: { a: { text: " " } } })).toThrow(/text/);
   });
 });
