@@ -1,0 +1,209 @@
+{
+  "source": {
+    "title": "Ḥiṣnul Muslim Kumpulan Zikir dari Al-Qur`an dan Sunnah",
+    "author": "Dr. Sa'īd bin Ali bin Wahf Al-Qaḥṭāniy",
+    "publisher": "Message of The Two Holy Mosques (Risala)",
+    "site": "IslamHouse.com",
+    "bookId": "2846946",
+    "url": "https://islamhouse.com/id/books/2846946/",
+    "pdf": "https://d1.islamhouse.com/data/id/ih_books/single/risala_id_hisnulmuslim.pdf",
+    "pdfVersion": "id24v5.0 - 04/10/2026",
+    "policyUrl": "https://github.com/IslamHouse-API/multilingual-quran-hadith-islamic-content-database-api-hub"
+  },
+  "quranSource": {
+    "title": "Indonesian Translation - Ministry of Religious Affairs",
+    "publisher": "Indonesian Ministry of Religious Affairs, under the supervision of Rowwad Translation Center",
+    "site": "QuranEnc.com",
+    "key": "indonesian_affairs",
+    "version": "1.0.1",
+    "url": "https://quranenc.com/en/browse/indonesian_affairs",
+    "api": "https://quranenc.com/api/v1/translation/aya/indonesian_affairs/1/2",
+    "termsUrl": "https://quranenc.com/en/home/about"
+  },
+  "items": {
+    "morning-001": {
+      "text": "Kami memasuki waktu pagi dan seluruh kerajaan milik Allah, segala puji milik Allah. Tidak ada tuhan yang berhak disembah kecuali Allah Yang Maha Esa, tidak ada sekutu bagi-Nya. Hanya milik-Nya seluruh kerajaan dan hanya milik-Nya seluruh pujian, dan Dia Maha Kuasa atas segala sesuatu.",
+      "source": "islamhouse-2846946",
+      "page": 62
+    },
+    "morning-002": {
+      "text": "Ya Allah, dengan pertolongan dan rahmat-Mu kami memasuki pagi hari, dengan pertolongan dan rahmat-Mu kami memasuki sore hari, dengan pertolongan dan rahmat-Mu kami hidup, dengan pertolongan dan rahmat-Mu kami mati, dan hanya kepada-Mu kebangkitan semua makhluk.",
+      "source": "islamhouse-2846946",
+      "page": 64
+    },
+    "morning-003": {
+      "text": "Kami memasuki pagi hari di atas fitrah Islam, di atas kalimat tauhid, agama nabi kami Muhammad ﷺ , dan di atas agama bapak kami Ibrahim yang lurus dan seorang muslim, dan dia tidaklah termasuk orang-orang musyrik.",
+      "source": "islamhouse-2846946",
+      "page": 75
+    },
+    "morning-004": {
+      "text": "Maha Suci Allah, aku memuji-Nya.",
+      "source": "islamhouse-2846946",
+      "page": 76
+    },
+    "morning-005": {
+      "text": "Tidak ada tuhan (yang berhak disembah) selain Allah, tiada sekutu bagi-Nya. Hanya kepunyaan-Nya seluruh kerajaan dan hanya milik-Nya semua pujian. Dia Maha Kuasa atas segala sesuatu.",
+      "source": "islamhouse-2846946",
+      "page": 76
+    },
+    "morning-006": {
+      "text": "Maha Suci Allah dan segala puji bagi-Nya, sejumlah makhluk-Nya, sebesar keridaan diri-Nya, seberat 'Arasy-Nya dan sebanyak tinta tulisan kalimat-kalimat-Nya.",
+      "source": "islamhouse-2846946",
+      "page": 78
+    },
+    "morning-007": {
+      "text": "Ya Allah, aku memohon kepada-Mu ilmu yang bermanfaat, rezeki yang baik, dan amalan yang diterima.",
+      "source": "islamhouse-2846946",
+      "page": 78
+    },
+    "morning-008": {
+      "text": "Aku memohon ampunan kepada Allah dan bertobat kepada-Nya.",
+      "source": "islamhouse-2846946",
+      "page": 78
+    },
+    "morning-009": {
+      "text": "Saya berlindung dengan kalimat Allah yang sempurna dari kejahatan makhluk-Nya.",
+      "source": "islamhouse-2846946",
+      "page": 79
+    },
+    "morning-010": {
+      "text": "Dengan nama Allah yang tidak akan berbahaya sesuatu apa pun di bumi dan di langit bersama nama-Nya, dan Dia Maha Mendengar lagi Maha Mengetahui.",
+      "source": "islamhouse-2846946",
+      "page": 72
+    },
+    "morning-011": {
+      "text": "Aku rida Allah sebagai Tuhanku, Islam sebagai agamaku, dan Muhammad ﷺ sebagai Nabiku.",
+      "source": "islamhouse-2846946",
+      "page": 72
+    },
+    "morning-012": {
+      "text": "Wahai Tuhan Yang Maha Hidup, wahai Tuhan yang terus-menerus mengurus (makhluk-Nya), dengan rahmat-Mu aku memohon pertolongan, perbaikilah semua urusanku dan jangan Engkau serahkan aku kepada diriku sendiri walau sekejap mata.",
+      "source": "islamhouse-2846946",
+      "page": 73
+    },
+    "morning-014": {
+      "text": "Ya Allah, berikanlah aku keselamatan pada badanku. Ya Allah, berikanlah aku keselamatan pada pendengaranku. Ya Allah, berikanlah aku keselamatan pada penglihatanku. Tidak ada tuhan (yang berhak disembah) selain Engkau.",
+      "source": "islamhouse-2846946",
+      "page": 69
+    },
+    "morning-015": {
+      "text": "Cukuplah Allah sebagai penolongku, tidak ada Tuhan yang berhak disembah kecuali Dia. Hanya kepada-Nya aku berserah diri dan Dia adalah Tuhan Arasy yang agung.",
+      "source": "islamhouse-2846946",
+      "page": 70
+    },
+    "evening-001": {
+      "text": "Kami memasuki waktu sore dan seluruh kerajaan milik Allah, segala puji milik Allah. Tidak ada tuhan (yang berhak disembah) kecuali Allah Yang Maha Esa, tidak ada sekutu bagi-Nya. Hanya milik-Nya seluruh kerajaan dan hanya milik-Nya seluruh pujian, dan Dia Maha Kuasa atas segala sesuatu.",
+      "source": "islamhouse-2846946",
+      "page": 63
+    },
+    "evening-002": {
+      "text": "Ya Allah, dengan pertolongan dan rahmat-Mu kami memasuki sore hari, dengan pertolongan dan rahmat-Mu kami memasuki pagi hari, dengan pertolongan dan rahmat-Mu kami hidup, dengan pertolongan dan rahmat-Mu kami mati, dan hanya kepada-Mu semua makhluk kembali.",
+      "source": "islamhouse-2846946",
+      "page": 65
+    },
+    "evening-003": {
+      "text": "\"Kami memasuki sore hari di atas fitrah Islam, di atas kalimat tauhid, agama nabi kami Muhammad ﷺ , dan di atas agama bapak kami Ibrahim yang lurus dan seorang muslim, dan dia tidaklah termasuk orang-orang musyrik.\"",
+      "source": "islamhouse-2846946",
+      "page": 76
+    },
+    "evening-004": {
+      "text": "Maha Suci Allah, aku memuji-Nya.",
+      "source": "islamhouse-2846946",
+      "page": 76
+    },
+    "evening-005": {
+      "text": "Tidak ada tuhan (yang berhak disembah) selain Allah, tiada sekutu bagi-Nya. Hanya kepunyaan-Nya seluruh kerajaan dan hanya milik-Nya semua pujian. Dia Maha Kuasa atas segala sesuatu.",
+      "source": "islamhouse-2846946",
+      "page": 76
+    },
+    "evening-006": {
+      "text": "Maha Suci Allah dan segala puji bagi-Nya, sejumlah makhluk-Nya, sebesar keridaan diri-Nya, seberat 'Arasy-Nya dan sebanyak tinta tulisan kalimat-kalimat-Nya.",
+      "source": "islamhouse-2846946",
+      "page": 78
+    },
+    "evening-007": {
+      "text": "Ya Allah, aku memohon kepada-Mu ilmu yang bermanfaat, rezeki yang baik, dan amalan yang diterima.",
+      "source": "islamhouse-2846946",
+      "page": 78
+    },
+    "evening-008": {
+      "text": "Aku memohon ampunan kepada Allah dan bertobat kepada-Nya.",
+      "source": "islamhouse-2846946",
+      "page": 78
+    },
+    "evening-009": {
+      "text": "Saya berlindung dengan kalimat Allah yang sempurna dari kejahatan makhluk-Nya.",
+      "source": "islamhouse-2846946",
+      "page": 79
+    },
+    "evening-010": {
+      "text": "Dengan nama Allah yang tidak akan berbahaya sesuatu apa pun di bumi dan di langit bersama nama-Nya, dan Dia Maha Mendengar lagi Maha Mengetahui.",
+      "source": "islamhouse-2846946",
+      "page": 72
+    },
+    "evening-011": {
+      "text": "Aku rida Allah sebagai Tuhanku, Islam sebagai agamaku, dan Muhammad ﷺ sebagai Nabiku.",
+      "source": "islamhouse-2846946",
+      "page": 72
+    },
+    "evening-012": {
+      "text": "Wahai Tuhan Yang Maha Hidup, wahai Tuhan yang terus-menerus mengurus (makhluk-Nya), dengan rahmat-Mu aku memohon pertolongan, perbaikilah semua urusanku dan jangan Engkau serahkan aku kepada diriku sendiri walau sekejap mata.",
+      "source": "islamhouse-2846946",
+      "page": 73
+    },
+    "evening-014": {
+      "text": "Ya Allah, berikanlah aku keselamatan pada badanku. Ya Allah, berikanlah aku keselamatan pada pendengaranku. Ya Allah, berikanlah aku keselamatan pada penglihatanku. Tidak ada tuhan (yang berhak disembah) selain Engkau.",
+      "source": "islamhouse-2846946",
+      "page": 69
+    },
+    "evening-015": {
+      "text": "Cukuplah Allah sebagai penolongku, tidak ada Tuhan yang berhak disembah kecuali Dia. Hanya kepada-Nya aku berserah diri dan Dia adalah Tuhan Arasy yang agung.",
+      "source": "islamhouse-2846946",
+      "page": 70
+    },
+    "dua-before-eating": {
+      "text": "\"Dengan nama Allah.\"",
+      "source": "islamhouse-2846946",
+      "page": 125
+    },
+    "dua-entering-home": {
+      "text": "Dengan nama Allah kami masuk, dan dengan nama Allah kami keluar. Hanya kepada Allah, Tuhan kami, kami bertawakal.",
+      "source": "islamhouse-2846946",
+      "page": 18
+    },
+    "dua-entering-masjid": {
+      "text": "Ya Allah, bukakanlah untukku pintu-pintu rahmat-Mu.",
+      "source": "islamhouse-2846946",
+      "page": 21
+    },
+    "dua-gratitude": {
+      "text": "Segala puji bagi Allah, Tuhan seluruh alam,",
+      "source": "quranenc-indonesian_affairs"
+    },
+    "dua-istighfar": {
+      "text": "Aku memohon ampunan kepada Allah dan bertobat kepada-Nya.",
+      "source": "islamhouse-2846946",
+      "page": 78
+    },
+    "dua-leaving-masjid": {
+      "text": "Ya Allah, aku memohon karunia-Mu.",
+      "source": "islamhouse-2846946",
+      "page": 22
+    },
+    "dua-protection": {
+      "text": "Saya berlindung dengan kalimat Allah yang sempurna dari kejahatan makhluk-Nya.",
+      "source": "islamhouse-2846946",
+      "page": 79
+    },
+    "dua-sayyidul-istighfar": {
+      "text": "Ya Allah, Engkau adalah Tuhanku, tidak ada tuhan yang hak kecuali Engkau. Engkau menciptakanku, aku adalah hamba-Mu. Aku yakin terhadap janji-Mu dan aku akan setia pada perjanjianku dengan-Mu semaksimal mungkin. Aku berlindung kepada-Mu dari keburukan perbuatanku. Aku mengakui nikmat-Mu atas diriku dan aku mengakui dosaku, maka ampunilah aku karena sesungguhnya tiada yang mengampuni dosa selain Engkau.",
+      "source": "islamhouse-2846946",
+      "page": 65
+    },
+    "dua-travel": {
+      "text": "{Maha Suci (Allah) yang telah menundukkan semua ini bagi kami, padahal kami sebelumnya tidak mampu menguasainya. Sesungguhnya kami akan kembali kepada Tuhan kami}",
+      "source": "islamhouse-2846946",
+      "page": 138
+    }
+  }
+}

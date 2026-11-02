@@ -13,11 +13,13 @@ import Testing
 
 private let adhkarFiles = [
     "duas.json", "evening_dhikr.json", "kubro-pagi.json", "kubro-petang.json",
-    "morning_dhikr.json", "sugro-pagi.json", "sugro-petang.json", "tasbih.json",
+    "morning_dhikr.json", "sugro-pagi.json", "sugro-petang.json", "tasbih.json", "translations-id.json",
 ]
 
 /// SHA-256 of the files as copied from the Mutabaah app's Resources (tasbih.json: its TasbihPreset list).
-/// A formatter or a hand edit that touches a byte of the Arabic fails here.
+/// A formatter or a hand edit that touches a byte of the Arabic fails here. translations-id.json is not a copy:
+/// the Indonesian text taken verbatim from IslamHouse/QuranEnc (content/adhkar/README.md), pinned so it is never
+/// reworded either.
 private let pinned: [String: String] = [
     "duas.json": "44b92d396af50d6b4e2a113fa1c6385be8b12af407d0081e7df2ba2e56bbbb6a",
     "evening_dhikr.json": "1b8c8b0ed77c167d32881bf85ad48591c005758990ce85b609dc51b07cf1db4d",
@@ -27,6 +29,7 @@ private let pinned: [String: String] = [
     "sugro-pagi.json": "5d66b65d960eb6b03d1f97acb88093cf7cc2b9ba3854b66284a0f3d8225f91a8",
     "sugro-petang.json": "2ffe51790503148d5e668d076c68465b5d6549f591ef5172e2c95297c370a1ff",
     "tasbih.json": "5675a8ddd44a083281841c1f36b1de2d5fcc46a4a4fa075aa7c53486f915144e",
+    "translations-id.json": "59f92e2706b7f7a3ba959ceebf6af4bb894db30def99add029be934071ad1048",
 ]
 
 private func adhkar(_ file: String) throws -> Data {
@@ -223,5 +226,92 @@ struct IbadahDuaContentTests {
         #expect(phrases.map(\.id) == ["subhanallah", "alhamdulillah", "allahu-akbar", "tahlil", "istighfar", "salawat"])
         #expect(phrases.map(\.recommendedCount) == [33, 33, 34, 100, 100, 100])
         #expect(phrases[0].arabic == "سُبْحَانَ اللَّهِ")
+    }
+}
+
+struct IbadahIndonesianTranslationTests {
+    private static let untranslated: Set<String> = [
+        "morning-013", "evening-013", "dua-after-eating", "dua-leaving-home", "dua-evil-eye", "dua-new-blessing",
+    ]
+
+    /// Every id of the sidecar is an item of the base files, and the ones whose Arabic differs from the book are absent.
+    @Test func everyKeyIsAnItemOfTheBaseFiles() throws {
+        var baseIds = Set<String>()
+        for file in ["morning_dhikr.json", "evening_dhikr.json"] {
+            for item in try #require(try jsonObject(file)["items"] as? [[String: Any]]) {
+                baseIds.insert(try #require(item["id"] as? String))
+            }
+        }
+        for category in try #require(try jsonObject("duas.json")["categories"] as? [[String: Any]]) {
+            for dua in try #require(category["duas"] as? [[String: Any]]) {
+                baseIds.insert(try #require(dua["id"] as? String))
+            }
+        }
+        let file = try jsonObject("translations-id.json")
+        let items = try #require(file["items"] as? [String: [String: Any]])
+        #expect(items.count == 37)
+        for (key, entry) in items {
+            #expect(baseIds.contains(key), "\(key)")
+            let text = try #require(entry["text"] as? String)
+            #expect(text == text.trimmingCharacters(in: .whitespacesAndNewlines) && !text.isEmpty, "\(key)")
+        }
+        #expect(Set(items.keys).isDisjoint(with: Self.untranslated))
+        #expect(baseIds.subtracting(items.keys) == Self.untranslated)
+        let quran = try #require(file["quranSource"] as? [String: Any])
+        #expect(quran["key"] as? String == "indonesian_affairs")
+        #expect(quran["version"] as? String == "1.0.1")
+    }
+
+    @Test func theLoadersAttachTheTextByIdAndLeaveTheStoredEnglishAlone() throws {
+        let map = try IbadahContent.parseIdTranslations(try adhkar("translations-id.json"))
+        #expect(map.count == 37)
+        let morning = try IbadahContent.parseDhikr(
+            try adhkar("morning_dhikr.json"), id: .dzikirPagi, idTranslations: map)
+        let four = try #require(morning.items.first { $0.key == "morning-004" })
+        #expect(four.lines[0].translationId == map["morning-004"])
+        #expect(four.lines[0].translation == "Glory be to Allah and praise Him")
+        #expect(morning.items.first { $0.key == "morning-013" }?.lines[0].translationId == nil)
+        let categories = try IbadahContent.parseDuas(try adhkar("duas.json"), idTranslations: map)
+        let gratitude = try #require(IbadahContent.findDua("dua-gratitude", in: categories))
+        #expect(gratitude.dua.translationId == "Segala puji bagi Allah, Tuhan seluruh alam,")
+        #expect(try #require(IbadahContent.findDua("dua-after-eating", in: categories)).dua.translationId == nil)
+        let matsurat = try IbadahContent.parseSession(
+            try adhkar("kubro-pagi.json"), id: .matsuratKubroPagi, idTranslations: map)
+        #expect(matsurat.items[0].lines[0].translationId == nil)
+    }
+
+    @Test func indonesianShowsInAnIndonesianUIAndEnglishOtherwise() {
+        let id = IbadahContent.pickTranslation(stored: "Praise", storedLang: .en, indonesian: "Puji", english: false)
+        #expect(id.text == "Puji" && id.lang == .id)
+        let missing = IbadahContent.pickTranslation(stored: "Praise", storedLang: .en, indonesian: nil, english: false)
+        #expect(missing.text == "Praise" && missing.lang == .en)
+        let en = IbadahContent.pickTranslation(stored: "Praise", storedLang: .en, indonesian: "Puji", english: true)
+        #expect(en.text == "Praise" && en.lang == .en)
+    }
+
+    @Test func theNoticeNamesTheLanguageOrSaysSomeAreMissing() throws {
+        func session(_ ids: [String?]) -> ReaderSession {
+            ReaderSession(
+                id: .dzikirPagi, sourceTitle: "t", translationLang: .en,
+                items: ids.enumerated().map { index, translationId in
+                    ReaderItem(
+                        key: String(index), title: nil, heading: nil,
+                        lines: [ReaderLine(
+                            label: nil, arabic: "ب", latin: nil, translation: "t", translationId: translationId)],
+                        repeatCount: 1, reference: nil)
+                })
+        }
+        #expect(IbadahContent.translationNote(session(["a", "b"]), english: false) == nil)
+        #expect(IbadahContent.translationNote(session([nil, nil]), english: false) == .en)
+        #expect(IbadahContent.translationNote(session(["a", nil]), english: false) == .mixed)
+        #expect(IbadahContent.translationNote(session(["a", nil]), english: true) == nil)
+        let matsurat = try IbadahContent.parseSession(try adhkar("kubro-pagi.json"), id: .matsuratKubroPagi)
+        #expect(IbadahContent.translationNote(matsurat, english: true) == .id)
+        #expect(IbadahContent.translationNote(matsurat, english: false) == nil)
+    }
+
+    @Test func malformedSidecarsAreRejected() {
+        #expect(throws: IbadahContentError.self) { try IbadahContent.parseIdTranslations(Data("not json".utf8)) }
+        #expect(throws: IbadahContentError.self) { try IbadahContent.parseIdTranslations(Data("{}".utf8)) }
     }
 }
