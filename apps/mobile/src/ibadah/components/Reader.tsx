@@ -16,7 +16,15 @@ import { useTranslation } from "@/i18n";
 import { Button } from "@/ramadhan/components/fields";
 import { hueColors, radius, spacing, tabular, typography, useTheme, type Hue } from "@/theme";
 
-import type { ReaderItem, ReaderSession, ReaderTime } from "../content";
+import {
+  pickTranslation,
+  translationNote,
+  type ReaderItem,
+  type ReaderLine,
+  type ReaderSession,
+  type ReaderTime,
+  type TextLang,
+} from "../content";
 import {
   isItemDone,
   mutabaahItemFor,
@@ -141,14 +149,16 @@ export function Reader({
     ]);
 
   const uiLang = i18n.language === "en" ? "en" : "id";
-  const translationNote =
-    session.translationLang !== uiLang
-      ? t(
-          session.translationLang === "en"
+  const note = translationNote(session, uiLang);
+  const noteText = note
+    ? t(
+        note === "mixed"
+          ? "ibadah.reader.translationMixed"
+          : note === "en"
             ? "ibadah.reader.translationEn"
             : "ibadah.reader.translationId",
-        )
-      : null;
+      )
+    : null;
 
   return (
     <ScrollView
@@ -201,8 +211,8 @@ export function Reader({
               onPress={() => view && saveView({ ...view, translation: !view.translation })}
             />
           </View>
-          {translationNote ? (
-            <Text style={[typography.footnote, { color: theme.muted }]}>{translationNote}</Text>
+          {noteText ? (
+            <Text style={[typography.footnote, { color: theme.muted }]}>{noteText}</Text>
           ) : null}
         </Card>
       ) : null}
@@ -225,6 +235,7 @@ export function Reader({
                 hue={hue}
                 showLatin={view?.latin ?? true}
                 showTranslation={view?.translation ?? true}
+                translationLang={session.translationLang}
                 onTap={() => onTap(index)}
                 onReset={() => onReset(index)}
               />
@@ -244,6 +255,7 @@ function ItemCard({
   hue,
   showLatin,
   showTranslation,
+  translationLang,
   onTap,
   onReset,
 }: {
@@ -253,10 +265,14 @@ function ItemCard({
   hue: Hue;
   showLatin: boolean;
   showTranslation: boolean;
+  translationLang: TextLang;
   onTap: () => void;
   onReset: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const uiLang = i18n.language === "en" ? "en" : "id";
+  const shownText = (line: ReaderLine) =>
+    pickTranslation(line.translation, translationLang, line.translationId, uiLang).text;
   const theme = useTheme();
   const colors = hueColors(theme, hue);
   const done = left === 0;
@@ -297,9 +313,9 @@ function ItemCard({
               {line.latin}
             </Text>
           ) : null}
-          {showTranslation && line.translation ? (
+          {showTranslation && shownText(line) ? (
             <Text style={[typography.subhead, styles.translation, { color: theme.muted }]}>
-              {line.translation}
+              {shownText(line)}
             </Text>
           ) : null}
         </View>

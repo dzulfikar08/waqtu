@@ -14,6 +14,8 @@ export interface ReaderLine {
   arabic: string;
   latin: string | null;
   translation: string | null;
+  /** Human Indonesian translation of a dhikr (translations-id.json); absent when there is none. */
+  translationId?: string;
 }
 
 /** One counted step of a session: a single text, or a passage of ayat recited together (`heading` names it). */
@@ -45,6 +47,8 @@ export interface Dua {
   arabic: string;
   transliteration: string;
   translation: string;
+  /** Human Indonesian translation (translations-id.json); absent when there is none. */
+  translationId?: string;
   reference: string;
   notes: string | null;
 }
@@ -147,7 +151,11 @@ export function parseMatsurat(raw: unknown, id: SessionId): ReaderSession {
 }
 
 /** A morning or evening dhikr file: `items` with their own id, order, repetitions and hadith reference. */
-export function parseDhikr(raw: unknown, id: SessionId): ReaderSession {
+export function parseDhikr(
+  raw: unknown,
+  id: SessionId,
+  translationsId: ReadonlyMap<string, string> = new Map(),
+): ReaderSession {
   const file = record(raw, id);
   const seen = new Set<string>();
   const items = list(file.items, `${id}.items`)
@@ -171,6 +179,7 @@ export function parseDhikr(raw: unknown, id: SessionId): ReaderSession {
             arabic: text(item.arabic, `${where}.arabic`),
             latin: optionalText(item.transliteration, `${where}.transliteration`),
             translation: optionalText(item.translation, `${where}.translation`),
+            ...(translationsId.get(key) ? { translationId: translationsId.get(key) } : {}),
           },
         ],
         repeat: repeat(item.repetitions, `${where}.repetitions`),
@@ -184,7 +193,10 @@ export function parseDhikr(raw: unknown, id: SessionId): ReaderSession {
 }
 
 /** duas.json: categories of duas, each with an id unique across the file. */
-export function parseDuas(raw: unknown): DuaCategory[] {
+export function parseDuas(
+  raw: unknown,
+  translationsId: ReadonlyMap<string, string> = new Map(),
+): DuaCategory[] {
   const file = record(raw, "duas");
   const seen = new Set<string>();
   return list(file.categories, "duas.categories").map((entry, c) => {
@@ -205,6 +217,7 @@ export function parseDuas(raw: unknown): DuaCategory[] {
           arabic: text(dua.arabic, `${at}.arabic`),
           transliteration: text(dua.transliteration, `${at}.transliteration`),
           translation: text(dua.translation, `${at}.translation`),
+          ...(translationsId.get(id) ? { translationId: translationsId.get(id) } : {}),
           reference: text(dua.reference, `${at}.reference`),
           notes: optionalText(dua.notes, `${at}.notes`),
         };
@@ -215,6 +228,74 @@ export function parseDuas(raw: unknown): DuaCategory[] {
 
 /** Translations of the duas are in English. */
 export const DUA_TRANSLATION_LANG: TextLang = "en";
+
+/**
+ * The human Indonesian translations of the dhikr and duas (translations-id.json, from IslamHouse's Ḥiṣnul Muslim and
+ * QuranEnc), by item id. Items without an exact Indonesian counterpart are absent, never filled in.
+ */
+export function parseIdTranslations(raw: unknown): ReadonlyMap<string, string> {
+  const file = record(raw, "translations-id");
+  for (const key of ["source", "quranSource"] as const) {
+    const source = record(file[key], `translations-id.${key}`);
+    text(source.title, `translations-id.${key}.title`);
+    text(source.url, `translations-id.${key}.url`);
+  }
+  const items = record(file.items, "translations-id.items");
+  const map = new Map<string, string>();
+  for (const [key, entry] of Object.entries(items)) {
+    map.set(
+      key,
+      text(record(entry, `translations-id.items.${key}`).text, `translations-id.items.${key}.text`),
+    );
+  }
+  return map;
+}
+
+let idTranslations: ReadonlyMap<string, string> | undefined;
+
+export function loadIdTranslations(): ReadonlyMap<string, string> {
+  idTranslations ??= parseIdTranslations(
+    require("../../../../content/adhkar/translations-id.json"),
+  );
+  return idTranslations;
+}
+
+/** A translation and the language it is in, as the reader shows it for the app language `ui`. */
+export function pickTranslation(
+  stored: string | null,
+  storedLang: TextLang,
+  indonesian: string | undefined,
+  ui: TextLang,
+): { text: string | null; lang: TextLang } {
+  if (ui === "id" && indonesian) return { text: indonesian, lang: "id" };
+  return { text: stored, lang: storedLang };
+}
+
+/**
+ * What the translation notice of a session should say for the app language: the language the shown translations are
+ * in when none match `ui`, "mixed" when only some do, null when all do (or there is nothing to show and the
+ * stored language is the app's).
+ */
+export function translationNote(session: ReaderSession, ui: TextLang): TextLang | "mixed" | null {
+  const langs = new Set<TextLang>();
+  for (const item of session.items) {
+    for (const line of item.lines) {
+      const shown = pickTranslation(
+        line.translation,
+        session.translationLang,
+        line.translationId,
+        ui,
+      );
+      if (shown.text) langs.add(shown.lang);
+    }
+  }
+  if (langs.size === 0) return session.translationLang !== ui ? session.translationLang : null;
+  if (langs.size === 1) {
+    const [only] = langs;
+    return only === ui ? null : only;
+  }
+  return "mixed";
+}
 
 const SOURCES: Record<SessionId, () => ReaderSession> = {
   "matsurat-kubro-pagi": () =>
@@ -229,9 +310,17 @@ const SOURCES: Record<SessionId, () => ReaderSession> = {
       "matsurat-sughro-petang",
     ),
   "dzikir-pagi": () =>
-    parseDhikr(require("../../../../content/adhkar/morning_dhikr.json"), "dzikir-pagi"),
+    parseDhikr(
+      require("../../../../content/adhkar/morning_dhikr.json"),
+      "dzikir-pagi",
+      loadIdTranslations(),
+    ),
   "dzikir-petang": () =>
-    parseDhikr(require("../../../../content/adhkar/evening_dhikr.json"), "dzikir-petang"),
+    parseDhikr(
+      require("../../../../content/adhkar/evening_dhikr.json"),
+      "dzikir-petang",
+      loadIdTranslations(),
+    ),
 };
 
 export const SESSION_IDS = Object.keys(SOURCES) as SessionId[];
@@ -259,7 +348,7 @@ export function dzikirSession(time: ReaderTime): SessionId {
 let duas: DuaCategory[] | undefined;
 
 export function loadDuas(): readonly DuaCategory[] {
-  duas ??= parseDuas(require("../../../../content/adhkar/duas.json"));
+  duas ??= parseDuas(require("../../../../content/adhkar/duas.json"), loadIdTranslations());
   return duas;
 }
 

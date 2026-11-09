@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Card } from "@/components/ui";
 import { useTranslation } from "@/i18n";
 import { ArabicText } from "@/ibadah/components/ArabicText";
-import { DUA_TRANSLATION_LANG, findDua } from "@/ibadah/content";
+import { DUA_TRANSLATION_LANG, findDua, pickTranslation } from "@/ibadah/content";
 import { categoryName, duaTitle } from "@/ibadah/labels";
 import { useFavourites } from "@/ibadah/useFavourites";
 import { Button } from "@/ramadhan/components/fields";
@@ -31,6 +31,12 @@ export default function DoaScreen() {
   const { dua, category } = found;
   const title = duaTitle(dua, i18n.language);
   const starred = favourites?.has(dua.id) ?? false;
+  const shown = pickTranslation(
+    dua.translation,
+    DUA_TRANSLATION_LANG,
+    dua.translationId,
+    i18n.language === "en" ? "en" : "id",
+  );
   return (
     <ScrollView
       style={{ backgroundColor: theme.background }}
@@ -58,8 +64,8 @@ export default function DoaScreen() {
         <Text style={[typography.overline, styles.label, { color: theme.muted }]}>
           {t("ibadah.doa.translation")}
         </Text>
-        <Text style={[typography.body, styles.body, { color: theme.text }]}>{dua.translation}</Text>
-        {DUA_TRANSLATION_LANG !== i18n.language ? (
+        <Text style={[typography.body, styles.body, { color: theme.text }]}>{shown.text}</Text>
+        {shown.lang !== i18n.language ? (
           <Text style={[typography.caption, { color: theme.faint }]}>
             {t("ibadah.doa.translationEn")}
           </Text>

@@ -65,6 +65,7 @@ export function searchDuas(
             categoryName(category, language),
             dua.transliteration,
             dua.translation,
+            language === "id" ? (dua.translationId ?? "") : "",
             dua.arabic,
             dua.reference,
           ].join(" "),

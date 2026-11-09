@@ -3,7 +3,8 @@
 //  waqtu
 //
 //  Adhkar, Al-Ma'tsurat, doa and tasbih phrases shipped in the app (content/adhkar, copied
-//  unmodified from the Mutabaah app and bundled as-is). Mac counterpart of
+//  unmodified from the Mutabaah app and bundled as-is; translations-id.json is the Indonesian
+//  text taken verbatim from IslamHouse/QuranEnc). Mac counterpart of
 //  apps/mobile/src/ibadah/content.ts and tasbih.ts: the parsers check the shape and keep every
 //  Arabic string exactly as stored; nothing here translates. A text carries the language its
 //  translation is in. Pure; no UI.
@@ -73,6 +74,8 @@ struct ReaderLine: Equatable {
     let arabic: String
     let latin: String?
     let translation: String?
+    /// Human Indonesian translation of a dhikr (translations-id.json); nil when there is none.
+    var translationId: String? = nil
 }
 
 struct ReaderHeading: Equatable {
@@ -110,6 +113,8 @@ struct Dua: Equatable, Identifiable {
     let translation: String
     let reference: String
     let notes: String?
+    /// Human Indonesian translation (translations-id.json); nil when there is none.
+    var translationId: String? = nil
 }
 
 struct DuaCategory: Equatable, Identifiable {
@@ -194,6 +199,25 @@ enum IbadahContent {
         return n
     }
 
+    // MARK: - Indonesian translations
+
+    /// translations-id.json: the human Indonesian text of the dhikr and duas (IslamHouse's Ḥiṣnul Muslim, and
+    /// QuranEnc for Quran 1:2), by item id. Items without an exact Indonesian counterpart are absent.
+    static func parseIdTranslations(_ data: Data) throws -> [String: String] {
+        let file = try root(data, "translations-id")
+        for key in ["source", "quranSource"] {
+            let source = try record(file[key], "translations-id.\(key)")
+            _ = try text(source["title"], "translations-id.\(key).title")
+            _ = try text(source["url"], "translations-id.\(key).url")
+        }
+        var map: [String: String] = [:]
+        for (key, value) in try record(file["items"], "translations-id.items") {
+            let at = "translations-id.items.\(key)"
+            map[key] = try text(try record(value, at)["text"], "\(at).text")
+        }
+        return map
+    }
+
     // MARK: - Al-Ma'tsurat
 
     /// An Al-Ma'tsurat file: `data` of `single` texts and `parent` passages whose ayat sit in their own `data`.
@@ -249,7 +273,9 @@ enum IbadahContent {
     // MARK: - Morning and evening dhikr
 
     /// A morning or evening dhikr file: `items` with their own id, order, repetitions and hadith reference.
-    static func parseDhikr(_ data: Data, id: ReaderSessionID) throws -> ReaderSession {
+    static func parseDhikr(
+        _ data: Data, id: ReaderSessionID, idTranslations: [String: String] = [:]
+    ) throws -> ReaderSession {
         let name = id.rawValue
         let file = try root(data, name)
         var seen = Set<String>()
@@ -273,7 +299,8 @@ enum IbadahContent {
                     label: nil,
                     arabic: try text(item["arabic"], "\(at).arabic"),
                     latin: try optionalText(item["transliteration"], "\(at).transliteration"),
-                    translation: try optionalText(item["translation"], "\(at).translation"))],
+                    translation: try optionalText(item["translation"], "\(at).translation"),
+                    translationId: idTranslations[key])],
                 repeatCount: try repeatCount(item["repetitions"], "\(at).repetitions"),
                 reference: try optionalText(item["reference"], "\(at).reference"))))
         }
@@ -285,15 +312,17 @@ enum IbadahContent {
     }
 
     /// The session of `id` from its file's bytes.
-    static func parseSession(_ data: Data, id: ReaderSessionID) throws -> ReaderSession {
+    static func parseSession(
+        _ data: Data, id: ReaderSessionID, idTranslations: [String: String] = [:]
+    ) throws -> ReaderSession {
         if id.isMatsurat { return try parseMatsurat(data, id: id) }
-        return try parseDhikr(data, id: id)
+        return try parseDhikr(data, id: id, idTranslations: idTranslations)
     }
 
     // MARK: - Doa
 
     /// duas.json: categories of duas, each with an id unique across the file.
-    static func parseDuas(_ data: Data) throws -> [DuaCategory] {
+    static func parseDuas(_ data: Data, idTranslations: [String: String] = [:]) throws -> [DuaCategory] {
         let file = try root(data, "duas")
         var seen = Set<String>()
         var categories: [DuaCategory] = []
@@ -313,7 +342,8 @@ enum IbadahContent {
                     transliteration: try text(dua["transliteration"], "\(duaAt).transliteration"),
                     translation: try text(dua["translation"], "\(duaAt).translation"),
                     reference: try text(dua["reference"], "\(duaAt).reference"),
-                    notes: try optionalText(dua["notes"], "\(duaAt).notes")))
+                    notes: try optionalText(dua["notes"], "\(duaAt).notes"),
+                    translationId: idTranslations[id]))
             }
             categories.append(DuaCategory(
                 id: try text(category["id"], "\(at).id"),
@@ -351,5 +381,41 @@ enum IbadahContent {
             if let dua = category.duas.first(where: { $0.id == id }) { return (dua, category) }
         }
         return nil
+    }
+
+    // MARK: - Which translation to show
+
+    /// What a session's translation notice says: the language of the shown translations when none is the UI's,
+    /// or that only some are.
+    enum TranslationNote: Equatable {
+        case en, id, mixed
+    }
+
+    /// A translation and the language it is in, as shown in an English (`english`) or Indonesian UI: the human
+    /// Indonesian text where one is bundled, else the stored one.
+    static func pickTranslation(
+        stored: String?, storedLang: IbadahTextLang, indonesian: String?, english: Bool
+    ) -> (text: String?, lang: IbadahTextLang) {
+        if !english, let indonesian { return (indonesian, .id) }
+        return (stored, storedLang)
+    }
+
+    /// The notice for a session in the UI language, nil when everything shown is in it.
+    static func translationNote(_ session: ReaderSession, english: Bool) -> TranslationNote? {
+        var langs = Set<IbadahTextLang>()
+        for item in session.items {
+            for line in item.lines {
+                let shown = pickTranslation(
+                    stored: line.translation, storedLang: session.translationLang,
+                    indonesian: line.translationId, english: english)
+                if shown.text != nil { langs.insert(shown.lang) }
+            }
+        }
+        let ui: IbadahTextLang = english ? .en : .id
+        // Nothing to show: the notice follows the session's stored language, as before.
+        let shownLangs: Set<IbadahTextLang> = langs.isEmpty ? [session.translationLang] : langs
+        if shownLangs.count > 1 { return .mixed }
+        guard let only = shownLangs.first, only != ui else { return nil }
+        return only == .en ? TranslationNote.en : TranslationNote.id
     }
 }

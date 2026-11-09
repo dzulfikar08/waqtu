@@ -94,6 +94,7 @@ private struct ReaderPane: View {
                                 label: IbadahReader.label(for: item, in: session),
                                 left: IbadahReader.remaining(counts, item),
                                 view: model.readerView,
+                                translationLang: session.translationLang,
                                 onTap: {
                                     if model.tap(session, index: index) {
                                         scrollToNext(session, from: index, proxy: scroll)
@@ -102,6 +103,7 @@ private struct ReaderPane: View {
                                 onReset: { model.reset(session, index: index) })
                                 .id(item.key)
                         }
+                        credit(session)
                         if progress.complete {
                             CompleteCard(model: model, time: time.wrappedValue)
                         }
@@ -200,9 +202,24 @@ private struct ReaderPane: View {
     }
 
     private func translationNote(_ session: ReaderSession) -> String? {
-        let english = ModuleLocale.english
-        if (session.translationLang == .en) == english { return nil }
-        return session.translationLang == .en ? istr("ibadah.reader.translationEn") : istr("ibadah.reader.translationId")
+        switch IbadahContent.translationNote(session, english: ModuleLocale.english) {
+        case .en: return istr("ibadah.reader.translationEn")
+        case .id: return istr("ibadah.reader.translationId")
+        case .mixed: return istr("ibadah.reader.translationMixed")
+        case nil: return nil
+        }
+    }
+
+    /// IslamHouse's and QuranEnc's terms ask that the translation's source is named; shown whenever the
+    /// Indonesian text is.
+    @ViewBuilder
+    private func credit(_ session: ReaderSession) -> some View {
+        if !ModuleLocale.english, session.items.contains(where: { $0.lines.contains { $0.translationId != nil } }) {
+            Text(istr("ibadah.credit"))
+                .font(.system(size: 11.5))
+                .foregroundStyle(Color.wqInkMuted)
+                .textSelection(.enabled)
+        }
     }
 
     /// After the last recitation of a text: a beat to see it done, then the next open one comes up.
@@ -231,6 +248,7 @@ private struct ItemCard: View {
     let label: ReaderItemLabel?
     let left: Int
     let view: ReaderView
+    let translationLang: IbadahTextLang
     let onTap: () -> Void
     let onReset: () -> Void
 
@@ -272,7 +290,10 @@ private struct ItemCard: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .textSelection(.enabled)
                     }
-                    if view.translation, let translation = line.translation {
+                    if view.translation,
+                       let translation = IbadahContent.pickTranslation(
+                           stored: line.translation, storedLang: translationLang,
+                           indonesian: line.translationId, english: ModuleLocale.english).text {
                         Text(translation)
                             .font(.system(size: 14.5))
                             .foregroundStyle(Color.wqInk.opacity(0.82))

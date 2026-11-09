@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Indonesian dzikir and doa (DEV-18)
+
+- **Human Indonesian translations** — In the Indonesian app the Worship window's morning/evening dzikir and doa show a human Indonesian translation where one exists: 37 of the 43 texts, taken word for word from IslamHouse's "Ḥiṣnul Muslim Kumpulan Zikir dari Al-Qur`an dan Sunnah" (Risala, id24v5.0 - 04/10/2026), plus Al-Fatihah 2 from QuranEnc's Indonesian Ministry of Religious Affairs translation (v1.0.1). They live in `content/adhkar/translations-id.json` (a resource of both Mac targets, SHA-256 pinned like the other files); the Arabic files are untouched. Texts whose Arabic is worded differently from the book (morning/evening 13, after eating, leaving home, evil eye, upon receiving a blessing) keep the English translation and its notice ("Sebagian terjemahan ... bahasa Inggris" when a session mixes both). The English app is unchanged.
+- **Credit** — The source is named under the Indonesian text in the readers and on each dua, as IslamHouse's and QuranEnc's terms require.
+
 ### Mac App Store
 
 - **Free trial through the App Store** — The Mac App Store build no longer has its own 7-day trial kept in the Keychain (App Review Guidelines 3.1.1/3.1.2). Waqtu opens with Waqtu Premium: an App Store subscription (both `dat.waqtu.mac.premium.monthly` and `.yearly` carry a one-week free trial as their introductory offer) or premium on the signed-in Waqtu account. Without it the menu bar and Settings show the subscribe screen instead of trial banners, the "trial ending" sheet or "trial ended" copy. The direct-download build keeps its local 7-day trial unchanged.

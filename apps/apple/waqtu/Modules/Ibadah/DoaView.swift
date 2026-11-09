@@ -205,6 +205,9 @@ private struct DuaDetailView: View {
 
     var body: some View {
         let starred = model.favourites.contains(dua.id)
+        let shown = IbadahContent.pickTranslation(
+            stored: dua.translation, storedLang: IbadahContent.duaTranslationLang,
+            indonesian: dua.translationId, english: english)
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 HStack(alignment: .top, spacing: 12) {
@@ -234,12 +237,18 @@ private struct DuaDetailView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     section(istr("ibadah.doa.transliteration"), dua.transliteration, color: .wqAccent, weight: .medium)
                     VStack(alignment: .leading, spacing: 4) {
-                        section(istr("ibadah.doa.translation"), dua.translation, color: Color.wqInk.opacity(0.85))
-                        // The translations in duas.json are in English; say so in the Indonesian UI.
-                        if !english {
+                        section(istr("ibadah.doa.translation"), shown.text ?? dua.translation, color: Color.wqInk.opacity(0.85))
+                        // Without an Indonesian text the stored English one shows; say so in the Indonesian UI.
+                        if shown.lang != (english ? IbadahTextLang.en : IbadahTextLang.id) {
                             Text(istr("ibadah.doa.translationEn"))
                                 .font(.system(size: 11.5))
                                 .foregroundStyle(Color.wqInkMuted)
+                        }
+                        if shown.lang == .id {
+                            Text(istr("ibadah.credit"))
+                                .font(.system(size: 11.5))
+                                .foregroundStyle(Color.wqInkMuted)
+                                .textSelection(.enabled)
                         }
                     }
                     if let notes = dua.notes {

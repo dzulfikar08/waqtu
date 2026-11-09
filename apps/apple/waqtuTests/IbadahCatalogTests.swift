@@ -275,6 +275,7 @@ struct IbadahCatalogTests {
         "ibadah.reader.times %lld": "reader.times",
         "ibadah.reader.translationEn": "reader.translationEn",
         "ibadah.reader.translationId": "reader.translationId",
+        "ibadah.reader.translationMixed": "reader.translationMixed",
         "ibadah.tasbih.cancel": "tasbih.cancel",
         "ibadah.tasbih.confirmReset": "tasbih.confirmReset",
         "ibadah.tasbih.counterLabel %lld": "tasbih.counterLabel",

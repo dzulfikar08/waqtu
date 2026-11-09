@@ -1,6 +1,23 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "ibadah.credit" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indonesian translation: 'Ḥiṣnul Muslim Kumpulan Zikir dari Al-Qur`an dan Sunnah' by Dr. Sa'īd bin Ali bin Wahf Al-Qaḥṭāniy, published by Risala (Message of The Two Holy Mosques), from IslamHouse.com (PDF id24v5.0 - 04/10/2026), used under the IslamHouse content policy with the wording unchanged (footnote numbers left out). Only texts whose Arabic matches the book exactly carry its translation. Quran 1:2: Indonesian Translation - Ministry of Religious Affairs, from QuranEnc.com (indonesian_affairs, version 1.0.1), developed under the supervision of Rowwad Translation Center, used unchanged."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terjemahan Indonesia: 'Ḥiṣnul Muslim Kumpulan Zikir dari Al-Qur`an dan Sunnah' karya Dr. Sa'īd bin Ali bin Wahf Al-Qaḥṭāniy, penerbit Risala (Message of The Two Holy Mosques), dari IslamHouse.com (PDF id24v5.0 - 04/10/2026), dipakai sesuai kebijakan konten IslamHouse dengan kata-kata tidak diubah (nomor catatan kaki dihilangkan). Hanya bacaan yang teks Arabnya persis sama dengan buku itu yang diberi terjemahannya. Al-Fatihah ayat 2: Terjemahan Indonesia - Kementerian Agama RI, dari QuranEnc.com (indonesian_affairs, versi 1.0.1), disusun di bawah pengawasan Rowwad Translation Center, dipakai tanpa perubahan."
+          }
+        }
+      }
+    },
     "ibadah.doa.all" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2088,6 +2105,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Terjemahan bacaan ini baru tersedia dalam bahasa Indonesia."
+          }
+        }
+      }
+    },
+    "ibadah.reader.translationMixed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some of these translations are only available in English so far."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sebagian terjemahan bacaan ini baru tersedia dalam bahasa Inggris."
           }
         }
       }
