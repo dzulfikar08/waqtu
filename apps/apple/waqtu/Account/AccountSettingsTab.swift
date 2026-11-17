@@ -51,7 +51,7 @@ struct AccountSettingsTab: View {
 
     private var signInSection: some View {
         Section {
-            Text("Sign in to sync your prayer checklist and prayer settings with Waqtu on your iPhone or Android, and to use the Waqtu Premium you subscribed to there. Your location is never uploaded.")
+            Text("Sign in to sync your prayer checklist and prayer settings with Waqtu on your iPhone, and to use the Waqtu Premium you subscribed to there. Your location is never uploaded.")
                 .font(.caption)
                 .foregroundColor(.waqtuMuted)
             // Native Sign in with Apple needs the entitlement, which Apple grants to Mac App Store
@@ -200,7 +200,7 @@ struct AccountSettingsTab: View {
                     if !on { confirmingCloudDelete = true }
                 }
             ))
-            Text("Off by default: your muhasabah notes stay on this Mac. When you turn this on they are stored on Waqtu's servers, tied to your account, so they sync with your iPhone or Android. Only you can read them.")
+            Text("Off by default: your muhasabah notes stay on this Mac. When you turn this on they are stored on Waqtu's servers, tied to your account, so they sync with your iPhone. Only you can read them.")
                 .font(.caption)
                 .foregroundColor(.waqtuMuted)
             if muhasabah.isEnabled {
@@ -239,7 +239,7 @@ struct AccountSettingsTab: View {
                     .font(.system(size: 12))
                     .foregroundColor(.waqtuPrimary)
             } else {
-                Text("No Waqtu Premium on this account yet. A subscription bought in Waqtu on your iPhone or Android unlocks this Mac too.")
+                Text("No Waqtu Premium on this account yet. A subscription bought in Waqtu on your iPhone unlocks this Mac too.")
                     .font(.caption)
                     .foregroundColor(.waqtuMuted)
                 Button("Check again") {

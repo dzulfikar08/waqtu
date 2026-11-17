@@ -992,7 +992,7 @@ struct PremiumOfferView: View {
                         .foregroundColor(.waqtuMuted)
                 }
                 #endif
-                Text("Waqtu Premium is one subscription for your Mac, iPhone and Android, kept by your Waqtu account. It includes sync across your devices and Circles.")
+                Text("Waqtu Premium is one subscription for your Mac and iPhone, kept by your Waqtu account. It includes sync across your devices and Circles.")
                     .font(.system(size: 13))
                     .foregroundColor(.waqtuText)
                     .fixedSize(horizontal: false, vertical: true)
@@ -1074,7 +1074,7 @@ struct PremiumOfferView: View {
         .task { await store.loadProducts() }
 
         if !viewModel.account.isSignedIn {
-            Text("Sign in under Account before subscribing so Premium also unlocks Waqtu on your iPhone or Android.")
+            Text("Sign in under Account before subscribing so Premium also unlocks Waqtu on your iPhone.")
                 .font(.system(size: 12))
                 .foregroundColor(.waqtuMuted)
                 .fixedSize(horizontal: false, vertical: true)

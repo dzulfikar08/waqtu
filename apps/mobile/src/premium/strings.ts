@@ -5,7 +5,7 @@ export const premiumId = {
   settingsActive: "Aktif · kelola langganan",
   title: "Waqtu Premium",
   intro:
-    "Waqtu Premium adalah satu langganan untuk semua perangkat: iPhone, Android, dan Mac. Fitur inti tetap gratis, selamanya. Premium membuka fitur tambahan dan membantu Waqtu terus dikembangkan.",
+    "Waqtu Premium adalah satu langganan untuk semua perangkatmu, termasuk aplikasi Waqtu untuk Mac. Fitur inti tetap gratis, selamanya. Premium membuka fitur tambahan dan membantu Waqtu terus dikembangkan.",
   unlocksTitle: "Yang dibuka Premium",
   unlocks: {
     sync: "Sinkron di semua perangkat lewat akun Waqtu, termasuk aplikasi Mac",
@@ -40,6 +40,7 @@ export const premiumId = {
   sourceApple: "Dibeli lewat App Store",
   sourceGoogle: "Dibeli lewat Google Play",
   sourcePolar: "Dibeli lewat getwaqtu.com",
+  sourceOther: "Dibeli di perangkat lain",
   thanks: "Terima kasih. Premium aktif.",
   pending: "Pembayaran masih menunggu. Premium aktif otomatis setelah pembayaran selesai.",
   restored: "Pembelian dipulihkan. Premium aktif.",
@@ -60,7 +61,7 @@ export const premiumEn: typeof premiumId = {
   settingsActive: "Active · manage subscription",
   title: "Waqtu Premium",
   intro:
-    "Waqtu Premium is one subscription for all your devices: iPhone, Android and Mac. The core stays free, forever. Premium unlocks extra features and helps keep Waqtu going.",
+    "Waqtu Premium is one subscription for all your devices, including the Waqtu Mac app. The core stays free, forever. Premium unlocks extra features and helps keep Waqtu going.",
   unlocksTitle: "What Premium unlocks",
   unlocks: {
     sync: "Sync across all your devices through your Waqtu account, including the Mac app",
@@ -96,6 +97,7 @@ export const premiumEn: typeof premiumId = {
   sourceApple: "Bought through the App Store",
   sourceGoogle: "Bought through Google Play",
   sourcePolar: "Bought on getwaqtu.com",
+  sourceOther: "Bought on another device",
   thanks: "Thank you. Premium is active.",
   pending: "Payment is still pending. Premium turns on automatically once it completes.",
   restored: "Purchases restored. Premium is active.",

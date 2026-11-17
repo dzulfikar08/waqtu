@@ -338,8 +338,8 @@ enum ScreenshotMode {
         case (3, .id): return Caption(title: "Jadwal imsakiyah Ramadan di kotamu", subtitle: "Imsak, berbuka, dan semua waktu sholat sebulan penuh")
         case (4, .en): return Caption(title: "Calculated the way your mosque does", subtitle: "Kemenag RI, Muslim World League, Umm al-Qura and more")
         case (4, .id): return Caption(title: "Sesuai metode perhitungan masjidmu", subtitle: "Kemenag RI, Muslim World League, Umm al-Qura, dan lainnya")
-        case (_, .en): return Caption(title: "One subscription for Mac, iPhone and Android", subtitle: "Waqtu Premium, with sync across your devices")
-        case (_, .id): return Caption(title: "Satu langganan untuk Mac, iPhone, dan Android", subtitle: "Waqtu Premium, tersinkron di semua perangkatmu")
+        case (_, .en): return Caption(title: "One subscription for Mac and iPhone", subtitle: "Waqtu Premium, with sync across your devices")
+        case (_, .id): return Caption(title: "Satu langganan untuk Mac dan iPhone", subtitle: "Waqtu Premium, tersinkron di semua perangkatmu")
         }
     }
 

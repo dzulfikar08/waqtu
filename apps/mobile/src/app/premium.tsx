@@ -160,7 +160,8 @@ export default function PremiumScreen() {
       case "apple":
         return t("premium.sourceApple");
       case "google":
-        return t("premium.sourceGoogle");
+        // iOS builds never name the other platform (App Review 2.3.10).
+        return t(Platform.OS === "ios" ? "premium.sourceOther" : "premium.sourceGoogle");
       case "polar":
         return t("premium.sourcePolar");
       default:
