@@ -10,7 +10,7 @@
     "platforms": ["ios", "android"],
     "ios": {
       "bundleIdentifier": "dat.waqtu.ios",
-      "buildNumber": "7",
+      "buildNumber": "8",
       "supportsTablet": false,
       "config": {
         "usesNonExemptEncryption": false

@@ -182,7 +182,7 @@ export const en: Widen<typeof id> = {
     deleteAccount: "Delete account",
     deleteTitle: "Delete your account?",
     deleteBody:
-      "This deletes your account on our server: synced mutabaah and settings, your Circles profile, posts and voice notes, and premium records linked to it. It cannot be undone. Data on this phone stays, and so does any subscription you pay through the App Store or Google Play; cancel that in the store.",
+      "This deletes your account on our server: synced mutabaah and settings, your Circles profile, posts and voice notes, and premium records linked to it. It cannot be undone. Data on this phone stays, and so does any subscription you pay through your app store; cancel that in the store.",
     deleteConfirm: "Delete account",
     deleteCancel: "Cancel",
     deleteFailed: "Could not delete the account. Check your connection and try again.",

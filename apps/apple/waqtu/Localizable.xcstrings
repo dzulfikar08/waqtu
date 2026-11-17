@@ -2185,12 +2185,12 @@
         }
       }
     },
-    "No Waqtu Premium on this account yet. A subscription bought in Waqtu on your iPhone or Android unlocks this Mac too." : {
+    "No Waqtu Premium on this account yet. A subscription bought in Waqtu on your iPhone unlocks this Mac too." : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Akun ini belum memiliki Waqtu Premium. Langganan yang dibeli di Waqtu untuk iPhone atau Android juga membuka Mac ini."
+            "value" : "Akun ini belum memiliki Waqtu Premium. Langganan yang dibeli di Waqtu untuk iPhone juga membuka Mac ini."
           }
         }
       }
@@ -2258,12 +2258,12 @@
     "OK" : {
       "shouldTranslate" : false
     },
-    "Off by default: your muhasabah notes stay on this Mac. When you turn this on they are stored on Waqtu's servers, tied to your account, so they sync with your iPhone or Android. Only you can read them." : {
+    "Off by default: your muhasabah notes stay on this Mac. When you turn this on they are stored on Waqtu's servers, tied to your account, so they sync with your iPhone. Only you can read them." : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mati secara bawaan: catatan muhasabahmu tetap di Mac ini. Kalau kamu menyalakannya, catatan disimpan di server Waqtu, terikat ke akunmu, sehingga ikut sinkron ke iPhone atau Android. Hanya kamu yang bisa membacanya."
+            "value" : "Mati secara bawaan: catatan muhasabahmu tetap di Mac ini. Kalau kamu menyalakannya, catatan disimpan di server Waqtu, terikat ke akunmu, sehingga ikut sinkron ke iPhone. Hanya kamu yang bisa membacanya."
           }
         }
       }
@@ -2907,32 +2907,32 @@
         }
       }
     },
-    "Sign in to sync your prayer checklist and prayer settings with Waqtu on your iPhone or Android, and to use the Waqtu Premium you subscribed to there. Your location is never uploaded." : {
+    "Sign in to sync your prayer checklist and prayer settings with Waqtu on your iPhone, and to use the Waqtu Premium you subscribed to there. Your location is never uploaded." : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Masuk untuk menyinkronkan mutabaah dan pengaturan sholat dengan Waqtu di iPhone atau Android, dan untuk memakai Waqtu Premium yang kamu langgani di sana. Lokasimu tidak pernah diunggah."
+            "value" : "Masuk untuk menyinkronkan mutabaah dan pengaturan sholat dengan Waqtu di iPhone, dan untuk memakai Waqtu Premium yang kamu langgani di sana. Lokasimu tidak pernah diunggah."
           }
         }
       }
     },
-    "Sign in to sync your prayer checklist and prayer settings with Waqtu on your iPhone or Android. Your location is never uploaded." : {
+    "Sign in to sync your prayer checklist and prayer settings with Waqtu on your iPhone. Your location is never uploaded." : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Masuk untuk menyinkronkan mutabaah dan pengaturan sholat dengan Waqtu di iPhone atau Android. Lokasimu tidak pernah diunggah."
+            "value" : "Masuk untuk menyinkronkan mutabaah dan pengaturan sholat dengan Waqtu di iPhone. Lokasimu tidak pernah diunggah."
           }
         }
       }
     },
-    "Sign in under Account before subscribing so Premium also unlocks Waqtu on your iPhone or Android." : {
+    "Sign in under Account before subscribing so Premium also unlocks Waqtu on your iPhone." : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Masuk di Akun sebelum berlangganan agar Premium juga membuka Waqtu di iPhone atau Android-mu."
+            "value" : "Masuk di Akun sebelum berlangganan agar Premium juga membuka Waqtu di iPhone-mu."
           }
         }
       }
@@ -3549,12 +3549,12 @@
         }
       }
     },
-    "Waqtu Premium is one subscription for your Mac, iPhone and Android, kept by your Waqtu account. It includes sync across your devices and Circles." : {
+    "Waqtu Premium is one subscription for your Mac and iPhone, kept by your Waqtu account. It includes sync across your devices and Circles." : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Waqtu Premium adalah satu langganan untuk Mac, iPhone, dan Android, tersimpan di akun Waqtu-mu. Termasuk sinkron antarperangkat dan Lingkaran."
+            "value" : "Waqtu Premium adalah satu langganan untuk Mac dan iPhone, tersimpan di akun Waqtu-mu. Termasuk sinkron antarperangkat dan Lingkaran."
           }
         }
       }
